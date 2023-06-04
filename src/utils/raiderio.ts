@@ -1,0 +1,26 @@
+interface MythicPlusScores {
+    all: number
+    dps: number
+    haler: number
+    tank: number
+}
+
+interface MythicPlusScoresBySeason {
+    season: string
+    scores: MythicPlusScores
+}
+
+interface MythicPlusRun {
+    short_name: string
+    mythic_level: number
+    score: number
+}
+
+export interface RaiderioProfile {
+    name: string
+    race: string
+    class: string
+    active_spec_name: string
+    mythic_plus_scores_by_season: MythicPlusScoresBySeason[]
+    mythic_plus_best_runs: MythicPlusRun[]
+}
