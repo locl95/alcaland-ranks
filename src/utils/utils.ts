@@ -83,7 +83,12 @@ export const characters: Character[] = [
     name: "jing",
     realm: "zuljin",
     region: "eu"
-  }
+  },
+  /* {
+    name: "chaunxa",
+    realm: "sanguino",
+    region: "eu"
+  } */
 ]
 
 export interface Class {

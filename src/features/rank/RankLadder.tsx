@@ -6,6 +6,7 @@ import { ColumnsType } from "antd/es/table"
 interface RankLadderProps {
   gamerRank: GamerRank[]
   caption: string
+  loading: boolean
 }
 export const RankLadder = (props: RankLadderProps) => {
   const columns: ColumnsType<GamerRank> = [
@@ -17,7 +18,15 @@ export const RankLadder = (props: RankLadderProps) => {
 
   return (
     <div>
-      <Table columns={columns} dataSource={props.gamerRank} pagination={false} showHeader={true} bordered={true} caption={<div className={"font-face-lc"}><h1>{props.caption}</h1></div>}/>
+      <Table
+          columns={columns}
+          dataSource={props.gamerRank}
+          pagination={false}
+          showHeader={true}
+          bordered={true}
+          caption={<div className={"font-face-lc"}><h1>{props.caption}</h1></div>}
+          loading={props.loading}
+      />
     </div>
   )
 }
