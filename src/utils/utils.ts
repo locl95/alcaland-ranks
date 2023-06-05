@@ -85,3 +85,48 @@ export const characters: Character[] = [
     region: "eu"
   }
 ]
+
+export interface Class {
+  class: string
+  specs: number[]
+}
+
+export const classes: Class[] = [
+  {
+    class: "Priest",
+    specs: [256, 257, 258]
+  },
+  {
+    class: "Paladin",
+    specs: [65, 66, 70]
+  },
+  {
+    class: "Rogue",
+    specs: [259, 260, 261]
+  },
+  {
+    class: "Druid",
+    specs: [102, 103, 104,105]
+  },
+  {
+    class: "Monk",
+    specs: [268, 269, 270]
+  },
+  {
+    class: "Evoker",
+    specs: [1467, 1468, 1473]
+  },
+]
+
+export const specs: Map<number, string> = new Map([
+  [269, "Wind Walker"],
+  [70, "Retribution"],
+  [261, "Subtlety"],
+  [105, "Restoration"],
+  [1467, "Devastation"],
+  [260, "Outlaw"],
+  [66, "Protection"],
+  [102, "Balance"],
+  [257, "Holy Priest"],
+  [104, "Guardian"]]
+)

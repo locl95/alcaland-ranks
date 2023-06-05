@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import {Ladder} from "./features/ladder/Ladder";
-import {characters, raiderioFetch} from "./utils/utils";
+import {characters, Class, classes, raiderioFetch} from "./utils/utils";
 import {gamerFromRaiderioProfile} from "./features/ladder/types";
 import {RaiderioProfile} from "./utils/raiderio";
 import {DungeonLadder} from "./features/dungeon/DungeonLadder";
@@ -17,6 +17,8 @@ import uldbg from './assets/dungeons/ULD.webp';
 import neltbg from './assets/dungeons/NELT.webp';
 import {RankLadder} from "./features/rank/RankLadder";
 import {gamerRankFromRaiderioProfile} from "./features/rank/types";
+import {gamerRankSpecsFromRaiderioProfile} from "./features/rankSpecs/types";
+import {RankSpecsLadder} from "./features/rankSpecs/RankSpecsLadder";
 
 function App() {
 
@@ -32,6 +34,7 @@ function App() {
     }, [])
 
     console.log(data)
+    data.forEach(rio => console.log(rio.mythic_plus_ranks))
 
   return (
     <div className="App">
@@ -40,6 +43,12 @@ function App() {
          />
         <RankLadder
             gamerRank={data.map(rio => gamerRankFromRaiderioProfile(rio)).sort((a, b) => a.world - b.world)}
+        />
+        <RankSpecsLadder
+            gamerRank={data.flatMap(rio => {
+                const classWithSpecs: Class = classes.find(c => c.class === rio.class)!
+                return classWithSpecs.specs.map(spec => gamerRankSpecsFromRaiderioProfile(rio, spec))
+            }).filter(gr => gr.world > 0).sort((a,b) => a.world - b.world)}
         />
         <Row>
             <Col span={12}>

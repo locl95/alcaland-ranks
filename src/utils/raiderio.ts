@@ -21,7 +21,32 @@ export interface Rank {
     region: number
     realm: number
 }
-
+/*
+{
+    class: "Priest",
+    specs: [256, 257, 258]
+  },
+  {
+    class: "Paladin",
+    specs: [65, 66, 70]
+  },
+  {
+    class: "Rogue",
+    specs: [259, 260, 261]
+  },
+  {
+    class: "Druid",
+    specs: [102, 103, 104,105]
+  },
+  {
+    class: "Monk",
+    specs: [268, 269, 270]
+  },
+  {
+    class: "Evoker",
+    specs: [1467, 1468, 1473]
+  },
+ */
 interface MythicPlusRanks {
     overall: Rank
 }
