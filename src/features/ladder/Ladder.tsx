@@ -16,7 +16,7 @@ export const Ladder = (props: LadderProps) => {
 
   return (
     <div>
-      <Table columns={columns} dataSource={props.gamers} pagination={false}/>
+      <Table columns={columns} dataSource={props.gamers} pagination={false} showHeader={false}/>
     </div>
   )
 }

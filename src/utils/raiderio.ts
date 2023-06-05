@@ -16,6 +16,16 @@ interface MythicPlusRun {
     score: number
 }
 
+export interface Rank {
+    world: number
+    region: number
+    realm: number
+}
+
+interface MythicPlusRanks {
+    overall: Rank
+}
+
 export interface RaiderioProfile {
     name: string
     race: string
@@ -23,4 +33,5 @@ export interface RaiderioProfile {
     active_spec_name: string
     mythic_plus_scores_by_season: MythicPlusScoresBySeason[]
     mythic_plus_best_runs: MythicPlusRun[]
+    mythic_plus_ranks: MythicPlusRanks
 }

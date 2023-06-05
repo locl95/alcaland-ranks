@@ -15,7 +15,7 @@ export const DungeonLadder = (props: DungeonLadderProps) => {
 
   return (
     <div>
-      <Table columns={columns} dataSource={props.gamersDungeon} pagination={false}/>
+      <Table columns={columns} dataSource={props.gamersDungeon} pagination={false} showHeader={false}/>
     </div>
   )
 }
