@@ -1,4 +1,4 @@
-import {RaiderioProfile, Rank} from "../../utils/raiderio";
+import {RaiderioProfile} from "../../utils/raiderio";
 
 export interface GamerRank {
   name: string
