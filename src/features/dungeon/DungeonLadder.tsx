@@ -5,6 +5,7 @@ import { ColumnsType } from "antd/es/table"
 
 interface DungeonLadderProps {
   gamersDungeon: GamerDungeon[]
+  caption: string
 }
 export const DungeonLadder = (props: DungeonLadderProps) => {
   const columns: ColumnsType<GamerDungeon> = [
@@ -15,7 +16,7 @@ export const DungeonLadder = (props: DungeonLadderProps) => {
 
   return (
     <div>
-      <Table columns={columns} dataSource={props.gamersDungeon} pagination={false} showHeader={false}/>
+      <Table columns={columns} dataSource={props.gamersDungeon} pagination={false} showHeader={false} bordered={true} caption={props.caption}/>
     </div>
   )
 }

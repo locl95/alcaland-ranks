@@ -7,14 +7,6 @@ import {RaiderioProfile} from "./utils/raiderio";
 import {DungeonLadder} from "./features/dungeon/DungeonLadder";
 import {gamerDungeonFromRaiderioProfile} from "./features/dungeon/types";
 import {Col, Row} from "antd";
-import undrbg from './assets/dungeons/UNDR.webp';
-import nlbg from './assets/dungeons/NL.webp';
-import fhbg from './assets/dungeons/FH.webp';
-import bhbg from './assets/dungeons/BH.webp';
-import hoibg from './assets/dungeons/HOI.webp';
-import vpbg from './assets/dungeons/VP.webp';
-import uldbg from './assets/dungeons/ULD.webp';
-import neltbg from './assets/dungeons/NELT.webp';
 import {RankLadder} from "./features/rank/RankLadder";
 import {gamerRankFromRaiderioProfile} from "./features/rank/types";
 import {gamerRankSpecsFromRaiderioProfile} from "./features/rankSpecs/types";
@@ -39,12 +31,15 @@ function App() {
   return (
     <div className="App">
          <Ladder
-            gamers={data.map(rio => gamerFromRaiderioProfile(rio)).sort((a, b) => b.score - a.score)}
+             caption={"General Score"}
+             gamers={data.map(rio => gamerFromRaiderioProfile(rio)).sort((a, b) => b.score - a.score)}
          />
         <RankLadder
+            caption={"General Rank"}
             gamerRank={data.map(rio => gamerRankFromRaiderioProfile(rio)).sort((a, b) => a.world - b.world)}
         />
         <RankSpecsLadder
+            caption={"Specs Rank"}
             gamerRank={data.flatMap(rio => {
                 const classWithSpecs: Class = classes.find(c => c.class === rio.class)!
                 return classWithSpecs.specs.map(spec => gamerRankSpecsFromRaiderioProfile(rio, spec))
@@ -52,56 +47,56 @@ function App() {
         />
         <Row>
             <Col span={12}>
-                <img src={undrbg} alt="UNDR"/>
                 <DungeonLadder
+                    caption={"Underrot"}
                     gamersDungeon={data.map(rio => gamerDungeonFromRaiderioProfile(rio, "UNDR")).sort((a,b) => b.score - a.score)}
                 />
             </Col>
             <Col span={12}>
-                <img src={nlbg} alt="NL"/>
                 <DungeonLadder
+                    caption={"Neltharion's Lair"}
                     gamersDungeon={data.map(rio => gamerDungeonFromRaiderioProfile(rio, "NL")).sort((a,b) => b.score - a.score)}
                 />
             </Col>
         </Row>
         <Row>
             <Col span={12}>
-                <img src={fhbg} alt="FH"/>
                 <DungeonLadder
+                    caption={"Freehold"}
                     gamersDungeon={data.map(rio => gamerDungeonFromRaiderioProfile(rio, "FH")).sort((a,b) => b.score - a.score)}
                 />
             </Col>
             <Col span={12}>
-                <img src={bhbg} alt="BH"/>
                 <DungeonLadder
+                    caption={"Brackenhide Hollow"}
                     gamersDungeon={data.map(rio => gamerDungeonFromRaiderioProfile(rio, "BH")).sort((a,b) => b.score - a.score)}
                 />
             </Col>
         </Row>
         <Row>
             <Col span={12}>
-                <img src={hoibg} alt="HOI"/>
                 <DungeonLadder
+                    caption={"Halls of Infusion"}
                     gamersDungeon={data.map(rio => gamerDungeonFromRaiderioProfile(rio, "HOI")).sort((a,b) => b.score - a.score)}
                 />
             </Col>
             <Col span={12}>
-                <img src={vpbg} alt="VP"/>
                 <DungeonLadder
+                    caption={"Vortex Pinnacle"}
                     gamersDungeon={data.map(rio => gamerDungeonFromRaiderioProfile(rio, "VP")).sort((a,b) => b.score - a.score)}
                 />
             </Col>
         </Row>
         <Row>
             <Col span={12}>
-                <img src={uldbg} alt="ULD"/>
                 <DungeonLadder
+                    caption={"Uldaman: Legacy of Tyr"}
                     gamersDungeon={data.map(rio => gamerDungeonFromRaiderioProfile(rio, "ULD")).sort((a,b) => b.score - a.score)}
                 />
             </Col>
             <Col span={12}>
-                <img src={neltbg} alt="NELT"/>
                 <DungeonLadder
+                    caption={"Neltharus"}
                     gamersDungeon={data.map(rio => gamerDungeonFromRaiderioProfile(rio, "NELT")).sort((a,b) => b.score - a.score)}
                 />
             </Col>
