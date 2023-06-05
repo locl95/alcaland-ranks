@@ -18,7 +18,7 @@ export const RankSpecsLadder = (props: RankLadderProps) => {
 
   return (
     <div>
-      <Table columns={columns} dataSource={props.gamerRank} pagination={false} showHeader={true} bordered={true} caption={props.caption}/>
+      <Table columns={columns} dataSource={props.gamerRank} pagination={false} showHeader={true} bordered={true} caption={<div className={"font-face-lc"}><h1>{props.caption}</h1></div>}/>
     </div>
   )
 }
