@@ -12,7 +12,8 @@ export const Ladder = (props: LadderProps) => {
     { title: "Name", dataIndex: "name" },
     { title: "Class", dataIndex: "class" },
     { title: "Spec", dataIndex: "spec" },
-    { title: "Score", dataIndex: "score"}
+    { title: "Score", dataIndex: "score"},
+    { title: "Quantile", dataIndex: "quantile"}
   ]
 
   return (

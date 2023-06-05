@@ -21,32 +21,7 @@ export interface Rank {
     region: number
     realm: number
 }
-/*
-{
-    class: "Priest",
-    specs: [256, 257, 258]
-  },
-  {
-    class: "Paladin",
-    specs: [65, 66, 70]
-  },
-  {
-    class: "Rogue",
-    specs: [259, 260, 261]
-  },
-  {
-    class: "Druid",
-    specs: [102, 103, 104,105]
-  },
-  {
-    class: "Monk",
-    specs: [268, 269, 270]
-  },
-  {
-    class: "Evoker",
-    specs: [1467, 1468, 1473]
-  },
- */
+
 interface MythicPlusRanks {
     overall: Rank
 }
@@ -59,4 +34,19 @@ export interface RaiderioProfile {
     mythic_plus_scores_by_season: MythicPlusScoresBySeason[]
     mythic_plus_best_runs: MythicPlusRun[]
     mythic_plus_ranks: MythicPlusRanks
+}
+
+interface Quantile {
+    totalPopulationCount: number
+}
+
+interface _Cutoff {
+    all: Quantile
+}
+interface Cutoff {
+    p999: _Cutoff
+}
+
+export interface RaiderioCutoff {
+    cutoffs: Cutoff
 }
