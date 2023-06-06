@@ -23,7 +23,7 @@ export const Ladder = (props: LadderProps) => {
           columns={columns}
           dataSource={props.gamers}
           pagination={false}
-          showHeader={false}
+          showHeader={true}
           bordered={true}
           caption={<div className={"font-face-lc"}><h1>{props.caption}</h1></div>}
           loading={props.loading}
