@@ -10,10 +10,17 @@ interface MythicPlusScoresBySeason {
     scores: MythicPlusScores
 }
 
-interface MythicPlusRun {
+interface Affix {
+    id: number
+    name: string
+}
+
+export interface MythicPlusRun {
     short_name: string
     mythic_level: number
     score: number
+    affixes: Affix[]
+    num_keystone_upgrades: number
 }
 
 export interface Rank {
@@ -33,6 +40,7 @@ export interface RaiderioProfile {
     active_spec_name: string
     mythic_plus_scores_by_season: MythicPlusScoresBySeason[]
     mythic_plus_best_runs: MythicPlusRun[]
+    mythic_plus_alternate_runs: MythicPlusRun[]
     mythic_plus_ranks: MythicPlusRanks
 }
 

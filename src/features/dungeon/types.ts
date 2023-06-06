@@ -1,15 +1,29 @@
-import {RaiderioProfile} from "../../utils/raiderio";
+import {MythicPlusRun, RaiderioProfile} from "../../utils/raiderio";
 
 export interface GamerDungeon {
   name: string
-  level: number
+  tyrannicalLevel: string
+  fortifiedLevel: string
   score: number
 }
 
 export function gamerDungeonFromRaiderioProfile(raiderioProfile: RaiderioProfile, dungeon: string): GamerDungeon {
+
+  function numberToPlusString(n: number) {
+    return Array.from(Array(n).keys()).map(x => "+").toString().replaceAll(",","")
+  }
+
+  const bestDungeon: MythicPlusRun | undefined = raiderioProfile.mythic_plus_best_runs.find(mpr => mpr.short_name === dungeon)
+  const bestAlternateDungeon: MythicPlusRun | undefined = raiderioProfile.mythic_plus_alternate_runs.find(mpr => mpr.short_name === dungeon)
+
+  const bestTyrannicalDungeon = bestDungeon?.affixes.some(a => a.name === "Tyrannical") ? bestDungeon : bestAlternateDungeon
+  const bestFortifiedDungeon = bestDungeon?.affixes.some(a => a.name === "Fortified") ? bestDungeon : bestAlternateDungeon
+
   return {
     name: raiderioProfile.name,
-    level: raiderioProfile.mythic_plus_best_runs.find(mpr => mpr.short_name === dungeon)!.mythic_level,
-    score: raiderioProfile.mythic_plus_best_runs.find(mpr => mpr.short_name === dungeon)!.score
+    tyrannicalLevel: (bestTyrannicalDungeon?.mythic_level.toString() ?? "") + numberToPlusString(bestTyrannicalDungeon?.num_keystone_upgrades ?? 0),
+    fortifiedLevel: (bestFortifiedDungeon?.mythic_level.toString() ?? "") +  numberToPlusString(bestFortifiedDungeon?.num_keystone_upgrades ?? 0),
+    score: Number(((bestDungeon?.score ?? 0) * 1.5
+        +  (bestAlternateDungeon?.score ?? 0) * 0.5).toFixed(1))
   }
 }

@@ -20,13 +20,15 @@ function App() {
     useEffect(() => {
         async function foo() {
             const profiles = await Promise.all(characters.map(async (c) =>
-                await raiderioFetch<RaiderioProfile>(`/characters/profile?region=${c.region}&realm=${c.realm}&name=${c.name}&fields=mythic_plus_scores_by_season%3Acurrent,mythic_plus_best_runs%3Aall,mythic_plus_ranks`)))
+                await raiderioFetch<RaiderioProfile>(`/characters/profile?region=${c.region}&realm=${c.realm}&name=${c.name}&fields=mythic_plus_scores_by_season%3Acurrent,mythic_plus_best_runs%3Aall,mythic_plus_ranks,mythic_plus_alternate_runs%3Aall`)))
             const cutoffs = await raiderioFetch<RaiderioCutoff>("/mythic-plus/season-cutoffs?season=season-df-2&region=eu")
             setRaiderioProfiles(profiles)
             setRaiderioCutoff(cutoffs)
         }
         foo()
     }, [])
+
+    console.log(raiderioProfiles)
 
   return (
     <div className="App">

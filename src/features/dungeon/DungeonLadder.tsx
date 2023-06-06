@@ -11,8 +11,9 @@ interface DungeonLadderProps {
 export const DungeonLadder = (props: DungeonLadderProps) => {
   const columns: ColumnsType<GamerDungeon> = [
     { title: "Name", dataIndex: "name" },
-    { title: "Level", dataIndex: "level" },
-    { title: "Score", dataIndex: "score"}
+    { title: "Tyrannical Level", dataIndex: "tyrannicalLevel", sorter:(a,b) => a.tyrannicalLevel.localeCompare(b.tyrannicalLevel) },
+    { title: "Fortified Level", dataIndex: "fortifiedLevel", sorter:(a,b) => a.fortifiedLevel.localeCompare(b.fortifiedLevel) },
+    { title: "Score", dataIndex: "score", sorter: (a,b) => a.score -b.score}
   ]
 
   return (
@@ -21,7 +22,7 @@ export const DungeonLadder = (props: DungeonLadderProps) => {
           columns={columns}
           dataSource={props.gamersDungeon}
           pagination={false}
-          showHeader={false}
+          showHeader={true}
           bordered={true}
           caption={<div className={"font-face-lc"}><h1>{props.caption}</h1></div>}
           loading={props.loading}
