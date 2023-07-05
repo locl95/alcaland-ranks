@@ -84,11 +84,32 @@ export const characters: Character[] = [
     realm: "zuljin",
     region: "eu"
   },
-  /* {
+  {
     name: "chaunxa",
     realm: "sanguino",
     region: "eu"
-  } */
+  },
+  {
+    name: "avacado",
+    realm: "zuljin",
+    region: "eu"
+  },
+  {
+    name: "secsii",
+    realm: "zuljin",
+    region: "eu"
+  },
+  {
+    name: "osborno",
+    realm: "zuljin",
+    region: "eu"
+  },
+  {
+    name: "chöcø",
+    realm: "zuljin",
+    region: "eu"
+  },
+
 ]
 
 export interface Class {
@@ -121,17 +142,26 @@ export const classes: Class[] = [
     class: "Evoker",
     specs: [1467, 1468, 1473]
   },
+  {
+    class: "Shaman",
+    specs: [262, 263, 264]
+  },
 ]
 
 export const specs: Map<number, string> = new Map([
   [269, "Wind Walker"],
   [70, "Retribution"],
   [261, "Subtlety"],
-  [105, "Restoration"],
+  [105, "Druid Restoration"],
   [1467, "Devastation"],
   [260, "Outlaw"],
   [66, "Protection"],
   [102, "Balance"],
   [257, "Holy Priest"],
-  [104, "Guardian"]]
+  [104, "Guardian"],
+  [65, "Holy Paladin"],
+  [1468, "Preservation"],
+  [264, "Shaman Restoration"],
+  [262, "Elemental"],
+  [263, "Enhancement"]]
 )
