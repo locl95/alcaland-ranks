@@ -158,6 +158,7 @@ export const specs: Map<number, string> = new Map([
   [66, "Protection"],
   [102, "Balance"],
   [257, "Holy Priest"],
+  [258, "Shadow"],
   [104, "Guardian"],
   [65, "Holy Paladin"],
   [1468, "Preservation"],
