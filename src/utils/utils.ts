@@ -109,6 +109,11 @@ export const characters: Character[] = [
     realm: "zuljin",
     region: "eu"
   },
+  {
+    name: "sacrøz",
+    realm: "zuljin",
+    region: "eu"
+  },
 
 ]
 
