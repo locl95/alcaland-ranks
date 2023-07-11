@@ -1,6 +1,5 @@
 import {MythicPlusScores, RaiderioProfile, Rank} from "../../utils/raiderio";
 import {Spec} from "../../utils/utils";
-import {match} from "ts-pattern";
 
 export interface GamerRankSpec {
   name: string
