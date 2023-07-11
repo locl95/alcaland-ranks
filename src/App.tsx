@@ -54,7 +54,7 @@ function App() {
                     gamerRank={raiderioProfiles.flatMap(rio => {
                         const classWithSpecs: Class = classes.find(c => c.class === rio.class)!
                         return classWithSpecs.specs.map(spec => gamerRankSpecsFromRaiderioProfile(rio, spec))
-                    }).filter(gr => gr.world > 0).sort((a, b) => a.world - b.world)}
+                    }).filter(gr => gr.world > 0).sort((a, b) => b.score - a.score)}
                 />
                 <Row>
                     <Col span={12} xs={24} xl={12}>

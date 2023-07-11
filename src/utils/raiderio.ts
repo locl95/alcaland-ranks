@@ -1,8 +1,12 @@
-interface MythicPlusScores {
+export interface MythicPlusScores {
     all: number
     dps: number
     haler: number
     tank: number
+    spec_0: number
+    spec_1: number
+    spec_2: number
+    spec_3: number
 }
 
 interface MythicPlusScoresBySeason {
