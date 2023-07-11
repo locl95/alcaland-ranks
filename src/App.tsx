@@ -57,14 +57,14 @@ function App() {
                     }).filter(gr => gr.world > 0).sort((a, b) => a.world - b.world)}
                 />
                 <Row>
-                    <Col span={12}>
+                    <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
                             caption={"Underrot"}
                             loading={raiderioProfiles.length === 0}
                             gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "UNDR")).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
-                    <Col span={12}>
+                    <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
                             caption={"Neltharion's Lair"}
                             loading={raiderioProfiles.length === 0}
@@ -73,14 +73,14 @@ function App() {
                     </Col>
                 </Row>
                 <Row>
-                    <Col span={12}>
+                    <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
                             caption={"Freehold"}
                             loading={raiderioProfiles.length === 0}
                             gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "FH")).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
-                    <Col span={12}>
+                    <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
                             caption={"Brackenhide Hollow"}
                             loading={raiderioProfiles.length === 0}
@@ -89,14 +89,14 @@ function App() {
                     </Col>
                 </Row>
                 <Row>
-                    <Col span={12}>
+                    <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
                             caption={"Halls of Infusion"}
                             loading={raiderioProfiles.length === 0}
                             gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "HOI")).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
-                    <Col span={12}>
+                    <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
                             caption={"Vortex Pinnacle"}
                             loading={raiderioProfiles.length === 0}
@@ -105,14 +105,14 @@ function App() {
                     </Col>
                 </Row>
                 <Row>
-                    <Col span={12}>
+                    <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
                             caption={"Uldaman: Legacy of Tyr"}
                             loading={raiderioProfiles.length === 0}
                             gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "ULD")).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
-                    <Col span={12}>
+                    <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
                             caption={"Neltharus"}
                             loading={raiderioProfiles.length === 0}

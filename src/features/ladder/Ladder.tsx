@@ -12,7 +12,7 @@ interface LadderProps {
 export const Ladder = (props: LadderProps) => {
     const columns: ColumnsType<Gamer> = [
         {title: "Name", dataIndex: "name"},
-        {title: "Class", dataIndex: "class"},
+        {title: "Class", dataIndex: "class", responsive: ["sm"]},
         {title: "Spec", dataIndex: "spec"},
         {title: "Score", dataIndex: "score"},
         {title: "Quantile", dataIndex: "quantile"}

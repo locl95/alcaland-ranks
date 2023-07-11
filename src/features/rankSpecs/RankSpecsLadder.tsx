@@ -13,8 +13,8 @@ export const RankSpecsLadder = (props: RankLadderProps) => {
     { title: "Name", dataIndex: "name" },
     { title: "Spec", dataIndex: "spec" },
     { title: "World", dataIndex: "world", sorter: (a,b) => a.world-b.world},
-    { title: "Region", dataIndex: "region", sorter: (a,b) => a.region-b.region },
-    { title: "Realm", dataIndex: "realm", sorter: (a,b) => a.realm-b.realm }
+    { title: "Region", dataIndex: "region", sorter: (a,b) => a.region-b.region, responsive: ["sm"]},
+    { title: "Realm", dataIndex: "realm", sorter: (a,b) => a.realm-b.realm , responsive: ["sm"]}
   ]
 
   return (

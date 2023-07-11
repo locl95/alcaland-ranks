@@ -114,6 +114,16 @@ export const characters: Character[] = [
     realm: "zuljin",
     region: "eu"
   },
+  {
+    name: "fdefifa",
+    realm: "sanguino",
+    region: "eu"
+  },
+  {
+    name: "fdéfifa",
+    realm: "sanguino",
+    region: "eu"
+  },
 
 ]
 
@@ -151,6 +161,10 @@ export const classes: Class[] = [
     class: "Shaman",
     specs: [262, 263, 264]
   },
+  {
+    class: "Warrior",
+    specs: [71, 72, 73]
+  }
 ]
 
 export const specs: Map<number, string> = new Map([
@@ -160,7 +174,7 @@ export const specs: Map<number, string> = new Map([
   [105, "Druid Restoration"],
   [1467, "Devastation"],
   [260, "Outlaw"],
-  [66, "Protection"],
+  [66, "Paladin Protection"],
   [102, "Balance"],
   [257, "Holy Priest"],
   [258, "Shadow"],
@@ -169,5 +183,8 @@ export const specs: Map<number, string> = new Map([
   [1468, "Preservation"],
   [264, "Shaman Restoration"],
   [262, "Elemental"],
-  [263, "Enhancement"]]
+  [263, "Enhancement"],
+  [72, "Fury"],
+  [71, "Arms"],
+  [73, "Warrior Protection"]]
 )
