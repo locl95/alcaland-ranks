@@ -123,6 +123,11 @@ export const characters: Character[] = [
         realm: "sanguino",
         region: "eu"
     },
+    {
+        name: "sokahthyr",
+        realm: "zuljin",
+        region: "eu"
+    },
 
 ]
 
