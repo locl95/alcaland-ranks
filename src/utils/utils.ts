@@ -5,9 +5,7 @@ export const easyFetch = async <T>(
     token?: string
 ): Promise<T> => {
 
-    console.log(process.env.REACT_APP_API_HOST)
-
-    const url = "http://localhost:8080/api" + partialUrl
+    const url = process.env.REACT_APP_API_HOST + "/api" + partialUrl
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
