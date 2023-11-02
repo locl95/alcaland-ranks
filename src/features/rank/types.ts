@@ -10,8 +10,8 @@ export interface GamerRank {
 export function gamerRankFromRaiderioProfile(raiderioProfile: RaiderioProfile): GamerRank {
   return {
     name: raiderioProfile.name,
-    world: raiderioProfile.mythic_plus_ranks.overall.world,
-    region: raiderioProfile.mythic_plus_ranks.overall.region,
-    realm: raiderioProfile.mythic_plus_ranks.overall.realm
+    world: raiderioProfile.mythicPlusRanks.overall.world,
+    region: raiderioProfile.mythicPlusRanks.overall.region,
+    realm: raiderioProfile.mythicPlusRanks.overall.realm
   }
 }

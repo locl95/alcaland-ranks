@@ -1,4 +1,4 @@
-import {RaiderioCutoff, RaiderioProfile} from "../../utils/raiderio";
+import {RaiderioProfile} from "../../utils/raiderio";
 
 export interface Gamer {
     name: string
@@ -8,17 +8,12 @@ export interface Gamer {
     quantile: number
 }
 
-function calculateQuantile(raiderioCutoff: RaiderioCutoff, raiderioProfile: RaiderioProfile): number {
-    return raiderioProfile.mythic_plus_ranks.overall.region / raiderioCutoff.cutoffs.p999.all.totalPopulationCount * 100
-}
-
-export function gamerFromRaiderioProfile(raiderioProfile: RaiderioProfile, cutoffs: RaiderioCutoff): Gamer {
-    const score = raiderioProfile.mythic_plus_scores_by_season.find(mps => mps.season === "season-df-2")!.scores.all
+export function gamerFromRaiderioProfile(raiderioProfile: RaiderioProfile): Gamer {
     return {
         name: raiderioProfile.name,
         class: raiderioProfile.class,
-        spec: raiderioProfile.active_spec_name,
-        score: score,
-        quantile: Number(calculateQuantile(cutoffs,raiderioProfile).toFixed(2))
+        spec: raiderioProfile.spec,
+        score:  raiderioProfile.score,
+        quantile: raiderioProfile.quantile
     }
 }
