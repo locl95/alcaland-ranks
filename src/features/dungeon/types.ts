@@ -13,8 +13,8 @@ export function gamerDungeonFromRaiderioProfile(raiderioProfile: RaiderioProfile
     return Array.from(Array(n).keys()).map(x => "+").toString().replaceAll(",","")
   }
 
-  const bestDungeon: MythicPlusRun | undefined = raiderioProfile.mythic_plus_best_runs.find(mpr => mpr.short_name === dungeon)
-  const bestAlternateDungeon: MythicPlusRun | undefined = raiderioProfile.mythic_plus_alternate_runs.find(mpr => mpr.short_name === dungeon)
+  const bestDungeon: MythicPlusRun | undefined = raiderioProfile.mythicPlusBestRuns.find(mpr => mpr.short_name === dungeon)
+  const bestAlternateDungeon: MythicPlusRun | undefined = raiderioProfile.mythicPlusAlternateRuns.find(mpr => mpr.short_name === dungeon)
 
   const bestTyrannicalDungeon = bestDungeon?.affixes.some(a => a.name === "Tyrannical") ? bestDungeon : bestAlternateDungeon
   const bestFortifiedDungeon = bestDungeon?.affixes.some(a => a.name === "Fortified") ? bestDungeon : bestAlternateDungeon

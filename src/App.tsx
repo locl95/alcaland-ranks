@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import {Ladder} from "./features/ladder/Ladder";
-import {characters, Class, classes, raiderioFetch} from "./utils/utils";
+import {easyFetch} from "./utils/utils";
 import {gamerFromRaiderioProfile} from "./features/ladder/types";
-import {RaiderioCutoff, RaiderioProfile} from "./utils/raiderio";
+import {RaiderioProfile} from "./utils/raiderio";
 import {DungeonLadder} from "./features/dungeon/DungeonLadder";
 import {gamerDungeonFromRaiderioProfile} from "./features/dungeon/types";
 import {Col, ConfigProvider, Row, theme} from "antd";
@@ -11,25 +11,23 @@ import {RankLadder} from "./features/rank/RankLadder";
 import {gamerRankFromRaiderioProfile} from "./features/rank/types";
 import {gamerRankSpecsFromRaiderioProfile} from "./features/rankSpecs/types";
 import {RankSpecsLadder} from "./features/rankSpecs/RankSpecsLadder";
+import {Token} from "./features/auth/types";
+import {useParams} from "react-router-dom";
 
 function App() {
 
     const [raiderioProfiles, setRaiderioProfiles] = useState<RaiderioProfile[]>([])
-    const [raiderioCutoff, setRaiderioCutoff] = useState<RaiderioCutoff>()
+    const { viewId} = useParams()
 
     useEffect(() => {
-        async function foo() {
-            const profiles = await Promise.all(characters.map(async (c) =>
-                await raiderioFetch<RaiderioProfile>(`/characters/profile?region=${c.region}&realm=${c.realm}&name=${c.name}&fields=mythic_plus_scores_by_season%3Acurrent,mythic_plus_best_runs%3Aall,mythic_plus_ranks,mythic_plus_alternate_runs%3Aall`)))
-            const cutoffs = await raiderioFetch<RaiderioCutoff>("/mythic-plus/season-cutoffs?season=season-df-2&region=eu")
+
+        async function getData() {
+            const token: Token = await easyFetch<Token>("POST", "/auth", undefined, "Basic ZXJpYzoxMjM0")
+            const profiles = await easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/data`, undefined, `Bearer ${token.token}`)
             setRaiderioProfiles(profiles)
-            setRaiderioCutoff(cutoffs)
         }
-
-        foo()
-    }, [])
-
-    console.log(raiderioProfiles)
+        getData()
+    }, [viewId])
 
     return (
         <ConfigProvider
@@ -41,7 +39,7 @@ function App() {
                 <Ladder
                     caption={"General Score"}
                     loading={raiderioProfiles.length === 0}
-                    gamers={raiderioProfiles.map(rio => gamerFromRaiderioProfile(rio, raiderioCutoff!)).sort((a, b) => b.score - a.score)}
+                    gamers={raiderioProfiles.map(rio => gamerFromRaiderioProfile(rio)).sort((a, b) => b.score - a.score)}
                 />
                 <RankLadder
                     caption={"General Rank"}
@@ -52,8 +50,7 @@ function App() {
                     caption={"Specs Rank"}
                     loading={raiderioProfiles.length === 0}
                     gamerRank={raiderioProfiles.flatMap(rio => {
-                        const classWithSpecs: Class = classes.find(c => c.class === rio.class)!
-                        return classWithSpecs.specs.map(spec => gamerRankSpecsFromRaiderioProfile(rio, spec))
+                        return rio.mythicPlusRanks.specs.map(mythicPlusRank => gamerRankSpecsFromRaiderioProfile(rio, mythicPlusRank))
                     }).filter(gr => gr.world > 0).sort((a, b) => b.score - a.score)}
                 />
                 <Row>
