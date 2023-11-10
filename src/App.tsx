@@ -11,7 +11,6 @@ import {RankLadder} from "./features/rank/RankLadder";
 import {gamerRankFromRaiderioProfile} from "./features/rank/types";
 import {gamerRankSpecsFromRaiderioProfile} from "./features/rankSpecs/types";
 import {RankSpecsLadder} from "./features/rankSpecs/RankSpecsLadder";
-import {Token} from "./features/auth/types";
 import {useParams} from "react-router-dom";
 
 function App() {
@@ -22,8 +21,7 @@ function App() {
     useEffect(() => {
 
         async function getData() {
-            const token: Token = await easyFetch<Token>("POST", "/auth", undefined, "Basic ZXJpYzoxMjM0")
-            const profiles = await easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/data`, undefined, `Bearer ${token.token}`)
+            const profiles = await easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`)
             setRaiderioProfiles(profiles)
         }
         getData()
