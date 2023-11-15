@@ -2,7 +2,6 @@ import React from "react"
 import {Table} from "antd"
 import {Gamer} from "./types"
 import {ColumnsType} from "antd/es/table"
-import {wentDown, wentUp} from "../../utils/utils";
 import Comparable from "../comparables/Comparable";
 
 interface LadderProps {
