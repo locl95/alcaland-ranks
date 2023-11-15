@@ -17,7 +17,7 @@ export const DungeonLadder = (props: DungeonLadderProps) => {
             dataIndex: "tyrannicalLevel",
             sorter: (a, b) => a.tyrannicalLevel.localeCompare(b.tyrannicalLevel),
             render: (text, record) => (
-                <a target="_blank" href={record.tyrannicalUrl}>{text}</a>
+                <a target="_blank" rel="noreferrer" href={record.tyrannicalUrl}>{text}</a>
             ),
         },
         {
@@ -25,7 +25,7 @@ export const DungeonLadder = (props: DungeonLadderProps) => {
             dataIndex: "fortifiedLevel",
             sorter: (a, b) => a.fortifiedLevel.localeCompare(b.fortifiedLevel),
             render: (text, record) => (
-                <a target="_blank" href={record.fortifiedUrl}>{text}</a>
+                <a target="_blank" rel="noreferrer" href={record.fortifiedUrl}>{text}</a>
             ),
         },
         {title: "Score", dataIndex: "score", sorter: (a, b) => a.score - b.score}
