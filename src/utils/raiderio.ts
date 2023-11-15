@@ -30,6 +30,7 @@ export interface MythicPlusRun {
 }
 
 export interface RaiderioProfile {
+    id: number,
     name: string
     score: number
     class: string

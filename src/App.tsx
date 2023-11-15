@@ -16,13 +16,16 @@ import {useParams} from "react-router-dom";
 function App() {
 
     const [raiderioProfiles, setRaiderioProfiles] = useState<RaiderioProfile[]>([])
+    const [raiderioCachedProfiles, setRaiderioCachedProfiles] = useState<RaiderioProfile[]>([])
     const { viewId} = useParams()
 
     useEffect(() => {
 
         async function getData() {
             const profiles = await easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`)
+            const cachedProfiles = await easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/cached-data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`)
             setRaiderioProfiles(profiles)
+            setRaiderioCachedProfiles(cachedProfiles)
         }
         getData()
     }, [viewId])
@@ -37,7 +40,7 @@ function App() {
                 <Ladder
                     caption={"General Score"}
                     loading={raiderioProfiles.length === 0}
-                    gamers={raiderioProfiles.map(rio => gamerFromRaiderioProfile(rio)).sort((a, b) => b.score - a.score)}
+                    gamers={raiderioProfiles.map(rio => gamerFromRaiderioProfile(rio, raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
                 />
                 <RankLadder
                     caption={"General Rank"}

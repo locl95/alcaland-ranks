@@ -5,15 +5,20 @@ export interface Gamer {
     class: string
     spec: string
     score: number
+    cachedScore?: number
     quantile: number
+    cachedQuantile?: number
 }
 
-export function gamerFromRaiderioProfile(raiderioProfile: RaiderioProfile): Gamer {
+export function gamerFromRaiderioProfile(raiderioProfile: RaiderioProfile, cachedProfile?: RaiderioProfile): Gamer {
+
     return {
         name: raiderioProfile.name,
         class: raiderioProfile.class,
         spec: raiderioProfile.spec,
         score:  raiderioProfile.score,
-        quantile: raiderioProfile.quantile
+        cachedScore: cachedProfile?.score,
+        quantile: raiderioProfile.quantile,
+        cachedQuantile: cachedProfile?.quantile
     }
 }
