@@ -2,6 +2,7 @@ import React from "react"
 import {Table} from "antd"
 import {GamerDungeon} from "./types"
 import {ColumnsType} from "antd/es/table"
+import Comparable from "../comparables/Comparable";
 
 interface DungeonLadderProps {
     gamersDungeon: GamerDungeon[]
@@ -28,7 +29,13 @@ export const DungeonLadder = (props: DungeonLadderProps) => {
                 <a target="_blank" rel="noreferrer" href={record.fortifiedUrl}>{text}</a>
             ),
         },
-        {title: "Score", dataIndex: "score", sorter: (a, b) => a.score - b.score}
+        {
+            title: "Score",
+            dataIndex: "score",
+            sorter: (a, b) => a.score - b.score,
+            render: (text, record) => <Comparable greenWhenUp={false} number={record.score}
+                                                  difference={record.scoreDifference}/>
+        }
     ]
 
     return (
