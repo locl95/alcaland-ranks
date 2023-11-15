@@ -33,7 +33,7 @@ export const DungeonLadder = (props: DungeonLadderProps) => {
             title: "Score",
             dataIndex: "score",
             sorter: (a, b) => a.score - b.score,
-            render: (text, record) => <Comparable greenWhenUp={false} number={record.score}
+            render: (text, record) => <Comparable greenWhenUp={true} number={record.score}
                                                   difference={record.scoreDifference}/>
         }
     ]
