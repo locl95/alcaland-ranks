@@ -26,3 +26,10 @@ export const easyFetch = async <T>(
     }
     return ((await response.json()) as unknown) as T
 }
+
+export const wentUp = (num?: number) => num && num > 0
+export const wentDown = (num?: number) => num && num < 0
+
+export const differenceOrUndefined = (value: number, cachedNumber?:number) => {
+    return (cachedNumber && parseFloat((value - cachedNumber).toFixed(2))) || undefined
+}

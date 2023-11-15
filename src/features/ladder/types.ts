@@ -1,13 +1,14 @@
 import {RaiderioProfile} from "../../utils/raiderio";
+import {differenceOrUndefined} from "../../utils/utils";
 
 export interface Gamer {
     name: string
     class: string
     spec: string
     score: number
-    cachedScore?: number
+    scoreDifference?: number
     quantile: number
-    cachedQuantile?: number
+    quantileDifference?: number
 }
 
 export function gamerFromRaiderioProfile(raiderioProfile: RaiderioProfile, cachedProfile?: RaiderioProfile): Gamer {
@@ -16,9 +17,9 @@ export function gamerFromRaiderioProfile(raiderioProfile: RaiderioProfile, cache
         name: raiderioProfile.name,
         class: raiderioProfile.class,
         spec: raiderioProfile.spec,
-        score:  raiderioProfile.score,
-        cachedScore: cachedProfile?.score,
+        score: raiderioProfile.score,
+        scoreDifference: differenceOrUndefined(raiderioProfile.score, cachedProfile?.score),
         quantile: raiderioProfile.quantile,
-        cachedQuantile: cachedProfile?.quantile
+        quantileDifference: differenceOrUndefined(raiderioProfile.quantile, cachedProfile?.quantile)
     }
 }

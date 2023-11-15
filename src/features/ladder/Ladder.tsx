@@ -2,6 +2,8 @@ import React from "react"
 import {Table} from "antd"
 import {Gamer} from "./types"
 import {ColumnsType} from "antd/es/table"
+import {wentDown, wentUp} from "../../utils/utils";
+import Comparable from "../comparables/Comparable";
 
 interface LadderProps {
     gamers: Gamer[]
@@ -10,19 +12,22 @@ interface LadderProps {
 }
 
 export const Ladder = (props: LadderProps) => {
+
     const columns: ColumnsType<Gamer> = [
         {title: "Name", dataIndex: "name"},
         {title: "Class", dataIndex: "class", responsive: ["sm"]},
         {title: "Spec", dataIndex: "spec"},
         {
-            title: "Score", dataIndex: "score", render: (text, record) => (
-                <span>{record.score} ({record.score - (record?.cachedScore ?? record.score)})</span>
-            )
+            title: "Score",
+            dataIndex: "score",
+            render: (text, record) => <Comparable greenWhenUp={true} number={record.score}
+                                                  difference={record.scoreDifference}/>
         },
         {
-            title: "Quantile", dataIndex: "quantile", render: (text, record) => (
-                <span>{record.quantile} ({record.quantile - (record?.quantile ?? record.cachedQuantile)})</span>
-            )
+            title: "Quantile",
+            dataIndex: "quantile",
+            render: (text, record) => <Comparable greenWhenUp={false} number={record.quantile}
+                                                  difference={record.quantileDifference}/>
         }
     ]
 
