@@ -22,8 +22,10 @@ function App() {
     useEffect(() => {
 
         async function getData() {
-            const profiles = await easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`)
-            const cachedProfiles = await easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/cached-data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`)
+            const [profiles, cachedProfiles] = await Promise.all([
+                easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`),
+                easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/cached-data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`)
+            ]);
             setRaiderioProfiles(profiles)
             setRaiderioCachedProfiles(cachedProfiles)
         }
