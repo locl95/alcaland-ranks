@@ -60,64 +60,64 @@ function App() {
                 <Row>
                     <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
-                            caption={"Atal'dazar"}
+                            caption={"Mists of Tirna Scithe"}
                             loading={raiderioProfiles.length === 0}
-                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "AD", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
+                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "MISTS", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
                     <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
-                            caption={"Waycrest Manor"}
+                            caption={"The Dawnbreaker"}
                             loading={raiderioProfiles.length === 0}
-                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "WM", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
-                        />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={12} xs={24} xl={12}>
-                        <DungeonLadder
-                            caption={"Throne of the Tides"}
-                            loading={raiderioProfiles.length === 0}
-                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "TOTT", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
-                        />
-                    </Col>
-                    <Col span={12} xs={24} xl={12}>
-                        <DungeonLadder
-                            caption={"Black Rook Hold"}
-                            loading={raiderioProfiles.length === 0}
-                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "BRH", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
+                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "DAWN", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
                 </Row>
                 <Row>
                     <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
-                            caption={"Everbloom"}
+                            caption={"Ara-Kara, City of Echoes"}
                             loading={raiderioProfiles.length === 0}
-                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "EB", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
+                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "ARAK", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
                     <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
-                            caption={"Darkheart Thicket"}
+                            caption={"The Stonevault"}
                             loading={raiderioProfiles.length === 0}
-                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "DHT", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
+                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "SV", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
                 </Row>
                 <Row>
                     <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
-                            caption={"DOTI: Murozond's Rise"}
+                            caption={"Siege of Boralus"}
                             loading={raiderioProfiles.length === 0}
-                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "RISE", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
+                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "SIEGE", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
                     <Col span={12} xs={24} xl={12}>
                         <DungeonLadder
-                            caption={"DOTI: Galakrond's Fall"}
+                            caption={"Grim Batol"}
                             loading={raiderioProfiles.length === 0}
-                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "FALL", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
+                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "GB", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
+                        />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col span={12} xs={24} xl={12}>
+                        <DungeonLadder
+                            caption={"City of Threads"}
+                            loading={raiderioProfiles.length === 0}
+                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "COT", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
+                        />
+                    </Col>
+                    <Col span={12} xs={24} xl={12}>
+                        <DungeonLadder
+                            caption={"The Necrotic Wake"}
+                            loading={raiderioProfiles.length === 0}
+                            gamersDungeon={raiderioProfiles.map(rio => gamerDungeonFromRaiderioProfile(rio, "NW", raiderioCachedProfiles.find(c => c.id === rio.id))).sort((a, b) => b.score - a.score)}
                         />
                     </Col>
                 </Row>
