@@ -38,5 +38,4 @@ export interface RaiderioProfile {
     quantile: number
     mythicPlusRanks: MythicPlusRanks
     mythicPlusBestRuns: MythicPlusRun[]
-    mythicPlusAlternateRuns: MythicPlusRun[]
 }

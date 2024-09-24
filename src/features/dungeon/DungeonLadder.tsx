@@ -14,19 +14,11 @@ export const DungeonLadder = (props: DungeonLadderProps) => {
     const columns: ColumnsType<GamerDungeon> = [
         {title: "Name", dataIndex: "name"},
         {
-            title: "Tyrannical Level",
-            dataIndex: "tyrannicalLevel",
-            sorter: (a, b) => a.tyrannicalLevel.localeCompare(b.tyrannicalLevel),
+            title: "Key Level",
+            dataIndex: "keyLevel",
+            sorter: (a, b) => a.keyLevel.localeCompare(b.keyLevel),
             render: (text, record) => (
-                <a target="_blank" rel="noreferrer" href={record.tyrannicalUrl}>{text}</a>
-            ),
-        },
-        {
-            title: "Fortified Level",
-            dataIndex: "fortifiedLevel",
-            sorter: (a, b) => a.fortifiedLevel.localeCompare(b.fortifiedLevel),
-            render: (text, record) => (
-                <a target="_blank" rel="noreferrer" href={record.fortifiedUrl}>{text}</a>
+                <a target="_blank" rel="noreferrer" href={record.keyUrl}>{text}</a>
             ),
         },
         {
