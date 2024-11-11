@@ -3,7 +3,7 @@ import './App.css';
 import {Ladder} from "./features/ladder/Ladder";
 import {easyFetch} from "./utils/utils";
 import {gamerFromRaiderioProfile} from "./features/ladder/types";
-import {RaiderioProfile} from "./utils/raiderio";
+import {RaiderioProfile, ViewData} from "./utils/raiderio";
 import {DungeonLadder} from "./features/dungeon/DungeonLadder";
 import {gamerDungeonFromRaiderioProfile} from "./features/dungeon/types";
 import {Col, ConfigProvider, Row, theme} from "antd";
@@ -22,12 +22,12 @@ function App() {
     useEffect(() => {
 
         async function getData() {
-            const [profiles, cachedProfiles] = await Promise.all([
-                easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`),
-                easyFetch<RaiderioProfile[]>("GET", `/views/${viewId}/cached-data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`)
+            const [data, cachedData] = await Promise.all([
+                easyFetch<ViewData>("GET", `/views/${viewId}/data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`),
+                easyFetch<ViewData>("GET", `/views/${viewId}/cached-data`, undefined, `Bearer ${process.env.REACT_APP_SERVICE_TOKEN}`)
             ]);
-            setRaiderioProfiles(profiles)
-            setRaiderioCachedProfiles(cachedProfiles)
+            setRaiderioProfiles(data.data)
+            setRaiderioCachedProfiles(cachedData.data)
         }
 
         getData()

@@ -39,3 +39,8 @@ export interface RaiderioProfile {
     mythicPlusRanks: MythicPlusRanks
     mythicPlusBestRuns: MythicPlusRun[]
 }
+
+export interface ViewData {
+    data: RaiderioProfile[]
+    viewName: string
+}
