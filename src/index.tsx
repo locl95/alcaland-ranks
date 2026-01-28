@@ -12,7 +12,7 @@ const root = ReactDOM.createRoot(
 
 const router = createBrowserRouter([
     {
-        path: "/:viewId",
+        path: "/",
         element: <App />,
     }
 ]);
