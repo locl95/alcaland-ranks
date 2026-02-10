@@ -3,5 +3,5 @@ import { SimpleView } from "./SimpleView"
 
 export interface GetViewsResponse {
     metadata?: ViewMetadata | null
-    views: SimpleView[]
+    records: SimpleView[]
 }
