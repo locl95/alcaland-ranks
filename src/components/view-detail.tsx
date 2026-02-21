@@ -4,7 +4,6 @@ import {fetchWithResponse} from "../utils/EasyFetch";
 import {Col, ConfigProvider, Row, theme} from "antd";
 import {Ladder} from "../features/ladder/Ladder";
 import {gamerFromRaiderioProfile} from "../features/ladder/types";
-import './App.css';
 import {RankLadder} from "../features/rank/RankLadder";
 import {gamerRankFromRaiderioProfile} from "../features/rank/types";
 import {RankSpecsLadder} from "../features/rankSpecs/RankSpecsLadder";
