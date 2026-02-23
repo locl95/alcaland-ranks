@@ -1,19 +1,11 @@
-import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
-import loginReducer from "../features/login/loginSlice";
-import loadingReducer from "../features/loading/loadingSlice";
+import {configureStore} from '@reduxjs/toolkit'
+import loadingReducer from '@/app/features/loading/loadingSlice'
 
 export const store = configureStore({
-  reducer: {
-    login: loginReducer,
-    loading: loadingReducer,
-  },
-});
+    reducer: {
+        loading: loadingReducer,
+    },
+})
 
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
->;
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
