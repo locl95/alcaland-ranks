@@ -6,6 +6,7 @@ import {SimpleView} from "@/app/utils/views/SimpleView";
 import {loading, notLoading} from "./features/loading/loadingSlice";
 import {fetchWithResponse} from "./utils/EasyFetch";
 import {GetViewsResponse} from "./utils/views/GetViewsResponse";
+import {ViewDetail} from "@/app/components/view-detail";
 
 
 type Screen =
@@ -78,28 +79,23 @@ export default function App() {
             </>
         );
     }
-    //
-    // if (currentScreen.type === 'view-detail') {
-    //   const view = views.find(v => v.id === currentScreen.viewId);
-    //   if (!view) {
-    //     setCurrentScreen({ type: 'views' });
-    //     return null;
-    //   }
-    //
-    //   const characters = MOCK_CHARACTERS.filter(c =>
-    //     view.characterIds.includes(c.id)
-    //   );
-    //
-    //   return (
-    //     <ViewDetail
-    //       view={view}
-    //       characters={characters}
-    //       onBack={handleBackToViews}
-    //       onCharacterClick={(characterId) => handleCharacterClick(characterId, view.id)}
-    //     />
-    //   );
-    // }
-    //
+
+    if (currentScreen.type === 'view-detail') {
+        const view = views.find(v => v.id === currentScreen.viewId);
+        if (!view) {
+            setCurrentScreen({type: 'views'});
+            return null;
+        }
+
+        return (
+            <ViewDetail
+                view={view}
+                onBack={handleBackToViews}
+                onCharacterClick={(characterId) => handleCharacterClick(characterId, view.id)}
+            />
+        );
+    }
+
     // if (currentScreen.type === 'character-detail') {
     //   const character = MOCK_CHARACTERS.find(c => c.id === currentScreen.characterId);
     //   if (!character) {
