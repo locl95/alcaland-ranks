@@ -126,17 +126,16 @@
 
 .ladder-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem;
+  flex-direction: column;
   background: rgba(51, 65, 85, 0.3);
   border: 1px solid #334155;
   border-radius: 0.5rem;
   transition: background 0.2s;
+  overflow: hidden;
 }
 
 .ladder-row:hover {
-  background: rgba(51, 65, 85, 0.5);
+  background: rgba(51, 65, 85, 0.4);
 }
 
 .ladder-row-inner {
@@ -144,6 +143,8 @@
   align-items: center;
   gap: 1rem;
   flex: 1;
+  padding: 0.75rem;
+  cursor: pointer;
 }
 
 .ladder-rank {
@@ -223,6 +224,132 @@
 .ladder-score-label {
   font-size: 0.75rem;
   color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.ladder-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.expand-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.expand-btn:hover {
+  color: #cbd5e1;
+}
+
+.ladder-row-expanded {
+  padding: 1.5rem;
+  border-top: 1px solid #334155;
+  background: rgba(30, 41, 59, 0.3);
+}
+
+.rankings-section {
+  margin-bottom: 1.5rem;
+}
+
+.rankings-section:last-child {
+  margin-bottom: 0;
+}
+
+.rankings-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.rankings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.ranking-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(51, 65, 85, 0.3);
+  border: 1px solid #334155;
+  border-radius: 0.375rem;
+}
+
+.ranking-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ranking-value {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #cbd5e1;
+}
+
+.spec-ranking {
+  margin-bottom: 1rem;
+}
+
+.spec-ranking:last-child {
+  margin-bottom: 0;
+}
+
+.spec-ranking-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.spec-ranking-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.spec-ranking-score {
+  font-size: 0.875rem;
+  color: #fbbf24;
+  font-weight: 500;
+}
+
+.ladder-rankings {
+  display: flex;
+  flex-direction: column;
+}
+
+.ladder-ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.ladder-ranking-label {
+  color: #64748b;
+  font-weight: 500;
+  min-width: 3.5rem;
+}
+
+.ladder-ranking-value {
+  color: #cbd5e1;
+  font-weight: 600;
 }
 
 .raider-io-btn {

@@ -7,7 +7,6 @@ import {loading, notLoading} from "./features/loading/loadingSlice";
 import {fetchWithResponse} from "./utils/EasyFetch";
 import {GetViewsResponse} from "./utils/views/GetViewsResponse";
 import {ViewDetail} from "@/app/components/view-detail";
-import {CharacterDetail} from "@/app/components/character-detail";
 import {RaiderioProfile} from "@/app/utils/raiderio";
 
 
@@ -93,18 +92,6 @@ export default function App() {
             <ViewDetail
                 view={view}
                 onBack={handleBackToViews}
-                onCharacterClick={(character) =>
-                    handleCharacterClick(character, view.id)
-                }
-            />
-        );
-    }
-
-    if (currentScreen.type === 'character-detail') {
-        return (
-            <CharacterDetail
-                character={currentScreen.character}
-                onBack={() => handleBackToView(currentScreen.viewId)}
             />
         );
     }

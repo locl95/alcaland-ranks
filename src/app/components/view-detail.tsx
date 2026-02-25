@@ -10,7 +10,6 @@ import {loading, notLoading} from "@/app/features/loading/loadingSlice";
 type ViewDetailProps = {
     view: SimpleView;
     onBack: () => void;
-    onCharacterClick: (character: RaiderioProfile) => void;
 };
 
 interface CharacterDungeonScore {
@@ -18,7 +17,8 @@ interface CharacterDungeonScore {
     run: MythicPlusRun | undefined;
 }
 
-export function ViewDetail({view, onBack, onCharacterClick}: ViewDetailProps) {
+export function ViewDetail({view, onBack}: ViewDetailProps) {
+    const [expandedCharacters, setExpandedCharacters] = useState<Set<number>>(new Set());
     const [raiderioProfiles, setRaiderioProfiles] = useState<RaiderioProfile[]>([]);
     const [raiderioCachedProfiles, setRaiderioCachedProfiles] = useState<RaiderioProfile[]>([]);
     const [season, setSeason] = useState({
@@ -78,6 +78,18 @@ export function ViewDetail({view, onBack, onCharacterClick}: ViewDetailProps) {
         window.open(url, '_blank', 'noopener,noreferrer');
     };
 
+    const toggleCharacter = (characterId: number) => {
+        setExpandedCharacters(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(characterId)) {
+                newSet.delete(characterId);
+            } else {
+                newSet.add(characterId);
+            }
+            return newSet;
+        });
+    };
+
     const getClassSlug = (className: string): string => {
         return className.toLowerCase().replace(/\s+/g, '-');
     };
@@ -124,42 +136,122 @@ export function ViewDetail({view, onBack, onCharacterClick}: ViewDetailProps) {
                             </div>
                             {isLadderOpen && (
                                 <div className="ladder-content">
-                                    {sortedCharacters.map((character, index) => (
-                                        <div key={character.name} className="ladder-row">
-                                            <div className="ladder-row-inner">
-                                                <div className="ladder-rank">{index + 1}</div>
+                                    {sortedCharacters.map((character, index) => {
+                                        const isExpanded = expandedCharacters.has(character.id);
+
+                                        return (
+                                            <div key={character.id} className="ladder-row">
                                                 <div
-                                                    className="ladder-character-info"
-                                                    onClick={() => onCharacterClick(character)}
+                                                    className="ladder-row-inner"
+                                                    onClick={() => toggleCharacter(character.id)}
                                                 >
-                                                    <p className="ladder-character-name">{character.name}</p>
-                                                    <div className="ladder-character-meta">
-                            <span className={`class-badge ${getClassSlug(character.class)}`}>
-                              {character.class}
-                            </span>
-                                                        <span className="ladder-character-spec">{character.spec}</span>
-                                                        <span className="ladder-character-realm">• {'Sanguino'}</span>
+                                                    <div className="ladder-rank">{index + 1}</div>
+                                                    <div className="ladder-character-info">
+                                                        <p className="ladder-character-name">{character.name}</p>
+                                                        <div className="ladder-character-meta">
+                                                            <span
+                                                                className={`class-badge ${getClassSlug(character.class)}`}>
+                                                                {character.class}
+                                                            </span>
+                                                            <span
+                                                                className="ladder-character-spec">{character.spec}</span>
+                                                            <span
+                                                                className="ladder-character-realm">• {'Sanguino'}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="ladder-score">
+                                                        <p className="ladder-score-value">
+                                                            {character.score.toLocaleString()}
+                                                        </p>
+                                                        <p className="ladder-score-label">M+ Score</p>
+                                                    </div>
+                                                    <div className="ladder-actions">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                openRaiderIO(character);
+                                                            }}
+                                                            className="raider-io-btn"
+                                                        >
+                                                            <ExternalLink className="external-icon"/>
+                                                            Raider.IO
+                                                        </button>
+                                                        <button className="expand-btn">
+                                                            {isExpanded ? (
+                                                                <ChevronUp className="chevron-icon"/>
+                                                            ) : (
+                                                                <ChevronDown className="chevron-icon"/>
+                                                            )}
+                                                        </button>
                                                     </div>
                                                 </div>
-                                                <div className="ladder-score">
-                                                    <p className="ladder-score-value">
-                                                        {character.score.toLocaleString()}
-                                                    </p>
-                                                    <p className="ladder-score-label">M+ Score</p>
-                                                </div>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        openRaiderIO(character);
-                                                    }}
-                                                    className="raider-io-btn"
-                                                >
-                                                    <ExternalLink className="external-icon"/>
-                                                    Raider.IO
-                                                </button>
+
+                                                {isExpanded && character.mythicPlusRanks && (
+                                                    <div className="ladder-row-expanded">
+                                                        <div className="rankings-section">
+                                                            <h4 className="rankings-section-title">Overall Rankings</h4>
+                                                            <div className="rankings-grid">
+                                                                <div className="ranking-item">
+                                                                    <span className="ranking-label">World</span>
+                                                                    <span
+                                                                        className="ranking-value">#{character.mythicPlusRanks.overall.world.toLocaleString()}</span>
+                                                                </div>
+                                                                <div className="ranking-item">
+                                                                    <span className="ranking-label">Region</span>
+                                                                    <span
+                                                                        className="ranking-value">#{character.mythicPlusRanks.overall.region.toLocaleString()}</span>
+                                                                </div>
+                                                                <div className="ranking-item">
+                                                                    <span className="ranking-label">Realm</span>
+                                                                    <span
+                                                                        className="ranking-value">#{character.mythicPlusRanks.overall.realm.toLocaleString()}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {character.mythicPlusRanks.specs.length > 0 && (
+                                                            <div className="rankings-section">
+                                                                <h4 className="rankings-section-title">Spec
+                                                                    Rankings</h4>
+                                                                {character.mythicPlusRanks.specs
+                                                                    .filter(spec => spec.score > 1000)
+                                                                    .map((spec) => (
+                                                                    <div key={spec.name} className="spec-ranking">
+                                                                        <div className="spec-ranking-header">
+                                                                            <span
+                                                                                className="spec-ranking-name">{spec.name}</span>
+                                                                            <span
+                                                                                className="spec-ranking-score">({spec.score.toLocaleString()})</span>
+                                                                        </div>
+                                                                        <div className="rankings-grid">
+                                                                            <div className="ranking-item">
+                                                                                <span
+                                                                                    className="ranking-label">World</span>
+                                                                                <span
+                                                                                    className="ranking-value">#{spec.world.toLocaleString()}</span>
+                                                                            </div>
+                                                                            <div className="ranking-item">
+                                                                                <span
+                                                                                    className="ranking-label">Region</span>
+                                                                                <span
+                                                                                    className="ranking-value">#{spec.region.toLocaleString()}</span>
+                                                                            </div>
+                                                                            <div className="ranking-item">
+                                                                                <span
+                                                                                    className="ranking-label">Realm</span>
+                                                                                <span
+                                                                                    className="ranking-value">#{spec.realm.toLocaleString()}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
@@ -183,7 +275,6 @@ export function ViewDetail({view, onBack, onCharacterClick}: ViewDetailProps) {
                                                 return (
                                                     <div
                                                         key={character.id}
-                                                        onClick={() => onCharacterClick(character)}
                                                         className={`character-run ${isHighest ? 'highest' : 'normal'}`}
                                                     >
                                                         <div className="character-run-left">
