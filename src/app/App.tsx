@@ -7,12 +7,14 @@ import {loading, notLoading} from "./features/loading/loadingSlice";
 import {fetchWithResponse} from "./utils/EasyFetch";
 import {GetViewsResponse} from "./utils/views/GetViewsResponse";
 import {ViewDetail} from "@/app/components/view-detail";
+import {CharacterDetail} from "@/app/components/character-detail";
+import {RaiderioProfile} from "@/app/utils/raiderio";
 
 
 type Screen =
     | { type: 'views' }
     | { type: 'view-detail'; viewId: string }
-    | { type: 'character-detail'; characterId: string; viewId: string };
+    | { type: 'character-detail'; character: RaiderioProfile; viewId: string };
 
 export default function App() {
     const [views, setViews] = useState<SimpleView[]>([]);
@@ -50,8 +52,8 @@ export default function App() {
         setCurrentScreen({type: 'view-detail', viewId});
     };
 
-    const handleCharacterClick = (characterId: string, viewId: string) => {
-        setCurrentScreen({type: 'character-detail', characterId, viewId});
+    const handleCharacterClick = (character: RaiderioProfile, viewId: string) => {
+        setCurrentScreen({type: 'character-detail', character, viewId});
     };
 
     const handleBackToViews = () => {
@@ -91,24 +93,19 @@ export default function App() {
             <ViewDetail
                 view={view}
                 onBack={handleBackToViews}
-                onCharacterClick={(characterId) => handleCharacterClick(characterId, view.id)}
+                onCharacterClick={(character) =>
+                    handleCharacterClick(character, view.id)
+                }
             />
         );
     }
 
-    // if (currentScreen.type === 'character-detail') {
-    //   const character = MOCK_CHARACTERS.find(c => c.id === currentScreen.characterId);
-    //   if (!character) {
-    //     setCurrentScreen({ type: 'views' });
-    //     return null;
-    //   }
-    //
-    //   return (
-    //     <CharacterDetail
-    //       character={character}
-    //       dungeons={SEASON_DUNGEONS}
-    //       onBack={() => handleBackToView(currentScreen.viewId)}
-    //     />
-    //   );
-    return null;
+    if (currentScreen.type === 'character-detail') {
+        return (
+            <CharacterDetail
+                character={currentScreen.character}
+                onBack={() => handleBackToView(currentScreen.viewId)}
+            />
+        );
+    }
 }

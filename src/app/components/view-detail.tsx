@@ -2,16 +2,16 @@ import {ArrowLeft, ChevronDown, ChevronUp, Crown, ExternalLink, Trophy} from 'lu
 import {useEffect, useState} from 'react';
 import './view-detail.css';
 import {SimpleView} from "@/app/utils/views/SimpleView";
-import {Dungeon, MythicPlusRun, RaiderioProfile, Season, ViewData} from "@/app/utils/raiderio";
+import {MythicPlusRun, RaiderioProfile, Season, ViewData} from "@/app/utils/raiderio";
 import {fetchWithResponse} from "@/app/utils/EasyFetch";
 import {useAppDispatch} from "@/app/hooks";
 import {loading, notLoading} from "@/app/features/loading/loadingSlice";
 
-interface ViewDetailProps {
+type ViewDetailProps = {
     view: SimpleView;
     onBack: () => void;
-    onCharacterClick: (characterId: string) => void;
-}
+    onCharacterClick: (character: RaiderioProfile) => void;
+};
 
 interface CharacterDungeonScore {
     character: RaiderioProfile;
@@ -130,7 +130,7 @@ export function ViewDetail({view, onBack, onCharacterClick}: ViewDetailProps) {
                                                 <div className="ladder-rank">{index + 1}</div>
                                                 <div
                                                     className="ladder-character-info"
-                                                    onClick={() => onCharacterClick(character.id.toString())}
+                                                    onClick={() => onCharacterClick(character)}
                                                 >
                                                     <p className="ladder-character-name">{character.name}</p>
                                                     <div className="ladder-character-meta">
@@ -183,7 +183,7 @@ export function ViewDetail({view, onBack, onCharacterClick}: ViewDetailProps) {
                                                 return (
                                                     <div
                                                         key={character.id}
-                                                        onClick={() => onCharacterClick(character.id.toString())}
+                                                        onClick={() => onCharacterClick(character)}
                                                         className={`character-run ${isHighest ? 'highest' : 'normal'}`}
                                                     >
                                                         <div className="character-run-left">
