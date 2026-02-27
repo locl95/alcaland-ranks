@@ -97,16 +97,14 @@ export function ViewDetail({view, onBack}: ViewDetailProps) {
     return (
         <div className="view-detail-container">
             <div className="view-detail-content">
-                <button onClick={onBack} className="back-button">
-                    <ArrowLeft className="chevron-icon"/>
-                    Back to Views
-                </button>
-
-                <div className="view-header">
-                    <h1 className="view-title">{view.name}</h1>
-                    <p className="view-stats">
-                        {view.entitiesIds.length} character{view.entitiesIds.length !== 1 ? 's' : ''} tracked
-                    </p>
+                <div className="view-detail-header">
+                    <button onClick={onBack} className="header-back-button">
+                        <ArrowLeft className="header-icon"/>
+                    </button>
+                    <h1 className="header-view-title">{view.name}</h1>
+                    <button className="header-project-button">
+                        <ExternalLink className="header-icon"/>
+                    </button>
                 </div>
 
                 {view.entitiesIds.length === 0 ? (

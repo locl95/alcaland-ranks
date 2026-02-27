@@ -7,13 +7,11 @@ import {loading, notLoading} from "./features/loading/loadingSlice";
 import {fetchWithResponse} from "./utils/EasyFetch";
 import {GetViewsResponse} from "./utils/views/GetViewsResponse";
 import {ViewDetail} from "@/app/components/view-detail";
-import {RaiderioProfile} from "@/app/utils/raiderio";
 
 
 type Screen =
     | { type: 'views' }
-    | { type: 'view-detail'; viewId: string }
-    | { type: 'character-detail'; character: RaiderioProfile; viewId: string };
+    | { type: 'view-detail'; viewId: string };
 
 export default function App() {
     const [views, setViews] = useState<SimpleView[]>([]);
@@ -42,25 +40,15 @@ export default function App() {
         fetchViews();
     }, [dispatch]);
 
-    const handleCreateView = (name: string, description: string) => {
-        const newView: SimpleView = null;
-        setViews([...views, newView]);
+    const handleCreateView = () => {
     };
 
     const handleViewClick = (viewId: string) => {
         setCurrentScreen({type: 'view-detail', viewId});
     };
 
-    const handleCharacterClick = (character: RaiderioProfile, viewId: string) => {
-        setCurrentScreen({type: 'character-detail', character, viewId});
-    };
-
     const handleBackToViews = () => {
         setCurrentScreen({type: 'views'});
-    };
-
-    const handleBackToView = (viewId: string) => {
-        setCurrentScreen({type: 'view-detail', viewId});
     };
 
     // Render based on current screen
