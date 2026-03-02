@@ -53,10 +53,9 @@ export function ViewDetail({view, onBack}: ViewDetailProps) {
 
     const [isLadderOpen, setIsLadderOpen] = useState(true);
 
-    // Sort characters by score (highest first)
     const sortedCharacters = [...raiderioProfiles].sort((a, b) => b.score - a.score);
+    const sortedCachedCharacters = [...raiderioCachedProfiles].sort((a, b) => b.score - a.score);
 
-    // Get best run for each character in a specific dungeon
     const getCharacterScoresForDungeon = (dungeonId: string): CharacterDungeonScore[] => {
         return raiderioProfiles.map(character => ({
             character,
@@ -64,7 +63,6 @@ export function ViewDetail({view, onBack}: ViewDetailProps) {
         }));
     };
 
-    // Find the highest score for a dungeon
     const getHighestScore = (scores: CharacterDungeonScore[]): number => {
         return Math.max(...scores.map(s => s.run?.score || 0));
     };
@@ -90,8 +88,39 @@ export function ViewDetail({view, onBack}: ViewDetailProps) {
         });
     };
 
+    const getCachedRaiderIoProfile = (raiderioCachedProfiles: RaiderioProfile[], character: RaiderioProfile): RaiderioProfile | undefined => {
+        return raiderioCachedProfiles.find(cachedProfile => cachedProfile.id == character.id);
+    }
+
     const getClassSlug = (className: string): string => {
         return className.toLowerCase().replace(/\s+/g, '-');
+    };
+
+    const getLadderPositionChange = (raiderIoProfile: RaiderioProfile, cachedRaiderIoProfile: RaiderioProfile | undefined): number | null => {
+        if (cachedRaiderIoProfile == undefined) return null;
+
+        const currentPosition = sortedCharacters.findIndex(c => c.id === raiderIoProfile.id) + 1;
+        const previousPosition = sortedCachedCharacters.findIndex(c => c.id === raiderIoProfile.id) + 1;
+
+        return previousPosition - currentPosition;
+    };
+
+    const getRankChange = (currentRank: number, previousRank: number): number => {
+        return previousRank - currentRank;
+    };
+
+    const getScoreImprovement = (raiderioProfile: RaiderioProfile, currentRun: MythicPlusRun): number => {
+        const cachedRun = getCachedRaiderIoProfile(
+            raiderioCachedProfiles,
+            raiderioProfile
+        )?.mythicPlusBestRuns
+            .find(run => run.short_name === currentRun.short_name);
+
+        if (!cachedRun) {
+            return 0;
+        }
+
+        return currentRun.score - cachedRun.score
     };
 
     return (
@@ -136,15 +165,25 @@ export function ViewDetail({view, onBack}: ViewDetailProps) {
                                 <div className="ladder-content">
                                     {sortedCharacters.map((character, index) => {
                                         const isExpanded = expandedCharacters.has(character.id);
+                                        const cachedRaiderIoProfile = getCachedRaiderIoProfile(raiderioCachedProfiles, character);
+                                        const positionChange = getLadderPositionChange(character, cachedRaiderIoProfile);
 
                                         return (
                                             <div key={character.id} className="ladder-row">
                                                 <div
                                                     className="ladder-row-inner"
-                                                    onClick={() => toggleCharacter(character.id)}
-                                                >
+                                                    onClick={() => toggleCharacter(character.id)}>
                                                     <div className="ladder-rank">{index + 1}</div>
                                                     <div className="ladder-character-info">
+                                                        <div className="ladder-character-name-row">
+                                                            <p className="ladder-character-name">{character.name}</p>
+                                                            {positionChange !== null && positionChange !== 0 && (
+                                                                <span
+                                                                    className={`ladder-position-change ${positionChange > 0 ? 'improved' : 'declined'}`}>
+                                                                    {positionChange > 0 ? `↑ ${positionChange}` : `↓ ${Math.abs(positionChange)}`}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                         <p className="ladder-character-name">{character.name}</p>
                                                         <div className="ladder-character-meta">
                                                             <span
@@ -191,18 +230,48 @@ export function ViewDetail({view, onBack}: ViewDetailProps) {
                                                             <div className="rankings-grid">
                                                                 <div className="ranking-item">
                                                                     <span className="ranking-label">World</span>
-                                                                    <span
-                                                                        className="ranking-value">#{character.mythicPlusRanks.overall.world.toLocaleString()}</span>
+                                                                    <div className="ranking-value-row">
+                                                                        <span
+                                                                            className="ranking-value">#{character.mythicPlusRanks.overall.world.toLocaleString()}</span>
+                                                                        {cachedRaiderIoProfile?.mythicPlusRanks.overall.world.toLocaleString() && (() => {
+                                                                            const change = getRankChange(character.mythicPlusRanks.overall.world, cachedRaiderIoProfile?.mythicPlusRanks.overall.world);
+                                                                            return change === 0 ? null : (
+                                                                                <span
+                                                                                    className={`rank-change ${change > 0 ? 'improved' : 'declined'}`}>{change > 0 ? `+${change}` : change}
+                                                                                </span>);
+                                                                        })()
+                                                                        }
+                                                                    </div>
                                                                 </div>
                                                                 <div className="ranking-item">
                                                                     <span className="ranking-label">Region</span>
-                                                                    <span
-                                                                        className="ranking-value">#{character.mythicPlusRanks.overall.region.toLocaleString()}</span>
+                                                                    <div className="ranking-value-row">
+                                                                        <span
+                                                                            className="ranking-value">#{character.mythicPlusRanks.overall.region.toLocaleString()}</span>
+                                                                        {cachedRaiderIoProfile?.mythicPlusRanks.overall.world.toLocaleString() && (() => {
+                                                                            const change = getRankChange(character.mythicPlusRanks.overall.region, cachedRaiderIoProfile?.mythicPlusRanks.overall.region);
+                                                                            return change === 0 ? null : (
+                                                                                <span
+                                                                                    className={`rank-change ${change > 0 ? 'improved' : 'declined'}`}>{change > 0 ? `+${change}` : change}
+                                                                                </span>);
+                                                                        })()
+                                                                        }
+                                                                    </div>
                                                                 </div>
                                                                 <div className="ranking-item">
                                                                     <span className="ranking-label">Realm</span>
-                                                                    <span
-                                                                        className="ranking-value">#{character.mythicPlusRanks.overall.realm.toLocaleString()}</span>
+                                                                    <div className="ranking-value-row">
+                                                                        <span
+                                                                            className="ranking-value">#{character.mythicPlusRanks.overall.realm.toLocaleString()}</span>
+                                                                        {cachedRaiderIoProfile?.mythicPlusRanks.overall.realm.toLocaleString() && (() => {
+                                                                            const change = getRankChange(character.mythicPlusRanks.overall.realm, cachedRaiderIoProfile?.mythicPlusRanks.overall.realm);
+                                                                            return change === 0 ? null : (
+                                                                                <span
+                                                                                    className={`rank-change ${change > 0 ? 'improved' : 'declined'}`}>{change > 0 ? `+${change}` : change}
+                                                                                </span>);
+                                                                        })()
+                                                                        }
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -213,36 +282,72 @@ export function ViewDetail({view, onBack}: ViewDetailProps) {
                                                                     Rankings</h4>
                                                                 {character.mythicPlusRanks.specs
                                                                     .filter(spec => spec.score > 1000)
-                                                                    .map((spec) => (
-                                                                    <div key={spec.name} className="spec-ranking">
-                                                                        <div className="spec-ranking-header">
-                                                                            <span
-                                                                                className="spec-ranking-name">{spec.name}</span>
-                                                                            <span
-                                                                                className="spec-ranking-score">({spec.score.toLocaleString()})</span>
-                                                                        </div>
-                                                                        <div className="rankings-grid">
-                                                                            <div className="ranking-item">
+                                                                    .map((spec) => {
+                                                                        const previousSpec =
+                                                                            cachedRaiderIoProfile?.mythicPlusRanks.specs.find(s => s.name === spec.name);
+
+                                                                        return (
+                                                                            <div key={spec.name}
+                                                                                 className="spec-ranking">
+                                                                                <div className="spec-ranking-header">
                                                                                 <span
-                                                                                    className="ranking-label">World</span>
-                                                                                <span
-                                                                                    className="ranking-value">#{spec.world.toLocaleString()}</span>
+                                                                                    className="spec-ranking-name">{spec.name}</span>
+                                                                                    <span
+                                                                                        className="spec-ranking-score">({spec.score.toLocaleString()})</span>
+                                                                                </div>
+                                                                                <div className="rankings-grid">
+                                                                                    <div className="ranking-item">
+                                                                                    <span
+                                                                                        className="ranking-label">World</span>
+                                                                                        <div
+                                                                                            className="ranking-value-row">
+                                                                                        <span
+                                                                                            className="ranking-value">#{spec.world.toLocaleString()}</span>
+                                                                                            {previousSpec && (() => {
+                                                                                                const change = getRankChange(spec.world, previousSpec.world);
+                                                                                                return change === 0 ? null : (
+                                                                                                    <span
+                                                                                                        className={`rank-change ${change > 0 ? 'improved' : 'declined'}`}>{change > 0 ? `+${change}` : change}</span>
+                                                                                                );
+                                                                                            })()}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="ranking-item">
+                                                                                    <span
+                                                                                        className="ranking-label">Region</span>
+                                                                                        <div
+                                                                                            className="ranking-value-row">
+                                                                                        <span
+                                                                                            className="ranking-value">#{spec.region.toLocaleString()}</span>
+                                                                                            {previousSpec && (() => {
+                                                                                                const change = getRankChange(spec.region, previousSpec.region);
+                                                                                                return change === 0 ? null : (
+                                                                                                    <span
+                                                                                                        className={`rank-change ${change > 0 ? 'improved' : 'declined'}`}>{change > 0 ? `+${change}` : change}</span>
+                                                                                                );
+                                                                                            })()}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="ranking-item">
+                                                                                    <span
+                                                                                        className="ranking-label">Realm</span>
+                                                                                        <div
+                                                                                            className="ranking-value-row">
+                                                                                        <span
+                                                                                            className="ranking-value">#{spec.realm.toLocaleString()}</span>
+                                                                                            {previousSpec && (() => {
+                                                                                                const change = getRankChange(spec.realm, previousSpec.realm);
+                                                                                                return change === 0 ? null : (
+                                                                                                    <span
+                                                                                                        className={`rank-change ${change > 0 ? 'improved' : 'declined'}`}>{change > 0 ? `+${change}` : change}</span>
+                                                                                                );
+                                                                                            })()}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
-                                                                            <div className="ranking-item">
-                                                                                <span
-                                                                                    className="ranking-label">Region</span>
-                                                                                <span
-                                                                                    className="ranking-value">#{spec.region.toLocaleString()}</span>
-                                                                            </div>
-                                                                            <div className="ranking-item">
-                                                                                <span
-                                                                                    className="ranking-label">Realm</span>
-                                                                                <span
-                                                                                    className="ranking-value">#{spec.realm.toLocaleString()}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
+                                                                        );
+                                                                    })}
                                                             </div>
                                                         )}
                                                     </div>
@@ -268,7 +373,8 @@ export function ViewDetail({view, onBack}: ViewDetailProps) {
                                         </div>
                                         <div className="dungeon-content">
                                             {characterScores.map(({character, run}) => {
-                                                const isHighest = run && run.score === highestScore && highestScore > 0;
+                                                const isHighest = run?.score === highestScore && highestScore > 0;
+                                                const scoreImprovement = run ? getScoreImprovement(character, run) : 0;
 
                                                 return (
                                                     <div
@@ -289,9 +395,15 @@ export function ViewDetail({view, onBack}: ViewDetailProps) {
 
                                                         {run ? (
                                                             <div className="character-run-stats">
-                                                                <p className={`character-run-score ${isHighest ? 'highest' : 'normal'}`}>
-                                                                    {run.score}
-                                                                </p>
+                                                                <div className="character-run-score-row">
+                                                                    <p className={`character-run-score ${isHighest ? 'highest' : 'normal'}`}>
+                                                                        {run.score}
+                                                                    </p>
+                                                                    {scoreImprovement > 0 && (
+                                                                        <span
+                                                                            className="score-improvement">+{scoreImprovement}</span>
+                                                                    )}
+                                                                </div>
                                                                 <p className="character-run-level">+{run.mythic_level}</p>
                                                                 <p className="character-run-date">
                                                                     {new Date().toLocaleDateString('en-US', {
