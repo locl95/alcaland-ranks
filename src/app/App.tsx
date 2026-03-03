@@ -6,7 +6,7 @@ import {SimpleView} from "@/app/utils/views/SimpleView";
 import {loading, notLoading} from "./features/loading/loadingSlice";
 import {fetchWithResponse} from "./utils/EasyFetch";
 import {GetViewsResponse} from "./utils/views/GetViewsResponse";
-import {ViewDetail} from "@/app/components/view-detail";
+import {ViewDetail} from "@/app/components/view/detail/view-detail.tsx";
 
 
 type Screen =
