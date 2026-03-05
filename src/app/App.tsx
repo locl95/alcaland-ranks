@@ -80,6 +80,7 @@ export default function App() {
             <ViewDetail
                 view={view}
                 onBack={handleBackToViews}
+                onDeleteCharacter={(characterId) => handleDeleteCharacter(view.id, characterId)}
             />
         );
     }
