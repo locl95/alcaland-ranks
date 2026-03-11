@@ -2,7 +2,7 @@ import { ArrowLeft, Edit, Trophy } from "lucide-react";
 import { SimpleView } from "@/app/utils/views/SimpleView";
 import { RaiderioProfile, Season, ViewData } from "@/app/utils/raiderio";
 import { fetchWithResponse } from "@/app/utils/EasyFetch";
-import { EditViewWindow } from "@/app/components/view/detail/edit-view-window.tsx";
+import { EditView } from "@/app/components/view/detail/edit-view.tsx";
 import { CharacterLadder } from "@/app/components/view/detail/character-ladder.tsx";
 import { DungeonGrid } from "@/app/components/view/detail/dungeon-grid.tsx";
 import { loading, notLoading } from "@/app/features/loading/loadingSlice.ts";
@@ -119,7 +119,7 @@ export function ViewDetail({
         )}
       </div>
 
-      <EditViewWindow
+      <EditView
         isOpen={isEditOpen}
         characters={profiles}
         onClose={() => setIsEditOpen(false)}

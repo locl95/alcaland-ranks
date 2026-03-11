@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, X } from "lucide-react";
 import { RaiderioProfile } from "@/app/utils/raiderio";
-import { AddCharacterWindow } from "./add-character-window";
-import "./edit-view-window.css";
+import { AddCharacter } from "./add-character.tsx";
+import "./edit-view.css";
 
 interface Props {
   isOpen: boolean;
@@ -11,7 +11,12 @@ interface Props {
   onSave: (characters: RaiderioProfile[]) => void;
 }
 
-export function EditViewWindow({ isOpen, characters, onClose, onSave }: Props) {
+export function EditView({
+  isOpen,
+  characters,
+  onClose,
+  onSave,
+}: Readonly<Props>) {
   const [editingCharacters, setEditingCharacters] = useState<RaiderioProfile[]>(
     [],
   );
@@ -55,10 +60,7 @@ export function EditViewWindow({ isOpen, characters, onClose, onSave }: Props) {
   return (
     <>
       <div className="edit-view-overlay" onClick={onClose}>
-        <div
-          className="edit-view-content"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="edit-view-content" onClick={(e) => e.stopPropagation()}>
           <div className="edit-view-header">
             <div>
               <h2 className="edit-view-title">Manage Characters</h2>
@@ -74,39 +76,41 @@ export function EditViewWindow({ isOpen, characters, onClose, onSave }: Props) {
           <div className="edit-view-body">
             <div className="character-edit-items">
               {editingCharacters
-                  .filter(character => character.score > -1)
-                  .map((character) => (
-                <div key={character.id} className="character-edit-row">
-                  <div className="character-edit-info">
-                    <div className="character-edit-name-row">
-                      <p className="character-edit-name">{character.name}</p>
-                      <span
-                        className={`character-edit-class-badge ${getClassSlug(character.class)}`}
-                      >
-                        {character.class}
-                      </span>
+                .filter((character) => character.score > -1)
+                .map((character) => (
+                  <div key={character.id} className="character-edit-row">
+                    <div className="character-edit-info">
+                      <div className="character-edit-name-row">
+                        <p className="character-edit-name">{character.name}</p>
+                        <span
+                          className={`character-edit-class-badge ${getClassSlug(character.class)}`}
+                        >
+                          {character.class}
+                        </span>
+                      </div>
+                      <div className="character-edit-meta">
+                        <span className="character-edit-spec">
+                          {character.spec}
+                        </span>
+                        <span className="character-edit-separator">•</span>
+                        <span className="character-edit-realm">
+                          {"Sanguino"}
+                        </span>
+                        <span className="character-edit-separator">•</span>
+                        <span className="character-edit-score">
+                          {character.score.toLocaleString()} M+
+                        </span>
+                      </div>
                     </div>
-                    <div className="character-edit-meta">
-                      <span className="character-edit-spec">
-                        {character.spec}
-                      </span>
-                      <span className="character-edit-separator">•</span>
-                      <span className="character-edit-realm">{"Sanguino"}</span>
-                      <span className="character-edit-separator">•</span>
-                      <span className="character-edit-score">
-                        {character.score.toLocaleString()} M+
-                      </span>
-                    </div>
+                    <button
+                      onClick={() => deleteCharacter(character.id)}
+                      className="character-delete-btn"
+                    >
+                      <Trash2 className="delete-icon" />
+                      Delete
+                    </button>
                   </div>
-                  <button
-                    onClick={() => deleteCharacter(character.id)}
-                    className="character-delete-btn"
-                  >
-                    <Trash2 className="delete-icon" />
-                    Delete
-                  </button>
-                </div>
-              ))}
+                ))}
 
               <button
                 onClick={() => setIsAddOpen(true)}
@@ -129,7 +133,7 @@ export function EditViewWindow({ isOpen, characters, onClose, onSave }: Props) {
         </div>
       </div>
 
-      <AddCharacterWindow
+      <AddCharacter
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
         onAdd={addCharacter}

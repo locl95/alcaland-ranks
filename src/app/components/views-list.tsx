@@ -12,7 +12,7 @@ export function ViewsList({
   views,
   onViewClick,
   onCreateView,
-}: ViewsListProps) {
+}: Readonly<ViewsListProps>) {
   return (
     <div className="views-list-container">
       <div className="views-list-content">
