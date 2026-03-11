@@ -8,6 +8,7 @@
   padding: 1rem;
   z-index: 50;
   animation: fadeIn 0.2s ease-out;
+
 }
 
 @keyframes fadeIn {

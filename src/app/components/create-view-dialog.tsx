@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import './create-view-dialog.css';
+import { useState, useEffect } from "react";
+import "./create-view-dialog.css";
 
 interface CreateViewDialogProps {
   open: boolean;
@@ -7,25 +7,29 @@ interface CreateViewDialogProps {
   onCreateView: (name: string, description: string) => void;
 }
 
-export function CreateViewDialog({ open, onOpenChange, onCreateView }: CreateViewDialogProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+export function CreateViewDialog({
+  open,
+  onOpenChange,
+  onCreateView,
+}: CreateViewDialogProps) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
+      if (e.key === "Escape" && open) {
         onOpenChange(false);
       }
     };
 
     if (open) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [open, onOpenChange]);
 
@@ -33,8 +37,8 @@ export function CreateViewDialog({ open, onOpenChange, onCreateView }: CreateVie
     e.preventDefault();
     if (name.trim()) {
       onCreateView(name, description);
-      setName('');
-      setDescription('');
+      setName("");
+      setDescription("");
       onOpenChange(false);
     }
   };
@@ -59,7 +63,9 @@ export function CreateViewDialog({ open, onOpenChange, onCreateView }: CreateVie
         <form onSubmit={handleSubmit} className="dialog-form">
           <div className="form-content">
             <div className="form-field">
-              <label htmlFor="name" className="form-label">View Name</label>
+              <label htmlFor="name" className="form-label">
+                View Name
+              </label>
               <input
                 id="name"
                 type="text"
@@ -71,7 +77,9 @@ export function CreateViewDialog({ open, onOpenChange, onCreateView }: CreateVie
               />
             </div>
             <div className="form-field">
-              <label htmlFor="description" className="form-label">Description</label>
+              <label htmlFor="description" className="form-label">
+                Description
+              </label>
               <textarea
                 id="description"
                 className="form-textarea"
@@ -83,10 +91,18 @@ export function CreateViewDialog({ open, onOpenChange, onCreateView }: CreateVie
             </div>
           </div>
           <div className="dialog-footer">
-            <button type="button" className="btn btn-outline" onClick={() => onOpenChange(false)}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={!name.trim()}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!name.trim()}
+            >
               Create View
             </button>
           </div>

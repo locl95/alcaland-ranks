@@ -22,6 +22,7 @@
     display: flex;
     flex-direction: column;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+
 }
 
 .manage-modal-header {
@@ -120,19 +121,58 @@
     font-weight: 500;
 }
 
-.character-edit-class-badge.warrior { background: #d97706; }
-.character-edit-class-badge.paladin { background: #ec4899; }
-.character-edit-class-badge.hunter { background: #65a30d; }
-.character-edit-class-badge.rogue { background: #facc15; }
-.character-edit-class-badge.priest { background: #f1f5f9; color: #1e293b; }
-.character-edit-class-badge.death-knight { background: #b91c1c; }
-.character-edit-class-badge.shaman { background: #3b82f6; }
-.character-edit-class-badge.mage { background: #22d3ee; }
-.character-edit-class-badge.warlock { background: #9333ea; }
-.character-edit-class-badge.monk { background: #10b981; }
-.character-edit-class-badge.druid { background: #f97316; }
-.character-edit-class-badge.demon-hunter { background: #7c3aed; }
-.character-edit-class-badge.evoker { background: #14b8a6; }
+.character-edit-class-badge.warrior {
+    background: #d97706;
+}
+
+.character-edit-class-badge.paladin {
+    background: #ec4899;
+}
+
+.character-edit-class-badge.hunter {
+    background: #65a30d;
+}
+
+.character-edit-class-badge.rogue {
+    background: #facc15;
+}
+
+.character-edit-class-badge.priest {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.character-edit-class-badge.death-knight {
+    background: #b91c1c;
+}
+
+.character-edit-class-badge.shaman {
+    background: #3b82f6;
+}
+
+.character-edit-class-badge.mage {
+    background: #22d3ee;
+}
+
+.character-edit-class-badge.warlock {
+    background: #9333ea;
+}
+
+.character-edit-class-badge.monk {
+    background: #10b981;
+}
+
+.character-edit-class-badge.druid {
+    background: #f97316;
+}
+
+.character-edit-class-badge.demon-hunter {
+    background: #7c3aed;
+}
+
+.character-edit-class-badge.evoker {
+    background: #14b8a6;
+}
 
 .character-edit-meta {
     display: flex;
