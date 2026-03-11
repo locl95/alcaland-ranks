@@ -42,16 +42,16 @@ export function AddCharacterWindow({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2 className="modal-title">Add Character</h2>
-          <button onClick={handleClose} className="modal-close-btn">
+    <div className="add-character-overlay" onClick={handleClose}>
+      <div className="add-character-content" onClick={(e) => e.stopPropagation()}>
+        <div className="add-character-header">
+          <h2 className="add-character-title">Add Character</h2>
+          <button onClick={handleClose} className="add-character-close-btn">
             <X className="close-icon" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-form">
+        <form onSubmit={handleSubmit} className="add-character-form">
           <div className="form-group">
             <label htmlFor="characterName" className="form-label">
               Character Name *
@@ -100,17 +100,17 @@ export function AddCharacterWindow({
             </select>
           </div>
 
-          <div className="modal-actions">
+          <div className="add-character-actions">
             <button
               type="button"
               onClick={handleClose}
-              className="modal-btn modal-btn-cancel"
+              className="add-character-btn add-character-btn-cancel"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="modal-btn modal-btn-submit"
+              className="add-character-btn add-character-btn-submit"
               disabled={
                 !characterName.trim() || !realm.trim() || !region.trim()
               }

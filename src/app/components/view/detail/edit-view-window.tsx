@@ -54,24 +54,24 @@ export function EditViewWindow({ isOpen, characters, onClose, onSave }: Props) {
 
   return (
     <>
-      <div className="manage-modal-overlay" onClick={onClose}>
+      <div className="edit-view-overlay" onClick={onClose}>
         <div
-          className="manage-modal-content"
+          className="edit-view-content"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="manage-modal-header">
+          <div className="edit-view-header">
             <div>
-              <h2 className="manage-modal-title">Manage Characters</h2>
-              <p className="manage-modal-subtitle">
+              <h2 className="edit-view-title">Manage Characters</h2>
+              <p className="edit-view-subtitle">
                 Edit your character list by adding or removing characters
               </p>
             </div>
-            <button onClick={onClose} className="manage-modal-close-btn">
+            <button onClick={onClose} className="edit-view-close-btn">
               <X className="close-icon" />
             </button>
           </div>
 
-          <div className="manage-modal-body">
+          <div className="edit-view-body">
             <div className="character-edit-items">
               {editingCharacters
                   .filter(character => character.score > -1)
@@ -118,7 +118,7 @@ export function EditViewWindow({ isOpen, characters, onClose, onSave }: Props) {
             </div>
           </div>
 
-          <div className="manage-modal-footer">
+          <div className="edit-view-footer">
             <button
               onClick={() => onSave(editingCharacters)}
               className="manage-done-btn"

@@ -1,4 +1,4 @@
-.manage-modal-overlay {
+.edit-view-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -12,7 +12,7 @@
     padding: 1rem;
 }
 
-.manage-modal-content {
+.edit-view-content {
     background: #1e293b;
     border: 1px solid #334155;
     border-radius: 0.75rem;
@@ -25,7 +25,7 @@
 
 }
 
-.manage-modal-header {
+.edit-view-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -33,19 +33,19 @@
     border-bottom: 1px solid #334155;
 }
 
-.manage-modal-title {
+.edit-view-title {
     font-size: 1.5rem;
     font-weight: bold;
     color: #ffffff;
     margin-bottom: 0.5rem;
 }
 
-.manage-modal-subtitle {
+.edit-view-subtitle {
     font-size: 0.875rem;
     color: #94a3b8;
 }
 
-.manage-modal-close-btn {
+.edit-view-close-btn {
     background: transparent;
     border: none;
     color: #94a3b8;
@@ -59,7 +59,7 @@
     flex-shrink: 0;
 }
 
-.manage-modal-close-btn:hover {
+.edit-view-close-btn:hover {
     color: #ffffff;
     background: rgba(51, 65, 85, 0.5);
 }
@@ -69,7 +69,7 @@
     height: 1.5rem;
 }
 
-.manage-modal-body {
+.edit-view-body {
     padding: 1.5rem;
     overflow-y: auto;
 }
@@ -253,7 +253,7 @@
     height: 1.25rem;
 }
 
-.manage-modal-footer {
+.edit-view-footer {
     padding: 1.5rem;
     border-top: 1px solid #334155;
     display: flex;
