@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { ViewsList } from "@/app/components/views-list";
-import { CreateViewDialog } from "@/app/components/create-view-dialog";
+import { CreateView } from "@/app/components/create-view.tsx";
 import { useAppDispatch } from "./hooks";
-import { SimpleView } from "@/app/utils/views/SimpleView";
 import { loading, notLoading } from "./features/loading/loadingSlice";
 import { fetchWithResponse } from "./utils/EasyFetch";
 import { GetViewsResponse } from "./utils/views/GetViewsResponse";
 import { ViewDetail } from "@/app/components/view/detail/view-detail.tsx";
+import { View } from "@/app/utils/views/View.tsx";
 
 type Screen = { type: "views" } | { type: "view-detail"; viewId: string };
 
 export default function App() {
-  const [views, setViews] = useState<SimpleView[]>([]);
+  const [views, setViews] = useState<View[]>([]);
   const [currentScreen, setCurrentScreen] = useState<Screen>({ type: "views" });
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const dispatch = useAppDispatch();
@@ -27,7 +27,13 @@ export default function App() {
           `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
         );
 
-        setViews(response.records);
+        setViews(
+          response.records.map((v) => ({
+            id: v.id,
+            simpleView: v,
+            isSynced: true,
+          })),
+        );
       } catch (error) {
         console.error("Failed to fetch views", error);
       } finally {
@@ -37,7 +43,9 @@ export default function App() {
     fetchViews();
   }, [dispatch]);
 
-  const handleCreateView = () => {};
+  const handleCreateView = (view: View) => {
+    setViews((prev) => [...prev, view]);
+  };
 
   const handleViewClick = (viewId: string) => {
     setCurrentScreen({ type: "view-detail", viewId });
@@ -47,7 +55,6 @@ export default function App() {
     setCurrentScreen({ type: "views" });
   };
 
-  // Render based on current screen
   if (currentScreen.type === "views") {
     return (
       <>
@@ -56,7 +63,7 @@ export default function App() {
           onViewClick={handleViewClick}
           onCreateView={() => setIsCreateDialogOpen(true)}
         />
-        <CreateViewDialog
+        <CreateView
           open={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
           onCreateView={handleCreateView}
@@ -72,14 +79,6 @@ export default function App() {
       return null;
     }
 
-    return (
-      <ViewDetail
-        view={view}
-        onBack={handleBackToViews}
-        onDeleteCharacter={(characterId) =>
-          handleDeleteCharacter(view.id, characterId)
-        }
-      />
-    );
+    return <ViewDetail view={view.simpleView} onBack={handleBackToViews} />;
   }
 }

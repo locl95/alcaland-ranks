@@ -170,3 +170,19 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.character-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.character-row .form-input {
+  flex: 1;
+}
+
+.btn-small {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.75rem;
+  min-width: 50px;
+}

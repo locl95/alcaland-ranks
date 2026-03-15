@@ -32,7 +32,6 @@ export function AddCharacter({
   };
 
   const handleClose = () => {
-    // Reset form on close
     setCharacterName("");
     setRealm("");
     setRegion("EU");
