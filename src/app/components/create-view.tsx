@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import "./create-view.css";
 import { fetchWithResponse } from "@/app/utils/EasyFetch.ts";
-import { CreateViewRequest } from "@/app/utils/views/CreateViewRequest.tsx";
 import { View } from "@/app/utils/views/View.tsx";
+import { useCreateViewForm } from "@/app/utils/views/CreateViewFunctions.tsx";
 
 interface CreateViewDialogProps {
   open: boolean;
@@ -10,23 +10,22 @@ interface CreateViewDialogProps {
   onCreateView: (newView: View) => void;
 }
 
-interface CharacterRow {
-  name: string;
-  realm: string;
-  region: string;
-  mode: "add" | "added";
-}
-
 export function CreateView({
   open,
   onOpenChange,
   onCreateView,
 }: Readonly<CreateViewDialogProps>) {
-  const [name, setName] = useState("");
-
-  const [characters, setCharacters] = useState<CharacterRow[]>([
-    { name: "", realm: "", region: "", mode: "add" },
-  ]);
+  const {
+    name,
+    setName,
+    characters,
+    updateCharacter,
+    addCharacter,
+    removeCharacter,
+    resetForm,
+    canSubmit,
+    getAddedCharacters,
+  } = useCreateViewForm();
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -40,91 +39,63 @@ export function CreateView({
       document.body.style.overflow = "hidden";
     }
 
-    if (!open) resetForm();
-
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "unset";
     };
   }, [open, onOpenChange]);
 
-  const updateCharacter = (index: number, field: string, value: string) => {
-    const updated = [...characters];
-    updated[index] = { ...updated[index], [field]: value };
-    setCharacters(updated);
-  };
+  useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+  }, [open, resetForm]);
 
-  const resetForm = () => {
-    setName("");
-    setCharacters([{ name: "", realm: "", region: "", mode: "add" }]);
-  };
-
-
-  const handleCreateView = (e: React.FormEvent) => {
+  const handleCreateView = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const request: CreateViewRequest = {
-      name: name,
-      entities: characters
-        .filter((c) => c.mode === "added")
-        .map((c) => ({
-          name: c.name,
-          region: c.region,
-          realm: c.realm,
-          type: "com.kos.entities.domain.WowEntityRequest",
-        })),
+    const addedCharacters = getAddedCharacters();
+
+    const request = {
+      name,
+      entities: addedCharacters.map((c) => ({
+        name: c.name,
+        region: c.region,
+        realm: c.realm,
+        type: "com.kos.entities.domain.WowEntityRequest",
+      })),
       published: true,
-      featured: true,
+      featured: false,
       game: "WOW",
     };
 
-    // await fetchWithResponse(
-    //   "POST",
-    //   `/views`,
-    //   request,
-    //   `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-    // );
+    try {
+      await fetchWithResponse(
+        "POST",
+        `/views`,
+        request,
+        `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
+      );
 
-    onCreateView({
-      id: "",
-      simpleView: {
+      onCreateView({
         id: "",
-        name: name,
-        owner: "",
-        published: false,
-        entitiesIds: [characters.filter((c) => c.mode == "added").length],
-        game: "WOW",
-        featured: true,
-        extraArguments: null,
-      },
-      isSynced: false,
-    });
-
-    onOpenChange(false);
-  };
-
-  const addCharacter = (index: number) => {
-    const updated = [...characters];
-
-    updated[index].mode = "added";
-
-    updated.push({
-      name: "",
-      realm: "",
-      region: "",
-      mode: "add",
-    });
-
-    setCharacters(updated);
-  };
-
-  const removeCharacter = (index: number) => {
-    const updated = characters.filter((_, i) => i !== index);
-    setCharacters(
-      updated.length
-        ? updated
-        : [{ name: "", realm: "", region: "", mode: "add" }],
-    );
+        simpleView: {
+          id: "",
+          name,
+          owner: "",
+          published: false,
+          entitiesIds: [],
+          game: "WOW",
+          featured: false,
+          extraArguments: null,
+        },
+        isSynced: false,
+      });
+    } catch (error) {
+      console.error("Failed to create view", error);
+    } finally {
+      onOpenChange(false);
+    }
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -223,9 +194,7 @@ export function CreateView({
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={
-                !name.trim() || !characters.some((c) => c.mode == "added")
-              }
+              disabled={!canSubmit()}
             >
               Create
             </button>
