@@ -19,7 +19,7 @@ export function CharacterLadder({
   cachedCharacters,
 }: Readonly<CharacterLadderProps>) {
   const [isLadderOpen, setIsLadderOpen] = useState(true);
-  const [expandedCharacters, setExpandedCharacters] = useState<Set<string>>(
+  const [expandedCharacters, setExpandedCharacters] = useState<Set<number>>(
     new Set(),
   );
 
@@ -28,9 +28,9 @@ export function CharacterLadder({
     (a, b) => b.score - a.score,
   );
 
+  const hasHistoricalData = cachedCharacters.length > 0;
+
   const openRaiderIO = (character: RaiderioProfile) => {
-    // Raider.IO URL format: https://raider.io/characters/region/realm/name
-    // Assuming EU region for this example - you may want to add region to Character type
     const realm = "Sanguino".replace(/\s+/g, "-");
     const name = character.name.toLowerCase();
     const url = `https://raider.io/characters/eu/${realm}/${name}`;
@@ -54,7 +54,7 @@ export function CharacterLadder({
     character: RaiderioProfile,
   ): RaiderioProfile | undefined => {
     return raiderioCachedProfiles.find(
-      (cachedProfile) => cachedProfile.id == character.id,
+      (cachedProfile) => cachedProfile.id === character.id,
     );
   };
 
@@ -64,21 +64,30 @@ export function CharacterLadder({
 
   const getLadderPositionChange = (
     raiderIoProfile: RaiderioProfile,
-    cachedRaiderIoProfile: RaiderioProfile | undefined,
   ): number | null => {
-    if (cachedRaiderIoProfile == undefined) return null;
+    if (!hasHistoricalData) return null;
 
-    const currentPosition =
-      sortedCharacters
-        .filter((c) => c.score > 0)
-        .findIndex((c) => c.id === raiderIoProfile.id) + 1;
-    const previousPosition =
-      sortedCachedCharacters.findIndex((c) => c.id === raiderIoProfile.id) + 1;
+    const currentIndex = sortedCharacters.findIndex(
+      (c) => c.id === raiderIoProfile.id,
+    );
+
+    const previousIndex = sortedCachedCharacters.findIndex(
+      (c) => c.id === raiderIoProfile.id,
+    );
+
+    if (currentIndex === -1 || previousIndex === -1) return null;
+
+    const currentPosition = currentIndex + 1;
+    const previousPosition = previousIndex + 1;
 
     return previousPosition - currentPosition;
   };
 
-  const getRankChange = (currentRank: number, previousRank: number): number => {
+  const getRankChange = (
+    currentRank: number,
+    previousRank?: number,
+  ): number | null => {
+    if (previousRank === undefined) return null;
     return previousRank - currentRank;
   };
 
@@ -100,19 +109,19 @@ export function CharacterLadder({
           )}
         </button>
       </div>
+
       {isLadderOpen && (
         <div className="ladder-content">
           {sortedCharacters.map((character, index) => {
             const isExpanded = expandedCharacters.has(character.id);
             const isSyncing = character.score == -1;
+
             const cachedRaiderIoProfile = getCachedRaiderIoProfile(
               cachedCharacters,
               character,
             );
-            const positionChange = getLadderPositionChange(
-              character,
-              cachedRaiderIoProfile,
-            );
+
+            const positionChange = getLadderPositionChange(character);
 
             return (
               <div key={character.id} className="ladder-row">
@@ -121,14 +130,19 @@ export function CharacterLadder({
                   onClick={() => toggleCharacter(character.id)}
                 >
                   <div className="ladder-rank">{index + 1}</div>
+
                   <div className="ladder-character-info">
                     <div className="ladder-character-name-row">
                       <p className="ladder-character-name">{character.name}</p>
+
                       {!isSyncing &&
+                        hasHistoricalData &&
                         positionChange !== null &&
                         positionChange !== 0 && (
                           <span
-                            className={`ladder-position-change ${positionChange > 0 ? "improved" : "declined"}`}
+                            className={`ladder-position-change ${
+                              positionChange > 0 ? "improved" : "declined"
+                            }`}
                           >
                             {positionChange > 0
                               ? `↑ ${positionChange}`
@@ -136,10 +150,13 @@ export function CharacterLadder({
                           </span>
                         )}
                     </div>
+
                     {!isSyncing && (
                       <div className="ladder-character-meta">
                         <span
-                          className={`class-badge ${getClassSlug(character.class)}`}
+                          className={`class-badge ${getClassSlug(
+                            character.class,
+                          )}`}
                         >
                           {character.class}
                         </span>
@@ -152,6 +169,7 @@ export function CharacterLadder({
                       </div>
                     )}
                   </div>
+
                   {isSyncing ? (
                     <div className="ladder-syncing-indicator">
                       <div className="syncing-warning-wrapper">
@@ -169,6 +187,7 @@ export function CharacterLadder({
                         </p>
                         <p className="ladder-score-label">M+ Score</p>
                       </div>
+
                       <div className="ladder-actions">
                         <button
                           onClick={(e) => {
@@ -180,6 +199,7 @@ export function CharacterLadder({
                           <ExternalLink className="external-icon" />
                           Raider.IO
                         </button>
+
                         <button className="expand-btn">
                           {isExpanded ? (
                             <ChevronUp className="chevron-icon" />
@@ -198,6 +218,7 @@ export function CharacterLadder({
                       <h4 className="rankings-section-title">
                         Overall Rankings
                       </h4>
+
                       <div className="rankings-grid">
                         <div className="ranking-item">
                           <span className="ranking-label">World</span>
@@ -206,16 +227,21 @@ export function CharacterLadder({
                               #
                               {character.mythicPlusRanks.overall.world.toLocaleString()}
                             </span>
-                            {cachedRaiderIoProfile?.mythicPlusRanks.overall.world.toLocaleString() &&
+
+                            {cachedRaiderIoProfile &&
                               (() => {
                                 const change = getRankChange(
                                   character.mythicPlusRanks.overall.world,
-                                  cachedRaiderIoProfile?.mythicPlusRanks.overall
+                                  cachedRaiderIoProfile.mythicPlusRanks.overall
                                     .world,
                                 );
-                                return change === 0 ? null : (
+
+                                return change === null ||
+                                  change === 0 ? null : (
                                   <span
-                                    className={`rank-change ${change > 0 ? "improved" : "declined"}`}
+                                    className={`rank-change ${
+                                      change > 0 ? "improved" : "declined"
+                                    }`}
                                   >
                                     {change > 0 ? `+${change}` : change}
                                   </span>
@@ -223,6 +249,7 @@ export function CharacterLadder({
                               })()}
                           </div>
                         </div>
+
                         <div className="ranking-item">
                           <span className="ranking-label">Region</span>
                           <div className="ranking-value-row">
@@ -230,16 +257,21 @@ export function CharacterLadder({
                               #
                               {character.mythicPlusRanks.overall.region.toLocaleString()}
                             </span>
-                            {cachedRaiderIoProfile?.mythicPlusRanks.overall.world.toLocaleString() &&
+
+                            {cachedRaiderIoProfile &&
                               (() => {
                                 const change = getRankChange(
                                   character.mythicPlusRanks.overall.region,
-                                  cachedRaiderIoProfile?.mythicPlusRanks.overall
+                                  cachedRaiderIoProfile.mythicPlusRanks.overall
                                     .region,
                                 );
-                                return change === 0 ? null : (
+
+                                return change === null ||
+                                  change === 0 ? null : (
                                   <span
-                                    className={`rank-change ${change > 0 ? "improved" : "declined"}`}
+                                    className={`rank-change ${
+                                      change > 0 ? "improved" : "declined"
+                                    }`}
                                   >
                                     {change > 0 ? `+${change}` : change}
                                   </span>
@@ -247,6 +279,7 @@ export function CharacterLadder({
                               })()}
                           </div>
                         </div>
+
                         <div className="ranking-item">
                           <span className="ranking-label">Realm</span>
                           <div className="ranking-value-row">
@@ -254,16 +287,21 @@ export function CharacterLadder({
                               #
                               {character.mythicPlusRanks.overall.realm.toLocaleString()}
                             </span>
-                            {cachedRaiderIoProfile?.mythicPlusRanks.overall.realm.toLocaleString() &&
+
+                            {cachedRaiderIoProfile &&
                               (() => {
                                 const change = getRankChange(
                                   character.mythicPlusRanks.overall.realm,
-                                  cachedRaiderIoProfile?.mythicPlusRanks.overall
+                                  cachedRaiderIoProfile.mythicPlusRanks.overall
                                     .realm,
                                 );
-                                return change === 0 ? null : (
+
+                                return change === null ||
+                                  change === 0 ? null : (
                                   <span
-                                    className={`rank-change ${change > 0 ? "improved" : "declined"}`}
+                                    className={`rank-change ${
+                                      change > 0 ? "improved" : "declined"
+                                    }`}
                                   >
                                     {change > 0 ? `+${change}` : change}
                                   </span>
@@ -273,111 +311,6 @@ export function CharacterLadder({
                         </div>
                       </div>
                     </div>
-
-                    {character.mythicPlusRanks.specs.length > 0 && (
-                      <div className="rankings-section">
-                        <h4 className="rankings-section-title">
-                          Spec Rankings
-                        </h4>
-                        {character.mythicPlusRanks.specs
-                          .filter((spec) => spec.score > 1000)
-                          .map((spec) => {
-                            const previousSpec =
-                              cachedRaiderIoProfile?.mythicPlusRanks.specs.find(
-                                (s) => s.name === spec.name,
-                              );
-
-                            return (
-                              <div key={spec.name} className="spec-ranking">
-                                <div className="spec-ranking-header">
-                                  <span className="spec-ranking-name">
-                                    {spec.name}
-                                  </span>
-                                  <span className="spec-ranking-score">
-                                    ({spec.score.toLocaleString()})
-                                  </span>
-                                </div>
-                                <div className="rankings-grid">
-                                  <div className="ranking-item">
-                                    <span className="ranking-label">World</span>
-                                    <div className="ranking-value-row">
-                                      <span className="ranking-value">
-                                        #{spec.world.toLocaleString()}
-                                      </span>
-                                      {previousSpec &&
-                                        (() => {
-                                          const change = getRankChange(
-                                            spec.world,
-                                            previousSpec.world,
-                                          );
-                                          return change === 0 ? null : (
-                                            <span
-                                              className={`rank-change ${change > 0 ? "improved" : "declined"}`}
-                                            >
-                                              {change > 0
-                                                ? `+${change}`
-                                                : change}
-                                            </span>
-                                          );
-                                        })()}
-                                    </div>
-                                  </div>
-                                  <div className="ranking-item">
-                                    <span className="ranking-label">
-                                      Region
-                                    </span>
-                                    <div className="ranking-value-row">
-                                      <span className="ranking-value">
-                                        #{spec.region.toLocaleString()}
-                                      </span>
-                                      {previousSpec &&
-                                        (() => {
-                                          const change = getRankChange(
-                                            spec.region,
-                                            previousSpec.region,
-                                          );
-                                          return change === 0 ? null : (
-                                            <span
-                                              className={`rank-change ${change > 0 ? "improved" : "declined"}`}
-                                            >
-                                              {change > 0
-                                                ? `+${change}`
-                                                : change}
-                                            </span>
-                                          );
-                                        })()}
-                                    </div>
-                                  </div>
-                                  <div className="ranking-item">
-                                    <span className="ranking-label">Realm</span>
-                                    <div className="ranking-value-row">
-                                      <span className="ranking-value">
-                                        #{spec.realm.toLocaleString()}
-                                      </span>
-                                      {previousSpec &&
-                                        (() => {
-                                          const change = getRankChange(
-                                            spec.realm,
-                                            previousSpec.realm,
-                                          );
-                                          return change === 0 ? null : (
-                                            <span
-                                              className={`rank-change ${change > 0 ? "improved" : "declined"}`}
-                                            >
-                                              {change > 0
-                                                ? `+${change}`
-                                                : change}
-                                            </span>
-                                          );
-                                        })()}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    )}
                   </div>
                 )}
               </div>

@@ -7,6 +7,8 @@ import { fetchWithResponse } from "./utils/EasyFetch";
 import { GetViewsResponse } from "./utils/views/GetViewsResponse";
 import { ViewDetail } from "@/app/components/view/detail/view-detail.tsx";
 import { View } from "@/app/utils/views/View.tsx";
+import {Plus} from "lucide-react";
+import "./App.css";
 
 type Screen = { type: "views" } | { type: "view-detail"; viewId: string };
 
@@ -153,18 +155,38 @@ export default function App() {
 
   if (currentScreen.type === "views") {
     return (
-      <>
-        <ViewsList
-          views={views}
-          onViewClick={handleViewClick}
-          onCreateView={() => setIsCreateDialogOpen(true)}
-        />
-        <CreateView
-          open={isCreateDialogOpen}
-          onOpenChange={setIsCreateDialogOpen}
-          onCreateView={handleCreateView}
-        />
-      </>
+        <div className="views-list-container">
+          <div className="views-list-content">
+            <div className="views-header">
+              <div className="views-header-text">
+                <h1>Mythic+ ladder tracker</h1>
+              </div>
+
+              {views.length > 0 &&
+                  (<button onClick={() => setIsCreateDialogOpen(true)} className="create-view-btn">
+                    <Plus className="icon-lg"/>
+                    Create View
+                  </button>)}
+            </div>
+
+            <div className="views-season">
+              <span className="views-season-label">Current season</span>
+              <span className="views-season-value">Midnight Season 1</span>
+            </div>
+
+            <ViewsList
+                views={views}
+                onViewClick={handleViewClick}
+                onCreateView={() => setIsCreateDialogOpen(true)}
+            />
+          </div>
+
+          <CreateView
+              open={isCreateDialogOpen}
+              onOpenChange={setIsCreateDialogOpen}
+              onCreateView={handleCreateView}
+          />
+        </div>
     );
   }
 

@@ -14,20 +14,7 @@ export function ViewsList({
   onCreateView,
 }: Readonly<ViewsListProps>) {
   return (
-    <div className="views-list-container">
-      <div className="views-list-content">
-        <div className="views-header">
-          <div className="views-header-text">
-            <h1>Mythic+ Tracker</h1>
-            <p>Track your characters' dungeon progression</p>
-          </div>
-          <button onClick={onCreateView} className="create-view-btn">
-            <Plus className="icon-lg" />
-            Create View
-          </button>
-        </div>
-
-        {views.length === 0 ? (
+        views.length === 0 ? (
           <div className="views-empty-state">
             <div className="views-empty-content">
               <Users className="views-empty-icon" />
@@ -94,8 +81,6 @@ export function ViewsList({
               );
             })}
           </div>
-        )}
-      </div>
-    </div>
+        )
   );
 }

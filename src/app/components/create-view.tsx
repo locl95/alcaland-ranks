@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./create-view.css";
 import { fetchWithResponse } from "@/app/utils/EasyFetch.ts";
 import { View } from "@/app/utils/views/View.tsx";
@@ -57,14 +57,14 @@ export function CreateView({
   }, [open, resetForm]);
 
   const updateCharacter = useCallback(
-      (index: number, field: string, value: string) => {
-        setCharacters((prev) => {
-          const updated = [...prev];
-          updated[index] = { ...updated[index], [field]: value };
-          return updated;
-        });
-      },
-      [],
+    (index: number, field: string, value: string) => {
+      setCharacters((prev) => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], [field]: value };
+        return updated;
+      });
+    },
+    [],
   );
 
   const addCharacter = useCallback((index: number) => {
@@ -88,26 +88,26 @@ export function CreateView({
       const updated = prev.filter((_, i) => i !== index);
 
       return updated.length
-          ? updated
-          : [{ name: "", realm: "", region: "", mode: "add" }];
+        ? updated
+        : [{ name: "", realm: "", region: "", mode: "add" }];
     });
   }, []);
 
   const getAddedCharacters = useCallback(() => {
     return characters
-        .map((c, i, arr) => {
-          if (
-              i === arr.length - 1 &&
-              c.mode === "add" &&
-              c.name.trim() &&
-              c.realm.trim() &&
-              c.region.trim()
-          ) {
-            return { ...c, mode: "added" };
-          }
-          return c;
-        })
-        .filter((c) => c.mode === "added");
+      .map((c, i, arr) => {
+        if (
+          i === arr.length - 1 &&
+          c.mode === "add" &&
+          c.name.trim() &&
+          c.realm.trim() &&
+          c.region.trim()
+        ) {
+          return { ...c, mode: "added" };
+        }
+        return c;
+      })
+      .filter((c) => c.mode === "added");
   }, [characters]);
 
   const canSubmit = useCallback(() => {

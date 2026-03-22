@@ -1,0 +1,67 @@
+.views-list-container {
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #0f172a, #1e293b);
+    padding: 2rem;
+
+}
+
+.views-list-content {
+    max-width: 72rem;
+    margin: 0 auto;
+}
+
+.views-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.views-header-text h1 {
+    font-size: 2.25rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.views-header-text p {
+    color: #94a3b8;
+}
+
+.create-view-btn {
+    padding: 0.75rem 1.5rem;
+    background: #3b82f6;
+    border: none;
+    color: #ffffff;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.create-view-btn:hover {
+    background: #2563eb;
+}
+
+.views-season {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0 0.75rem 0.25rem;
+    font-size: 0.875rem;
+}
+
+.views-season-label {
+    color: #64748b;
+}
+
+.views-season-value {
+    color: #e2e8f0;
+    font-weight: 500;
+}
