@@ -133,6 +133,7 @@ export default function App() {
     setViews((prev) => [...prev, pendingView]);
 
     if (import.meta.env.FEATURE_FLAG_POLLING_ENABLED) {
+      console.log("starting polling");
       startPolling(3, 3000, 5000);
     }
   };
@@ -144,6 +145,7 @@ export default function App() {
   const handleBackToViews = async () => {
     setCurrentScreen({ type: "views" });
 
+    console.log("clearing polling");
     clearPolling();
 
     await fetchAndSetViews();
