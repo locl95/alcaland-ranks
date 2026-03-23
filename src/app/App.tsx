@@ -3,7 +3,7 @@ import { ViewsList } from "@/app/components/views-list";
 import { CreateView } from "@/app/components/create-view.tsx";
 import { useAppDispatch } from "./hooks";
 import { loading, notLoading } from "./features/loading/loadingSlice";
-import { fetchWithResponse } from "./utils/EasyFetch";
+import {fetchWithoutResponse, fetchWithResponse} from "./utils/EasyFetch";
 import { GetViewsResponse } from "./utils/views/GetViewsResponse";
 import { ViewDetail } from "@/app/components/view/detail/view-detail.tsx";
 import { View } from "@/app/utils/views/View.tsx";
@@ -49,7 +49,7 @@ export default function App() {
       "GET",
       "/views?game=wow",
       undefined,
-      `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
+      `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`
     );
 
     return response.records.map((v) => ({
@@ -126,6 +126,24 @@ export default function App() {
     await fetchAndSetViews();
   };
 
+  const handleDeleteView = async (viewId: string) => {
+    setViews((prev) => prev.filter((view) => view.id !== viewId));
+
+    try {
+      await fetchWithoutResponse(
+          "DELETE",
+          `/views/${viewId}`,
+          undefined,
+          `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`
+      );
+
+    } catch (error) {
+      console.log("error [DeleteView] viewId:", viewId);
+
+      fetchAndSetViews();
+    }
+  }
+
   if (currentScreen.type === "views") {
     return (
         <div className="views-list-container">
@@ -151,6 +169,7 @@ export default function App() {
                 views={views}
                 onViewClick={handleViewClick}
                 onCreateView={() => setIsCreateDialogOpen(true)}
+                onDeleteView={handleDeleteView}
             />
           </div>
 

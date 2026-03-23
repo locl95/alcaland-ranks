@@ -137,3 +137,41 @@
     50% { opacity: 1; }
     100% { opacity: 0.6; }
 }
+
+.view-row-actions {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Delete button hidden by default */
+.view-row-delete {
+    position: absolute;
+    right: 0;
+    opacity: 0;
+    pointer-events: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+/* Chevron visible by default */
+.view-row-chevron {
+    transition: opacity 0.2s;
+}
+
+/* Hover behavior */
+.view-row:hover .view-row-delete {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.view-row:hover .view-row-chevron {
+    opacity: 0;
+}
+
+.view-row-delete.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
