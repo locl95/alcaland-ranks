@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ViewsList } from "@/app/components/views-list";
 import { CreateView } from "@/app/components/create-view.tsx";
 import { useAppDispatch } from "./hooks";
@@ -9,6 +9,7 @@ import { ViewDetail } from "@/app/components/view/detail/view-detail.tsx";
 import { View } from "@/app/utils/views/View.tsx";
 import {Plus} from "lucide-react";
 import "./App.css";
+import { usePolling} from "@/app/utils/usePolling.tsx";
 
 type Screen = { type: "views" } | { type: "view-detail"; viewId: string };
 
@@ -18,16 +19,8 @@ export default function App() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const dispatch = useAppDispatch();
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   useEffect(() => {
     fetchAndSetViews();
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      clearPolling();
-    };
   }, []);
 
   useEffect(() => {
@@ -51,53 +44,6 @@ export default function App() {
     }
   };
 
-  const clearPolling = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  };
-
-  const startPolling = (
-    attempts: number,
-    initialDelay: number,
-    retryDelay: number,
-  ) => {
-    clearPolling();
-
-    timeoutRef.current = setTimeout(() => {
-      pollViews(attempts, retryDelay);
-    }, initialDelay);
-  };
-
-  const pollViews = async (attemptsLeft: number, delay: number) => {
-    if (attemptsLeft === 0) return;
-
-    try {
-      const backendViews = await fetchBackendViews();
-
-      setViews((prev) => {
-        const updated = reconcileViews(prev, backendViews);
-
-        const stillPending = updated.some((v) => !v.isSynced);
-
-        if (stillPending) {
-          timeoutRef.current = setTimeout(() => {
-            pollViews(attemptsLeft - 1, delay);
-          }, delay);
-        }
-
-        return updated;
-      });
-    } catch (error) {
-      console.error("Polling failed", error);
-
-      timeoutRef.current = setTimeout(() => {
-        pollViews(attemptsLeft - 1, delay);
-      }, delay);
-    }
-  };
-
   const fetchBackendViews = async (): Promise<View[]> => {
     const response = await fetchWithResponse<GetViewsResponse>(
       "GET",
@@ -112,6 +58,33 @@ export default function App() {
       isSynced: true,
     }));
   };
+
+  const {
+    start: startPolling,
+    stop: stopPolling,
+  } = usePolling<View[]>({
+    fn: fetchBackendViews,
+    shouldContinue: (backendViews) => {
+      let stillPending = false;
+
+      setViews((prev) => {
+        const updated = reconcileViews(prev, backendViews);
+        stillPending = updated.some((v) => !v.isSynced);
+        return updated;
+      });
+
+      return stillPending;
+    },
+    maxAttempts: 3,
+    delay: 5000,
+    initialDelay: 3000,
+  });
+
+  useEffect(() => {
+    return () => {
+      stopPolling();
+    };
+  }, [stopPolling]);
 
   const reconcileViews = (current: View[], backend: View[]): View[] => {
     const pending = current.filter((v) => !v.isSynced);
@@ -134,9 +107,9 @@ export default function App() {
   const handleCreateView = (pendingView: View) => {
     setViews((prev) => [...prev, pendingView]);
 
-    if (import.meta.env.FEATURE_FLAG_POLLING_ENABLED) {
+    if (import.meta.env.VITE_FEATURE_FLAG_POLLING_ENABLED == "true") {
       console.log("starting polling");
-      startPolling(3, 3000, 5000);
+      startPolling();
     }
   };
 
@@ -148,7 +121,7 @@ export default function App() {
     setCurrentScreen({ type: "views" });
 
     console.log("clearing polling");
-    clearPolling();
+    stopPolling();
 
     await fetchAndSetViews();
   };
