@@ -1,7 +1,7 @@
 import { ArrowLeft, Edit, Trophy } from "lucide-react";
 import { SimpleView } from "@/app/utils/views/SimpleView";
 import { RaiderioProfile, Season, ViewData } from "@/app/utils/raiderio";
-import { fetchWithResponse } from "@/app/utils/EasyFetch";
+import { fetchWithoutResponse, fetchWithResponse } from "@/app/utils/EasyFetch";
 import { EditView } from "@/app/components/view/detail/edit-view.tsx";
 import { CharacterLadder } from "@/app/components/view/detail/character-ladder.tsx";
 import { DungeonGrid } from "@/app/components/view/detail/dungeon-grid.tsx";
@@ -9,6 +9,7 @@ import { loading, notLoading } from "@/app/features/loading/loadingSlice.ts";
 import { useAppDispatch } from "@/app/hooks.ts";
 import "./view-detail.css";
 import { useEffect, useState } from "react";
+import { ViewRequest } from "@/app/utils/views/ViewRequest.tsx";
 
 export function ViewDetail({
   view,
@@ -21,7 +22,7 @@ export function ViewDetail({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    async function load() {
+    async function fetchData() {
       dispatch(loading());
       try {
         const [seasonData, data, cachedData] = await Promise.all([
@@ -44,7 +45,7 @@ export function ViewDetail({
             `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
           ),
         ]);
-        setSeason(seasonData);
+        setSeason(seasonData); //season data prob should be fetched from app.tsx
         setProfiles(data.data);
         setCachedProfiles(cachedData.data);
       } catch (error) {
@@ -54,20 +55,36 @@ export function ViewDetail({
       }
     }
 
-    load();
+    fetchData();
   }, [view.id]);
 
-  const handleSavedCharacters = (characters: RaiderioProfile[]) => {
-    // const characterIds = characters.map(c => c.id);
-    //
-    // await fetchWithResponse(
-    //     "PATCH",
-    //     `/views/${view.id}`,
-    //     { characterIds }
-    // );
+  const handleSavedCharacters = async (characters: RaiderioProfile[]) => {
+    const request: ViewRequest = {
+      name: view.name,
+      entities: characters.map((c) => ({
+        name: c.name,
+        region: c.region,
+        realm: c.realm,
+        type: "com.kos.entities.domain.WowEntityRequest",
+      })),
+      published: true,
+      featured: false,
+      game: "WOW",
+    };
 
-    setProfiles(characters);
-    setIsEditOpen(false);
+    try {
+      await fetchWithoutResponse(
+        "PUT",
+        `/views/${view.id}`,
+        request,
+        `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
+      );
+
+      setProfiles(characters);
+    } catch (error) {
+      console.error("Failed to create view", error);
+      setIsEditOpen(false);
+    }
   };
 
   return (

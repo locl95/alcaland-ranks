@@ -24,11 +24,11 @@ export function EditView({
 
   useEffect(() => {
     if (isOpen) {
-      setEditingCharacters(characters);
+      setEditingCharacters(
+        characters.filter((character) => character.score > -1),
+      );
     }
   }, [isOpen, characters]);
-
-  if (!isOpen) return null;
 
   const deleteCharacter = (id: number) => {
     setEditingCharacters((prev) => prev.filter((c) => c.id !== id));
@@ -42,6 +42,8 @@ export function EditView({
     const newCharacter: RaiderioProfile = {
       id: Date.now(),
       name,
+      realm,
+      region,
       score: -1,
       class: "",
       spec: "",
@@ -56,6 +58,8 @@ export function EditView({
 
     setEditingCharacters((prev) => [...prev, newCharacter]);
   };
+
+  if (!isOpen) return null;
 
   return (
     <>
@@ -75,42 +79,40 @@ export function EditView({
 
           <div className="edit-view-body">
             <div className="character-edit-items">
-              {editingCharacters
-                .filter((character) => character.score > -1)
-                .map((character) => (
-                  <div key={character.id} className="character-edit-row">
-                    <div className="character-edit-info">
-                      <div className="character-edit-name-row">
-                        <p className="character-edit-name">{character.name}</p>
-                        <span
-                          className={`character-edit-class-badge ${getClassSlug(character.class)}`}
-                        >
-                          {character.class}
-                        </span>
-                      </div>
-                      <div className="character-edit-meta">
-                        <span className="character-edit-spec">
-                          {character.spec}
-                        </span>
-                        <span className="character-edit-separator">•</span>
-                        <span className="character-edit-realm">
-                          {"Sanguino"}
-                        </span>
-                        <span className="character-edit-separator">•</span>
-                        <span className="character-edit-score">
-                          {character.score.toLocaleString()} M+
-                        </span>
-                      </div>
+              {editingCharacters.map((character) => (
+                <div key={character.id} className="character-edit-row">
+                  <div className="character-edit-info">
+                    <div className="character-edit-name-row">
+                      <p className="character-edit-name">{character.name}</p>
+                      <span
+                        className={`character-edit-class-badge ${getClassSlug(character.class)}`}
+                      >
+                        {character.class}
+                      </span>
                     </div>
-                    <button
-                      onClick={() => deleteCharacter(character.id)}
-                      className="character-delete-btn"
-                    >
-                      <Trash2 className="delete-icon" />
-                      Delete
-                    </button>
+                    <div className="character-edit-meta">
+                      <span className="character-edit-spec">
+                        {character.spec}
+                      </span>
+                      <span className="character-edit-separator">•</span>
+                      <span className="character-edit-realm">
+                        {character.realm}
+                      </span>
+                      <span className="character-edit-separator">•</span>
+                      <span className="character-edit-score">
+                        {character.score.toLocaleString()} M+
+                      </span>
+                    </div>
                   </div>
-                ))}
+                  <button
+                    onClick={() => deleteCharacter(character.id)}
+                    className="character-delete-btn"
+                  >
+                    <Trash2 className="delete-icon" />
+                    Delete
+                  </button>
+                </div>
+              ))}
 
               <button
                 onClick={() => setIsAddOpen(true)}

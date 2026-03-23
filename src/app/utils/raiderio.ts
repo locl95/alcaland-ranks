@@ -21,17 +21,19 @@ interface MythicPlusRanks {
 
 export interface MythicPlusRun {
     dungeon: string
-    short_name: string //camelCase
-    mythic_level: number //camelCase
-    num_keystone_upgrades: number //camelCase
+    short_name: string
+    mythic_level: number
+    num_keystone_upgrades: number
     score: number
     url: string
     affixes: Affix[]
 }
 
 export interface RaiderioProfile {
-    id: number,
+    id: number
     name: string
+    realm: string
+    region: string
     score: number
     class: string
     spec: string
