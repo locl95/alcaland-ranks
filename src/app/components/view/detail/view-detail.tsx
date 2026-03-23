@@ -58,33 +58,56 @@ export function ViewDetail({
     fetchData();
   }, [view.id]);
 
-  const handleSavedCharacters = async (characters: RaiderioProfile[]) => {
-    const request: ViewRequest = {
-      name: view.name,
-      entities: characters.map((c) => ({
-        name: c.name,
-        region: c.region,
-        realm: c.realm,
-        type: "com.kos.entities.domain.WowEntityRequest",
-      })),
-      published: true,
-      featured: false,
-      game: "WOW",
-    };
+  function haveSameCharacters(
+    a: RaiderioProfile[],
+    b: RaiderioProfile[],
+  ): boolean {
+    if (a.length !== b.length) return false;
 
-    try {
-      await fetchWithoutResponse(
-        "PUT",
-        `/views/${view.id}`,
-        request,
-        `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-      );
+    const idsA = new Set(a.map((c) => c.id));
 
-      setProfiles(characters);
-    } catch (error) {
-      console.error("Failed to create view", error);
-      setIsEditOpen(false);
+    for (const character of b) {
+      if (!idsA.has(character.id)) {
+        return false;
+      }
     }
+
+    return true;
+  }
+
+  const handleSavedCharacters = async (characters: RaiderioProfile[]) => {
+    if (!haveSameCharacters(characters, profiles)) {
+      const request: ViewRequest = {
+        name: view.name,
+        entities: characters.map((c) => ({
+          name: c.name,
+          region: c.region,
+          realm: c.realm,
+          type: "com.kos.entities.domain.WowEntityRequest",
+        })),
+        published: true,
+        featured: false,
+        game: "WOW",
+      };
+
+      try {
+        console.log("[EditView] request:", request);
+
+        await fetchWithoutResponse(
+          "PUT",
+          `/views/${view.id}`,
+          request,
+          `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
+        );
+
+        setProfiles(characters);
+      } catch (error) {
+        console.error("Failed to create view", error);
+        setIsEditOpen(false);
+      }
+    }
+
+    setIsEditOpen(false);
   };
 
   return (

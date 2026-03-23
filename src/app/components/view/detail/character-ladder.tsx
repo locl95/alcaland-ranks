@@ -31,9 +31,10 @@ export function CharacterLadder({
   const hasHistoricalData = cachedCharacters.length > 0;
 
   const openRaiderIO = (character: RaiderioProfile) => {
-    const realm = "Sanguino".replace(/\s+/g, "-");
+    const realm = character.realm.replace(/\s+/g, "-");
     const name = character.name.toLowerCase();
-    const url = `https://raider.io/characters/eu/${realm}/${name}`;
+    const region = character.region.toLowerCase();
+    const url = `https://raider.io/characters/${region}/${realm}/${name}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
@@ -164,7 +165,7 @@ export function CharacterLadder({
                           {character.spec}
                         </span>
                         <span className="ladder-character-realm">
-                          • {"Sanguino"}
+                          • {character.realm}
                         </span>
                       </div>
                     )}

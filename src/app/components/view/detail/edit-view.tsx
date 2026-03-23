@@ -73,61 +73,70 @@ export function EditView({
               </p>
             </div>
             <button onClick={onClose} className="edit-view-close-btn">
-              <X className="close-icon" />
+              <X className="close-icon"/>
             </button>
           </div>
 
           <div className="edit-view-body">
             <div className="character-edit-items">
               {editingCharacters.map((character) => (
-                <div key={character.id} className="character-edit-row">
-                  <div className="character-edit-info">
-                    <div className="character-edit-name-row">
-                      <p className="character-edit-name">{character.name}</p>
-                      <span
-                        className={`character-edit-class-badge ${getClassSlug(character.class)}`}
-                      >
-                        {character.class}
-                      </span>
-                    </div>
-                    <div className="character-edit-meta">
-                      <span className="character-edit-spec">
-                        {character.spec}
-                      </span>
-                      <span className="character-edit-separator">•</span>
-                      <span className="character-edit-realm">
-                        {character.realm}
-                      </span>
-                      <span className="character-edit-separator">•</span>
-                      <span className="character-edit-score">
-                        {character.score.toLocaleString()} M+
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => deleteCharacter(character.id)}
-                    className="character-delete-btn"
-                  >
-                    <Trash2 className="delete-icon" />
-                    Delete
-                  </button>
-                </div>
-              ))}
+                  <div key={character.id} className="character-edit-row">
+                    <div className="character-edit-info">
+                      <div className="character-edit-name-row">
+                        <p className="character-edit-name">{character.name}</p>
 
-              <button
-                onClick={() => setIsAddOpen(true)}
-                className="character-add-btn"
-              >
-                <Plus className="plus-icon" />
-                Add Character
-              </button>
+                        {character.score > -1 && (
+                            <span
+                                className={`character-edit-class-badge ${getClassSlug(
+                                    character.class,
+                                )}`}
+                            >
+                          {character.class}
+                        </span>
+                        )}
+                      </div>
+
+                      {character.score > -1 && (
+                          <div className="character-edit-meta">
+                        <span className="character-edit-spec">
+                          {character.spec}
+                        </span>
+                            <span className="character-edit-separator">•</span>
+                            <span className="character-edit-realm">
+                          {character.realm}
+                        </span>
+                            <span className="character-edit-separator">•</span>
+                            <span className="character-edit-score">
+                          {character.score.toLocaleString()} M+
+                        </span>
+                          </div>
+                      )}
+                    </div>
+
+                    <button
+                        onClick={() => deleteCharacter(character.id)}
+                        className="character-delete-btn"
+                    >
+                      <Trash2 className="delete-icon"/>
+                      Delete
+                    </button>
+                  </div>
+              ))}
             </div>
           </div>
 
+          <button
+              onClick={() => setIsAddOpen(true)}
+              className="character-add-btn"
+          >
+            <Plus className="plus-icon"/>
+            Add Character
+          </button>
+
           <div className="edit-view-footer">
             <button
-              onClick={() => onSave(editingCharacters)}
-              className="manage-done-btn"
+                onClick={() => onSave(editingCharacters)}
+                className="manage-done-btn"
             >
               Done
             </button>
@@ -135,10 +144,11 @@ export function EditView({
         </div>
       </div>
 
+
       <AddCharacter
-        isOpen={isAddOpen}
-        onClose={() => setIsAddOpen(false)}
-        onAdd={addCharacter}
+          isOpen={isAddOpen}
+          onClose={() => setIsAddOpen(false)}
+          onAdd={addCharacter}
       />
     </>
   );

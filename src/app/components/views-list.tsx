@@ -46,11 +46,9 @@ export function ViewsList({
                   <div className="view-row-content">
                     <h3 className="view-row-title">{view.simpleView.name}</h3>
 
-                    <p className="view-row-description">
-                      {isPending
-                        ? "Synchronizing with server..."
-                        : "No description"}
-                    </p>
+                      {isPending && (<p className="view-row-description">
+                          "Synchronizing with server..."
+                    </p>)}
 
                     <div className="view-row-meta">
                       <div className="view-row-meta-item">
