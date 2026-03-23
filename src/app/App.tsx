@@ -3,13 +3,13 @@ import { ViewsList } from "@/app/components/views-list";
 import { CreateView } from "@/app/components/create-view.tsx";
 import { useAppDispatch } from "./hooks";
 import { loading, notLoading } from "./features/loading/loadingSlice";
-import {fetchWithoutResponse, fetchWithResponse} from "./utils/EasyFetch";
+import { fetchWithoutResponse, fetchWithResponse } from "./utils/EasyFetch";
 import { GetViewsResponse } from "./utils/views/GetViewsResponse";
 import { ViewDetail } from "@/app/components/view/detail/view-detail.tsx";
 import { View } from "@/app/utils/views/View.tsx";
-import {Plus} from "lucide-react";
+import { Plus } from "lucide-react";
 import "./App.css";
-import { usePolling} from "@/app/utils/usePolling.tsx";
+import { usePolling } from "@/app/utils/usePolling.tsx";
 
 type Screen = { type: "views" } | { type: "view-detail"; viewId: string };
 
@@ -49,7 +49,7 @@ export default function App() {
       "GET",
       "/views?game=wow",
       undefined,
-      `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`
+      `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
     );
 
     return response.records.map((v) => ({
@@ -59,10 +59,7 @@ export default function App() {
     }));
   };
 
-  const {
-    start: startPolling,
-    stop: stopPolling,
-  } = usePolling<View[]>({
+  const { start: startPolling, stop: stopPolling } = usePolling<View[]>({
     fn: fetchBackendViews,
     shouldContinue: (backendViews) => {
       let stillPending = false;
@@ -131,54 +128,57 @@ export default function App() {
 
     try {
       await fetchWithoutResponse(
-          "DELETE",
-          `/views/${viewId}`,
-          undefined,
-          `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`
+        "DELETE",
+        `/views/${viewId}`,
+        undefined,
+        `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
       );
-
     } catch (error) {
       console.log("error [DeleteView] viewId:", viewId);
 
       fetchAndSetViews();
     }
-  }
+  };
 
   if (currentScreen.type === "views") {
     return (
-        <div className="views-list-container">
-          <div className="views-list-content">
-            <div className="views-header">
-              <div className="views-header-text">
-                <h1>Mythic+ ladder tracker</h1>
-              </div>
-
-              {views.length > 0 &&
-                  (<button onClick={() => setIsCreateDialogOpen(true)} className="create-view-btn">
-                    <Plus className="icon-lg"/>
-                    Create View
-                  </button>)}
+      <div className="views-list-container">
+        <div className="views-list-content">
+          <div className="views-header">
+            <div className="views-header-text">
+              <h1>Mythic+ ladder tracker</h1>
             </div>
 
-            <div className="views-season">
-              <span className="views-season-label">Current season</span>
-              <span className="views-season-value">Midnight Season 1</span>
-            </div>
-
-            <ViewsList
-                views={views}
-                onViewClick={handleViewClick}
-                onCreateView={() => setIsCreateDialogOpen(true)}
-                onDeleteView={handleDeleteView}
-            />
+            {views.length > 0 && (
+              <button
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="create-view-btn"
+              >
+                <Plus className="icon-lg" />
+                Create View
+              </button>
+            )}
           </div>
 
-          <CreateView
-              open={isCreateDialogOpen}
-              onOpenChange={setIsCreateDialogOpen}
-              onCreateView={handleCreateView}
+          <div className="views-season">
+            <span className="views-season-label">Current season</span>
+            <span className="views-season-value">Midnight Season 1</span>
+          </div>
+
+          <ViewsList
+            views={views}
+            onViewClick={handleViewClick}
+            onCreateView={() => setIsCreateDialogOpen(true)}
+            onDeleteView={handleDeleteView}
           />
         </div>
+
+        <CreateView
+          open={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+          onCreateView={handleCreateView}
+        />
+      </div>
     );
   }
 
