@@ -6,8 +6,8 @@ import {
   AlertTriangle,
   Trash2,
 } from "lucide-react";
-import "./views-list.css";
-import { View } from "@/app/utils/views/View.tsx";
+import "@/styles/features/views/views-list.css";
+import {View} from "@/features/views/model/View.tsx";
 
 interface ViewsListProps {
   views: View[];

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, X } from "lucide-react";
-import { RaiderioProfile } from "@/app/utils/raiderio";
 import { AddCharacter } from "./add-character.tsx";
-import "./edit-view.css";
+import "@/styles/features/views/edit-view.css";
+import {RaiderioProfile} from "@/features/views/api/Raiderio.tsx";
 
 interface Props {
   isOpen: boolean;

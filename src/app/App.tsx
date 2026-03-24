@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
-import { ViewsList } from "@/app/components/views-list";
-import { CreateView } from "@/app/components/create-view.tsx";
+import { ViewsList } from "@/features/views/components/views-list.tsx";
+import { CreateView } from "@/features/views/components/create-view.tsx";
 import { useAppDispatch } from "./hooks";
-import { loading, notLoading } from "./features/loading/loadingSlice";
-import { fetchWithoutResponse, fetchWithResponse } from "./utils/EasyFetch";
-import { GetViewsResponse } from "./utils/views/GetViewsResponse";
-import { ViewDetail } from "@/app/components/view/detail/view-detail.tsx";
-import { View } from "@/app/utils/views/View.tsx";
+import {loading, notLoading} from "@/features/loading/loadingSlice.ts";
+import { fetchWithoutResponse, fetchWithResponse } from "@/shared/api/EasyFetch.ts";
+import { GetViewsResponse} from "@/features/views/api/GetViewsResponse.tsx";
+import { ViewDetail } from "@/features/views/components/view-detail.tsx";
+import { View } from "@/features/views/model/View.tsx";
 import { Plus } from "lucide-react";
-import "./App.css";
-import { usePolling } from "@/app/utils/usePolling.tsx";
+import "@/styles/app/App.css";
+import { usePolling } from "@/shared/hooks/usePolling.tsx";
 
 type Screen = { type: "views" } | { type: "view-detail"; viewId: string };
 
-export default function App() {
+export function App() {
   const [views, setViews] = useState<View[]>([]);
   const [currentScreen, setCurrentScreen] = useState<Screen>({ type: "views" });
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -135,7 +135,6 @@ export default function App() {
       );
     } catch (error) {
       console.log("error [DeleteView] viewId:", viewId);
-
       fetchAndSetViews();
     }
   };
@@ -191,3 +190,5 @@ export default function App() {
 
   return null;
 }
+
+export default App;

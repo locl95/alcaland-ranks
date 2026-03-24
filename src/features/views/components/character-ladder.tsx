@@ -5,9 +5,9 @@ import {
   ExternalLink,
   Trophy,
 } from "lucide-react";
-import "./character-ladder.css";
-import { RaiderioProfile } from "@/app/utils/raiderio.ts";
+import "@/styles/features/views/character-ladder.css";
 import { useState } from "react";
+import {RaiderioProfile} from "@/features/views/api/Raiderio.tsx";
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];

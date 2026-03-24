@@ -1,4 +1,4 @@
-import {ViewExtraArguments} from "@/app/utils/views/ViewExtraArguments";
+import {ViewExtraArguments} from "@/features/views/api/ViewExtraArguments.tsx";
 
 export interface SimpleView {
     id: string
