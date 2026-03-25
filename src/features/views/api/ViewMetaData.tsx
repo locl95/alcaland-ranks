@@ -1,3 +1,3 @@
 export interface ViewMetadata {
-    totalCount?: number | null
+  totalCount?: number | null;
 }

@@ -7,7 +7,7 @@ import {
   Trash2,
 } from "lucide-react";
 import "@/styles/features/views/views-list.css";
-import {View} from "@/features/views/model/View.tsx";
+import { View } from "@/features/views/model/View.tsx";
 
 interface ViewsListProps {
   views: View[];

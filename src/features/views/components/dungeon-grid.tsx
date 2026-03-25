@@ -1,6 +1,10 @@
 import { Crown } from "lucide-react";
 import "@/styles/features/views/dungeon-grid.css";
-import {MythicPlusRun, RaiderioProfile, Season} from "@/features/views/api/Raiderio.tsx";
+import {
+  MythicPlusRun,
+  RaiderioProfile,
+  Season,
+} from "@/features/views/api/Raiderio.tsx";
 
 interface DungeonGridProps {
   raiderioProfiles: RaiderioProfile[];

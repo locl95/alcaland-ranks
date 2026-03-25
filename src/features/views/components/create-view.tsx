@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import "@/styles/features/views/create-view.css";
-import {View} from "@/features/views/model/View.tsx";
-import {fetchWithResponse} from "@/shared/api/EasyFetch.ts";
+import { View } from "@/features/views/model/View.tsx";
+import { fetchWithResponse } from "@/shared/api/EasyFetch.ts";
 
 interface CharacterRow {
   name: string;

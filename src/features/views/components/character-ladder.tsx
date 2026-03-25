@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import "@/styles/features/views/character-ladder.css";
 import { useState } from "react";
-import {RaiderioProfile} from "@/features/views/api/Raiderio.tsx";
+import { RaiderioProfile } from "@/features/views/api/Raiderio.tsx";
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];

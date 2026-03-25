@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { ViewsList } from "@/features/views/components/views-list.tsx";
 import { CreateView } from "@/features/views/components/create-view.tsx";
 import { useAppDispatch } from "./hooks";
-import {loading, notLoading} from "@/features/loading/loadingSlice.ts";
-import { fetchWithoutResponse, fetchWithResponse } from "@/shared/api/EasyFetch.ts";
-import { GetViewsResponse} from "@/features/views/api/GetViewsResponse.tsx";
+import { loading, notLoading } from "@/features/loading/loadingSlice.ts";
+import {
+  fetchWithoutResponse,
+  fetchWithResponse,
+} from "@/shared/api/EasyFetch.ts";
+import { GetViewsResponse } from "@/features/views/api/GetViewsResponse.tsx";
 import { ViewDetail } from "@/features/views/components/view-detail.tsx";
 import { View } from "@/features/views/model/View.tsx";
 import { Plus } from "lucide-react";

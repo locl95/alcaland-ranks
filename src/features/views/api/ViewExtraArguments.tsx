@@ -1,3 +1,3 @@
 export interface ViewExtraArguments {
-    [key: string]: unknown
+  [key: string]: unknown;
 }

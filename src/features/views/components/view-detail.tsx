@@ -2,14 +2,21 @@ import { ArrowLeft, Edit, Trophy } from "lucide-react";
 import { useAppDispatch } from "@/app/hooks.ts";
 import "@/styles/features/views/view-detail.css";
 import { useEffect, useState } from "react";
-import {SimpleView} from "@/features/views/api/SimpleView.tsx";
-import {RaiderioProfile, Season, ViewData} from "@/features/views/api/Raiderio.tsx";
-import {loading, notLoading} from "@/features/loading/loadingSlice.ts";
-import {fetchWithoutResponse, fetchWithResponse} from "@/shared/api/EasyFetch.ts";
-import {ViewRequest} from "@/features/views/api/ViewRequest.tsx";
-import {CharacterLadder} from "@/features/views/components/character-ladder.tsx";
-import {DungeonGrid} from "@/features/views/components/dungeon-grid.tsx";
-import {EditView} from "@/features/views/components/edit-view.tsx";
+import { SimpleView } from "@/features/views/api/SimpleView.tsx";
+import {
+  RaiderioProfile,
+  Season,
+  ViewData,
+} from "@/features/views/api/Raiderio.tsx";
+import { loading, notLoading } from "@/features/loading/loadingSlice.ts";
+import {
+  fetchWithoutResponse,
+  fetchWithResponse,
+} from "@/shared/api/EasyFetch.ts";
+import { ViewRequest } from "@/features/views/api/ViewRequest.tsx";
+import { CharacterLadder } from "@/features/views/components/character-ladder.tsx";
+import { DungeonGrid } from "@/features/views/components/dungeon-grid.tsx";
+import { EditView } from "@/features/views/components/edit-view.tsx";
 
 export function ViewDetail({
   view,
