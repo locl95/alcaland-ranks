@@ -88,6 +88,7 @@ export function ViewsList({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
+                      hidden={true}
                       className="view-row-menu-btn"
                       onClick={(e) => e.stopPropagation()}
                       title="View options"
