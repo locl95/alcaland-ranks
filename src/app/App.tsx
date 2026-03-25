@@ -153,6 +153,7 @@ export function App() {
 
             {views.length > 0 && (
               <button
+                hidden={true}
                 onClick={() => setIsCreateDialogOpen(true)}
                 className="create-view-btn"
               >
