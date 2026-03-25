@@ -126,6 +126,7 @@ export function ViewDetail({
           </button>
           <h1 className="header-view-title">{view.name}</h1>
           <button
+            hidden={true}
             className={`header-edit-button ${isEditOpen ? "active" : ""}`}
             onClick={() => setIsEditOpen(!isEditOpen)}
           >
