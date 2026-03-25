@@ -361,7 +361,7 @@
 
 .raider-io-btn {
     padding: 0.5rem 1rem;
-    border: 1px solid #475569;
+    border: none;
     background: transparent;
     color: #cbd5e1;
     border-radius: 0.375rem;
@@ -375,7 +375,12 @@
 
 .raider-io-btn:hover {
     color: #ffffff;
-    border-color: #64748b;
+}
+
+.raider-io-btn img {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
 }
 
 .trophy-icon {
@@ -389,7 +394,68 @@
     height: 1.25rem;
 }
 
-.external-icon {
-    width: 1rem;
-    height: 1rem;
+@media (max-width: 640px) {
+    .ladder-header {
+        padding: 1rem 0.75rem;
+    }
+
+    .ladder-content {
+        padding: 0 0.5rem 0.75rem;
+    }
+
+    .ladder-row-inner {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.625rem 0.5rem;
+    }
+
+    .ladder-character-info {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .ladder-character-name {
+        font-size: 0.9375rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ladder-character-meta {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .ladder-score {
+        margin-right: 0;
+    }
+
+    .ladder-score-value {
+        font-size: 1.125rem;
+    }
+
+    .ladder-actions {
+        gap: 0.25rem;
+    }
+
+    .raider-io-btn {
+        padding: 0.375rem 0.5rem;
+    }
+
+    .ladder-row-expanded {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .rankings-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+
+    .ranking-item {
+        padding: 0.5rem 0.25rem;
+    }
+
+    .ranking-value {
+        font-size: 1rem;
+    }
 }

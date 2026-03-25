@@ -2,12 +2,12 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronUp,
-  ExternalLink,
-  Trophy,
+  Trophy
 } from "lucide-react";
 import "@/styles/features/views/character-ladder.css";
 import { useState } from "react";
 import { RaiderioProfile } from "@/features/views/api/Raiderio.tsx";
+import raiderio2 from "@/assets/raiderio.png"
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];
@@ -116,13 +116,12 @@ export function CharacterLadder({
           {sortedCharacters.map((character, index) => {
             const isExpanded = expandedCharacters.has(character.id);
             const isSyncing = character.score == -1;
+            const positionChange = getLadderPositionChange(character);
 
             const cachedRaiderIoProfile = getCachedRaiderIoProfile(
               cachedCharacters,
               character,
             );
-
-            const positionChange = getLadderPositionChange(character);
 
             return (
               <div key={character.id} className="ladder-row">
@@ -197,8 +196,7 @@ export function CharacterLadder({
                           }}
                           className="raider-io-btn"
                         >
-                          <ExternalLink className="external-icon" />
-                          Raider.IO
+                          <img src={raiderio2} alt={'Raider IO'} aria-hidden={true} />
                         </button>
 
                         <button className="expand-btn">
@@ -244,7 +242,7 @@ export function CharacterLadder({
                                       change > 0 ? "improved" : "declined"
                                     }`}
                                   >
-                                    {change > 0 ? `+${change}` : change}
+                                    {change > 0 ? `+${Math.round(change)}` : Math.round(change)}
                                   </span>
                                 );
                               })()}
@@ -274,7 +272,7 @@ export function CharacterLadder({
                                       change > 0 ? "improved" : "declined"
                                     }`}
                                   >
-                                    {change > 0 ? `+${change}` : change}
+                                    {change > 0 ? `+${Math.round(change)}` : Math.round(change)}
                                   </span>
                                 );
                               })()}
@@ -286,7 +284,7 @@ export function CharacterLadder({
                           <div className="ranking-value-row">
                             <span className="ranking-value">
                               #
-                              {character.mythicPlusRanks.overall.realm.toLocaleString()}
+                              {Math.round(character.mythicPlusRanks.overall.realm).toLocaleString()}
                             </span>
 
                             {cachedRaiderIoProfile &&
@@ -304,7 +302,7 @@ export function CharacterLadder({
                                       change > 0 ? "improved" : "declined"
                                     }`}
                                   >
-                                    {change > 0 ? `+${change}` : change}
+                                    {change > 0 ? `+${Math.round(change)}` : Math.round(change)}
                                   </span>
                                 );
                               })()}

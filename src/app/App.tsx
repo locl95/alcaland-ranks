@@ -108,7 +108,6 @@ export function App() {
     setViews((prev) => [...prev, pendingView]);
 
     if (import.meta.env.VITE_FEATURE_FLAG_POLLING_ENABLED == "true") {
-      console.log("starting polling");
       startPolling();
     }
   };
@@ -120,7 +119,6 @@ export function App() {
   const handleBackToViews = async () => {
     setCurrentScreen({ type: "views" });
 
-    console.log("clearing polling");
     stopPolling();
 
     await fetchAndSetViews();

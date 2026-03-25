@@ -114,11 +114,11 @@ export function DungeonGrid({
                           <p
                             className={`character-run-score ${isHighest ? "highest" : "normal"}`}
                           >
-                            {run.score}
+                            {Math.round(run.score)}
                           </p>
                           {scoreImprovement > 0 && (
                             <span className="score-improvement">
-                              +{scoreImprovement}
+                              +{Math.round(scoreImprovement)}
                             </span>
                           )}
                         </div>

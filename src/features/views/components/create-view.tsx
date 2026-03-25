@@ -174,7 +174,7 @@ export function CreateView({
         <div className="dialog-header">
           <h2 className="dialog-title">Create New View</h2>
           <p className="dialog-description">
-            Create a new view to track your characters' Mythic+ progress
+            Create a new ladder to track your characters' Mythic+ progress
           </p>
         </div>
 
@@ -208,7 +208,7 @@ export function CreateView({
                     updateCharacter(index, "realm", e.target.value)
                   }
                 >
-                  <option value="">Realm...</option>
+                  <option value="">Realm</option>
                   {EU_REALMS.map((r) => (
                     <option key={r.slug} value={r.slug}>
                       {r.label}
@@ -222,7 +222,7 @@ export function CreateView({
                     className="btn-icon btn-icon-primary"
                     onClick={() => addCharacter(index)}
                     disabled={!char.name || !char.realm}
-                    title="Add character"
+                    title="Add"
                   >
                     <Plus size={16} />
                   </button>
@@ -231,7 +231,7 @@ export function CreateView({
                     type="button"
                     className="btn-icon btn-icon-outline"
                     onClick={() => removeCharacter(index)}
-                    title="Remove character"
+                    title="Remove"
                   >
                     <X size={16} />
                   </button>
