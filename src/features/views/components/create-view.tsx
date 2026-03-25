@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
+import { Plus, X } from "lucide-react";
 import "@/styles/features/views/create-view.css";
 import { View } from "@/features/views/model/View.tsx";
 import { fetchWithResponse } from "@/shared/api/EasyFetch.ts";
+import { EU_REALMS } from "@/features/views/constants/euRealms.ts";
 
 interface CharacterRow {
   name: string;
   realm: string;
-  region: string;
   mode: "add" | "added";
 }
 
@@ -24,12 +25,12 @@ export function CreateView({
   const [name, setName] = useState("");
 
   const [characters, setCharacters] = useState<CharacterRow[]>([
-    { name: "", realm: "", region: "", mode: "add" },
+    { name: "", realm: "", mode: "add" },
   ]);
 
   const resetForm = useCallback(() => {
     setName("");
-    setCharacters([{ name: "", realm: "", region: "", mode: "add" }]);
+    setCharacters([{ name: "", realm: "", mode: "add" }]);
   }, []);
 
   useEffect(() => {
@@ -75,7 +76,6 @@ export function CreateView({
       updated.push({
         name: "",
         realm: "",
-        region: "",
         mode: "add",
       });
 
@@ -89,7 +89,7 @@ export function CreateView({
 
       return updated.length
         ? updated
-        : [{ name: "", realm: "", region: "", mode: "add" }];
+        : [{ name: "", realm: "", mode: "add" }];
     });
   }, []);
 
@@ -100,8 +100,7 @@ export function CreateView({
           i === arr.length - 1 &&
           c.mode === "add" &&
           c.name.trim() &&
-          c.realm.trim() &&
-          c.region.trim()
+          c.realm.trim()
         ) {
           return { ...c, mode: "added" };
         }
@@ -123,7 +122,7 @@ export function CreateView({
       name,
       entities: addedCharacters.map((c) => ({
         name: c.name,
-        region: c.region,
+        region: "eu",
         realm: c.realm,
         type: "com.kos.entities.domain.WowEntityRequest",
       })),
@@ -202,40 +201,39 @@ export function CreateView({
                   }
                 />
 
-                <input
-                  className="form-input"
-                  placeholder="Realm"
+                <select
+                  className="form-select"
                   value={char.realm}
                   onChange={(e) =>
                     updateCharacter(index, "realm", e.target.value)
                   }
-                />
-
-                <input
-                  className="form-input"
-                  placeholder="Region"
-                  value={char.region}
-                  onChange={(e) =>
-                    updateCharacter(index, "region", e.target.value)
-                  }
-                />
+                >
+                  <option value="">Realm...</option>
+                  {EU_REALMS.map((r) => (
+                    <option key={r.slug} value={r.slug}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
 
                 {char.mode === "add" ? (
                   <button
                     type="button"
-                    className="btn btn-primary btn-small"
+                    className="btn-icon btn-icon-primary"
                     onClick={() => addCharacter(index)}
-                    disabled={!char.name || !char.realm || !char.region}
+                    disabled={!char.name || !char.realm}
+                    title="Add character"
                   >
-                    Add
+                    <Plus size={16} />
                   </button>
                 ) : (
                   <button
                     type="button"
-                    className="btn btn-outline btn-small"
+                    className="btn-icon btn-icon-outline"
                     onClick={() => removeCharacter(index)}
+                    title="Remove character"
                   >
-                    ✕
+                    <X size={16} />
                   </button>
                 )}
               </div>

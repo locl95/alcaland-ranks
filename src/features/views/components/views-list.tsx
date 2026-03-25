@@ -1,11 +1,10 @@
+import { Plus, User, Users, Loader2, Trash2, MoreHorizontal } from "lucide-react";
 import {
-  ChevronRight,
-  Plus,
-  User,
-  Users,
-  AlertTriangle,
-  Trash2,
-} from "lucide-react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
 import "@/styles/features/views/views-list.css";
 import { View } from "@/features/views/model/View.tsx";
 
@@ -83,30 +82,36 @@ export function ViewsList({
             </div>
 
             <div className="view-row-actions">
+              {isPending && <Loader2 className="loading-icon" />}
+
               {!isPending && (
-                <>
-                  <ChevronRight className="chevron-icon view-row-chevron" />
-
-                  <button
-                    title={
-                      viewsSyncing
-                        ? "Cannot delete while syncing"
-                        : "Delete view"
-                    }
-                    className={`view-row-delete ${viewsSyncing ? "disabled" : ""}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (viewsSyncing) return;
-
-                      onDeleteView(view.id);
-                    }}
-                  >
-                    <Trash2 className="delete-icon" />
-                  </button>
-                </>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="view-row-menu-btn"
+                      onClick={(e) => e.stopPropagation()}
+                      title="View options"
+                    >
+                      <MoreHorizontal className="view-row-menu-icon" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="view-row-menu-content" align="end">
+                    <DropdownMenuItem
+                      className={`view-row-menu-item view-row-menu-item--danger ${viewsSyncing ? "disabled" : ""}`}
+                      onSelect={(e) => {
+                        if (viewsSyncing) {
+                          e.preventDefault();
+                          return;
+                        }
+                        onDeleteView(view.id);
+                      }}
+                    >
+                      <Trash2 className="view-row-icon" />
+                      {viewsSyncing ? "Cannot delete while syncing" : "Delete view"}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
-
-              {isPending && <AlertTriangle className="warning-icon" />}
             </div>
           </div>
         );

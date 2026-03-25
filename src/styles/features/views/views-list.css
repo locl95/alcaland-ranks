@@ -122,56 +122,86 @@
     background: none;
 }
 
-/* warning icon */
+/* loading spinner icon */
 
-.warning-icon {
+.loading-icon {
     width: 1.25rem;
     height: 1.25rem;
-    color: #facc15;
+    color: #94a3b8;
     flex-shrink: 0;
-    animation: warning-pulse 1.6s infinite;
+    animation: spin 1s linear infinite;
 }
 
-@keyframes warning-pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .view-row-actions {
-    position: relative;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 }
 
-/* Delete button hidden by default */
-.view-row-delete {
-    position: absolute;
-    right: 0;
-    opacity: 0;
-    pointer-events: none;
+/* Three-dot menu trigger */
+.view-row-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.375rem;
     background: transparent;
     border: none;
     cursor: pointer;
+    color: #94a3b8;
+    transition: background 0.15s, color 0.15s;
 }
 
-/* Chevron visible by default */
-.view-row-chevron {
-    transition: opacity 0.2s;
+.view-row-menu-btn:hover {
+    background: rgba(51, 65, 85, 0.8);
+    color: #ffffff;
 }
 
-/* Hover behavior */
-.view-row:hover .view-row-delete {
-    opacity: 1;
-    pointer-events: auto;
+.view-row-menu-icon {
+    width: 1.125rem;
+    height: 1.125rem;
 }
 
-.view-row:hover .view-row-chevron {
-    opacity: 0;
+/* Dropdown content */
+.view-row-menu-content {
+    min-width: 10rem;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 50;
 }
 
-.view-row-delete.disabled {
-    opacity: 0.3;
+/* Dropdown items */
+.view-row-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.15s;
+}
+
+.view-row-menu-item--danger {
+    color: #f87171;
+}
+
+.view-row-menu-item--danger:hover,
+.view-row-menu-item--danger:focus {
+    background: rgba(248, 113, 113, 0.1);
+}
+
+.view-row-menu-item.disabled {
+    opacity: 0.4;
     cursor: not-allowed;
-    pointer-events: none;
 }
