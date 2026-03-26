@@ -98,7 +98,7 @@ export function App() {
   };
 
   const handleViewClick = (viewId: string) => {
-    navigate(`/ladder/${viewId}`);
+    navigate(`/${viewId}`);
   };
 
   const handleBackToViews = () => {
@@ -137,7 +137,7 @@ export function App() {
         />
 
         <Route
-          path="/ladder/:viewId"
+          path="/:viewId"
           element={<ViewDetail views={views} onBack={handleBackToViews} />}
         />
       </Routes>

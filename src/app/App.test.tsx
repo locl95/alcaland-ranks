@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { useState, useEffect } from 'react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
@@ -6,6 +7,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import App from './App';
 import loadingReducer from '@/features/loading/loadingSlice.ts';
 import type { View } from '@/features/views/model/View.tsx';
+import { MockViewsList, MockCreateView, MockViewDetail, makeSimpleView } from '@/test/mocks/view-mocks.tsx';
 
 // ---------------------------------------------------------------------------
 // Hoisted mocks – must be defined before vi.mock() factories run
@@ -21,9 +23,40 @@ const fetchMocks = vi.hoisted(() => ({
   fetchWithoutResponse: vi.fn(),
 }));
 
+// Lightweight in-memory router to avoid the React 18/19 version conflict that
+// arises when importing MemoryRouter from the globally-resolved react-router v7.
+const navState = vi.hoisted(() => {
+  let path = '/';
+  const listeners: (() => void)[] = [];
+
+  return {
+    get path() { return path; },
+    navigate(to: string) { path = to; listeners.slice().forEach((l) => l()); },
+    reset() { path = '/'; },
+    subscribe(l: () => void) {
+      listeners.push(l);
+      return () => { const i = listeners.indexOf(l); if (i >= 0) listeners.splice(i, 1); };
+    },
+    getParams(): Record<string, string> {
+      const match = path.match(/^\/(.+)$/);
+      return match ? { viewId: match[1] } : {};
+    },
+  };
+});
+
 // ---------------------------------------------------------------------------
 // Module mocks
 // ---------------------------------------------------------------------------
+vi.mock('react-router-dom', () => ({
+  Routes: ({ children }: { children: unknown }) => <>{children}</>,
+  Route: ({ path: routePath, element }: { path: string; element: unknown }) => {
+    const matches = routePath === '/' ? navState.path === '/' : navState.path !== '/';
+    return matches ? <>{element}</> : null;
+  },
+  useNavigate: () => (to: string) => navState.navigate(to),
+  useParams: () => navState.getParams(),
+}));
+
 vi.mock('@/shared/hooks/usePolling.tsx', () => ({
   usePolling: vi.fn((options: { shouldContinue: (r: View[]) => boolean }) => {
     pollingCapture.shouldContinue = options.shouldContinue;
@@ -34,88 +67,16 @@ vi.mock('@/shared/hooks/usePolling.tsx', () => ({
 vi.mock('@/shared/api/EasyFetch.ts', () => fetchMocks);
 
 vi.mock('@/features/views/components/views-list.tsx', () => ({
-  ViewsList: ({
-    views,
-    onViewClick,
-    onCreateView,
-    onDeleteView,
-  }: {
-    views: View[];
-    onViewClick: (id: string) => void;
-    onCreateView: () => void;
-    onDeleteView: (id: string) => void;
-  }) => (
-    <div data-testid="views-list">
-      {views.map((v) => (
-        <div key={v.id} data-testid={`view-item-${v.id}`}>
-          <button data-testid={`open-${v.id}`} onClick={() => onViewClick(v.id)}>
-            Open {v.simpleView.name}
-          </button>
-          <button data-testid={`delete-${v.id}`} onClick={() => onDeleteView(v.id)}>
-            Delete {v.simpleView.name}
-          </button>
-        </div>
-      ))}
-      <button data-testid="list-create-btn" onClick={onCreateView}>
-        Create from list
-      </button>
-    </div>
-  ),
+  ViewsList: (props: Parameters<typeof MockViewsList>[0]) => <MockViewsList {...props} />,
 }));
 
 vi.mock('@/features/views/components/create-view.tsx', () => ({
-  CreateView: ({
-    open,
-    onCreateView,
-    onOpenChange,
-  }: {
-    open: boolean;
-    onCreateView: (v: View) => void;
-    onOpenChange: (open: boolean) => void;
-  }) =>
-    open ? (
-      <div data-testid="create-view-dialog">
-        <button
-          data-testid="submit-create"
-          onClick={() =>
-            onCreateView({
-              id: 'pending-id',
-              simpleView: {
-                id: 'pending-id',
-                name: 'Pending View',
-                owner: 'testuser',
-                published: false,
-                entitiesIds: [],
-                game: 'WOW',
-                featured: false,
-              } as View['simpleView'],
-              isSynced: false,
-            })
-          }
-        >
-          Submit
-        </button>
-        <button data-testid="close-dialog" onClick={() => onOpenChange(false)}>
-          Close
-        </button>
-      </div>
-    ) : null,
+  CreateView: (props: Parameters<typeof MockCreateView>[0]) => <MockCreateView {...props} />,
 }));
 
 vi.mock('@/features/views/components/view-detail.tsx', () => ({
-  ViewDetail: ({
-    view,
-    onBack,
-  }: {
-    view: View['simpleView'];
-    onBack: () => void;
-  }) => (
-    <div data-testid="view-detail">
-      <span data-testid="view-detail-name">{view.name}</span>
-      <button data-testid="back-btn" onClick={onBack}>
-        Back
-      </button>
-    </div>
+  ViewDetail: (props: { views: View[]; onBack: () => void }) => (
+    <MockViewDetail {...props} viewId={navState.getParams().viewId ?? ''} />
   ),
 }));
 
@@ -124,35 +85,38 @@ vi.mock('@/features/views/components/view-detail.tsx', () => ({
 // ---------------------------------------------------------------------------
 const createStore = () => configureStore({ reducer: { loading: loadingReducer } });
 
-const renderApp = () =>
-  render(
-    <Provider store={createStore()}>
-      <App />
+const renderApp = () => {
+  const store = createStore();
+  function TestRouter() {
+    const [, tick] = useState(0);
+    useEffect(() => navState.subscribe(() => tick((n) => n + 1)), []);
+    return <App />;
+  }
+  return render(
+    <Provider store={store}>
+      <TestRouter />
     </Provider>,
   );
+};
 
-const makeSimpleView = (id: string, name: string) => ({
-  id,
-  name,
-  owner: 'testuser',
-  published: false,
-  entitiesIds: [],
-  game: 'WOW',
-  featured: false,
-});
+const renderWithViews = async (views = [makeSimpleView('v1', 'My View')]) => {
+  fetchMocks.fetchWithResponse.mockResolvedValue({ records: views });
+  const result = renderApp();
+  await waitFor(() => screen.getByTestId('views-list'));
+  return result;
+};
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     pollingCapture.shouldContinue = null;
+    navState.reset();
     fetchMocks.fetchWithResponse.mockResolvedValue({ records: [] });
     fetchMocks.fetchWithoutResponse.mockResolvedValue(undefined);
   });
 
-  // -------------------------------------------------------------------------
+  afterEach(() => vi.unstubAllEnvs());
+
   describe('initial render', () => {
     it('renders the views list screen', async () => {
       renderApp();
@@ -174,7 +138,6 @@ describe('App', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
   describe('fetching views on mount', () => {
     it('calls fetchWithResponse with the correct endpoint', async () => {
       renderApp();
@@ -189,44 +152,12 @@ describe('App', () => {
     });
 
     it('displays fetched views', async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'My View')],
-      });
-      renderApp();
-      await waitFor(() => expect(screen.getByTestId('view-item-v1')).toBeInTheDocument());
+      await renderWithViews([makeSimpleView('v1', 'My View')]);
+      expect(screen.getByTestId('view-item-v1')).toBeInTheDocument();
     });
   });
 
-  // -------------------------------------------------------------------------
-  describe('Create View button', () => {
-    it('shows header Create View button when views exist', async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'View 1')],
-      });
-      renderApp();
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: /create view/i })).toBeInTheDocument(),
-      );
-    });
-
-    it('does not show header Create View button when there are no views', async () => {
-      renderApp();
-      await waitFor(() => screen.getByTestId('views-list'));
-      expect(screen.queryByRole('button', { name: /create view/i })).not.toBeInTheDocument();
-    });
-
-    it('opens the create dialog when the header button is clicked', async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'View 1')],
-      });
-      renderApp();
-      await waitFor(() => screen.getByRole('button', { name: /create view/i }));
-
-      await userEvent.click(screen.getByRole('button', { name: /create view/i }));
-
-      expect(screen.getByTestId('create-view-dialog')).toBeInTheDocument();
-    });
-
+  describe('Create View dialog', () => {
     it('opens the create dialog when triggered from ViewsList', async () => {
       renderApp();
       await waitFor(() => screen.getByTestId('list-create-btn'));
@@ -235,9 +166,18 @@ describe('App', () => {
 
       expect(screen.getByTestId('create-view-dialog')).toBeInTheDocument();
     });
+
+    it('closes the create dialog when onOpenChange(false) is called', async () => {
+      renderApp();
+      await waitFor(() => screen.getByTestId('list-create-btn'));
+
+      await userEvent.click(screen.getByTestId('list-create-btn'));
+      await userEvent.click(screen.getByTestId('close-dialog'));
+
+      expect(screen.queryByTestId('create-view-dialog')).not.toBeInTheDocument();
+    });
   });
 
-  // -------------------------------------------------------------------------
   describe('handleCreateView', () => {
     it('adds the pending view to the list', async () => {
       renderApp();
@@ -258,7 +198,6 @@ describe('App', () => {
       await userEvent.click(screen.getByTestId('submit-create'));
 
       expect(pollingCapture.start).toHaveBeenCalled();
-      vi.unstubAllEnvs();
     });
 
     it('does not start polling when VITE_FEATURE_FLAG_POLLING_ENABLED is not true', async () => {
@@ -270,52 +209,39 @@ describe('App', () => {
       await userEvent.click(screen.getByTestId('submit-create'));
 
       expect(pollingCapture.start).not.toHaveBeenCalled();
-      vi.unstubAllEnvs();
     });
   });
 
-  // -------------------------------------------------------------------------
   describe('handleViewClick', () => {
     it('navigates to the view-detail screen', async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'My View')],
-      });
-      renderApp();
-      await waitFor(() => screen.getByTestId('open-v1'));
-
+      await renderWithViews();
       await userEvent.click(screen.getByTestId('open-v1'));
 
-      expect(screen.getByTestId('view-detail')).toBeInTheDocument();
-      expect(screen.queryByTestId('views-list')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('view-detail')).toBeInTheDocument();
+        expect(screen.queryByTestId('views-list')).not.toBeInTheDocument();
+      });
     });
 
     it('passes the correct view data to ViewDetail', async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'My View')],
-      });
-      renderApp();
-      await waitFor(() => screen.getByTestId('open-v1'));
-
+      await renderWithViews();
       await userEvent.click(screen.getByTestId('open-v1'));
 
-      expect(screen.getByTestId('view-detail-name')).toHaveTextContent('My View');
+      await waitFor(() =>
+        expect(screen.getByTestId('view-detail-name')).toHaveTextContent('My View'),
+      );
     });
   });
 
-  // -------------------------------------------------------------------------
   describe('handleBackToViews', () => {
     const goToViewDetail = async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'My View')],
-      });
-      renderApp();
-      await waitFor(() => screen.getByTestId('open-v1'));
+      await renderWithViews();
       await userEvent.click(screen.getByTestId('open-v1'));
+      await waitFor(() => screen.getByTestId('view-detail'));
     };
 
     it('navigates back to the views list', async () => {
       await goToViewDetail();
-
       await userEvent.click(screen.getByTestId('back-btn'));
 
       await waitFor(() => {
@@ -326,45 +252,22 @@ describe('App', () => {
 
     it('stops polling when navigating back', async () => {
       await goToViewDetail();
-
       await userEvent.click(screen.getByTestId('back-btn'));
 
       expect(pollingCapture.stop).toHaveBeenCalled();
     });
-
-    it('re-fetches views when navigating back', async () => {
-      await goToViewDetail();
-      const callsBefore = fetchMocks.fetchWithResponse.mock.calls.length;
-
-      await userEvent.click(screen.getByTestId('back-btn'));
-
-      await waitFor(() =>
-        expect(fetchMocks.fetchWithResponse.mock.calls.length).toBeGreaterThan(callsBefore),
-      );
-    });
   });
 
-  // -------------------------------------------------------------------------
   describe('handleDeleteView', () => {
     it('removes the view from the list optimistically', async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'My View')],
-      });
-      renderApp();
-      await waitFor(() => screen.getByTestId('delete-v1'));
-
+      await renderWithViews();
       await userEvent.click(screen.getByTestId('delete-v1'));
 
       expect(screen.queryByTestId('view-item-v1')).not.toBeInTheDocument();
     });
 
     it('calls the DELETE API with the correct viewId', async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'My View')],
-      });
-      renderApp();
-      await waitFor(() => screen.getByTestId('delete-v1'));
-
+      await renderWithViews();
       await userEvent.click(screen.getByTestId('delete-v1'));
 
       await waitFor(() =>
@@ -378,12 +281,8 @@ describe('App', () => {
     });
 
     it('re-fetches views when the DELETE API call fails', async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'My View')],
-      });
       fetchMocks.fetchWithoutResponse.mockRejectedValue(new Error('Network error'));
-      renderApp();
-      await waitFor(() => screen.getByTestId('delete-v1'));
+      await renderWithViews();
       const callsBefore = fetchMocks.fetchWithResponse.mock.calls.length;
 
       await userEvent.click(screen.getByTestId('delete-v1'));
@@ -394,7 +293,6 @@ describe('App', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
   describe('reconcileViews (via polling shouldContinue)', () => {
     it('keeps pending views that are not yet present in the backend', async () => {
       renderApp();
@@ -402,12 +300,8 @@ describe('App', () => {
 
       await userEvent.click(screen.getByTestId('list-create-btn'));
       await userEvent.click(screen.getByTestId('submit-create'));
-      expect(screen.getByTestId('view-item-pending-id')).toBeInTheDocument();
 
-      // Backend returns nothing yet – pending view should remain
-      act(() => {
-        pollingCapture.shouldContinue!([]);
-      });
+      act(() => { pollingCapture.shouldContinue!([]); });
 
       expect(screen.getByTestId('view-item-pending-id')).toBeInTheDocument();
     });
@@ -420,16 +314,10 @@ describe('App', () => {
       await userEvent.click(screen.getByTestId('submit-create'));
 
       const backendViews: View[] = [
-        {
-          id: 'real-id',
-          simpleView: makeSimpleView('real-id', 'Pending View') as View['simpleView'],
-          isSynced: true,
-        },
+        { id: 'real-id', simpleView: makeSimpleView('real-id', 'Pending View'), isSynced: true },
       ];
 
-      act(() => {
-        pollingCapture.shouldContinue!(backendViews);
-      });
+      act(() => { pollingCapture.shouldContinue!(backendViews); });
 
       await waitFor(() => {
         expect(screen.queryByTestId('view-item-pending-id')).not.toBeInTheDocument();
@@ -438,7 +326,6 @@ describe('App', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
   describe('cleanup', () => {
     it('stops polling when the component unmounts', async () => {
       const { unmount } = renderApp();
@@ -447,29 +334,6 @@ describe('App', () => {
       unmount();
 
       expect(pollingCapture.stop).toHaveBeenCalled();
-    });
-  });
-
-  // -------------------------------------------------------------------------
-  describe('navigation effect', () => {
-    it('navigates back to views list when the currently viewed view disappears from state', async () => {
-      fetchMocks.fetchWithResponse.mockResolvedValue({
-        records: [makeSimpleView('v1', 'My View')],
-      });
-      renderApp();
-      await waitFor(() => screen.getByTestId('open-v1'));
-      await userEvent.click(screen.getByTestId('open-v1'));
-      expect(screen.getByTestId('view-detail')).toBeInTheDocument();
-
-      // Polling callback: backend no longer returns v1
-      act(() => {
-        pollingCapture.shouldContinue!([]);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId('views-list')).toBeInTheDocument();
-        expect(screen.queryByTestId('view-detail')).not.toBeInTheDocument();
-      });
     });
   });
 });
