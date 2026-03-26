@@ -310,6 +310,73 @@ export function CharacterLadder({
                         </div>
                       </div>
                     </div>
+
+                    {character.mythicPlusRanks.specs.length > 0 && (
+                      <div className="rankings-section">
+                        <h4 className="rankings-section-title">
+                          Spec Rankings
+                        </h4>
+
+                        {character.mythicPlusRanks.specs
+                            .filter((spec) => spec.score > 0)
+                            .map((spec) => {
+                          const cachedSpec =
+                            cachedRaiderIoProfile?.mythicPlusRanks.specs.find(
+                              (s) => s.name === spec.name,
+                            );
+
+                          return (
+                            <div key={spec.name} className="spec-ranking">
+                              <div className="spec-ranking-header">
+                                <span className="spec-ranking-name">
+                                  {spec.name}
+                                </span>
+                                <span className="spec-ranking-score">
+                                  {Math.round(spec.score).toLocaleString()}
+                                </span>
+                              </div>
+
+                              <div className="rankings-grid">
+                                {(
+                                  [
+                                    ["World", "world"],
+                                    ["Region", "region"],
+                                    ["Realm", "realm"],
+                                  ] as const
+                                ).map(([label, key]) => {
+                                  const change = getRankChange(
+                                    spec[key],
+                                    cachedSpec?.[key],
+                                  );
+
+                                  return (
+                                    <div key={key} className="ranking-item">
+                                      <span className="ranking-label">
+                                        {label}
+                                      </span>
+                                      <div className="ranking-value-row">
+                                        <span className="ranking-value">
+                                          #{Math.round(spec[key]).toLocaleString()}
+                                        </span>
+                                        {change !== null && change !== 0 && (
+                                          <span
+                                            className={`rank-change ${change > 0 ? "improved" : "declined"}`}
+                                          >
+                                            {change > 0
+                                              ? `+${Math.round(change)}`
+                                              : Math.round(change)}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

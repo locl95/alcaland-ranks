@@ -2,7 +2,8 @@ import { ArrowLeft, Edit, Trophy } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks.ts";
 import "@/styles/features/views/view-detail.css";
 import { useEffect, useState } from "react";
-import { SimpleView } from "@/features/views/api/SimpleView.tsx";
+import { useParams, useNavigate } from "react-router-dom";
+import { View } from "@/features/views/model/View.tsx";
 import {
   RaiderioProfile,
   Season,
@@ -14,20 +15,31 @@ import {
   fetchWithResponse,
 } from "@/shared/api/EasyFetch.ts";
 import { ViewRequest } from "@/features/views/api/ViewRequest.tsx";
+import { SimpleView } from "@/features/views/api/SimpleView.tsx";
 import { CharacterLadder } from "@/features/views/components/character-ladder.tsx";
 import { DungeonGrid } from "@/features/views/components/dungeon-grid.tsx";
 import { EditView } from "@/features/views/components/edit-view.tsx";
 
 export function ViewDetail({
-  view,
+  views,
   onBack,
-}: Readonly<{ view: SimpleView; onBack: () => void }>) {
+}: Readonly<{ views: View[]; onBack: () => void }>) {
+  const { viewId } = useParams();
+  const navigate = useNavigate();
+  const view: SimpleView | undefined = views.find((v) => v.id === viewId)?.simpleView;
+
   const [profiles, setProfiles] = useState<RaiderioProfile[]>([]);
   const [cachedProfiles, setCachedProfiles] = useState<RaiderioProfile[]>([]);
   const [season, setSeason] = useState<Season | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const dispatch = useAppDispatch();
   const isLoading = useAppSelector(selectLoading);
+
+  useEffect(() => {
+    if (!isLoading && !view) {
+      navigate("/");
+    }
+  }, [isLoading, view]);
 
   useEffect(() => {
     async function fetchData() {
@@ -63,8 +75,8 @@ export function ViewDetail({
       }
     }
 
-    fetchData();
-  }, [view.id]);
+    if (view) fetchData();
+  }, [view?.id]);
 
   function haveSameCharacters(
     a: RaiderioProfile[],
@@ -117,6 +129,8 @@ export function ViewDetail({
 
     setIsEditOpen(false);
   };
+
+  if (!view) return null;
 
   return (
     <div className="view-detail-container">

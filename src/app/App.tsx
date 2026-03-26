@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { ViewsList } from "@/features/views/components/views-list.tsx";
-import { CreateView } from "@/features/views/components/create-view.tsx";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "./hooks";
 import { loading, notLoading } from "@/features/loading/loadingSlice.ts";
 import {
@@ -10,31 +9,18 @@ import {
 import { GetViewsResponse } from "@/features/views/api/GetViewsResponse.tsx";
 import { ViewDetail } from "@/features/views/components/view-detail.tsx";
 import { View } from "@/features/views/model/View.tsx";
-import { Plus } from "lucide-react";
-import "@/styles/app/App.css";
 import { usePolling } from "@/shared/hooks/usePolling.tsx";
 import { Spinner } from "@/shared/components/spinner.tsx";
-
-type Screen = { type: "views" } | { type: "view-detail"; viewId: string };
+import {ViewsPage} from "@/features/views/components/views-page.tsx";
 
 export function App() {
   const [views, setViews] = useState<View[]>([]);
-  const [currentScreen, setCurrentScreen] = useState<Screen>({ type: "views" });
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAndSetViews();
   }, []);
-
-  useEffect(() => {
-    if (currentScreen.type === "view-detail") {
-      const viewExists = views.some((v) => v.id === currentScreen.viewId);
-      if (!viewExists) {
-        setCurrentScreen({ type: "views" });
-      }
-    }
-  }, [currentScreen, views]);
 
   const fetchAndSetViews = async () => {
     dispatch(loading());
@@ -89,14 +75,12 @@ export function App() {
 
   const reconcileViews = (current: View[], backend: View[]): View[] => {
     const pending = current.filter((v) => !v.isSynced);
-
     const reconciled = [...backend];
 
     pending.forEach((temp) => {
       const exists = backend.some(
         (v) => v.simpleView.name === temp.simpleView.name,
       );
-
       if (!exists) {
         reconciled.push(temp);
       }
@@ -114,15 +98,13 @@ export function App() {
   };
 
   const handleViewClick = (viewId: string) => {
-    setCurrentScreen({ type: "view-detail", viewId });
+    navigate(`/ladder/${viewId}`);
   };
 
   const handleBackToViews = async () => {
-    setCurrentScreen({ type: "views" });
-
+    navigate("/");
     stopPolling();
-
-    await fetchAndSetViews();
+    fetchAndSetViews();
   };
 
   const handleDeleteView = async (viewId: string) => {
@@ -141,65 +123,24 @@ export function App() {
     }
   };
 
-  if (currentScreen.type === "views") {
-    return (
-      <>
-        <Spinner />
-        <div className="views-list-container">
-          <div className="views-list-content">
-            <div className="views-header">
-              <div className="views-header-text">
-                <h1>Mythic+ ladder tracker</h1>
-              </div>
+  return (
+    <>
+      <Spinner />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ViewsPage views={views} onViewClick={handleViewClick} onDeleteView={handleDeleteView} onCreateView={handleCreateView} />
+          }
+        />
 
-              {views.length > 0 && (
-                <button
-                  hidden={true}
-                  onClick={() => setIsCreateDialogOpen(true)}
-                  className="create-view-btn"
-                >
-                  <Plus className="icon-lg" />
-                  Create View
-                </button>
-              )}
-            </div>
-
-            <div className="views-season">
-              <span className="views-season-label">Current season</span>
-              <span className="views-season-value">Midnight Season 1</span>
-            </div>
-
-            <ViewsList
-              views={views}
-              onViewClick={handleViewClick}
-              onCreateView={() => setIsCreateDialogOpen(true)}
-              onDeleteView={handleDeleteView}
-            />
-          </div>
-
-          <CreateView
-            open={isCreateDialogOpen}
-            onOpenChange={setIsCreateDialogOpen}
-            onCreateView={handleCreateView}
-          />
-        </div>
-      </>
-    );
-  }
-
-  if (currentScreen.type === "view-detail") {
-    const view = views.find((v) => v.id === currentScreen.viewId);
-    if (!view) return null;
-
-    return (
-      <>
-        <Spinner />
-        <ViewDetail view={view.simpleView} onBack={handleBackToViews} />
-      </>
-    );
-  }
-
-  return null;
+        <Route
+          path="/ladder/:viewId"
+          element={<ViewDetail views={views} onBack={handleBackToViews} />}
+        />
+      </Routes>
+    </>
+  );
 }
 
 export default App;
