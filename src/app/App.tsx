@@ -101,10 +101,12 @@ export function App() {
     navigate(`/ladder/${viewId}`);
   };
 
-  const handleBackToViews = async () => {
-    navigate("/");
+  const handleBackToViews = () => {
     stopPolling();
-    fetchAndSetViews();
+    navigate("/");
+    if (views.some((v) => !v.isSynced)) {
+      startPolling();
+    }
   };
 
   const handleDeleteView = async (viewId: string) => {
