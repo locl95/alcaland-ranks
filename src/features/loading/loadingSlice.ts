@@ -3,7 +3,7 @@ import {RootState} from "@/app/store";
 import {LoadingState} from "./types";
 
 const initialState: LoadingState = {
-  loading: false,
+  loading: true,
 }
 
 export const loadingSlice = createSlice({
