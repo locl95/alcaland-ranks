@@ -13,6 +13,7 @@ import { View } from "@/features/views/model/View.tsx";
 import { Plus } from "lucide-react";
 import "@/styles/app/App.css";
 import { usePolling } from "@/shared/hooks/usePolling.tsx";
+import { Spinner } from "@/shared/components/spinner.tsx";
 
 type Screen = { type: "views" } | { type: "view-detail"; viewId: string };
 
@@ -142,44 +143,47 @@ export function App() {
 
   if (currentScreen.type === "views") {
     return (
-      <div className="views-list-container">
-        <div className="views-list-content">
-          <div className="views-header">
-            <div className="views-header-text">
-              <h1>Mythic+ ladder tracker</h1>
+      <>
+        <Spinner />
+        <div className="views-list-container">
+          <div className="views-list-content">
+            <div className="views-header">
+              <div className="views-header-text">
+                <h1>Mythic+ ladder tracker</h1>
+              </div>
+
+              {views.length > 0 && (
+                <button
+                  hidden={true}
+                  onClick={() => setIsCreateDialogOpen(true)}
+                  className="create-view-btn"
+                >
+                  <Plus className="icon-lg" />
+                  Create View
+                </button>
+              )}
             </div>
 
-            {views.length > 0 && (
-              <button
-                hidden={true}
-                onClick={() => setIsCreateDialogOpen(true)}
-                className="create-view-btn"
-              >
-                <Plus className="icon-lg" />
-                Create View
-              </button>
-            )}
+            <div className="views-season">
+              <span className="views-season-label">Current season</span>
+              <span className="views-season-value">Midnight Season 1</span>
+            </div>
+
+            <ViewsList
+              views={views}
+              onViewClick={handleViewClick}
+              onCreateView={() => setIsCreateDialogOpen(true)}
+              onDeleteView={handleDeleteView}
+            />
           </div>
 
-          <div className="views-season">
-            <span className="views-season-label">Current season</span>
-            <span className="views-season-value">Midnight Season 1</span>
-          </div>
-
-          <ViewsList
-            views={views}
-            onViewClick={handleViewClick}
-            onCreateView={() => setIsCreateDialogOpen(true)}
-            onDeleteView={handleDeleteView}
+          <CreateView
+            open={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+            onCreateView={handleCreateView}
           />
         </div>
-
-        <CreateView
-          open={isCreateDialogOpen}
-          onOpenChange={setIsCreateDialogOpen}
-          onCreateView={handleCreateView}
-        />
-      </div>
+      </>
     );
   }
 
@@ -187,7 +191,12 @@ export function App() {
     const view = views.find((v) => v.id === currentScreen.viewId);
     if (!view) return null;
 
-    return <ViewDetail view={view.simpleView} onBack={handleBackToViews} />;
+    return (
+      <>
+        <Spinner />
+        <ViewDetail view={view.simpleView} onBack={handleBackToViews} />
+      </>
+    );
   }
 
   return null;

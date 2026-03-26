@@ -1,5 +1,5 @@
 import { ArrowLeft, Edit, Trophy } from "lucide-react";
-import { useAppDispatch } from "@/app/hooks.ts";
+import { useAppDispatch, useAppSelector } from "@/app/hooks.ts";
 import "@/styles/features/views/view-detail.css";
 import { useEffect, useState } from "react";
 import { SimpleView } from "@/features/views/api/SimpleView.tsx";
@@ -8,7 +8,7 @@ import {
   Season,
   ViewData,
 } from "@/features/views/api/Raiderio.tsx";
-import { loading, notLoading } from "@/features/loading/loadingSlice.ts";
+import { loading, notLoading, selectLoading } from "@/features/loading/loadingSlice.ts";
 import {
   fetchWithoutResponse,
   fetchWithResponse,
@@ -27,6 +27,7 @@ export function ViewDetail({
   const [season, setSeason] = useState<Season | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const dispatch = useAppDispatch();
+  const isLoading = useAppSelector(selectLoading);
 
   useEffect(() => {
     async function fetchData() {
@@ -135,7 +136,7 @@ export function ViewDetail({
           </button>
         </div>
 
-        {profiles.length === 0 ? (
+        {!isLoading && profiles.length === 0 ? (
           <div className="empty-state">
             <Trophy className="empty-icon" />
             <h3 className="empty-title">No characters in this view</h3>

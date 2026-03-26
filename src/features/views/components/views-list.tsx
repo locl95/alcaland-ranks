@@ -7,6 +7,8 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import "@/styles/features/views/views-list.css";
 import { View } from "@/features/views/model/View.tsx";
+import { useAppSelector } from "@/app/hooks.ts";
+import { selectLoading } from "@/features/loading/loadingSlice.ts";
 
 interface ViewsListProps {
   views: View[];
@@ -21,7 +23,10 @@ export function ViewsList({
   onCreateView,
   onDeleteView,
 }: Readonly<ViewsListProps>) {
+  const isLoading = useAppSelector(selectLoading);
   const viewsSyncing = views.some((v) => !v.isSynced);
+
+  if (isLoading && views.length === 0) return null;
 
   return views.length === 0 ? (
     <div className="views-empty-state">
