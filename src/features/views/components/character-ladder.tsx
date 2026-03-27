@@ -8,6 +8,7 @@ import "@/styles/features/views/character-ladder.css";
 import { useState } from "react";
 import { RaiderioProfile } from "@/features/views/api/Raiderio.tsx";
 import raiderio2 from "@/assets/raiderio.png"
+import summoned from "@/assets/summmoned.png"
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];
@@ -35,6 +36,14 @@ export function CharacterLadder({
     const name = character.name.toLowerCase();
     const region = character.region.toLowerCase();
     const url = `https://raider.io/characters/${region}/${realm}/${name}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const openSummonedIO = (character: RaiderioProfile) => {
+    const realm = character.realm.replace(/\s+/g, "-");
+    const name = character.name.toLowerCase();
+    const region = character.region.toLowerCase();
+    const url = `https://summonned.io/${region}/${realm}/${name}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
@@ -197,6 +206,15 @@ export function CharacterLadder({
                           className="raider-io-btn"
                         >
                           <img src={raiderio2} alt={'Raider IO'} aria-hidden={true} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openSummonedIO(character);
+                          }}
+                          className="raider-io-btn"
+                        >
+                          <img src={summoned} alt={'Summoned IO'} aria-hidden={true} />
                         </button>
 
                         <button className="expand-btn">
