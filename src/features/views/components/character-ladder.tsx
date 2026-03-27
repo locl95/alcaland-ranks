@@ -43,7 +43,7 @@ export function CharacterLadder({
     const realm = character.realm.replace(/\s+/g, "-");
     const name = character.name.toLowerCase();
     const region = character.region.toLowerCase();
-    const url = `https://summonned.io/${region}/${realm}/${name}`;
+    const url = `https://summoned.io/${region}/${realm}/${name}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
