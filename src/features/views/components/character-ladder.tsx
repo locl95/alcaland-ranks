@@ -8,7 +8,7 @@ import "@/styles/features/views/character-ladder.css";
 import { useState } from "react";
 import { RaiderioProfile } from "@/features/views/api/Raiderio.tsx";
 import raiderio2 from "@/assets/raiderio.png"
-import summoned from "@/assets/summmoned.png"
+import summoned from "@/assets/summoned.png"
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];
