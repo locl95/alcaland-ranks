@@ -87,9 +87,7 @@ export function CreateView({
     setCharacters((prev) => {
       const updated = prev.filter((_, i) => i !== index);
 
-      return updated.length
-        ? updated
-        : [{ name: "", realm: "", mode: "add" }];
+      return updated.length ? updated : [{ name: "", realm: "", mode: "add" }];
     });
   }, []);
 

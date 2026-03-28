@@ -8,7 +8,11 @@ import {
   Season,
   ViewData,
 } from "@/features/views/api/Raiderio.tsx";
-import { loading, notLoading, selectLoading } from "@/features/loading/loadingSlice.ts";
+import {
+  loading,
+  notLoading,
+  selectLoading,
+} from "@/features/loading/loadingSlice.ts";
 import {
   fetchWithoutResponse,
   fetchWithResponse,
@@ -18,9 +22,7 @@ import { CharacterLadder } from "@/features/views/components/character-ladder.ts
 import { DungeonGrid } from "@/features/views/components/dungeon-grid.tsx";
 import { EditView } from "@/features/views/components/edit-view.tsx";
 
-export function ViewDetail({
-  onBack,
-}: Readonly<{ onBack: () => void }>) {
+export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
   const { viewId } = useParams();
   const navigate = useNavigate();
   const [viewName, setViewName] = useState<string>("");

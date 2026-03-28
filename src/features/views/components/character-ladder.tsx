@@ -2,13 +2,14 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronUp,
-  Trophy
+  MoreHorizontal,
+  Trophy,
 } from "lucide-react";
 import "@/styles/features/views/character-ladder.css";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RaiderioProfile } from "@/features/views/api/Raiderio.tsx";
-import raiderio2 from "@/assets/raiderio.png"
-import summoned from "@/assets/summoned.png"
+import raiderio2 from "@/assets/raiderio.png";
+import summoned from "@/assets/summoned.png";
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];
@@ -23,6 +24,18 @@ export function CharacterLadder({
   const [expandedCharacters, setExpandedCharacters] = useState<Set<number>>(
     new Set(),
   );
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const sortedCharacters = [...characters].sort((a, b) => b.score - a.score);
   const sortedCachedCharacters = [...cachedCharacters].sort(
@@ -110,7 +123,10 @@ export function CharacterLadder({
     <div className="ladder-card">
       <div
         className="ladder-header"
-        onClick={() => setIsLadderOpen(!isLadderOpen)}
+        onClick={() => {
+          if (isLadderOpen) setExpandedCharacters(new Set());
+          setIsLadderOpen(!isLadderOpen);
+        }}
       >
         <div className="ladder-title">
           <Trophy className="trophy-icon" />
@@ -174,9 +190,6 @@ export function CharacterLadder({
                         >
                           {character.class}
                         </span>
-                        <span className="ladder-character-spec">
-                          {character.spec}
-                        </span>
                         <span className="ladder-character-realm">
                           • {character.realm}
                         </span>
@@ -203,24 +216,60 @@ export function CharacterLadder({
                       </div>
 
                       <div className="ladder-actions">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openRaiderIO(character);
-                          }}
-                          className="raider-io-btn"
+                        <div
+                          className="char-menu-wrapper"
+                          ref={openMenuId === character.id ? menuRef : null}
                         >
-                          <img src={raiderio2} alt={'Raider IO'} aria-hidden={true} />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openSummonedIO(character);
-                          }}
-                          className="raider-io-btn"
-                        >
-                          <img src={summoned} alt={'Summoned IO'} aria-hidden={true} />
-                        </button>
+                          <button
+                            className="char-menu-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuId(
+                                openMenuId === character.id
+                                  ? null
+                                  : character.id,
+                              );
+                            }}
+                          >
+                            <MoreHorizontal className="chevron-icon" />
+                          </button>
+                          {openMenuId === character.id && (
+                            <div className="char-menu-dropdown">
+                              <button
+                                className="char-menu-item"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openRaiderIO(character);
+                                  setOpenMenuId(null);
+                                }}
+                              >
+                                <img
+                                  src={raiderio2}
+                                  alt=""
+                                  aria-hidden={true}
+                                  className="char-menu-icon"
+                                />
+                                Raider.io
+                              </button>
+                              <button
+                                className="char-menu-item"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openSummonedIO(character);
+                                  setOpenMenuId(null);
+                                }}
+                              >
+                                <img
+                                  src={summoned}
+                                  alt=""
+                                  aria-hidden={true}
+                                  className="char-menu-icon"
+                                />
+                                Summoned.io
+                              </button>
+                            </div>
+                          )}
+                        </div>
 
                         <button className="expand-btn">
                           {isExpanded ? (
@@ -252,25 +301,39 @@ export function CharacterLadder({
                             {(["overall", "class"] as const).map((rankType) => (
                               <tr key={rankType} className="rankings-tr">
                                 <td className="rankings-td-label">
-                                  {rankType === "overall" ? "Overall" : character.class}
+                                  {rankType === "overall"
+                                    ? "Overall"
+                                    : character.class}
                                 </td>
-                                {(["world", "region", "realm"] as const).map((key) => {
-                                  const current = character.mythicPlusRanks[rankType][key];
-                                  const previous = cachedRaiderIoProfile?.mythicPlusRanks[rankType][key];
-                                  const change = getRankChange(current, previous);
-                                  return (
-                                    <td key={key} className="rankings-td">
-                                      <span className="ranking-value">
-                                        #{Math.round(current).toLocaleString()}
-                                      </span>
-                                      {change !== null && change !== 0 && (
-                                        <span className={`rank-change ${change > 0 ? "improved" : "declined"}`}>
-                                          {formatRankChange(change)}
+                                {(["world", "region", "realm"] as const).map(
+                                  (key) => {
+                                    const current =
+                                      character.mythicPlusRanks[rankType][key];
+                                    const previous =
+                                      cachedRaiderIoProfile?.mythicPlusRanks[
+                                        rankType
+                                      ][key];
+                                    const change = getRankChange(
+                                      current,
+                                      previous,
+                                    );
+                                    return (
+                                      <td key={key} className="rankings-td">
+                                        <span className="ranking-value">
+                                          #
+                                          {Math.round(current).toLocaleString()}
                                         </span>
-                                      )}
-                                    </td>
-                                  );
-                                })}
+                                        {change !== null && change !== 0 && (
+                                          <span
+                                            className={`rank-change ${change > 0 ? "improved" : "declined"}`}
+                                          >
+                                            {formatRankChange(change)}
+                                          </span>
+                                        )}
+                                      </td>
+                                    );
+                                  },
+                                )}
                               </tr>
                             ))}
                           </tbody>
@@ -278,9 +341,12 @@ export function CharacterLadder({
                       </div>
                     </div>
 
-                    {character.mythicPlusRanks.specs.filter((s) => s.score > 0).length > 0 && (
+                    {character.mythicPlusRanks.specs.filter((s) => s.score > 0)
+                      .length > 0 && (
                       <div className="rankings-section">
-                        <h4 className="rankings-section-title">Spec Rankings</h4>
+                        <h4 className="rankings-section-title">
+                          Spec Rankings
+                        </h4>
                         <div className="table-scroll">
                           <table className="spec-table">
                             <thead>
@@ -296,27 +362,46 @@ export function CharacterLadder({
                               {character.mythicPlusRanks.specs
                                 .filter((s) => s.score > 0)
                                 .map((spec) => {
-                                  const cachedSpec = cachedRaiderIoProfile?.mythicPlusRanks.specs.find(
-                                    (s) => s.name === spec.name,
-                                  );
+                                  const cachedSpec =
+                                    cachedRaiderIoProfile?.mythicPlusRanks.specs.find(
+                                      (s) => s.name === spec.name,
+                                    );
                                   return (
                                     <tr key={spec.name} className="spec-tr">
-                                      <td className="spec-td spec-td--name">{spec.name}</td>
-                                      <td className="spec-td spec-td--score">
-                                        {Math.round(spec.score).toLocaleString()}
+                                      <td className="spec-td spec-td--name">
+                                        {spec.name}
                                       </td>
-                                      {(["world", "region", "realm"] as const).map((key) => {
-                                        const change = getRankChange(spec[key], cachedSpec?.[key]);
+                                      <td className="spec-td spec-td--score">
+                                        {Math.round(
+                                          spec.score,
+                                        ).toLocaleString()}
+                                      </td>
+                                      {(
+                                        ["world", "region", "realm"] as const
+                                      ).map((key) => {
+                                        const change = getRankChange(
+                                          spec[key],
+                                          cachedSpec?.[key],
+                                        );
                                         return (
-                                          <td key={key} className="spec-td spec-td--rank">
+                                          <td
+                                            key={key}
+                                            className="spec-td spec-td--rank"
+                                          >
                                             <span className="spec-rank-value">
-                                              #{Math.round(spec[key]).toLocaleString()}
+                                              #
+                                              {Math.round(
+                                                spec[key],
+                                              ).toLocaleString()}
                                             </span>
-                                            {change !== null && change !== 0 && (
-                                              <span className={`rank-change ${change > 0 ? "improved" : "declined"}`}>
-                                                {formatRankChange(change)}
-                                              </span>
-                                            )}
+                                            {change !== null &&
+                                              change !== 0 && (
+                                                <span
+                                                  className={`rank-change ${change > 0 ? "improved" : "declined"}`}
+                                                >
+                                                  {formatRankChange(change)}
+                                                </span>
+                                              )}
                                           </td>
                                         );
                                       })}

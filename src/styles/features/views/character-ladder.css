@@ -40,7 +40,7 @@
 }
 
 .ladder-content {
-    padding: 0 1.5rem 1.5rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -415,28 +415,64 @@
     margin-right: 0.375rem;
 }
 
-.raider-io-btn {
-    padding: 0.5rem 1rem;
-    border: none;
-    background: transparent;
-    color: #cbd5e1;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    transition: all 0.2s;
+.char-menu-wrapper {
+    position: relative;
 }
 
-.raider-io-btn:hover {
+.char-menu-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    border-radius: 0.25rem;
+    transition: color 0.2s;
+}
+
+.char-menu-btn:hover {
+    color: #cbd5e1;
+}
+
+.char-menu-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.375rem);
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+    min-width: 9rem;
+    overflow: hidden;
+}
+
+.char-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: none;
+    color: #cbd5e1;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+}
+
+.char-menu-item:hover {
+    background: rgba(51, 65, 85, 0.6);
     color: #ffffff;
 }
 
-.raider-io-btn img {
-    width: 2rem;
-    height: 2rem;
+.char-menu-icon {
+    width: 1.125rem;
+    height: 1.125rem;
     object-fit: contain;
+    flex-shrink: 0;
 }
 
 .trophy-icon {
@@ -456,7 +492,7 @@
     }
 
     .ladder-content {
-        padding: 0 0.375rem 0.625rem;
+        padding: 0.625rem 0.375rem;
         gap: 0.375rem;
     }
 
@@ -562,15 +598,6 @@
     .ladder-actions {
         gap: 0.125rem;
         flex-shrink: 0;
-    }
-
-    .raider-io-btn {
-        padding: 0.25rem;
-    }
-
-    .raider-io-btn img {
-        width: 1.375rem;
-        height: 1.375rem;
     }
 
     .expand-btn {

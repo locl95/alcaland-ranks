@@ -1,4 +1,11 @@
-import { Plus, User, Users, Loader2, Trash2, MoreHorizontal } from "lucide-react";
+import {
+  Plus,
+  User,
+  Users,
+  Loader2,
+  Trash2,
+  MoreHorizontal,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -101,7 +108,10 @@ export function ViewsList({
                       <MoreHorizontal className="view-row-menu-icon" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="view-row-menu-content" align="end">
+                  <DropdownMenuContent
+                    className="view-row-menu-content"
+                    align="end"
+                  >
                     <DropdownMenuItem
                       className={`view-row-menu-item view-row-menu-item--danger ${viewsSyncing ? "disabled" : ""}`}
                       onSelect={(e) => {
@@ -113,7 +123,9 @@ export function ViewsList({
                       }}
                     >
                       <Trash2 className="view-row-icon" />
-                      {viewsSyncing ? "Cannot delete while syncing" : "Delete view"}
+                      {viewsSyncing
+                        ? "Cannot delete while syncing"
+                        : "Delete view"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

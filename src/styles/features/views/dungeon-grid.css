@@ -153,14 +153,14 @@
 }
 
 .character-run-level {
-    font-size: 0.75rem;
-    color: #94a3b8;
+    font-size: 1rem;
+    font-weight: 600;
 }
 
-.character-run-date {
-    font-size: 0.75rem;
-    color: #64748b;
-}
+.character-run-level.keystone-depleted { color: #f87171; }
+.character-run-level.keystone-1        { color: #4ade80; }
+.character-run-level.keystone-2        { color: #60a5fa; }
+.character-run-level.keystone-3        { color: #fb923c; }
 
 .character-run-no-data {
     text-align: right;

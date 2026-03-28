@@ -59,24 +59,16 @@ export const MockCreateView = ({
   ) : null;
 
 export const MockViewDetail = ({
-  views,
   onBack,
-  viewId,
 }: {
-  views: View[];
   onBack: () => void;
-  viewId: string;
-}) => {
-  const view = views.find((v) => v.id === viewId)?.simpleView;
-  return (
-    <div data-testid="view-detail">
-      <span data-testid="view-detail-name">{view?.name}</span>
-      <button data-testid="back-btn" onClick={onBack}>
-        Back
-      </button>
-    </div>
-  );
-};
+}) => (
+  <div data-testid="view-detail">
+    <button data-testid="back-btn" onClick={onBack}>
+      Back
+    </button>
+  </div>
+);
 
 export const makeSimpleView = (id: string, name: string): SimpleView => ({
   id,

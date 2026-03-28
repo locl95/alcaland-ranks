@@ -17,6 +17,14 @@ interface CharacterDungeonScore {
   run: MythicPlusRun | undefined;
 }
 
+const KEYSTONE_DISPLAY: Record<number, { prefix: string; className: string }> =
+  {
+    0: { prefix: "", className: "keystone-depleted" },
+    1: { prefix: "+", className: "keystone-1" },
+    2: { prefix: "++", className: "keystone-2" },
+    3: { prefix: "+++", className: "keystone-3" },
+  };
+
 export function DungeonGrid({
   raiderioProfiles,
   raiderioCachedProfiles,
@@ -25,12 +33,14 @@ export function DungeonGrid({
   const getCharacterScoresForDungeon = (
     dungeonId: string,
   ): CharacterDungeonScore[] => {
-    return raiderioProfiles.map((character) => ({
-      character,
-      run: character.mythicPlusBestRuns.find(
-        (run) => run.short_name === dungeonId,
-      ),
-    }));
+    return raiderioProfiles
+      .map((character) => ({
+        character,
+        run: character.mythicPlusBestRuns.find(
+          (run) => run.short_name === dungeonId,
+        ),
+      }))
+      .sort((a, b) => (b.run?.score ?? 0) - (a.run?.score ?? 0));
   };
 
   const getHighestScore = (scores: CharacterDungeonScore[]): number => {
@@ -45,6 +55,8 @@ export function DungeonGrid({
       (cachedProfile) => cachedProfile.id == character.id,
     );
   };
+
+  const getKeystoneDisplay = (upgrades: number) => KEYSTONE_DISPLAY[upgrades];
 
   const getScoreImprovement = (
     raiderioProfile: RaiderioProfile,
@@ -102,9 +114,7 @@ export function DungeonGrid({
                         >
                           {character.name}
                         </p>
-                        <p className="character-run-class">
-                          {character.class} - {character.spec}
-                        </p>
+                        <p className="character-run-class">{character.spec}</p>
                       </div>
                     </div>
 
@@ -122,15 +132,17 @@ export function DungeonGrid({
                             </span>
                           )}
                         </div>
-                        <p className="character-run-level">
-                          +{run.mythic_level}
-                        </p>
-                        <p className="character-run-date">
-                          {new Date().toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </p>
+                        {(() => {
+                          const { prefix, className } = getKeystoneDisplay(
+                            run.num_keystone_upgrades,
+                          );
+                          return (
+                            <p className={`character-run-level ${className}`}>
+                              {prefix}
+                              {run.mythic_level}
+                            </p>
+                          );
+                        })()}
                       </div>
                     ) : (
                       <div className="character-run-no-data">

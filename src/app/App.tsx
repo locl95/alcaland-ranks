@@ -11,7 +11,7 @@ import { ViewDetail } from "@/features/views/components/view-detail.tsx";
 import { View } from "@/features/views/model/View.tsx";
 import { usePolling } from "@/shared/hooks/usePolling.tsx";
 import { Spinner } from "@/shared/components/spinner.tsx";
-import {ViewsPage} from "@/features/views/components/views-page.tsx";
+import { ViewsPage } from "@/features/views/components/views-page.tsx";
 
 export function App() {
   const [views, setViews] = useState<View[]>([]);
@@ -132,7 +132,12 @@ export function App() {
         <Route
           path="/"
           element={
-            <ViewsPage views={views} onViewClick={handleViewClick} onDeleteView={handleDeleteView} onCreateView={handleCreateView} />
+            <ViewsPage
+              views={views}
+              onViewClick={handleViewClick}
+              onDeleteView={handleDeleteView}
+              onCreateView={handleCreateView}
+            />
           }
         />
 
