@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks.ts";
 import "@/styles/features/views/view-detail.css";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { View } from "@/features/views/model/View.tsx";
 import {
   RaiderioProfile,
   Season,
@@ -15,18 +14,16 @@ import {
   fetchWithResponse,
 } from "@/shared/api/EasyFetch.ts";
 import { ViewRequest } from "@/features/views/api/ViewRequest.tsx";
-import { SimpleView } from "@/features/views/api/SimpleView.tsx";
 import { CharacterLadder } from "@/features/views/components/character-ladder.tsx";
 import { DungeonGrid } from "@/features/views/components/dungeon-grid.tsx";
 import { EditView } from "@/features/views/components/edit-view.tsx";
 
 export function ViewDetail({
-  views,
   onBack,
-}: Readonly<{ views: View[]; onBack: () => void }>) {
+}: Readonly<{ onBack: () => void }>) {
   const { viewId } = useParams();
   const navigate = useNavigate();
-  const view: SimpleView | undefined = views.find((v) => v.id === viewId)?.simpleView;
+  const [viewName, setViewName] = useState<string>("");
 
   const [profiles, setProfiles] = useState<RaiderioProfile[]>([]);
   const [cachedProfiles, setCachedProfiles] = useState<RaiderioProfile[]>([]);
@@ -34,12 +31,6 @@ export function ViewDetail({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const dispatch = useAppDispatch();
   const isLoading = useAppSelector(selectLoading);
-
-  useEffect(() => {
-    if (!isLoading && !view) {
-      navigate("/");
-    }
-  }, [isLoading, view]);
 
   useEffect(() => {
     async function fetchData() {
@@ -54,29 +45,31 @@ export function ViewDetail({
           ),
           fetchWithResponse<ViewData>(
             "GET",
-            `/views/${view.id}/data`,
+            `/views/${viewId}/data`,
             undefined,
             `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
           ),
           fetchWithResponse<ViewData>(
             "GET",
-            `/views/${view.id}/cached-data`,
+            `/views/${viewId}/cached-data`,
             undefined,
             `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
           ),
         ]);
-        setSeason(seasonData); //season data prob should be fetched from app.tsx
+        setSeason(seasonData);
+        setViewName(data.viewName);
         setProfiles(data.data);
         setCachedProfiles(cachedData.data);
       } catch (error) {
         console.error("Failed to fetch view data", error);
+        navigate("/");
       } finally {
         dispatch(notLoading());
       }
     }
 
-    if (view) fetchData();
-  }, [view?.id]);
+    fetchData();
+  }, [viewId]);
 
   function haveSameCharacters(
     a: RaiderioProfile[],
@@ -98,7 +91,7 @@ export function ViewDetail({
   const handleSavedCharacters = async (characters: RaiderioProfile[]) => {
     if (!haveSameCharacters(characters, profiles)) {
       const request: ViewRequest = {
-        name: view.name,
+        name: viewName,
         entities: characters.map((c) => ({
           name: c.name,
           region: c.region,
@@ -115,7 +108,7 @@ export function ViewDetail({
 
         await fetchWithoutResponse(
           "PUT",
-          `/views/${view.id}`,
+          `/views/${viewId}`,
           request,
           `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
         );
@@ -130,8 +123,6 @@ export function ViewDetail({
     setIsEditOpen(false);
   };
 
-  if (!view) return null;
-
   return (
     <div className="view-detail-container">
       <div className="view-detail-content">
@@ -139,7 +130,7 @@ export function ViewDetail({
           <button onClick={onBack} className="header-back-button">
             <ArrowLeft className="header-icon" />
           </button>
-          <h1 className="header-view-title">{view.name}</h1>
+          <h1 className="header-view-title">{viewName}</h1>
           <button
             hidden={true}
             className={`header-edit-button ${isEditOpen ? "active" : ""}`}

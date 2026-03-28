@@ -138,7 +138,7 @@ export function App() {
 
         <Route
           path="/:viewId"
-          element={<ViewDetail views={views} onBack={handleBackToViews} />}
+          element={<ViewDetail onBack={handleBackToViews} />}
         />
       </Routes>
     </>
