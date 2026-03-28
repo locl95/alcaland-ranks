@@ -101,6 +101,11 @@ export function CharacterLadder({
     return previousRank - currentRank;
   };
 
+  const formatRankChange = (change: number): string => {
+    const formatted = Math.round(Math.abs(change)).toLocaleString();
+    return change > 0 ? `+${formatted}` : `-${formatted}`;
+  };
+
   return (
     <div className="ladder-card">
       <div
@@ -232,167 +237,95 @@ export function CharacterLadder({
                 {isExpanded && character.mythicPlusRanks && (
                   <div className="ladder-row-expanded">
                     <div className="rankings-section">
-                      <h4 className="rankings-section-title">
-                        Overall Rankings
-                      </h4>
-
-                      <div className="rankings-grid">
-                        <div className="ranking-item">
-                          <span className="ranking-label">World</span>
-                          <div className="ranking-value-row">
-                            <span className="ranking-value">
-                              #
-                              {character.mythicPlusRanks.overall.world.toLocaleString()}
-                            </span>
-
-                            {cachedRaiderIoProfile &&
-                              (() => {
-                                const change = getRankChange(
-                                  character.mythicPlusRanks.overall.world,
-                                  cachedRaiderIoProfile.mythicPlusRanks.overall
-                                    .world,
-                                );
-
-                                return change === null ||
-                                  change === 0 ? null : (
-                                  <span
-                                    className={`rank-change ${
-                                      change > 0 ? "improved" : "declined"
-                                    }`}
-                                  >
-                                    {change > 0 ? `+${Math.round(change)}` : Math.round(change)}
-                                  </span>
-                                );
-                              })()}
-                          </div>
-                        </div>
-
-                        <div className="ranking-item">
-                          <span className="ranking-label">Region</span>
-                          <div className="ranking-value-row">
-                            <span className="ranking-value">
-                              #
-                              {character.mythicPlusRanks.overall.region.toLocaleString()}
-                            </span>
-
-                            {cachedRaiderIoProfile &&
-                              (() => {
-                                const change = getRankChange(
-                                  character.mythicPlusRanks.overall.region,
-                                  cachedRaiderIoProfile.mythicPlusRanks.overall
-                                    .region,
-                                );
-
-                                return change === null ||
-                                  change === 0 ? null : (
-                                  <span
-                                    className={`rank-change ${
-                                      change > 0 ? "improved" : "declined"
-                                    }`}
-                                  >
-                                    {change > 0 ? `+${Math.round(change)}` : Math.round(change)}
-                                  </span>
-                                );
-                              })()}
-                          </div>
-                        </div>
-
-                        <div className="ranking-item">
-                          <span className="ranking-label">Realm</span>
-                          <div className="ranking-value-row">
-                            <span className="ranking-value">
-                              #
-                              {Math.round(character.mythicPlusRanks.overall.realm).toLocaleString()}
-                            </span>
-
-                            {cachedRaiderIoProfile &&
-                              (() => {
-                                const change = getRankChange(
-                                  character.mythicPlusRanks.overall.realm,
-                                  cachedRaiderIoProfile.mythicPlusRanks.overall
-                                    .realm,
-                                );
-
-                                return change === null ||
-                                  change === 0 ? null : (
-                                  <span
-                                    className={`rank-change ${
-                                      change > 0 ? "improved" : "declined"
-                                    }`}
-                                  >
-                                    {change > 0 ? `+${Math.round(change)}` : Math.round(change)}
-                                  </span>
-                                );
-                              })()}
-                          </div>
-                        </div>
+                      <h4 className="rankings-section-title">Rankings</h4>
+                      <div className="table-scroll">
+                        <table className="rankings-table">
+                          <thead>
+                            <tr>
+                              <th className="rankings-th rankings-th--label" />
+                              <th className="rankings-th">World</th>
+                              <th className="rankings-th">Region</th>
+                              <th className="rankings-th">Realm</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {(["overall", "class"] as const).map((rankType) => (
+                              <tr key={rankType} className="rankings-tr">
+                                <td className="rankings-td-label">
+                                  {rankType === "overall" ? "Overall" : character.class}
+                                </td>
+                                {(["world", "region", "realm"] as const).map((key) => {
+                                  const current = character.mythicPlusRanks[rankType][key];
+                                  const previous = cachedRaiderIoProfile?.mythicPlusRanks[rankType][key];
+                                  const change = getRankChange(current, previous);
+                                  return (
+                                    <td key={key} className="rankings-td">
+                                      <span className="ranking-value">
+                                        #{Math.round(current).toLocaleString()}
+                                      </span>
+                                      {change !== null && change !== 0 && (
+                                        <span className={`rank-change ${change > 0 ? "improved" : "declined"}`}>
+                                          {formatRankChange(change)}
+                                        </span>
+                                      )}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
 
-                    {character.mythicPlusRanks.specs.length > 0 && (
+                    {character.mythicPlusRanks.specs.filter((s) => s.score > 0).length > 0 && (
                       <div className="rankings-section">
-                        <h4 className="rankings-section-title">
-                          Spec Rankings
-                        </h4>
-
-                        {character.mythicPlusRanks.specs
-                            .filter((spec) => spec.score > 0)
-                            .map((spec) => {
-                          const cachedSpec =
-                            cachedRaiderIoProfile?.mythicPlusRanks.specs.find(
-                              (s) => s.name === spec.name,
-                            );
-
-                          return (
-                            <div key={spec.name} className="spec-ranking">
-                              <div className="spec-ranking-header">
-                                <span className="spec-ranking-name">
-                                  {spec.name}
-                                </span>
-                                <span className="spec-ranking-score">
-                                  {Math.round(spec.score).toLocaleString()}
-                                </span>
-                              </div>
-
-                              <div className="rankings-grid">
-                                {(
-                                  [
-                                    ["World", "world"],
-                                    ["Region", "region"],
-                                    ["Realm", "realm"],
-                                  ] as const
-                                ).map(([label, key]) => {
-                                  const change = getRankChange(
-                                    spec[key],
-                                    cachedSpec?.[key],
+                        <h4 className="rankings-section-title">Spec Rankings</h4>
+                        <div className="table-scroll">
+                          <table className="spec-table">
+                            <thead>
+                              <tr>
+                                <th className="spec-th spec-th--name">Spec</th>
+                                <th className="spec-th spec-th--num">Score</th>
+                                <th className="spec-th spec-th--num">World</th>
+                                <th className="spec-th spec-th--num">Region</th>
+                                <th className="spec-th spec-th--num">Realm</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {character.mythicPlusRanks.specs
+                                .filter((s) => s.score > 0)
+                                .map((spec) => {
+                                  const cachedSpec = cachedRaiderIoProfile?.mythicPlusRanks.specs.find(
+                                    (s) => s.name === spec.name,
                                   );
-
                                   return (
-                                    <div key={key} className="ranking-item">
-                                      <span className="ranking-label">
-                                        {label}
-                                      </span>
-                                      <div className="ranking-value-row">
-                                        <span className="ranking-value">
-                                          #{Math.round(spec[key]).toLocaleString()}
-                                        </span>
-                                        {change !== null && change !== 0 && (
-                                          <span
-                                            className={`rank-change ${change > 0 ? "improved" : "declined"}`}
-                                          >
-                                            {change > 0
-                                              ? `+${Math.round(change)}`
-                                              : Math.round(change)}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
+                                    <tr key={spec.name} className="spec-tr">
+                                      <td className="spec-td spec-td--name">{spec.name}</td>
+                                      <td className="spec-td spec-td--score">
+                                        {Math.round(spec.score).toLocaleString()}
+                                      </td>
+                                      {(["world", "region", "realm"] as const).map((key) => {
+                                        const change = getRankChange(spec[key], cachedSpec?.[key]);
+                                        return (
+                                          <td key={key} className="spec-td spec-td--rank">
+                                            <span className="spec-rank-value">
+                                              #{Math.round(spec[key]).toLocaleString()}
+                                            </span>
+                                            {change !== null && change !== 0 && (
+                                              <span className={`rank-change ${change > 0 ? "improved" : "declined"}`}>
+                                                {formatRankChange(change)}
+                                              </span>
+                                            )}
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
                                   );
                                 })}
-                              </div>
-                            </div>
-                          );
-                        })}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     )}
                   </div>
