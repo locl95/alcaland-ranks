@@ -220,8 +220,13 @@
 .ladder-score-value {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #fbbf24;
 }
+
+.score-grey   { color: #94a3b8; }
+.score-green  { color: #4ade80; }
+.score-blue   { color: #60a5fa; }
+.score-purple { color: #c084fc; }
+.score-orange { color: #fb923c; }
 
 .ladder-score-label {
     font-size: 0.75rem;

@@ -60,6 +60,14 @@ export function CharacterLadder({
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const getScoreClass = (score: number): string => {
+    if (score < 300)  return "score-grey";
+    if (score < 1100)  return "score-green";
+    if (score < 1800) return "score-blue";
+    if (score < 3000) return "score-purple";
+    return "score-orange";
+  };
+
   const toggleCharacter = (characterId: number) => {
     setExpandedCharacters((prev) => {
       const newSet = new Set(prev);
@@ -209,7 +217,7 @@ export function CharacterLadder({
                   ) : (
                     <>
                       <div className="ladder-score">
-                        <p className="ladder-score-value">
+                        <p className={`ladder-score-value ${getScoreClass(character.score)}`}>
                           {character.score.toLocaleString()}
                         </p>
                         <p className="ladder-score-label">M+ Score</p>
