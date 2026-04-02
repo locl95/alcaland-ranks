@@ -169,3 +169,115 @@
     font-size: 0.875rem;
     color: #475569;
 }
+
+/* Run Details Panel */
+.character-run-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.character-run.expanded {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: transparent;
+}
+
+.run-details-panel {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid #334155;
+    border-top: none;
+    border-radius: 0 0 0.5rem 0.5rem;
+    padding: 0.625rem 0.75rem 0.625rem;
+}
+
+.run-details-spinner {
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem 0;
+}
+
+.run-details-spinner-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    color: #64748b;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.run-details-top {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.4rem;
+}
+
+.run-details-deaths {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #f87171;
+}
+
+.skull-icon {
+    width: 0.8rem;
+    height: 0.8rem;
+}
+
+.run-details-roster {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.run-details-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.run-details-character-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.run-details-name {
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.run-details-realm {
+    font-size: 0.7rem;
+    color: #475569;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.run-details-score {
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+.run-details-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.4rem;
+}
+
+.run-details-date {
+    font-size: 0.7rem;
+    color: #475569;
+}

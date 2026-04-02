@@ -30,7 +30,6 @@ export function ViewsPage({
 
           {views.length > 0 && (
             <button
-              hidden={true}
               onClick={() => setIsCreateDialogOpen(true)}
               className="create-view-btn"
             >
