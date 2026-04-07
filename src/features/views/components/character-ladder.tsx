@@ -293,6 +293,15 @@ export function CharacterLadder({
 
                 {isExpanded && character.mythicPlusRanks && (
                   <div className="ladder-row-expanded">
+                    {character.quantile != null && (
+                      <div className="quantile-banner">
+                        <span className="quantile-label">Top</span>
+                        <span className="quantile-value">
+                          {(character.quantile).toFixed(2)}%
+                        </span>
+                        <span className="quantile-label">of all players</span>
+                      </div>
+                    )}
                     <div className="rankings-section">
                       <h4 className="rankings-section-title">Rankings</h4>
                       <div className="table-scroll">
