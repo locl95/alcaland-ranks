@@ -57,7 +57,7 @@ export interface RaiderioProfile {
   spec: string;
   quantile: number;
   mythicPlusRanks: MythicPlusRanks;
-  mythicPlusBestRuns: MythicPlusRun[];
+  mythicPlusBestRuns: MythicPlusBestRun[];
 }
 
 export interface ViewData {
@@ -109,9 +109,6 @@ export interface RunDetailsCharacter {
 
 export interface RunDetailsRosterRanks {
   score: number;
-  world: number;
-  region: number;
-  realm: number;
 }
 
 export interface RunDetailsRosterEntry {
@@ -120,7 +117,20 @@ export interface RunDetailsRosterEntry {
   ranks: RunDetailsRosterRanks;
 }
 
-export interface RunDetailsResponse {
+export interface RunDetailsDeath {
+  character_id: number;
+  approximate_died_at: number;
+  logged_encounter_id?: number;
+}
+
+export interface RunDetails {
   roster: RunDetailsRosterEntry[];
-  deathCount: number;
+  logged_details?: {
+    deaths?: RunDetailsDeath[];
+  };
+}
+
+export interface MythicPlusBestRun {
+  run: MythicPlusRun;
+  details: RunDetails | null;
 }

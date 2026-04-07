@@ -281,3 +281,11 @@
     font-size: 0.7rem;
     color: #475569;
 }
+
+.run-details-unavailable {
+    font-size: 0.75rem;
+    color: #475569;
+    text-align: center;
+    padding: 0.5rem 0;
+    font-style: italic;
+}

@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { Crown, Skull, Loader2 } from "lucide-react";
+import { Crown, Skull } from "lucide-react";
 import "@/styles/features/views/dungeon-grid.css";
 import {
+  MythicPlusBestRun,
   MythicPlusRun,
   RaiderioProfile,
-  RunDetailsResponse,
   Season,
   formatClearTime,
   formatDate,
 } from "@/features/views/api/Raiderio.tsx";
-import { fetchWithResponse } from "@/shared/api/EasyFetch.ts";
 
 interface DungeonGridProps {
   raiderioProfiles: RaiderioProfile[];
@@ -19,7 +18,7 @@ interface DungeonGridProps {
 
 interface CharacterDungeonScore {
   character: RaiderioProfile;
-  run: MythicPlusRun | undefined;
+  bestRun: MythicPlusBestRun | undefined;
 }
 
 const KEYSTONE_DISPLAY: Record<number, { prefix: string; className: string }> =
@@ -62,13 +61,9 @@ export function DungeonGrid({
   season,
 }: Readonly<DungeonGridProps>) {
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
-  const [runDetailsCache, setRunDetailsCache] = useState<Record<number, RunDetailsResponse>>({});
-  const [loadingRunIds, setLoadingRunIds] = useState<Set<number>>(new Set());
 
-  const handleRunClick = async (characterId: number, run: MythicPlusRun) => {
-    const runId = run.keystone_run_id;
+  const handleRunClick = (characterId: number, runId: number) => {
     const expandKey = `${characterId}-${runId}`;
-
     setExpandedKeys((prev) => {
       const next = new Set(prev);
       if (next.has(expandKey)) {
@@ -78,32 +73,6 @@ export function DungeonGrid({
       }
       return next;
     });
-
-    if (runDetailsCache[runId] !== undefined || loadingRunIds.has(runId)) return;
-
-    setLoadingRunIds((prev) => new Set(prev).add(runId));
-    try {
-      const details = await fetchWithResponse<RunDetailsResponse>(
-        "GET",
-        `/sources/wow/rundetails?runId=${runId}`,
-        undefined,
-        `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-      );
-      setRunDetailsCache((prev) => ({ ...prev, [runId]: details }));
-    } catch (error) {
-      console.error("Failed to fetch run details", error);
-      setExpandedKeys((prev) => {
-        const next = new Set(prev);
-        next.delete(expandKey);
-        return next;
-      });
-    } finally {
-      setLoadingRunIds((prev) => {
-        const next = new Set(prev);
-        next.delete(runId);
-        return next;
-      });
-    }
   };
 
   const getCharacterScoresForDungeon = (
@@ -112,19 +81,19 @@ export function DungeonGrid({
     return raiderioProfiles
       .map((character) => ({
         character,
-        run: character.mythicPlusBestRuns.find(
-          (run) => run.short_name === dungeonId,
+        bestRun: character.mythicPlusBestRuns.find(
+          (br) => br.run.short_name === dungeonId,
         ),
       }))
       .sort((a, b) => {
-        const scoreDiff = (b.run?.score ?? 0) - (a.run?.score ?? 0);
+        const scoreDiff = (b.bestRun?.run.score ?? 0) - (a.bestRun?.run.score ?? 0);
         if (scoreDiff !== 0) return scoreDiff;
-        return (a.run?.clear_time_ms ?? Infinity) - (b.run?.clear_time_ms ?? Infinity);
+        return (a.bestRun?.run.clear_time_ms ?? Infinity) - (b.bestRun?.run.clear_time_ms ?? Infinity);
       });
   };
 
   const getWinningRun = (scores: CharacterDungeonScore[]): MythicPlusRun | undefined => {
-    return scores.find((s) => s.run)?.run;
+    return scores.find((s) => s.bestRun)?.bestRun?.run;
   };
 
   const getCachedRaiderIoProfile = (
@@ -140,20 +109,20 @@ export function DungeonGrid({
 
   const getScoreImprovement = (
     raiderioProfile: RaiderioProfile,
-    currentRun: MythicPlusRun,
+    currentBestRun: MythicPlusBestRun,
   ): number => {
-    const cachedRun = getCachedRaiderIoProfile(
+    const cachedBestRun = getCachedRaiderIoProfile(
       raiderioCachedProfiles,
       raiderioProfile,
     )?.mythicPlusBestRuns.find(
-      (run) => run.short_name === currentRun.short_name,
+      (br) => br.run.short_name === currentBestRun.run.short_name,
     );
 
-    if (!cachedRun) {
+    if (!cachedBestRun) {
       return 0;
     }
 
-    return currentRun.score - cachedRun.score;
+    return currentBestRun.run.score - cachedBestRun.run.score;
   };
 
   return (
@@ -171,24 +140,25 @@ export function DungeonGrid({
               <div className="dungeon-abbreviation">{dungeon.short_name}</div>
             </div>
             <div className="dungeon-content">
-              {characterScores.map(({ character, run }) => {
+              {characterScores.map(({ character, bestRun }) => {
+                const run = bestRun?.run;
+                const details = bestRun?.details;
                 const isHighest =
                   !!winningRun &&
                   run?.score === winningRun.score &&
                   run?.clear_time_ms === winningRun.clear_time_ms;
-                const scoreImprovement = run
-                  ? getScoreImprovement(character, run)
+                const scoreImprovement = bestRun
+                  ? getScoreImprovement(character, bestRun)
                   : 0;
                 const expandKey = run ? `${character.id}-${run.keystone_run_id}` : "";
                 const isExpanded = run ? expandedKeys.has(expandKey) : false;
-                const isLoadingDetails = isExpanded && !!run && loadingRunIds.has(run.keystone_run_id);
-                const details = run ? runDetailsCache[run.keystone_run_id] : undefined;
+                const deathCount = details?.logged_details?.deaths?.length ?? 0;
 
                 return (
                   <div key={character.id} className="character-run-wrapper">
                     <div
                       className={`character-run ${isHighest ? "highest" : "normal"} ${isExpanded ? "expanded" : ""}`}
-                      onClick={() => run && handleRunClick(character.id, run)}
+                      onClick={() => run && handleRunClick(character.id, run.keystone_run_id)}
                     >
                       <div className="character-run-left">
                         {isHighest && <Crown className="crown-icon" />}
@@ -242,16 +212,12 @@ export function DungeonGrid({
 
                     {run && isExpanded && (
                       <div className="run-details-panel">
-                        {isLoadingDetails ? (
-                          <div className="run-details-spinner">
-                            <Loader2 className="run-details-spinner-icon" />
-                          </div>
-                        ) : details ? (
+                        {details ? (
                           <>
                             <div className="run-details-top">
                               <span className="run-details-deaths">
                                 <Skull className="skull-icon" />
-                                x {details.deathCount}
+                                x {deathCount}
                               </span>
                             </div>
                             <div className="run-details-roster">
@@ -284,7 +250,11 @@ export function DungeonGrid({
                               <span className="run-details-date">{formatDate(run.completed_at)}</span>
                             </div>
                           </>
-                        ) : null}
+                        ) : (
+                          <div className="run-details-unavailable">
+                            Run details are currently unavailable.
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
