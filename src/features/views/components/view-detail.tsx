@@ -31,6 +31,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
   const [cachedProfiles, setCachedProfiles] = useState<RaiderioProfile[]>([]);
   const [season, setSeason] = useState<Season | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const dispatch = useAppDispatch();
   const isLoading = useAppSelector(selectLoading);
 
@@ -67,6 +68,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
         navigate("/");
       } finally {
         dispatch(notLoading());
+        setInitialized(true);
       }
     }
 
@@ -124,6 +126,8 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
 
     setIsEditOpen(false);
   };
+
+  if (!initialized) return null;
 
   return (
     <div className="view-detail-container">
