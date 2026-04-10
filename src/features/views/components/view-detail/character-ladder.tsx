@@ -7,18 +7,39 @@ import {
 } from "lucide-react";
 import "./character-ladder.css";
 import { useEffect, useRef, useState } from "react";
-import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
+import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
 import raiderio2 from "@/assets/raiderio.png";
 import summoned from "@/assets/summoned.png";
+import aaPng from "@/assets/dungeons/aa.png";
+import mcPng from "@/assets/dungeons/mc.png";
+import mtPng from "@/assets/dungeons/mt.png";
+import npxPng from "@/assets/dungeons/npx.png";
+import posPng from "@/assets/dungeons/pos.png";
+import seatPng from "@/assets/dungeons/seat.png";
+import srPng from "@/assets/dungeons/sr.png";
+import wsPng from "@/assets/dungeons/ws.png";
+
+const DUNGEON_IMAGES: Record<string, string> = {
+  aa: aaPng,
+  mc: mcPng,
+  mt: mtPng,
+  npx: npxPng,
+  pos: posPng,
+  seat: seatPng,
+  sr: srPng,
+  ws: wsPng,
+};
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];
   cachedCharacters: RaiderioProfile[];
+  season: Season | null;
 }
 
 export function CharacterLadder({
   characters,
   cachedCharacters,
+  season,
 }: Readonly<CharacterLadderProps>) {
   const [isLadderOpen, setIsLadderOpen] = useState(true);
   const [expandedCharacters, setExpandedCharacters] = useState<Set<number>>(
@@ -302,6 +323,35 @@ export function CharacterLadder({
                         <span className="quantile-label">of all players</span>
                       </div>
                     )}
+
+                    {season && (
+                      <div className="dungeon-thumbnails">
+                        {season.dungeons.map((dungeon) => {
+                          const img = DUNGEON_IMAGES[dungeon.short_name.toLowerCase()];
+                          const bestRun = character.mythicPlusBestRuns.find(
+                            (br) => br.run.short_name === dungeon.short_name,
+                          );
+                          return (
+                            <div key={dungeon.challenge_mode_id} className="dungeon-thumb" title={bestRun?.run.dungeon ?? dungeon.name}>
+                              <span className="dungeon-thumb-level">
+                                {bestRun ? bestRun.run.mythic_level : ""}
+                              </span>
+                              {img && (
+                                <img
+                                  src={img}
+                                  alt={dungeon.name}
+                                  className="dungeon-thumb-img"
+                                />
+                              )}
+                              <span className="dungeon-thumb-name">
+                                {dungeon.short_name}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
                     <div className="rankings-section">
                       <h4 className="rankings-section-title">Rankings</h4>
                       <div className="table-scroll">

@@ -166,6 +166,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
             <CharacterLadder
               characters={profiles}
               cachedCharacters={cachedProfiles}
+              season={season}
             />
 
             {season && (
