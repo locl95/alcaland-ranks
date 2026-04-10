@@ -1,26 +1,26 @@
 import { ArrowLeft, Edit, Trophy } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks.ts";
-import "@/styles/features/views/view-detail.css";
+import "./view-detail.css";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   RaiderioProfile,
   Season,
   ViewData,
-} from "@/features/views/api/Raiderio.tsx";
+} from "@/features/views/api/raiderio.ts";
 import {
   loading,
   notLoading,
   selectLoading,
-} from "@/features/loading/loadingSlice.ts";
+} from "@/app/loadingSlice.ts";
 import {
   fetchWithoutResponse,
   fetchWithResponse,
 } from "@/shared/api/EasyFetch.ts";
-import { ViewRequest } from "@/features/views/api/ViewRequest.tsx";
-import { CharacterLadder } from "@/features/views/components/character-ladder.tsx";
-import { DungeonGrid } from "@/features/views/components/dungeon-grid.tsx";
-import { EditView } from "@/features/views/components/edit-view.tsx";
+import { ViewRequest } from "@/features/views/api/view-types.ts";
+import { CharacterLadder } from "./character-ladder.tsx";
+import { DungeonGrid } from "./dungeon-grid.tsx";
+import { EditView } from "./edit-view.tsx";
 
 export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
   const { viewId } = useParams();

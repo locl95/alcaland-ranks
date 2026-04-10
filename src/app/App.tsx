@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "./hooks";
-import { loading, notLoading } from "@/features/loading/loadingSlice.ts";
+import { loading, notLoading } from "@/app/loadingSlice.ts";
 import {
   fetchWithoutResponse,
   fetchWithResponse,
 } from "@/shared/api/EasyFetch.ts";
-import { GetViewsResponse } from "@/features/views/api/GetViewsResponse.tsx";
-import { ViewDetail } from "@/features/views/components/view-detail.tsx";
-import { View } from "@/features/views/model/View.tsx";
+import { GetViewsResponse } from "@/features/views/api/view-types.ts";
+import { ViewDetail } from "@/features/views/components/view-detail/view-detail.tsx";
+import { View } from "@/features/views/model/view.ts";
 import { usePolling } from "@/shared/hooks/usePolling.tsx";
 import { Spinner } from "@/shared/components/spinner.tsx";
-import { ViewsPage } from "@/features/views/components/views-page.tsx";
+import { ViewsPage } from "@/features/views/components/views-page/views-page.tsx";
 
 export function App() {
   const [views, setViews] = useState<View[]>([]);

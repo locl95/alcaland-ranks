@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { View } from "@/features/views/model/View.tsx";
-import { ViewsList } from "@/features/views/components/views-list.tsx";
-import { CreateView } from "@/features/views/components/create-view.tsx";
-import "@/styles/app/App.css";
+import { View } from "@/features/views/model/view.ts";
+import { ViewsList } from "./views-list.tsx";
+import { CreateView } from "./create-view.tsx";
+import "./views-page.css";
 
 interface ViewsPageProps {
   views: View[];

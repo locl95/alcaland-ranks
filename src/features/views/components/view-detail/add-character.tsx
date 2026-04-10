@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react";
 import { X } from "lucide-react";
-import "@/styles/features/views/add-character.css";
+import "./add-character.css";
 
 interface AddCharacterWindowProps {
   isOpen: boolean;

@@ -12,10 +12,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import "@/styles/features/views/views-list.css";
-import { View } from "@/features/views/model/View.tsx";
+import "./views-list.css";
+import { View } from "@/features/views/model/view.ts";
 import { useAppSelector } from "@/app/hooks.ts";
-import { selectLoading } from "@/features/loading/loadingSlice.ts";
+import { selectLoading } from "@/app/loadingSlice.ts";
 
 interface ViewsListProps {
   views: View[];

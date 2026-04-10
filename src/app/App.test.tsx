@@ -5,14 +5,14 @@ import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import App from "./App";
-import loadingReducer from "@/features/loading/loadingSlice.ts";
-import type { View } from "@/features/views/model/View.tsx";
+import loadingReducer from "@/app/loadingSlice.ts";
+import type { View } from "@/features/views/model/view.ts";
 import {
   MockViewsList,
   MockCreateView,
   MockViewDetail,
   makeSimpleView,
-} from "@/test/mocks/view-mocks.tsx";
+} from "@/app/App.mocks.tsx";
 
 // ---------------------------------------------------------------------------
 // Hoisted mocks – must be defined before vi.mock() factories run
@@ -82,19 +82,19 @@ vi.mock("@/shared/hooks/usePolling.tsx", () => ({
 
 vi.mock("@/shared/api/EasyFetch.ts", () => fetchMocks);
 
-vi.mock("@/features/views/components/views-list.tsx", () => ({
+vi.mock("@/features/views/components/views-page/views-list.tsx", () => ({
   ViewsList: (props: Parameters<typeof MockViewsList>[0]) => (
     <MockViewsList {...props} />
   ),
 }));
 
-vi.mock("@/features/views/components/create-view.tsx", () => ({
+vi.mock("@/features/views/components/views-page/create-view.tsx", () => ({
   CreateView: (props: Parameters<typeof MockCreateView>[0]) => (
     <MockCreateView {...props} />
   ),
 }));
 
-vi.mock("@/features/views/components/view-detail.tsx", () => ({
+vi.mock("@/features/views/components/view-detail/view-detail.tsx", () => ({
   ViewDetail: (props: { onBack: () => void }) => <MockViewDetail {...props} />,
 }));
 

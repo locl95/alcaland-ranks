@@ -1,6 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {RootState} from "@/app/store";
-import {LoadingState} from "./types";
+import { RootState } from "@/app/store";
+
+interface LoadingState {
+  loading: boolean;
+}
 
 const initialState: LoadingState = {
   loading: false,

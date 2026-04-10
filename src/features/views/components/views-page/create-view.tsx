@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
-import "@/styles/features/views/create-view.css";
-import { View } from "@/features/views/model/View.tsx";
+import "./create-view.css";
+import { View } from "@/features/views/model/view.ts";
 import { fetchWithResponse } from "@/shared/api/EasyFetch.ts";
 import { EU_REALMS } from "@/features/views/constants/euRealms.ts";
 

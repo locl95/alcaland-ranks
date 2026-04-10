@@ -1,4 +1,4 @@
-import { SimpleView } from "@/features/views/api/SimpleView.tsx";
+import { SimpleView } from "@/features/views/api/view-types.ts";
 
 export interface View {
   id: string;

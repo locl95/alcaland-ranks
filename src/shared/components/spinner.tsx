@@ -1,6 +1,6 @@
 import { useAppSelector } from "@/app/hooks.ts";
-import { selectLoading } from "@/features/loading/loadingSlice.ts";
-import "@/styles/shared/spinner.css";
+import { selectLoading } from "@/app/loadingSlice.ts";
+import "./spinner.css";
 
 export function Spinner() {
   const isLoading = useAppSelector(selectLoading);

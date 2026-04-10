@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Crown, Skull } from "lucide-react";
-import "@/styles/features/views/dungeon-grid.css";
+import "./dungeon-grid.css";
 import {
   MythicPlusBestRun,
   MythicPlusRun,
@@ -8,7 +8,7 @@ import {
   Season,
   formatClearTime,
   formatDate,
-} from "@/features/views/api/Raiderio.tsx";
+} from "@/features/views/api/raiderio.ts";
 
 interface DungeonGridProps {
   raiderioProfiles: RaiderioProfile[];

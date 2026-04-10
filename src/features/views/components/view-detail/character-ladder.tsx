@@ -5,9 +5,9 @@ import {
   MoreHorizontal,
   Trophy,
 } from "lucide-react";
-import "@/styles/features/views/character-ladder.css";
+import "./character-ladder.css";
 import { useEffect, useRef, useState } from "react";
-import { RaiderioProfile } from "@/features/views/api/Raiderio.tsx";
+import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
 import raiderio2 from "@/assets/raiderio.png";
 import summoned from "@/assets/summoned.png";
 

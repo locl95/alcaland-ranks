@@ -1,5 +1,5 @@
-import type { View } from '@/features/views/model/View.tsx';
-import type { SimpleView } from '@/features/views/api/SimpleView.tsx';
+import type { View } from '@/features/views/model/view.ts';
+import type { SimpleView } from '@/features/views/api/view-types.ts';
 
 export const MockViewsList = ({
   views,
