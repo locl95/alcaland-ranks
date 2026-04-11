@@ -1,5 +1,11 @@
-# alcaland-ranks
-Part of the serresiete project https://github.com/locl95/serresiete-backend
 
-## Purpose
-Deliver a frontend so users can track their friends activity in world of warcraft mythic+ environment
+  # Dungeon View Tracker
+
+  This is a code bundle for Dungeon View Tracker. The original project is available at https://www.figma.com/design/louXqMG7dWpXu7f6URt6VL/Dungeon-View-Tracker.
+
+  ## Running the code
+
+  Run `npm i` to install the dependencies.
+
+  Run `npm run dev` to start the development server.
+  
