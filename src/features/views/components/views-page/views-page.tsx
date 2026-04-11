@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { View } from "@/features/views/model/view.ts";
 import { ViewsList } from "./views-list.tsx";
-import { CreateView } from "./create-view.tsx";
+import { CreateView } from "./actions/create-view.tsx";
 import "./views-page.css";
 
 interface ViewsPageProps {
@@ -30,6 +30,7 @@ export function ViewsPage({
 
           {views.length > 0 && (
             <button
+              hidden={true}
               onClick={() => setIsCreateDialogOpen(true)}
               className="create-view-btn"
             >

@@ -87,9 +87,7 @@ export function ViewsList({
                   <span>{view.simpleView.owner}</span>
                 </div>
 
-                <span className="view-row-meta-date">
-                  Created {new Date().toLocaleDateString()}
-                </span>
+
               </div>
             </div>
 

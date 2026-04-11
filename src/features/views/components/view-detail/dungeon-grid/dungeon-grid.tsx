@@ -32,27 +32,35 @@ const KEYSTONE_DISPLAY: Record<number, { prefix: string; className: string }> =
 const ROLE_ORDER: Record<string, number> = { tank: 0, healer: 1, dps: 2 };
 
 const CLASS_COLORS: Record<string, string> = {
-  "Warrior":      "#d97706",
-  "Paladin":      "#ec4899",
-  "Hunter":       "#65a30d",
-  "Rogue":        "#facc15",
-  "Priest":       "#f1f5f9",
+  Warrior: "#d97706",
+  Paladin: "#ec4899",
+  Hunter: "#65a30d",
+  Rogue: "#facc15",
+  Priest: "#f1f5f9",
   "Death Knight": "#b91c1c",
-  "Shaman":       "#3b82f6",
-  "Mage":         "#22d3ee",
-  "Warlock":      "#9333ea",
-  "Monk":         "#10b981",
-  "Druid":        "#f97316",
+  Shaman: "#3b82f6",
+  Mage: "#22d3ee",
+  Warlock: "#9333ea",
+  Monk: "#10b981",
+  Druid: "#f97316",
   "Demon Hunter": "#7c3aed",
-  "Evoker":       "#14b8a6",
+  Evoker: "#14b8a6",
 };
 
 const getScoreClass = (score: number): string => {
-  if (score < 300)  return "score-grey";
+  if (score < 300) return "score-grey";
   if (score < 1100) return "score-green";
   if (score < 1800) return "score-blue";
   if (score < 3000) return "score-purple";
   return "score-orange";
+};
+
+const openRaiderIO = (name: string, realmSlug: string, region: string) => {
+  window.open(
+    `https://raider.io/characters/${region.toLowerCase()}/${realmSlug}/${name.toLowerCase()}`,
+    "_blank",
+    "noopener,noreferrer",
+  );
 };
 
 export function DungeonGrid({
@@ -86,13 +94,19 @@ export function DungeonGrid({
         ),
       }))
       .sort((a, b) => {
-        const scoreDiff = (b.bestRun?.run.score ?? 0) - (a.bestRun?.run.score ?? 0);
+        const scoreDiff =
+          (b.bestRun?.run.score ?? 0) - (a.bestRun?.run.score ?? 0);
         if (scoreDiff !== 0) return scoreDiff;
-        return (a.bestRun?.run.clear_time_ms ?? Infinity) - (b.bestRun?.run.clear_time_ms ?? Infinity);
+        return (
+          (a.bestRun?.run.clear_time_ms ?? Infinity) -
+          (b.bestRun?.run.clear_time_ms ?? Infinity)
+        );
       });
   };
 
-  const getWinningRun = (scores: CharacterDungeonScore[]): MythicPlusRun | undefined => {
+  const getWinningRun = (
+    scores: CharacterDungeonScore[],
+  ): MythicPlusRun | undefined => {
     return scores.find((s) => s.bestRun)?.bestRun?.run;
   };
 
@@ -150,7 +164,9 @@ export function DungeonGrid({
                 const scoreImprovement = bestRun
                   ? getScoreImprovement(character, bestRun)
                   : 0;
-                const expandKey = run ? `${character.id}-${run.keystone_run_id}` : "";
+                const expandKey = run
+                  ? `${character.id}-${run.keystone_run_id}`
+                  : "";
                 const isExpanded = run ? expandedKeys.has(expandKey) : false;
                 const deathCount = details?.logged_details?.deaths?.length ?? 0;
 
@@ -158,7 +174,9 @@ export function DungeonGrid({
                   <div key={character.id} className="character-run-wrapper">
                     <div
                       className={`character-run ${isHighest ? "highest" : "normal"} ${isExpanded ? "expanded" : ""}`}
-                      onClick={() => run && handleRunClick(character.id, run.keystone_run_id)}
+                      onClick={() =>
+                        run && handleRunClick(character.id, run.keystone_run_id)
+                      }
                     >
                       <div className="character-run-left">
                         {isHighest && <Crown className="crown-icon" />}
@@ -168,7 +186,9 @@ export function DungeonGrid({
                           >
                             {character.name}
                           </p>
-                          <p className="character-run-class">{character.spec}</p>
+                          <p className="character-run-class">
+                            {character.spec}
+                          </p>
                         </div>
                       </div>
 
@@ -192,7 +212,9 @@ export function DungeonGrid({
                             );
                             return (
                               <>
-                                <p className={`character-run-level ${className}`}>
+                                <p
+                                  className={`character-run-level ${className}`}
+                                >
                                   {prefix}
                                   {run.mythic_level}
                                 </p>
@@ -216,23 +238,43 @@ export function DungeonGrid({
                           <>
                             <div className="run-details-top">
                               <span className="run-details-deaths">
-                                <Skull className="skull-icon" />
-                                x {deathCount}
+                                <Skull className="skull-icon" />x {deathCount}
                               </span>
                             </div>
                             <div className="run-details-roster">
                               {[...details.roster]
-                                .sort((a, b) => (ROLE_ORDER[a.role] ?? 99) - (ROLE_ORDER[b.role] ?? 99))
+                                .sort(
+                                  (a, b) =>
+                                    (ROLE_ORDER[a.role] ?? 99) -
+                                    (ROLE_ORDER[b.role] ?? 99),
+                                )
                                 .map((entry) => (
                                   <div
                                     key={`${entry.character.name}-${entry.character.realm.slug}`}
                                     className="run-details-row"
                                   >
-                                    <div className="run-details-character-info">
+                                    <div
+                                      className="run-details-character-info"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        openRaiderIO(
+                                          entry.character.name,
+                                          entry.character.realm.slug,
+                                          character.region,
+                                        );
+                                      }}
+                                    >
                                       <span className="run-details-name">
                                         {entry.character.name}
                                         {" · "}
-                                        <span style={{ color: CLASS_COLORS[entry.character.class.name] ?? "#94a3b8" }}>
+                                        <span
+                                          style={{
+                                            color:
+                                              CLASS_COLORS[
+                                                entry.character.class.name
+                                              ] ?? "#94a3b8",
+                                          }}
+                                        >
                                           {entry.character.spec.name}
                                         </span>
                                       </span>
@@ -240,14 +282,18 @@ export function DungeonGrid({
                                         {entry.character.realm.name}
                                       </span>
                                     </div>
-                                    <span className={`run-details-score ${getScoreClass(entry.ranks.score)}`}>
+                                    <span
+                                      className={`run-details-score ${getScoreClass(entry.ranks.score)}`}
+                                    >
                                       {Math.round(entry.ranks.score)}
                                     </span>
                                   </div>
                                 ))}
                             </div>
                             <div className="run-details-footer">
-                              <span className="run-details-date">{formatDate(run.completed_at)}</span>
+                              <span className="run-details-date">
+                                {formatDate(run.completed_at)}
+                              </span>
                             </div>
                           </>
                         ) : (

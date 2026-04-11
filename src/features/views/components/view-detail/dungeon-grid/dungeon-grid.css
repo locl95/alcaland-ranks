@@ -246,6 +246,11 @@
     flex-direction: column;
     flex: 1;
     min-width: 0;
+    cursor: pointer;
+}
+
+.run-details-name:hover {
+    text-decoration: underline;
 }
 
 .run-details-name {
@@ -263,6 +268,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 
 .run-details-score {
     font-weight: 600;

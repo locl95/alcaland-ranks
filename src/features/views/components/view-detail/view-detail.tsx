@@ -8,19 +8,15 @@ import {
   Season,
   ViewData,
 } from "@/features/views/api/raiderio.ts";
-import {
-  loading,
-  notLoading,
-  selectLoading,
-} from "@/app/loadingSlice.ts";
+import { loading, notLoading, selectLoading } from "@/app/loadingSlice.ts";
 import {
   fetchWithoutResponse,
   fetchWithResponse,
 } from "@/shared/api/EasyFetch.ts";
 import { ViewRequest } from "@/features/views/api/view-types.ts";
-import { CharacterLadder } from "./character-ladder.tsx";
-import { DungeonGrid } from "./dungeon-grid.tsx";
-import { EditView } from "./edit-view.tsx";
+import { CharacterLadder } from "./character-ladder/character-ladder.tsx";
+import { DungeonGrid } from "./dungeon-grid/dungeon-grid.tsx";
+import { EditView } from "./actions/edit-view.tsx";
 
 export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
   const { viewId } = useParams();
