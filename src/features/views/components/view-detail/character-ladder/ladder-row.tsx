@@ -1,18 +1,10 @@
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import "./ladder-row.css";
 import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
 import { CharacterMenu } from "./character-menu.tsx";
 import { LadderRowExpanded } from "./ladder-row-expanded.tsx";
 
-const getScoreClass = (score: number): string => {
-  if (score < 300) return "score-grey";
-  if (score < 1100) return "score-green";
-  if (score < 1800) return "score-blue";
-  if (score < 3000) return "score-purple";
-  return "score-orange";
-};
-
-const getClassSlug = (className: string): string =>
-  className.toLowerCase().replace(/\s+/g, "-");
+import { getClassSlug, getScoreClass } from "@/features/views/utils.ts";
 
 interface LadderRowProps {
   index: number;

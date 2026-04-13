@@ -32,6 +32,16 @@ export interface MythicPlusRun {
   affixes: Affix[];
 }
 
+export interface RecentRunSpec {
+  id: number;
+  name: string;
+  role: string;
+}
+
+export interface MythicPlusRecentRun extends MythicPlusRun {
+  spec: RecentRunSpec;
+}
+
 export function formatClearTime(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
@@ -58,6 +68,7 @@ export interface RaiderioProfile {
   quantile: number;
   mythicPlusRanks: MythicPlusRanks;
   mythicPlusBestRuns: MythicPlusBestRun[];
+  mythicPlusRecentRuns: MythicPlusRecentRun[];
 }
 
 export interface ViewData {

@@ -3,6 +3,7 @@ import { Plus, Trash2, X } from "lucide-react";
 import { AddCharacter } from "./add-character.tsx";
 import "./edit-view.css";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
+import { getClassSlug } from "@/features/views/utils.ts";
 
 interface Props {
   isOpen: boolean;
@@ -34,11 +35,7 @@ export function EditView({
     setEditingCharacters((prev) => prev.filter((c) => c.id !== id));
   };
 
-  const getClassSlug = (className: string): string => {
-    return className.toLowerCase().replace(/\s+/g, "-");
-  };
-
-  const addCharacter = (name: string, realm: string, region: string) => {
+const addCharacter = (name: string, realm: string, region: string) => {
     const newCharacter: RaiderioProfile = {
       id: Date.now(),
       name,

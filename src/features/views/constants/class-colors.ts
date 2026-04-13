@@ -1,0 +1,15 @@
+export const CLASS_COLORS: Record<string, string> = {
+  warrior: "#d97706",
+  paladin: "#ec4899",
+  hunter: "#65a30d",
+  rogue: "#facc15",
+  priest: "#cbd5e1",
+  "death-knight": "#b91c1c",
+  shaman: "#3b82f6",
+  mage: "#22d3ee",
+  warlock: "#9333ea",
+  monk: "#10b981",
+  druid: "#f97316",
+  "demon-hunter": "#7c3aed",
+  evoker: "#14b8a6",
+};
