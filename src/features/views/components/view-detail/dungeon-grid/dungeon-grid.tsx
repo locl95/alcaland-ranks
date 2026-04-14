@@ -9,6 +9,9 @@ import {
   formatClearTime,
   formatDate,
 } from "@/features/views/api/raiderio.ts";
+import { KEYSTONE_DISPLAY } from "@/features/views/constants/keystone.ts";
+import { CLASS_COLORS}  from "@/features/views/constants/class-colors.ts";
+import { getScoreClass } from "@/features/views/utils.ts";
 
 interface DungeonGridProps {
   raiderioProfiles: RaiderioProfile[];
@@ -21,39 +24,9 @@ interface CharacterDungeonScore {
   bestRun: MythicPlusBestRun | undefined;
 }
 
-const KEYSTONE_DISPLAY: Record<number, { prefix: string; className: string }> =
-  {
-    0: { prefix: "", className: "keystone-depleted" },
-    1: { prefix: "+", className: "keystone-1" },
-    2: { prefix: "++", className: "keystone-2" },
-    3: { prefix: "+++", className: "keystone-3" },
-  };
 
 const ROLE_ORDER: Record<string, number> = { tank: 0, healer: 1, dps: 2 };
 
-const CLASS_COLORS: Record<string, string> = {
-  Warrior: "#d97706",
-  Paladin: "#ec4899",
-  Hunter: "#65a30d",
-  Rogue: "#facc15",
-  Priest: "#f1f5f9",
-  "Death Knight": "#b91c1c",
-  Shaman: "#3b82f6",
-  Mage: "#22d3ee",
-  Warlock: "#9333ea",
-  Monk: "#10b981",
-  Druid: "#f97316",
-  "Demon Hunter": "#7c3aed",
-  Evoker: "#14b8a6",
-};
-
-const getScoreClass = (score: number): string => {
-  if (score < 300) return "score-grey";
-  if (score < 1100) return "score-green";
-  if (score < 1800) return "score-blue";
-  if (score < 3000) return "score-purple";
-  return "score-orange";
-};
 
 const openRaiderIO = (name: string, realmSlug: string, region: string) => {
   window.open(

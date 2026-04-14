@@ -1,14 +1,6 @@
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
-
-const getRankChange = (current: number, previous?: number): number | null => {
-  if (previous === undefined) return null;
-  return previous - current;
-};
-
-const formatRankChange = (change: number): string => {
-  const formatted = Math.round(Math.abs(change)).toLocaleString();
-  return change > 0 ? `+${formatted}` : `-${formatted}`;
-};
+import { getRankChange, formatRankChange } from "@/features/views/utils.ts";
+import "./rankings-table.css";
 
 interface RankingsTableProps {
   character: RaiderioProfile;

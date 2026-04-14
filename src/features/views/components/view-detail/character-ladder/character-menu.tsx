@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import "./character-menu.css";
 import { MoreHorizontal } from "lucide-react";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
 import raiderio2 from "@/assets/raiderio.png";

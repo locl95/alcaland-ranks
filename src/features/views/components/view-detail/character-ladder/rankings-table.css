@@ -1,0 +1,112 @@
+.rankings-section {
+    margin-bottom: 1.5rem;
+}
+
+.rankings-section:last-child {
+    margin-bottom: 0;
+}
+
+.rankings-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.rankings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.rankings-th {
+    padding: 0.375rem 1rem;
+    text-align: right;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid #1e293b;
+    white-space: nowrap;
+}
+
+.rankings-th--label {
+    text-align: left;
+    width: 6rem;
+}
+
+.rankings-tr:not(:last-child) {
+    border-bottom: 1px solid #1e293b;
+}
+
+.rankings-td-label {
+    padding: 0.625rem 1rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+
+.rankings-td {
+    padding: 0.625rem 1rem;
+    text-align: right;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.ranking-value {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-right: 0.375rem;
+}
+
+.rank-change {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    padding: 0.125rem 0.3125rem;
+    border-radius: 0.25rem;
+    border: 1px solid;
+    vertical-align: middle;
+}
+
+.rank-change.improved {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    border-color: rgba(74, 222, 128, 0.3);
+}
+
+.rank-change.declined {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+@media (max-width: 640px) {
+    .rankings-th,
+    .rankings-td,
+    .rankings-td-label {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .ranking-value {
+        font-size: 0.75rem;
+        margin-right: 0;
+    }
+
+    /* hide deltas inside tables on mobile — too cramped to read */
+    .rankings-td .rank-change {
+        display: none;
+    }
+}

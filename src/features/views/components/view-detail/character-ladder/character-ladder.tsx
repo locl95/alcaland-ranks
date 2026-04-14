@@ -1,4 +1,5 @@
-import { ChevronDown, ChevronUp, Trophy } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import keystone from "@/assets/keystone.png";
 import "./character-ladder.css";
 import { useState } from "react";
 import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
@@ -68,8 +69,8 @@ export function CharacterLadder({
         }}
       >
         <div className="ladder-title">
-          <Trophy className="trophy-icon" />
-          Character Ladder
+          <img src={keystone} alt="" aria-hidden={true} className="keystone-icon" />
+          Ladder
         </div>
         <button className="ladder-toggle-btn">
           {isLadderOpen ? (
