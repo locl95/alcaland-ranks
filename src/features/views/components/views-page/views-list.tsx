@@ -19,6 +19,7 @@ import { selectLoading } from "@/app/loadingSlice.ts";
 
 interface ViewsListProps {
   views: View[];
+  username: string | null;
   onViewClick: (viewId: string) => void;
   onCreateView: () => void;
   onDeleteView: (viewId: string) => void;
@@ -26,6 +27,7 @@ interface ViewsListProps {
 
 export function ViewsList({
   views,
+  username,
   onViewClick,
   onCreateView,
   onDeleteView,
@@ -91,16 +93,14 @@ export function ViewsList({
               </div>
             </div>
 
-            <div className="view-row-actions">
+            <div className="view-row-actions" onClick={(e) => e.stopPropagation()}>
               {isPending && <Loader2 className="loading-icon" />}
 
-              {!isPending && (
+              {!isPending && username === view.simpleView.owner && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
-                      hidden={true}
                       className="view-row-menu-btn"
-                      onClick={(e) => e.stopPropagation()}
                       title="View options"
                     >
                       <MoreHorizontal className="view-row-menu-icon" />

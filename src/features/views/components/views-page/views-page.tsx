@@ -7,18 +7,32 @@ import "./views-page.css";
 
 interface ViewsPageProps {
   views: View[];
+  isAuthenticated: boolean;
+  username: string | null;
   onViewClick: (viewId: string) => void;
   onCreateView: (pendingView: View) => void;
   onDeleteView: (viewId: string) => void;
+  onLoginRequired: () => void;
 }
 
 export function ViewsPage({
   views,
+  isAuthenticated,
+  username,
   onViewClick,
   onCreateView,
   onDeleteView,
+  onLoginRequired,
 }: Readonly<ViewsPageProps>) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  const handleCreateClick = () => {
+    if (!isAuthenticated) {
+      onLoginRequired();
+      return;
+    }
+    setIsCreateDialogOpen(true);
+  };
 
   return (
     <div className="views-list-container">
@@ -30,8 +44,7 @@ export function ViewsPage({
 
           {views.length > 0 && (
             <button
-              hidden={true}
-              onClick={() => setIsCreateDialogOpen(true)}
+              onClick={handleCreateClick}
               className="create-view-btn"
             >
               <Plus className="icon-lg" />
@@ -47,8 +60,9 @@ export function ViewsPage({
 
         <ViewsList
           views={views}
+          username={username}
           onViewClick={onViewClick}
-          onCreateView={() => setIsCreateDialogOpen(true)}
+          onCreateView={handleCreateClick}
           onDeleteView={onDeleteView}
         />
       </div>

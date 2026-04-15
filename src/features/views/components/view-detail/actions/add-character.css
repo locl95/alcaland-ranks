@@ -63,20 +63,9 @@
     padding: 1.5rem;
 }
 
-.form-group {
-    margin-bottom: 1.25rem;
-}
-
-.form-group:last-of-type {
-    margin-bottom: 0;
-}
-
-.form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #cbd5e1;
-    margin-bottom: 0.5rem;
+.add-character-row {
+    display: flex;
+    gap: 0.75rem;
 }
 
 .form-input,

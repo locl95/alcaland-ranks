@@ -2,25 +2,29 @@ import { ArrowLeft, Edit, Trophy } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks.ts";
 import "./view-detail.css";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   RaiderioProfile,
   Season,
   ViewData,
 } from "@/features/views/api/raiderio.ts";
 import { loading, notLoading, selectLoading } from "@/app/loadingSlice.ts";
-import {
-  fetchWithoutResponse,
-  fetchWithResponse,
-} from "@/shared/api/EasyFetch.ts";
+import { selectUsername } from "@/app/authSlice.ts";
+import { serviceGet, userRequestVoid } from "@/shared/api/httpClient.ts";
 import { ViewRequest } from "@/features/views/api/view-types.ts";
 import { CharacterLadder } from "./character-ladder/character-ladder.tsx";
 import { DungeonGrid } from "./dungeon-grid/dungeon-grid.tsx";
 import { EditView } from "./actions/edit-view.tsx";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
   const { viewId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const owner = (location.state as { owner?: string } | null)?.owner ?? null;
+  const username = useAppSelector(selectUsername);
+  const canEdit = username !== null && username === owner;
   const [viewName, setViewName] = useState<string>("");
 
   const [profiles, setProfiles] = useState<RaiderioProfile[]>([]);
@@ -32,28 +36,18 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
   const isLoading = useAppSelector(selectLoading);
 
   useEffect(() => {
+    if (!viewId || !UUID_REGEX.test(viewId)) {
+      navigate("/");
+      return;
+    }
+
     async function fetchData() {
       dispatch(loading());
       try {
         const [seasonData, data, cachedData] = await Promise.all([
-          fetchWithResponse<Season>(
-            "GET",
-            `/sources/wow/static`,
-            undefined,
-            `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-          ),
-          fetchWithResponse<ViewData>(
-            "GET",
-            `/views/${viewId}/data`,
-            undefined,
-            `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-          ),
-          fetchWithResponse<ViewData>(
-            "GET",
-            `/views/${viewId}/cached-data`,
-            undefined,
-            `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-          ),
+          serviceGet<Season>(`/sources/wow/static`),
+          serviceGet<ViewData>(`/views/${viewId}/data`),
+          serviceGet<ViewData>(`/views/${viewId}/cached-data`),
         ]);
         setSeason(seasonData);
         setViewName(data.viewName);
@@ -106,12 +100,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
       try {
         console.log("[EditView] request:", request);
 
-        await fetchWithoutResponse(
-          "PUT",
-          `/views/${viewId}`,
-          request,
-          `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-        );
+        await userRequestVoid("PUT", `/views/${viewId}`, request);
 
         setProfiles(characters);
       } catch (error) {
@@ -133,14 +122,15 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
             <ArrowLeft className="header-icon" />
           </button>
           <h1 className="header-view-title">{viewName}</h1>
-          <button
-            hidden={true}
-            className={`header-edit-button ${isEditOpen ? "active" : ""}`}
-            onClick={() => setIsEditOpen(!isEditOpen)}
-          >
-            <Edit className="header-icon" />
-            <span className="header-button-text">Edit</span>
-          </button>
+          {canEdit && (
+            <button
+              className="header-edit-button"
+              onClick={() => setIsEditOpen(!isEditOpen)}
+            >
+              <Edit className="header-icon" />
+              <span className="header-button-text">Edit</span>
+            </button>
+          )}
         </div>
 
         {!isLoading && profiles.length === 0 ? (
@@ -150,12 +140,14 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
             <p className="empty-text">
               Add characters to start tracking their Mythic+ progress
             </p>
-            <button
-              className="empty-add-btn"
-              onClick={() => setIsEditOpen(true)}
-            >
-              Add Your First Character
-            </button>
+            {canEdit && (
+              <button
+                className="empty-add-btn"
+                onClick={() => setIsEditOpen(true)}
+              >
+                Add Your First Character
+              </button>
+            )}
           </div>
         ) : (
           <>

@@ -35,12 +35,12 @@ export function EditView({
     setEditingCharacters((prev) => prev.filter((c) => c.id !== id));
   };
 
-const addCharacter = (name: string, realm: string, region: string) => {
+const addCharacter = (name: string, realm: string) => {
     const newCharacter: RaiderioProfile = {
       id: Date.now(),
       name,
       realm,
-      region,
+      region: "eu",
       score: -1,
       class: "",
       spec: "",
@@ -144,7 +144,7 @@ const addCharacter = (name: string, realm: string, region: string) => {
       <AddCharacter
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
-        onAdd={addCharacter}
+        onAdd={(name, realm) => addCharacter(name, realm)}
       />
     </>
   );

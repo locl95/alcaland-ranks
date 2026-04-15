@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
 import "./create-view.css";
 import { View } from "@/features/views/model/view.ts";
-import { fetchWithResponse } from "@/shared/api/EasyFetch.ts";
+import { userRequest } from "@/shared/api/httpClient.ts";
 import { EU_REALMS } from "@/features/views/constants/euRealms.ts";
 
 interface CharacterRow {
@@ -130,12 +130,7 @@ export function CreateView({
     };
 
     try {
-      await fetchWithResponse(
-        "POST",
-        `/views`,
-        request,
-        `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-      );
+      await userRequest("POST", `/views`, request);
 
       onCreateView({
         id: "",

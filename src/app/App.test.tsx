@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import App from "./App";
 import loadingReducer from "@/app/loadingSlice.ts";
+import authReducer from "@/app/authSlice.ts";
 import type { View } from "@/features/views/model/view.ts";
 import {
   MockViewsList,
@@ -24,8 +25,8 @@ const pollingCapture = vi.hoisted(() => ({
 }));
 
 const fetchMocks = vi.hoisted(() => ({
-  fetchWithResponse: vi.fn(),
-  fetchWithoutResponse: vi.fn(),
+  serviceGet: vi.fn(),
+  userRequestVoid: vi.fn(),
 }));
 
 // Lightweight in-memory router to avoid the React 18/19 version conflict that
@@ -69,8 +70,10 @@ vi.mock("react-router-dom", () => ({
       routePath === "/" ? navState.path === "/" : navState.path !== "/";
     return matches ? <>{element}</> : null;
   },
+  Navigate: () => null,
   useNavigate: () => (to: string) => navState.navigate(to),
   useParams: () => navState.getParams(),
+  useLocation: () => ({ pathname: navState.path, state: null }),
 }));
 
 vi.mock("@/shared/hooks/usePolling.tsx", () => ({
@@ -80,7 +83,7 @@ vi.mock("@/shared/hooks/usePolling.tsx", () => ({
   }),
 }));
 
-vi.mock("@/shared/api/EasyFetch.ts", () => fetchMocks);
+vi.mock("@/shared/api/httpClient.ts", () => fetchMocks);
 
 vi.mock("@/features/views/components/views-page/views-list.tsx", () => ({
   ViewsList: (props: Parameters<typeof MockViewsList>[0]) => (
@@ -102,7 +105,10 @@ vi.mock("@/features/views/components/view-detail/view-detail.tsx", () => ({
 // Helpers
 // ---------------------------------------------------------------------------
 const createStore = () =>
-  configureStore({ reducer: { loading: loadingReducer } });
+  configureStore({
+    reducer: { loading: loadingReducer, auth: authReducer },
+    preloadedState: { auth: { accessToken: "test-token", refreshToken: "test-refresh" } },
+  });
 
 const renderApp = () => {
   const store = createStore();
@@ -119,7 +125,7 @@ const renderApp = () => {
 };
 
 const renderWithViews = async (views = [makeSimpleView("v1", "My View")]) => {
-  fetchMocks.fetchWithResponse.mockResolvedValue({ records: views });
+  fetchMocks.serviceGet.mockResolvedValue({ records: views });
   const result = renderApp();
   await waitFor(() => screen.getByTestId("views-list"));
   return result;
@@ -130,8 +136,8 @@ describe("App", () => {
     vi.clearAllMocks();
     pollingCapture.shouldContinue = null;
     navState.reset();
-    fetchMocks.fetchWithResponse.mockResolvedValue({ records: [] });
-    fetchMocks.fetchWithoutResponse.mockResolvedValue(undefined);
+    fetchMocks.serviceGet.mockResolvedValue({ records: [] });
+    fetchMocks.userRequestVoid.mockResolvedValue(undefined);
   });
 
   afterEach(() => vi.unstubAllEnvs());
@@ -160,15 +166,10 @@ describe("App", () => {
   });
 
   describe("fetching views on mount", () => {
-    it("calls fetchWithResponse with the correct endpoint", async () => {
+    it("calls serviceGet with the correct endpoint", async () => {
       renderApp();
       await waitFor(() =>
-        expect(fetchMocks.fetchWithResponse).toHaveBeenCalledWith(
-          "GET",
-          "/views?game=wow",
-          undefined,
-          expect.stringContaining("Bearer"),
-        ),
+        expect(fetchMocks.serviceGet).toHaveBeenCalledWith("/views?game=wow"),
       );
     });
 
@@ -285,28 +286,19 @@ describe("App", () => {
       await userEvent.click(screen.getByTestId("delete-v1"));
 
       await waitFor(() =>
-        expect(fetchMocks.fetchWithoutResponse).toHaveBeenCalledWith(
-          "DELETE",
-          "/views/v1",
-          undefined,
-          expect.stringContaining("Bearer"),
-        ),
+        expect(fetchMocks.userRequestVoid).toHaveBeenCalledWith("DELETE", "/views/v1"),
       );
     });
 
     it("re-fetches views when the DELETE API call fails", async () => {
-      fetchMocks.fetchWithoutResponse.mockRejectedValue(
-        new Error("Network error"),
-      );
+      fetchMocks.userRequestVoid.mockRejectedValue(new Error("Network error"));
       await renderWithViews();
-      const callsBefore = fetchMocks.fetchWithResponse.mock.calls.length;
+      const callsBefore = fetchMocks.serviceGet.mock.calls.length;
 
       await userEvent.click(screen.getByTestId("delete-v1"));
 
       await waitFor(() =>
-        expect(fetchMocks.fetchWithResponse.mock.calls.length).toBeGreaterThan(
-          callsBefore,
-        ),
+        expect(fetchMocks.serviceGet.mock.calls.length).toBeGreaterThan(callsBefore),
       );
     });
   });

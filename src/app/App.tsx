@@ -1,22 +1,25 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import { useAppDispatch } from "./hooks";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "./hooks";
 import { loading, notLoading } from "@/app/loadingSlice.ts";
-import {
-  fetchWithoutResponse,
-  fetchWithResponse,
-} from "@/shared/api/EasyFetch.ts";
+import { serviceGet, userRequestVoid } from "@/shared/api/httpClient.ts";
 import { GetViewsResponse } from "@/features/views/api/view-types.ts";
 import { ViewDetail } from "@/features/views/components/view-detail/view-detail.tsx";
 import { View } from "@/features/views/model/view.ts";
 import { usePolling } from "@/shared/hooks/usePolling.tsx";
 import { Spinner } from "@/shared/components/spinner.tsx";
 import { ViewsPage } from "@/features/views/components/views-page/views-page.tsx";
+import { LoginPage } from "@/features/auth/LoginPage.tsx";
+import { selectIsAuthenticated, selectUsername } from "@/app/authSlice.ts";
+import { useLocation } from "react-router-dom";
 
 export function App() {
   const [views, setViews] = useState<View[]>([]);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const username = useAppSelector(selectUsername);
 
   useEffect(() => {
     fetchAndSetViews();
@@ -35,12 +38,7 @@ export function App() {
   };
 
   const fetchBackendViews = async (): Promise<View[]> => {
-    const response = await fetchWithResponse<GetViewsResponse>(
-      "GET",
-      "/views?game=wow",
-      undefined,
-      `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-    );
+    const response = await serviceGet<GetViewsResponse>("/views?game=wow");
 
     return response.records.map((v) => ({
       id: v.id,
@@ -98,7 +96,8 @@ export function App() {
   };
 
   const handleViewClick = (viewId: string) => {
-    navigate(`/${viewId}`);
+    const owner = views.find((v) => v.id === viewId)?.simpleView.owner;
+    navigate(`/${viewId}`, { state: { owner } });
   };
 
   const handleBackToViews = () => {
@@ -109,20 +108,28 @@ export function App() {
     }
   };
 
-  const handleDeleteView = async (viewId: string) => {
-    setViews((prev) => prev.filter((view) => view.id !== viewId));
-
-    try {
-      await fetchWithoutResponse(
-        "DELETE",
-        `/views/${viewId}`,
-        undefined,
-        `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-      );
-    } catch (error) {
-      console.log("error [DeleteView] viewId:", viewId);
-      fetchAndSetViews();
+  const requireAuth = (action: () => void) => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location.pathname } });
+      return;
     }
+    action();
+  };
+
+  const handleLoginRequired = () => {
+    navigate("/login", { state: { from: location.pathname } });
+  };
+
+  const handleDeleteView = async (viewId: string) => {
+    requireAuth(async () => {
+      setViews((prev) => prev.filter((view) => view.id !== viewId));
+      try {
+        await userRequestVoid("DELETE", `/views/${viewId}`);
+      } catch (error) {
+        console.log("error [DeleteView] viewId:", viewId);
+        fetchAndSetViews();
+      }
+    });
   };
 
   return (
@@ -134,9 +141,12 @@ export function App() {
           element={
             <ViewsPage
               views={views}
+              isAuthenticated={isAuthenticated}
+              username={username}
               onViewClick={handleViewClick}
               onDeleteView={handleDeleteView}
               onCreateView={handleCreateView}
+              onLoginRequired={handleLoginRequired}
             />
           }
         />
@@ -145,6 +155,10 @@ export function App() {
           path="/:viewId"
           element={<ViewDetail onBack={handleBackToViews} />}
         />
+
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );
