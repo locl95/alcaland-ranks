@@ -3,29 +3,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to bottom, #0f172a, #1e293b);
+  background:
+    radial-gradient(ellipse 100% 50% at 50% -5%, rgba(56, 189, 248, 0.07) 0%, transparent 65%),
+    linear-gradient(160deg, #05111f 0%, #0b1929 35%, #111827 100%);
 }
 
 .login-card {
   width: 100%;
   max-width: 380px;
   padding: 2rem;
-  border: 1px solid #334155;
-  border-radius: 0.5rem;
-  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 0.75rem;
+  background: rgba(10, 22, 40, 0.5);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(148, 163, 184, 0.04);
 }
 
 .login-title {
   margin: 0 0 0.25rem;
+  font-family: 'Cinzel', serif;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #ffffff;
+  letter-spacing: 0.04em;
+  background: linear-gradient(130deg, #f1f5f9 0%, #7dd3fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .login-subtitle {
   margin: 0 0 1.5rem;
   font-size: 0.875rem;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .login-form {
@@ -43,21 +52,22 @@
 .login-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #cbd5e1;
+  color: #94a3b8;
 }
 
 .login-input {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #475569;
+  border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: 0.375rem;
-  background-color: #0f172a;
-  color: #ffffff;
+  background-color: rgba(5, 17, 31, 0.8);
+  color: #f1f5f9;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .login-input:focus {
-  border-color: #64748b;
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
 }
 
 .login-error {
@@ -69,19 +79,24 @@
 .login-btn {
   margin-top: 0.5rem;
   padding: 0.625rem;
-  border: none;
+  border: 1px solid rgba(56, 189, 248, 0.3);
   border-radius: 0.375rem;
-  background-color: #3b82f6;
-  color: #ffffff;
+  background: rgba(56, 189, 248, 0.09);
+  color: #7dd3fc;
   cursor: pointer;
-  transition: opacity 0.15s;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.2s;
 }
 
 .login-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .login-btn:not(:disabled):hover {
-  opacity: 0.9;
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #bae6fd;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.1);
 }

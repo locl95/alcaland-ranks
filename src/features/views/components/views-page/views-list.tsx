@@ -1,17 +1,4 @@
-import {
-  Plus,
-  User,
-  Users,
-  Loader2,
-  Trash2,
-  MoreHorizontal,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+import { Plus, User, Users, Loader2, Trash2 } from "lucide-react";
 import "./views-list.css";
 import { View } from "@/features/views/model/view.ts";
 
@@ -97,33 +84,14 @@ export function ViewsList({
               {isPending && <Loader2 className="loading-icon" />}
 
               {!isPending && username === view.simpleView.owner && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="view-row-menu-btn" title="View options">
-                      <MoreHorizontal className="view-row-menu-icon" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="view-row-menu-content"
-                    align="end"
-                  >
-                    <DropdownMenuItem
-                      className={`view-row-menu-item view-row-menu-item--danger ${viewsSyncing ? "disabled" : ""}`}
-                      onSelect={(e) => {
-                        if (viewsSyncing) {
-                          e.preventDefault();
-                          return;
-                        }
-                        onDeleteView(view.id);
-                      }}
-                    >
-                      <Trash2 className="view-row-icon" />
-                      {viewsSyncing
-                        ? "Cannot delete while syncing"
-                        : "Delete view"}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <button
+                  className="view-row-delete-btn"
+                  title={viewsSyncing ? "Cannot delete while syncing" : "Delete view"}
+                  disabled={viewsSyncing}
+                  onClick={() => onDeleteView(view.id)}
+                >
+                  <Trash2 className="view-row-menu-icon" />
+                </button>
               )}
             </div>
           </div>

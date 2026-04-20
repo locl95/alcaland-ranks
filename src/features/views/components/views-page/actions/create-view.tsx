@@ -165,10 +165,19 @@ export function CreateView({
     <div className="dialog-overlay" onClick={handleOverlayClick}>
       <div className="dialog-content">
         <div className="dialog-header">
-          <h2 className="dialog-title">Create New View</h2>
-          <p className="dialog-description">
-            Create a new ladder to track your characters' Mythic+ progress
-          </p>
+          <div>
+            <h2 className="dialog-title">Create New View</h2>
+            <p className="dialog-description">
+              Create a new ladder to track your characters' Mythic+ progress
+            </p>
+          </div>
+          <button
+            type="button"
+            className="dialog-close-btn"
+            onClick={() => { resetForm(); onOpenChange(false); }}
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <form className="dialog-form" onSubmit={handleCreateView}>
@@ -234,17 +243,6 @@ export function CreateView({
           </div>
 
           <div className="dialog-footer">
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={() => {
-                resetForm();
-                onOpenChange(false);
-              }}
-            >
-              Cancel
-            </button>
-
             <button
               type="submit"
               className="btn btn-primary"

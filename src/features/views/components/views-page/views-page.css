@@ -1,6 +1,8 @@
 .views-list-container {
     min-height: 100vh;
-    background: linear-gradient(to bottom, #0f172a, #1e293b);
+    background:
+        radial-gradient(ellipse 100% 50% at 50% -5%, rgba(56, 189, 248, 0.07) 0%, transparent 65%),
+        linear-gradient(160deg, #05111f 0%, #0b1929 35%, #111827 100%);
     padding: 2rem;
 }
 
@@ -19,10 +21,16 @@
 }
 
 .views-header-text h1 {
-    font-size: 2.25rem;
-    font-weight: bold;
-    color: #ffffff;
-    margin-bottom: 0.5rem;
+    font-family: 'Cinzel', serif;
+    font-size: 1.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background: linear-gradient(130deg, #f1f5f9 0%, #7dd3fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 0;
 }
 
 .views-header-text p {
@@ -30,10 +38,10 @@
 }
 
 .create-view-btn {
-    padding: 0.5rem 0.875rem;
-    background: #3b82f6;
-    border: 1px solid #3b82f6;
-    color: #ffffff;
+    padding: 0.5rem 1rem;
+    background: rgba(56, 189, 248, 0.09);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    color: #7dd3fc;
     border-radius: 0.5rem;
     cursor: pointer;
     display: inline-flex;
@@ -41,11 +49,21 @@
     gap: 0.5rem;
     font-size: 0.875rem;
     font-weight: 500;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
 }
 
 .create-view-btn:hover {
-    background: #2563eb;
+    background: rgba(56, 189, 248, 0.16);
+    border-color: rgba(56, 189, 248, 0.45);
+    color: #bae6fd;
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.1);
+}
+
+.create-view-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 .views-header-actions {
@@ -59,26 +77,27 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.875rem;
-    background: rgba(51, 65, 85, 0.5);
-    border: 1px solid #334155;
+    background: rgba(10, 20, 36, 0.6);
+    border: 1px solid rgba(71, 85, 105, 0.45);
     border-radius: 0.5rem;
-    color: #e2e8f0;
+    color: #cbd5e1;
     cursor: pointer;
     font-size: 0.875rem;
     font-weight: 500;
     transition: all 0.2s;
+    backdrop-filter: blur(4px);
 }
 
 .user-menu-btn:hover {
-    background: rgba(51, 65, 85, 0.8);
-    border-color: #475569;
-    color: #ffffff;
+    background: rgba(30, 41, 59, 0.8);
+    border-color: #64748b;
+    color: #f1f5f9;
 }
 
 .user-menu-icon {
     width: 1rem;
     height: 1rem;
-    color: #94a3b8;
+    color: #64748b;
 }
 
 .user-menu-name {
@@ -89,11 +108,11 @@
 }
 
 .user-menu-content {
-    background: #1e293b;
-    border: 1px solid #334155;
+    background: #0b1929;
+    border: 1px solid rgba(51, 65, 85, 0.8);
     border-radius: 0.5rem;
     padding: 0.25rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(56, 189, 248, 0.04);
     min-width: 10rem;
     z-index: 50;
 }
@@ -126,11 +145,16 @@
 }
 
 .views-season {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin: 1rem 0 0.75rem 0.25rem;
-    font-size: 0.875rem;
+    margin: 0 0 1.5rem 0.125rem;
+    font-size: 0.8125rem;
+    padding: 0.25rem 0.75rem 0.25rem 0.625rem;
+    background: rgba(245, 158, 11, 0.07);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 2rem;
+    width: fit-content;
 }
 
 .views-season-label {
@@ -138,6 +162,7 @@
 }
 
 .views-season-value {
-    color: #e2e8f0;
+    color: #fbbf24;
     font-weight: 500;
+    letter-spacing: 0.02em;
 }
