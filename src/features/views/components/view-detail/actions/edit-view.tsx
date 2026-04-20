@@ -5,7 +5,7 @@ import "./edit-view.css";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
 import { getClassSlug } from "@/features/views/utils.ts";
 
-interface Props {
+interface EditViewProps {
   isOpen: boolean;
   characters: RaiderioProfile[];
   onClose: () => void;
@@ -17,7 +17,7 @@ export function EditView({
   characters,
   onClose,
   onSave,
-}: Readonly<Props>) {
+}: Readonly<EditViewProps>) {
   const [editingCharacters, setEditingCharacters] = useState<RaiderioProfile[]>(
     [],
   );

@@ -30,22 +30,99 @@
 }
 
 .create-view-btn {
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 0.875rem;
     background: #3b82f6;
-    border: none;
+    border: 1px solid #3b82f6;
     color: #ffffff;
     border-radius: 0.5rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 500;
     transition: background 0.2s;
 }
 
 .create-view-btn:hover {
     background: #2563eb;
+}
+
+.views-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background: rgba(51, 65, 85, 0.5);
+    border: 1px solid #334155;
+    border-radius: 0.5rem;
+    color: #e2e8f0;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.user-menu-btn:hover {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: #475569;
+    color: #ffffff;
+}
+
+.user-menu-icon {
+    width: 1rem;
+    height: 1rem;
+    color: #94a3b8;
+}
+
+.user-menu-name {
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-menu-content {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    min-width: 10rem;
+    z-index: 50;
+}
+
+.user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.15s;
+}
+
+.user-menu-item--danger {
+    color: #f87171;
+}
+
+.user-menu-item--danger:hover,
+.user-menu-item--danger[data-highlighted] {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+}
+
+.user-menu-item-icon {
+    width: 1rem;
+    height: 1rem;
 }
 
 .views-season {

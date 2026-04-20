@@ -1,5 +1,5 @@
-import type { View } from '@/features/views/model/view.ts';
-import type { SimpleView } from '@/features/views/api/view-types.ts';
+import type { View } from "@/features/views/model/view.ts";
+import type { SimpleView } from "@/features/views/api/view-types.ts";
 
 export const MockViewsList = ({
   views,
@@ -18,7 +18,10 @@ export const MockViewsList = ({
         <button data-testid={`open-${v.id}`} onClick={() => onViewClick(v.id)}>
           Open {v.simpleView.name}
         </button>
-        <button data-testid={`delete-${v.id}`} onClick={() => onDeleteView(v.id)}>
+        <button
+          data-testid={`delete-${v.id}`}
+          onClick={() => onDeleteView(v.id)}
+        >
           Delete {v.simpleView.name}
         </button>
       </div>
@@ -44,8 +47,8 @@ export const MockCreateView = ({
         data-testid="submit-create"
         onClick={() =>
           onCreateView({
-            id: 'pending-id',
-            simpleView: makeSimpleView('pending-id', 'Pending View'),
+            id: "pending-id",
+            simpleView: makeSimpleView("pending-id", "Pending View"),
             isSynced: false,
           })
         }
@@ -58,11 +61,7 @@ export const MockCreateView = ({
     </div>
   ) : null;
 
-export const MockViewDetail = ({
-  onBack,
-}: {
-  onBack: () => void;
-}) => (
+export const MockViewDetail = ({ onBack }: { onBack: () => void }) => (
   <div data-testid="view-detail">
     <button data-testid="back-btn" onClick={onBack}>
       Back
@@ -73,9 +72,9 @@ export const MockViewDetail = ({
 export const makeSimpleView = (id: string, name: string): SimpleView => ({
   id,
   name,
-  owner: 'testuser',
+  owner: "testuser",
   published: false,
   entitiesIds: [],
-  game: 'WOW',
+  game: "WOW",
   featured: false,
 });

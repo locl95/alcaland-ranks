@@ -1,5 +1,6 @@
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import "./ladder-row.css";
+import { useState } from "react";
 import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
 import { CharacterMenu } from "./character-menu.tsx";
 import { LadderRowExpanded } from "./ladder-row-expanded.tsx";
@@ -9,38 +10,34 @@ import { getClassSlug, getScoreClass } from "@/features/views/utils.ts";
 interface LadderRowProps {
   index: number;
   character: RaiderioProfile;
-  cachedCharacter: RaiderioProfile | undefined;
+  cachedCharacters: RaiderioProfile[];
   season: Season | null;
-  isExpanded: boolean;
-  hasHistoricalData: boolean;
-  positionChange: number | null;
-  onToggle: () => void;
 }
 
 export function LadderRow({
   index,
   character,
-  cachedCharacter,
+  cachedCharacters,
   season,
-  isExpanded,
-  hasHistoricalData,
-  positionChange,
-  onToggle,
 }: Readonly<LadderRowProps>) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const isSyncing = character.score === -1;
+  const hasHistoricalData = cachedCharacters.length > 0;
+  const cachedIndex = cachedCharacters.findIndex((c) => c.id === character.id);
+  const positionChange =
+    hasHistoricalData && cachedIndex !== -1 ? cachedIndex - index : null;
+
+  const showPositionChange = !isSyncing && hasHistoricalData && positionChange !== null && positionChange !== 0;
 
   return (
     <div className="ladder-row">
-      <div className="ladder-row-inner" onClick={onToggle}>
+      <div className="ladder-row-inner" onClick={() => setIsExpanded((prev) => !prev)}>
         <div className="ladder-rank">{index + 1}</div>
 
         <div className="ladder-character-info">
           <div className="ladder-character-name-row">
             <p className="ladder-character-name">{character.name}</p>
-            {!isSyncing &&
-              hasHistoricalData &&
-              positionChange !== null &&
-              positionChange !== 0 && (
+            {showPositionChange && (
                 <span
                   className={`ladder-position-change ${positionChange > 0 ? "improved" : "declined"}`}
                 >
@@ -96,7 +93,7 @@ export function LadderRow({
       {isExpanded && character.mythicPlusRanks && (
         <LadderRowExpanded
           character={character}
-          cachedCharacter={cachedCharacter}
+          cachedCharacter={cachedCharacters[cachedIndex]}
           season={season}
         />
       )}

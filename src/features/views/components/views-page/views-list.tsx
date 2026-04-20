@@ -14,11 +14,10 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import "./views-list.css";
 import { View } from "@/features/views/model/view.ts";
-import { useAppSelector } from "@/app/hooks.ts";
-import { selectLoading } from "@/app/loadingSlice.ts";
 
 interface ViewsListProps {
   views: View[];
+  isLoadingViews: boolean;
   username: string | null;
   onViewClick: (viewId: string) => void;
   onCreateView: () => void;
@@ -27,15 +26,15 @@ interface ViewsListProps {
 
 export function ViewsList({
   views,
+  isLoadingViews,
   username,
   onViewClick,
   onCreateView,
   onDeleteView,
 }: Readonly<ViewsListProps>) {
-  const isLoading = useAppSelector(selectLoading);
   const viewsSyncing = views.some((v) => !v.isSynced);
 
-  if (isLoading && views.length === 0) return null;
+  if (isLoadingViews && views.length === 0) return null;
 
   return views.length === 0 ? (
     <div className="views-empty-state">
@@ -88,21 +87,19 @@ export function ViewsList({
                   <User className="view-row-icon" />
                   <span>{view.simpleView.owner}</span>
                 </div>
-
-
               </div>
             </div>
 
-            <div className="view-row-actions" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="view-row-actions"
+              onClick={(e) => e.stopPropagation()}
+            >
               {isPending && <Loader2 className="loading-icon" />}
 
               {!isPending && username === view.simpleView.owner && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button
-                      className="view-row-menu-btn"
-                      title="View options"
-                    >
+                    <button className="view-row-menu-btn" title="View options">
                       <MoreHorizontal className="view-row-menu-icon" />
                     </button>
                   </DropdownMenuTrigger>

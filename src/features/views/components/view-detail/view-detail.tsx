@@ -1,89 +1,124 @@
-import { ArrowLeft, Edit, Trophy } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "@/app/hooks.ts";
+import { ArrowLeft, Edit, Trophy, Loader2 } from "lucide-react";
+import { useAppSelector } from "@/app/hooks.ts";
 import "./view-detail.css";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import {
-  RaiderioProfile,
-  Season,
-  ViewData,
-} from "@/features/views/api/raiderio.ts";
-import { loading, notLoading, selectLoading } from "@/app/loadingSlice.ts";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
+import { View } from "@/features/views/model/view.ts";
 import { selectUsername } from "@/app/authSlice.ts";
-import { serviceGet, userRequestVoid } from "@/shared/api/httpClient.ts";
+import { userRequestVoid } from "@/shared/api/httpClient.ts";
 import { ViewRequest } from "@/features/views/api/view-types.ts";
 import { CharacterLadder } from "./character-ladder/character-ladder.tsx";
 import { DungeonGrid } from "./dungeon-grid/dungeon-grid.tsx";
 import { EditView } from "./actions/edit-view.tsx";
+import {
+  viewKeys,
+  fetchViewData,
+  fetchCachedViewData,
+  fetchWowStatic,
+} from "@/features/views/api/viewQueries.ts";
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+interface ViewEditMeta {
+  pendingCharacters: RaiderioProfile[];
+}
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
   const { viewId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const owner = (location.state as { owner?: string } | null)?.owner ?? null;
+  const queryClient = useQueryClient();
   const username = useAppSelector(selectUsername);
+
+  const locationState = location.state as { owner?: string; entitiesCount?: number } | null;
+  const owner = locationState?.owner ?? null;
+  const entitiesCount = locationState?.entitiesCount ?? 0;
   const canEdit = username !== null && username === owner;
-  const [viewName, setViewName] = useState<string>("");
 
-  const [profiles, setProfiles] = useState<RaiderioProfile[]>([]);
-  const [cachedProfiles, setCachedProfiles] = useState<RaiderioProfile[]>([]);
-  const [season, setSeason] = useState<Season | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [initialized, setInitialized] = useState(false);
-  const dispatch = useAppDispatch();
-  const isLoading = useAppSelector(selectLoading);
 
-  useEffect(() => {
-    if (!viewId || !UUID_REGEX.test(viewId)) {
-      navigate("/");
-      return;
-    }
+  const isViewIdValid = !!viewId && UUID_REGEX.test(viewId);
+  const safeViewId = viewId ?? "";
 
-    async function fetchData() {
-      dispatch(loading());
-      try {
-        const [seasonData, data, cachedData] = await Promise.all([
-          serviceGet<Season>(`/sources/wow/static`),
-          serviceGet<ViewData>(`/views/${viewId}/data`),
-          serviceGet<ViewData>(`/views/${viewId}/cached-data`),
-        ]);
-        setSeason(seasonData);
-        setViewName(data.viewName);
-        setProfiles(data.data);
-        setCachedProfiles(cachedData.data);
-      } catch (error) {
-        console.error("Failed to fetch view data", error);
-        navigate("/");
-      } finally {
-        dispatch(notLoading());
-        setInitialized(true);
-      }
-    }
-
-    fetchData();
-  }, [viewId]);
-
-  function haveSameCharacters(
-    a: RaiderioProfile[],
-    b: RaiderioProfile[],
-  ): boolean {
-    if (a.length !== b.length) return false;
-
-    const idsA = new Set(a.map((c) => c.id));
-
-    for (const character of b) {
-      if (!idsA.has(character.id)) {
-        return false;
-      }
-    }
-
-    return true;
+  if (viewId && !UUID_REGEX.test(viewId)) {
+    navigate("/");
   }
 
-  const handleSavedCharacters = async (characters: RaiderioProfile[]) => {
-    if (!haveSameCharacters(characters, profiles)) {
+  const { data: rawViewData, isLoading } = useQuery({
+    queryKey: viewKeys.data(safeViewId),
+    queryFn: () => fetchViewData(safeViewId),
+    enabled: isViewIdValid,
+    refetchInterval: (query) => {
+      const hasPendingScore = query.state.data?.data.some((c) => c.score === -1);
+      const hasEditMeta = !!queryClient.getQueryData<ViewEditMeta>(
+        viewKeys.editMeta(safeViewId),
+      );
+      const isSyncingInitial =
+        entitiesCount > 0 && (query.state.data?.data.length ?? 0) === 0;
+      return hasPendingScore || hasEditMeta || isSyncingInitial ? 3000 : false;
+    },
+  });
+
+  const { data: cachedData } = useQuery({
+    queryKey: viewKeys.cachedData(safeViewId),
+    queryFn: () => fetchCachedViewData(safeViewId),
+    enabled: isViewIdValid,
+    staleTime: Infinity,
+  });
+
+  const { data: season } = useQuery({
+    queryKey: viewKeys.static(),
+    queryFn: fetchWowStatic,
+    staleTime: Infinity,
+  });
+
+  const { data: editMeta } = useQuery({
+    queryKey: viewKeys.editMeta(safeViewId),
+    queryFn: () => null as ViewEditMeta | null,
+    enabled: false,
+    staleTime: Infinity,
+    gcTime: 5 * 60 * 1000,
+    initialData: null,
+  });
+
+  const profiles = useMemo(() => {
+    const apiData = rawViewData?.data ?? [];
+    if (!editMeta) return apiData;
+
+    const { pendingCharacters } = editMeta;
+
+    const key = (c: RaiderioProfile) => c.name.toLowerCase();
+
+    const apiByKey = new Map(apiData.map((c) => [key(c), c]));
+    const pendingKeys = new Set(pendingCharacters.map(key));
+
+    const backendCaughtUp =
+      apiData.every((c) => pendingKeys.has(key(c))) &&
+      pendingCharacters.every((c) => apiByKey.has(key(c)));
+
+    if (backendCaughtUp) {
+      queryClient.setQueryData(viewKeys.editMeta(safeViewId), null);
+      return apiData;
+    }
+
+    return pendingCharacters.map((c) => apiByKey.get(key(c)) ?? c);
+  }, [rawViewData, editMeta, viewId, queryClient]);
+
+  const cachedProfiles = cachedData?.data ?? [];
+  const viewName = rawViewData?.viewName ?? "";
+  const initialized = !isLoading;
+
+  const haveSameCharacters = (a: RaiderioProfile[], b: RaiderioProfile[]): boolean => {
+    if (a.length !== b.length) return false;
+    const idsA = new Set(a.map((c) => c.id));
+    return b.every((c) => idsA.has(c.id));
+  };
+
+  const saveMutation = useMutation({
+    mutationFn: (characters: RaiderioProfile[]) => {
       const request: ViewRequest = {
         name: viewName,
         entities: characters.map((c) => ({
@@ -96,19 +131,41 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
         featured: false,
         game: "WOW",
       };
+      return userRequestVoid("PUT", `/views/${viewId}`, request);
+    },
 
-      try {
-        console.log("[EditView] request:", request);
+    onMutate: async (characters) => {
+      await queryClient.cancelQueries({ queryKey: viewKeys.data(safeViewId) });
 
-        await userRequestVoid("PUT", `/views/${viewId}`, request);
+      queryClient.setQueryData<ViewEditMeta>(viewKeys.editMeta(safeViewId), {
+        pendingCharacters: characters,
+      });
 
-        setProfiles(characters);
-      } catch (error) {
-        console.error("Failed to create view", error);
-        setIsEditOpen(false);
-      }
+      queryClient.setQueryData<View[]>(viewKeys.list(), (old) =>
+        old?.map((v) =>
+          v.id === viewId
+            ? {
+                ...v,
+                simpleView: {
+                  ...v.simpleView,
+                  entitiesIds: characters.map((_, i) => i),
+                },
+              }
+            : v,
+        ) ?? [],
+      );
+    },
+
+    onError: () => {
+      queryClient.setQueryData(viewKeys.editMeta(safeViewId), null);
+      queryClient.invalidateQueries({ queryKey: viewKeys.list() });
+    },
+  });
+
+  const handleSavedCharacters = async (characters: RaiderioProfile[]) => {
+    if (!haveSameCharacters(characters, profiles)) {
+      await saveMutation.mutateAsync(characters);
     }
-
     setIsEditOpen(false);
   };
 
@@ -126,6 +183,8 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
             <button
               className="header-edit-button"
               onClick={() => setIsEditOpen(!isEditOpen)}
+              disabled={!!editMeta}
+              title={editMeta ? "Wait for sync to complete" : undefined}
             >
               <Edit className="header-icon" />
               <span className="header-button-text">Edit</span>
@@ -133,7 +192,15 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
           )}
         </div>
 
-        {!isLoading && profiles.length === 0 ? (
+        {!isLoading && profiles.length === 0 && entitiesCount > 0 ? (
+          <div className="syncing-state">
+            <Loader2 className="syncing-icon" />
+            <h3 className="syncing-title">Syncing characters…</h3>
+            <p className="syncing-text">
+              Your characters are being prepared. This usually takes a few seconds.
+            </p>
+          </div>
+        ) : !isLoading && profiles.length === 0 ? (
           <div className="empty-state">
             <Trophy className="empty-icon" />
             <h3 className="empty-title">No characters in this view</h3>
@@ -154,7 +221,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
             <CharacterLadder
               characters={profiles}
               cachedCharacters={cachedProfiles}
-              season={season}
+              season={season ?? null}
             />
 
             {season && (

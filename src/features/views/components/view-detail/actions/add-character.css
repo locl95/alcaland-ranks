@@ -70,13 +70,14 @@
 
 .form-input,
 .form-select {
-    width: 100%;
-    padding: 0.75rem 1rem;
+    flex: 1;
+    min-width: 0;
+    padding: 0.5rem 0.75rem;
     background: #0f172a;
     border: 1px solid #334155;
     border-radius: 0.375rem;
     color: #ffffff;
-    font-size: 1rem;
+    font-size: 0.875rem;
     transition: all 0.2s;
 }
 
@@ -93,6 +94,16 @@
 
 .form-select {
     cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2rem;
+}
+
+.form-select option {
+    background: #1e293b;
+    color: #ffffff;
 }
 
 .add-character-actions {
