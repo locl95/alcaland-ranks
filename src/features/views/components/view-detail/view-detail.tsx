@@ -39,6 +39,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
   const canEdit = username !== null && username === owner;
 
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [expectedCount, setExpectedCount] = useState(entitiesCount);
 
   const isViewIdValid = !!viewId && UUID_REGEX.test(viewId);
   const safeViewId = viewId ?? "";
@@ -57,7 +58,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
         viewKeys.editMeta(safeViewId),
       );
       const isSyncingInitial =
-        entitiesCount > 0 && (query.state.data?.data.length ?? 0) === 0;
+        !hasEditMeta && expectedCount > 0 && (query.state.data?.data.length ?? 0) === 0;
       return hasPendingScore || hasEditMeta || isSyncingInitial ? 3000 : false;
     },
   });
@@ -135,6 +136,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
     },
 
     onMutate: async (characters) => {
+      setExpectedCount(characters.length);
       await queryClient.cancelQueries({ queryKey: viewKeys.data(safeViewId) });
 
       queryClient.setQueryData<ViewEditMeta>(viewKeys.editMeta(safeViewId), {
@@ -192,7 +194,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
           )}
         </div>
 
-        {!isLoading && profiles.length === 0 && entitiesCount > 0 ? (
+        {!isLoading && profiles.length === 0 && expectedCount > 0 ? (
           <div className="syncing-state">
             <Loader2 className="syncing-icon" />
             <h3 className="syncing-title">Syncing characters…</h3>
