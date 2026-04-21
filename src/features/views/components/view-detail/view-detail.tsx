@@ -138,6 +138,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
     onMutate: async (characters) => {
       setExpectedCount(characters.length);
       await queryClient.cancelQueries({ queryKey: viewKeys.data(safeViewId) });
+      await queryClient.cancelQueries({ queryKey: viewKeys.list() });
 
       queryClient.setQueryData<ViewEditMeta>(viewKeys.editMeta(safeViewId), {
         pendingCharacters: characters,

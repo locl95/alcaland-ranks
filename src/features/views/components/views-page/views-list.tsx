@@ -61,20 +61,22 @@ export function ViewsList({
                 </p>
               )}
 
-              <div className="view-row-meta">
-                <div className="view-row-meta-item">
-                  <Users className="view-row-icon" />
-                  <span>
-                    {view.simpleView.entitiesIds.length} character
-                    {view.simpleView.entitiesIds.length === 1 ? "" : "s"}
-                  </span>
-                </div>
+              {!isPending && (
+                <div className="view-row-meta">
+                  <div className="view-row-meta-item">
+                    <Users className="view-row-icon" />
+                    <span>
+                      {view.simpleView.entitiesIds.length} character
+                      {view.simpleView.entitiesIds.length === 1 ? "" : "s"}
+                    </span>
+                  </div>
 
-                <div className="view-row-meta-item">
-                  <User className="view-row-icon" />
-                  <span>{view.simpleView.owner}</span>
+                  <div className="view-row-meta-item">
+                    <User className="view-row-icon" />
+                    <span>{view.simpleView.owner}</span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div

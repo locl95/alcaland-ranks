@@ -237,6 +237,11 @@
   color: #f1f5f9;
 }
 
+.form-select-region {
+  flex: 0 0 auto;
+  width: 5rem;
+}
+
 /* Icon-only action buttons */
 .btn-icon {
   display: flex;

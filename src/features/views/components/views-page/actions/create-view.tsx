@@ -4,10 +4,12 @@ import "./create-view.css";
 import { View } from "@/features/views/model/view.ts";
 import { userRequest } from "@/shared/api/httpClient.ts";
 import { EU_REALMS } from "@/features/views/constants/euRealms.ts";
+import { NA_REALMS } from "@/features/views/constants/naRealms.ts";
 
 interface CharacterRow {
   name: string;
   realm: string;
+  region: string;
   mode: "add" | "added";
 }
 
@@ -25,12 +27,12 @@ export function CreateView({
   const [name, setName] = useState("");
 
   const [characters, setCharacters] = useState<CharacterRow[]>([
-    { name: "", realm: "", mode: "add" },
+    { name: "", realm: "", region: "eu", mode: "add" },
   ]);
 
   const resetForm = useCallback(() => {
     setName("");
-    setCharacters([{ name: "", realm: "", mode: "add" }]);
+    setCharacters([{ name: "", realm: "", region: "eu", mode: "add" }]);
   }, []);
 
   useEffect(() => {
@@ -76,6 +78,7 @@ export function CreateView({
       updated.push({
         name: "",
         realm: "",
+        region: "eu",
         mode: "add",
       });
 
@@ -87,7 +90,7 @@ export function CreateView({
     setCharacters((prev) => {
       const updated = prev.filter((_, i) => i !== index);
 
-      return updated.length ? updated : [{ name: "", realm: "", mode: "add" }];
+      return updated.length ? updated : [{ name: "", realm: "", region: "eu", mode: "add" }];
     });
   }, []);
 
@@ -120,7 +123,7 @@ export function CreateView({
       name,
       entities: addedCharacters.map((c) => ({
         name: c.name,
-        region: "eu",
+        region: c.region,
         realm: c.realm,
         type: "com.kos.entities.domain.WowEntityRequest",
       })),
@@ -166,10 +169,7 @@ export function CreateView({
       <div className="dialog-content">
         <div className="dialog-header">
           <div>
-            <h2 className="dialog-title">Create New View</h2>
-            <p className="dialog-description">
-              Create a new ladder to track your characters' Mythic+ progress
-            </p>
+            <h1 className="dialog-title">Create new m+ ladder</h1>
           </div>
           <button
             type="button"
@@ -183,7 +183,7 @@ export function CreateView({
         <form className="dialog-form" onSubmit={handleCreateView}>
           <div className="form-content">
             <div className="form-field">
-              <label className="form-label">View Name</label>
+              <label className="form-label">Ladder name</label>
               <input
                 className="form-input"
                 value={name}
@@ -191,6 +191,7 @@ export function CreateView({
                 placeholder="e.g., Main Push Team"
               />
             </div>
+            <label className="form-label">Characters</label>
 
             {characters.map((char, index) => (
               <div key={index} className="character-row">
@@ -204,6 +205,18 @@ export function CreateView({
                 />
 
                 <select
+                  className="form-select form-select-region"
+                  value={char.region}
+                  onChange={(e) => {
+                    updateCharacter(index, "region", e.target.value);
+                    updateCharacter(index, "realm", "");
+                  }}
+                >
+                  <option value="eu">EU</option>
+                  <option value="us">NA</option>
+                </select>
+
+                <select
                   className="form-select"
                   value={char.realm}
                   onChange={(e) =>
@@ -211,7 +224,7 @@ export function CreateView({
                   }
                 >
                   <option value="">Realm</option>
-                  {EU_REALMS.map((r) => (
+                  {(char.region === "us" ? NA_REALMS : EU_REALMS).map((r) => (
                     <option key={r.slug} value={r.slug}>
                       {r.label}
                     </option>

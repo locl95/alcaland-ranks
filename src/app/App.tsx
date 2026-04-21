@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useState } from "react";
 import { Routes, Route, useNavigate, Navigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "./hooks";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,48 +18,39 @@ export function App() {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const username = useAppSelector(selectUsername);
 
-  const { data: serverViews = [], isLoading: isLoadingViews } = useQuery({
+  const { data: views = [], isLoading: isLoadingViews } = useQuery({
     queryKey: viewKeys.list(),
-    queryFn: fetchViews,
-  });
+    queryFn: async () => {
+      const serverData = await fetchViews();
+      const cached = queryClient.getQueryData<View[]>(viewKeys.list()) ?? [];
 
-  const [pendingViews, setPendingViews] = useState<View[]>([]);
-  const [pollForViews, setPollForViews] = useState(false);
+      // Names of views still pending on the frontend
+      const pendingNames = new Set(
+        cached.filter((c) => !c.isSynced).map((c) => c.simpleView.name),
+      );
 
-  useQuery({
-    queryKey: [...viewKeys.list(), "poll"],
-    queryFn: fetchViews,
-    enabled: pollForViews,
-    refetchInterval: 5000,
-    select: (data) => {
-      queryClient.setQueryData(viewKeys.list(), data);
-      return data;
+      // Keep a server view as pending if it was pending on frontend and has no entities yet
+      const merged = serverData.map((v) =>
+        pendingNames.has(v.simpleView.name) && v.simpleView.entitiesIds.length === 0
+          ? { ...v, isSynced: false }
+          : v,
+      );
+
+      // Include pending views the server hasn't returned at all yet
+      const unconfirmed = cached.filter(
+        (c) => !c.isSynced && !serverData.some((s) => s.simpleView.name === c.simpleView.name),
+      );
+
+      return [...merged, ...unconfirmed];
+    },
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: (query) => {
+      const data = (query.state.data as View[] | undefined) ?? [];
+      return data.some((v) => !v.isSynced) ? 3000 : false;
     },
   });
-
-  const views = useMemo(
-    () => [
-      ...serverViews,
-      ...pendingViews.filter(
-        (p) =>
-          !serverViews.some((s) => s.simpleView.name === p.simpleView.name),
-      ),
-    ],
-    [serverViews, pendingViews],
-  );
-
-  useEffect(() => {
-    if (pendingViews.length === 0) return;
-    const stillPending = pendingViews.filter(
-      (p) => !serverViews.some((s) => s.simpleView.name === p.simpleView.name),
-    );
-    if (stillPending.length < pendingViews.length) {
-      setPendingViews(stillPending);
-    }
-    if (stillPending.length === 0) {
-      setPollForViews(false);
-    }
-  }, [serverViews, pendingViews]);
 
   const deleteViewMutation = useMutation({
     mutationFn: (viewId: string) =>
@@ -76,19 +66,28 @@ export function App() {
       return { previous };
     },
 
+    onSuccess: (_, viewId) => {
+      queryClient.setQueryData<View[]>(
+        viewKeys.list(),
+        (old) => old?.filter((v) => v.id !== viewId) ?? [],
+      );
+    },
+
     onError: (_, __, context) => {
       if (context?.previous) {
         queryClient.setQueryData(viewKeys.list(), context.previous);
       }
-      queryClient.invalidateQueries({ queryKey: viewKeys.list() });
     },
   });
 
   const handleCreateView = (pendingView: View) => {
-    setPendingViews((prev) => [...prev, pendingView]);
-    if (import.meta.env.VITE_FEATURE_FLAG_POLLING_ENABLED === "true") {
-      setPollForViews(true);
-    }
+    queryClient.setQueryData<View[]>(viewKeys.list(), (old) => [
+      ...(old ?? []),
+      pendingView,
+    ]);
+    // Kick off a fetch immediately; the queryFn will preserve the pending view
+    // until the server confirms it, and refetchInterval keeps polling after.
+    queryClient.refetchQueries({ queryKey: viewKeys.list() });
   };
 
   const handleViewClick = (viewId: string) => {
