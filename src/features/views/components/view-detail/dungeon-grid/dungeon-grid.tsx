@@ -11,7 +11,7 @@ import {
 } from "@/features/views/api/raiderio.ts";
 import { KEYSTONE_DISPLAY } from "@/features/views/constants/keystone.ts";
 import { CLASS_COLORS}  from "@/features/views/constants/class-colors.ts";
-import { getScoreClass } from "@/features/views/utils.ts";
+import { getClassSlug, getScoreClass } from "@/features/views/utils.ts";
 
 interface DungeonGridProps {
   raiderioProfiles: RaiderioProfile[];
@@ -159,8 +159,11 @@ export function DungeonGrid({
                           >
                             {character.name}
                           </p>
-                          <p className="character-run-class">
-                            {character.spec}
+                          <p
+                            className="character-run-class"
+                            style={{ color: CLASS_COLORS[getClassSlug(character.class)] ?? "#94a3b8" }}
+                          >
+                            {run?.spec?.name ?? character.spec}
                           </p>
                         </div>
                       </div>
@@ -244,7 +247,7 @@ export function DungeonGrid({
                                           style={{
                                             color:
                                               CLASS_COLORS[
-                                                entry.character.class.name
+                                                getClassSlug(entry.character.class.name)
                                               ] ?? "#94a3b8",
                                           }}
                                         >

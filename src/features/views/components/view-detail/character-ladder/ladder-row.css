@@ -167,6 +167,27 @@
     color: #64748b;
 }
 
+.ladder-region-badge {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 0.1rem 0.375rem;
+    border-radius: 0.25rem;
+    text-transform: uppercase;
+}
+
+.ladder-region-badge.eu {
+    color: #7dd3fc;
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.ladder-region-badge.us {
+    color: #fb923c;
+    background: rgba(251, 146, 60, 0.1);
+    border: 1px solid rgba(251, 146, 60, 0.2);
+}
+
 .ladder-score {
     text-align: right;
     margin-right: 1rem;
@@ -284,6 +305,13 @@
         text-overflow: ellipsis;
         flex-shrink: 1;
         min-width: 0;
+    }
+
+    .ladder-region-badge {
+        font-size: 0.5625rem;
+        padding: 0.0625rem 0.25rem;
+        flex-shrink: 0;
+        white-space: nowrap;
     }
 
     .ladder-score {

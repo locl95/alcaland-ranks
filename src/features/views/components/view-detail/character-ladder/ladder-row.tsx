@@ -55,6 +55,9 @@ export function LadderRow({
               <span className="ladder-character-realm">
                 • {character.realm}
               </span>
+              <span className={`ladder-region-badge ${character.region}`}>
+                {character.region === "us" ? "NA" : character.region.toUpperCase()}
+              </span>
             </div>
           )}
         </div>
