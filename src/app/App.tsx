@@ -11,6 +11,8 @@ import { ViewDetail } from "@/features/views/components/view-detail/view-detail.
 import { View } from "@/features/views/model/view.ts";
 import { usePolling } from "@/shared/hooks/usePolling.tsx";
 import { Spinner } from "@/shared/components/spinner.tsx";
+import "./App.css";
+import { Footer } from "@/shared/components/footer.tsx";
 import { ViewsPage } from "@/features/views/components/views-page/views-page.tsx";
 
 export function App() {
@@ -126,27 +128,30 @@ export function App() {
   };
 
   return (
-    <>
+    <div className="app-layout">
       <Spinner />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ViewsPage
-              views={views}
-              onViewClick={handleViewClick}
-              onDeleteView={handleDeleteView}
-              onCreateView={handleCreateView}
-            />
-          }
-        />
+      <main className="app-main">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ViewsPage
+                views={views}
+                onViewClick={handleViewClick}
+                onDeleteView={handleDeleteView}
+                onCreateView={handleCreateView}
+              />
+            }
+          />
 
-        <Route
-          path="/:viewId"
-          element={<ViewDetail onBack={handleBackToViews} />}
-        />
-      </Routes>
-    </>
+          <Route
+            path="/:viewId"
+            element={<ViewDetail onBack={handleBackToViews} />}
+          />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
   );
 }
 
