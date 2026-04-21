@@ -244,6 +244,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
         onClose={() => setIsEditOpen(false)}
         onSave={handleSavedCharacters}
       />
+
     </div>
   );
 }

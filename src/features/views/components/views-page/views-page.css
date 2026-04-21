@@ -1,5 +1,4 @@
 .views-list-container {
-    min-height: 100vh;
     background:
         radial-gradient(ellipse 100% 50% at 50% -5%, rgba(56, 189, 248, 0.07) 0%, transparent 65%),
         linear-gradient(160deg, #05111f 0%, #0b1929 35%, #111827 100%);

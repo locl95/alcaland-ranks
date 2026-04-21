@@ -5,6 +5,8 @@ import { userRequestVoid } from "@/shared/api/httpClient.ts";
 import { ViewDetail } from "@/features/views/components/view-detail/view-detail.tsx";
 import { View } from "@/features/views/model/view.ts";
 import { Spinner } from "@/shared/components/spinner.tsx";
+import "./App.css";
+import { Footer } from "@/shared/components/footer.tsx";
 import { ViewsPage } from "@/features/views/components/views-page/views-page.tsx";
 import { LoginPage } from "@/features/auth/LoginPage.tsx";
 import { selectIsAuthenticated, selectUsername } from "@/app/authSlice.ts";
@@ -123,15 +125,16 @@ export function App() {
   };
 
   return (
-    <>
+    <div className="app-layout">
       <Spinner />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ViewsPage
-              views={views}
-              isLoadingViews={isLoadingViews}
+      <main className="app-main">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ViewsPage
+                views={views}
+                isLoadingViews={isLoadingViews}
               isAuthenticated={isAuthenticated}
               username={username}
               onViewClick={handleViewClick}
@@ -139,9 +142,9 @@ export function App() {
               onCreateView={handleCreateView}
               onLoginRequired={handleLoginRequired}
               onLogout={handleLogout}
-            />
-          }
-        />
+              />
+            }
+          />
 
         <Route
           path="/:viewId"
@@ -152,7 +155,9 @@ export function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </>
+    </main>
+      <Footer />
+    </div>
   );
 }
 
