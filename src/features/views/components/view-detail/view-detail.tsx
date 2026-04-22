@@ -1,7 +1,7 @@
 import { ArrowLeft, Edit, Trophy, Loader2 } from "lucide-react";
 import { useAppSelector } from "@/app/hooks.ts";
 import "./view-detail.css";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
@@ -12,6 +12,7 @@ import { ViewRequest } from "@/features/views/api/view-types.ts";
 import { CharacterLadder } from "./character-ladder/character-ladder.tsx";
 import { DungeonGrid } from "./dungeon-grid/dungeon-grid.tsx";
 import { EditView } from "./actions/edit-view.tsx";
+import { SyncErrorDialog } from "./actions/sync-error-dialog.tsx";
 import {
   viewKeys,
   fetchViewData,
@@ -40,6 +41,8 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [expectedCount, setExpectedCount] = useState(entitiesCount);
+  const editPollCountRef = useRef(0);
+  const lastSeenDataUpdatedAt = useRef(0);
 
   const isViewIdValid = !!viewId && UUID_REGEX.test(viewId);
   const safeViewId = viewId ?? "";
@@ -48,7 +51,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
     navigate("/");
   }
 
-  const { data: rawViewData, isLoading } = useQuery({
+  const { data: rawViewData, isLoading, dataUpdatedAt } = useQuery({
     queryKey: viewKeys.data(safeViewId),
     queryFn: () => fetchViewData(safeViewId),
     enabled: isViewIdValid,
@@ -85,6 +88,17 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
     initialData: null,
   });
 
+  const { data: syncError } = useQuery({
+    queryKey: viewKeys.syncError(safeViewId),
+    queryFn: () => null as RaiderioProfile[] | null,
+    enabled: false,
+    staleTime: Infinity,
+    gcTime: 5 * 60 * 1000,
+    initialData: null,
+  });
+
+  const MAX_EDIT_POLLS = 5;
+
   const profiles = useMemo(() => {
     const apiData = rawViewData?.data ?? [];
     if (!editMeta) return apiData;
@@ -101,12 +115,28 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
       pendingCharacters.every((c) => apiByKey.has(key(c)));
 
     if (backendCaughtUp) {
+      editPollCountRef.current = 0;
       queryClient.setQueryData(viewKeys.editMeta(safeViewId), null);
       return apiData;
     }
 
+    // Count each new poll (dataUpdatedAt increases on every successful refetch)
+    if (dataUpdatedAt > lastSeenDataUpdatedAt.current) {
+      lastSeenDataUpdatedAt.current = dataUpdatedAt;
+      editPollCountRef.current += 1;
+      if (editPollCountRef.current >= MAX_EDIT_POLLS) {
+        editPollCountRef.current = 0;
+        const failed = pendingCharacters.filter((c) => !apiByKey.has(key(c)));
+        if (failed.length > 0) {
+          queryClient.setQueryData(viewKeys.syncError(safeViewId), failed);
+        }
+        queryClient.setQueryData(viewKeys.editMeta(safeViewId), null);
+        return apiData;
+      }
+    }
+
     return pendingCharacters.map((c) => apiByKey.get(key(c)) ?? c);
-  }, [rawViewData, editMeta, viewId, queryClient]);
+  }, [rawViewData, editMeta, safeViewId, queryClient, dataUpdatedAt]);
 
   const cachedProfiles = cachedData?.data ?? [];
   const viewName = rawViewData?.viewName ?? "";
@@ -136,6 +166,9 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
     },
 
     onMutate: async (characters) => {
+      editPollCountRef.current = 0;
+      lastSeenDataUpdatedAt.current = dataUpdatedAt;
+      queryClient.setQueryData(viewKeys.syncError(safeViewId), null);
       setExpectedCount(characters.length);
       await queryClient.cancelQueries({ queryKey: viewKeys.data(safeViewId) });
       await queryClient.cancelQueries({ queryKey: viewKeys.list() });
@@ -243,6 +276,11 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
         characters={profiles}
         onClose={() => setIsEditOpen(false)}
         onSave={handleSavedCharacters}
+      />
+
+      <SyncErrorDialog
+        failedCharacters={syncError ?? []}
+        onClose={() => queryClient.setQueryData(viewKeys.syncError(safeViewId), null)}
       />
 
     </div>

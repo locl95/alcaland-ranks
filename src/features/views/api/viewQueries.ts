@@ -9,6 +9,7 @@ export const viewKeys = {
   cachedData: (viewId: string) => ["viewCachedData", viewId] as const,
   static: () => ["wowStatic"] as const,
   editMeta: (viewId: string) => ["viewEditMeta", viewId] as const,
+  syncError: (viewId: string) => ["viewSyncError", viewId] as const,
 };
 
 export const fetchViews = async (): Promise<View[]> => {
