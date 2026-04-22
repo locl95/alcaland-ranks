@@ -26,17 +26,8 @@ export function App() {
       const serverData = await fetchViews();
       const cached = queryClient.getQueryData<View[]>(viewKeys.list()) ?? [];
 
-      // Names of views still pending on the frontend
-      const pendingNames = new Set(
-        cached.filter((c) => !c.isSynced).map((c) => c.simpleView.name),
-      );
-
-      // Keep a server view as pending if it was pending on frontend and has no entities yet
-      const merged = serverData.map((v) =>
-        pendingNames.has(v.simpleView.name) && v.simpleView.entitiesIds.length === 0
-          ? { ...v, isSynced: false }
-          : v,
-      );
+      // Once the server confirms the view (even with 0 entities), trust the server response
+      const merged = serverData.map((v) => v);
 
       // Include pending views the server hasn't returned at all yet
       const unconfirmed = cached.filter(
