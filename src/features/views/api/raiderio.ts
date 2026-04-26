@@ -30,6 +30,7 @@ export interface MythicPlusRun {
   score: number;
   url: string;
   affixes: Affix[];
+  spec?: RecentRunSpec;
 }
 
 export interface RecentRunSpec {

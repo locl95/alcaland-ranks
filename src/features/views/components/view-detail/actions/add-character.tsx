@@ -1,11 +1,12 @@
 import { useState, FormEvent } from "react";
 import { X } from "lucide-react";
+import { EU_REALMS } from "@/features/views/constants/euRealms.ts";
 import "./add-character.css";
 
 interface AddCharacterWindowProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (characterName: string, realm: string, region: string) => void;
+  onAdd: (characterName: string, realm: string) => void;
 }
 
 export function AddCharacter({
@@ -15,18 +16,14 @@ export function AddCharacter({
 }: Readonly<AddCharacterWindowProps>) {
   const [characterName, setCharacterName] = useState("");
   const [realm, setRealm] = useState("");
-  const [region, setRegion] = useState("EU");
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (characterName.trim() && realm.trim() && region.trim()) {
-      onAdd(characterName.trim(), realm.trim(), region.trim());
-
+    if (characterName.trim() && realm) {
+      onAdd(characterName.trim(), realm);
       setCharacterName("");
       setRealm("");
-      setRegion("EU");
-
       onClose();
     }
   };
@@ -34,7 +31,6 @@ export function AddCharacter({
   const handleClose = () => {
     setCharacterName("");
     setRealm("");
-    setRegion("EU");
     onClose();
   };
 
@@ -54,51 +50,30 @@ export function AddCharacter({
         </div>
 
         <form onSubmit={handleSubmit} className="add-character-form">
-          <div className="form-group">
-            <label htmlFor="characterName" className="form-label">
-              Character Name *
-            </label>
+          <div className="add-character-row">
             <input
               id="characterName"
               type="text"
               value={characterName}
               onChange={(e) => setCharacterName(e.target.value)}
-              placeholder="Enter character name"
+              placeholder="Character name"
               className="form-input"
               required
             />
-          </div>
 
-          <div className="form-group">
-            <label htmlFor="realm" className="form-label">
-              Realm *
-            </label>
-            <input
+            <select
               id="realm"
-              type="text"
               value={realm}
               onChange={(e) => setRealm(e.target.value)}
-              placeholder="e.g., Ragnaros, Tarren Mill"
-              className="form-input"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="region" className="form-label">
-              Region *
-            </label>
-            <select
-              id="region"
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
               className="form-select"
               required
             >
-              <option value="US">US</option>
-              <option value="EU">EU</option>
-              <option value="KR">KR</option>
-              <option value="TW">TW</option>
+              <option value="">Realm</option>
+              {EU_REALMS.map((r) => (
+                <option key={r.slug} value={r.slug}>
+                  {r.label}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -113,9 +88,7 @@ export function AddCharacter({
             <button
               type="submit"
               className="add-character-btn add-character-btn-submit"
-              disabled={
-                !characterName.trim() || !realm.trim() || !region.trim()
-              }
+              disabled={!characterName.trim() || !realm}
             >
               Add Character
             </button>

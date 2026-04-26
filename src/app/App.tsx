@@ -1,130 +1,118 @@
-import { useEffect, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import { useAppDispatch } from "./hooks";
-import { loading, notLoading } from "@/app/loadingSlice.ts";
-import {
-  fetchWithoutResponse,
-  fetchWithResponse,
-} from "@/shared/api/EasyFetch.ts";
-import { GetViewsResponse } from "@/features/views/api/view-types.ts";
+import { Routes, Route, useNavigate, Navigate, useLocation } from "react-router-dom";
+import { useAppSelector } from "./hooks";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { userRequestVoid } from "@/shared/api/httpClient.ts";
 import { ViewDetail } from "@/features/views/components/view-detail/view-detail.tsx";
 import { View } from "@/features/views/model/view.ts";
-import { usePolling } from "@/shared/hooks/usePolling.tsx";
 import { Spinner } from "@/shared/components/spinner.tsx";
 import "./App.css";
 import { Footer } from "@/shared/components/footer.tsx";
 import { ViewsPage } from "@/features/views/components/views-page/views-page.tsx";
+import { LoginPage } from "@/features/auth/LoginPage.tsx";
+import { selectIsAuthenticated, selectUsername } from "@/app/authSlice.ts";
+import { logout } from "@/features/auth/authApi.ts";
+import { viewKeys, fetchViews } from "@/features/views/api/viewQueries.ts";
 
 export function App() {
-  const [views, setViews] = useState<View[]>([]);
-  const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const username = useAppSelector(selectUsername);
 
-  useEffect(() => {
-    fetchAndSetViews();
-  }, []);
+  const { data: views = [], isLoading: isLoadingViews } = useQuery({
+    queryKey: viewKeys.list(),
+    queryFn: async () => {
+      const serverData = await fetchViews();
+      const cached = queryClient.getQueryData<View[]>(viewKeys.list()) ?? [];
 
-  const fetchAndSetViews = async () => {
-    dispatch(loading());
-    try {
-      const backendViews = await fetchBackendViews();
-      setViews(backendViews);
-    } catch (error) {
-      console.error("Failed to fetch views", error);
-    } finally {
-      dispatch(notLoading());
-    }
-  };
+      // Once the server confirms the view (even with 0 entities), trust the server response
+      const merged = serverData.map((v) => v);
 
-  const fetchBackendViews = async (): Promise<View[]> => {
-    const response = await fetchWithResponse<GetViewsResponse>(
-      "GET",
-      "/views?game=wow",
-      undefined,
-      `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-    );
+      // Include pending views the server hasn't returned at all yet
+      const unconfirmed = cached.filter(
+        (c) => !c.isSynced && !serverData.some((s) => s.simpleView.name === c.simpleView.name),
+      );
 
-    return response.records.map((v) => ({
-      id: v.id,
-      simpleView: v,
-      isSynced: true,
-    }));
-  };
-
-  const { start: startPolling, stop: stopPolling } = usePolling<View[]>({
-    fn: fetchBackendViews,
-    shouldContinue: (backendViews) => {
-      let stillPending = false;
-
-      setViews((prev) => {
-        const updated = reconcileViews(prev, backendViews);
-        stillPending = updated.some((v) => !v.isSynced);
-        return updated;
-      });
-
-      return stillPending;
+      return [...merged, ...unconfirmed];
     },
-    maxAttempts: 3,
-    delay: 5000,
-    initialDelay: 3000,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: (query) => {
+      const data = (query.state.data as View[] | undefined) ?? [];
+      return data.some((v) => !v.isSynced) ? 3000 : false;
+    },
   });
 
-  useEffect(() => {
-    return () => {
-      stopPolling();
-    };
-  }, [stopPolling]);
+  const deleteViewMutation = useMutation({
+    mutationFn: (viewId: string) =>
+      userRequestVoid("DELETE", `/views/${viewId}`),
 
-  const reconcileViews = (current: View[], backend: View[]): View[] => {
-    const pending = current.filter((v) => !v.isSynced);
-    const reconciled = [...backend];
-
-    pending.forEach((temp) => {
-      const exists = backend.some(
-        (v) => v.simpleView.name === temp.simpleView.name,
+    onMutate: async (viewId) => {
+      await queryClient.cancelQueries({ queryKey: viewKeys.list() });
+      const previous = queryClient.getQueryData<View[]>(viewKeys.list());
+      queryClient.setQueryData<View[]>(
+        viewKeys.list(),
+        (old) => old?.filter((v) => v.id !== viewId) ?? [],
       );
-      if (!exists) {
-        reconciled.push(temp);
-      }
-    });
+      return { previous };
+    },
 
-    return reconciled;
-  };
+    onSuccess: (_, viewId) => {
+      queryClient.setQueryData<View[]>(
+        viewKeys.list(),
+        (old) => old?.filter((v) => v.id !== viewId) ?? [],
+      );
+    },
+
+    onError: (_, __, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(viewKeys.list(), context.previous);
+      }
+    },
+  });
 
   const handleCreateView = (pendingView: View) => {
-    setViews((prev) => [...prev, pendingView]);
-
-    if (import.meta.env.VITE_FEATURE_FLAG_POLLING_ENABLED == "true") {
-      startPolling();
-    }
+    queryClient.setQueryData<View[]>(viewKeys.list(), (old) => [
+      ...(old ?? []),
+      pendingView,
+    ]);
+    // Kick off a fetch immediately; the queryFn will preserve the pending view
+    // until the server confirms it, and refetchInterval keeps polling after.
+    queryClient.refetchQueries({ queryKey: viewKeys.list() });
   };
 
   const handleViewClick = (viewId: string) => {
-    navigate(`/${viewId}`);
+    const view = views.find((v) => v.id === viewId);
+    const owner = view?.simpleView.owner;
+    const entitiesCount = view?.simpleView.entitiesIds.length ?? 0;
+    navigate(`/${viewId}`, { state: { owner, entitiesCount } });
   };
 
   const handleBackToViews = () => {
-    stopPolling();
     navigate("/");
-    if (views.some((v) => !v.isSynced)) {
-      startPolling();
-    }
   };
 
-  const handleDeleteView = async (viewId: string) => {
-    setViews((prev) => prev.filter((view) => view.id !== viewId));
-
-    try {
-      await fetchWithoutResponse(
-        "DELETE",
-        `/views/${viewId}`,
-        undefined,
-        `Bearer ${import.meta.env.VITE_SERVICE_TOKEN}`,
-      );
-    } catch (error) {
-      console.log("error [DeleteView] viewId:", viewId);
-      fetchAndSetViews();
+  const requireAuth = (action: () => void) => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location.pathname } });
+      return;
     }
+    action();
+  };
+
+  const handleLoginRequired = () => {
+    navigate("/login", { state: { from: location.pathname } });
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
+
+  const handleDeleteView = (viewId: string) => {
+    requireAuth(() => deleteViewMutation.mutate(viewId));
   };
 
   return (
@@ -137,19 +125,28 @@ export function App() {
             element={
               <ViewsPage
                 views={views}
-                onViewClick={handleViewClick}
-                onDeleteView={handleDeleteView}
-                onCreateView={handleCreateView}
+                isLoadingViews={isLoadingViews}
+              isAuthenticated={isAuthenticated}
+              username={username}
+              onViewClick={handleViewClick}
+              onDeleteView={handleDeleteView}
+              onCreateView={handleCreateView}
+              onLoginRequired={handleLoginRequired}
+              onLogout={handleLogout}
               />
             }
           />
 
-          <Route
-            path="/:viewId"
-            element={<ViewDetail onBack={handleBackToViews} />}
-          />
-        </Routes>
-      </main>
+        <Route
+          path="/:viewId"
+          element={<ViewDetail onBack={handleBackToViews} />}
+        />
+
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </main>
       <Footer />
     </div>
   );

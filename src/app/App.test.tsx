@@ -4,8 +4,9 @@ import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
-import loadingReducer from "@/app/loadingSlice.ts";
+import authReducer from "@/app/authSlice.ts";
 import type { View } from "@/features/views/model/view.ts";
 import {
   MockViewsList,
@@ -15,21 +16,13 @@ import {
 } from "@/app/App.mocks.tsx";
 
 // ---------------------------------------------------------------------------
-// Hoisted mocks – must be defined before vi.mock() factories run
+// Hoisted mocks
 // ---------------------------------------------------------------------------
-const pollingCapture = vi.hoisted(() => ({
-  shouldContinue: null as ((result: View[]) => boolean) | null,
-  start: vi.fn(),
-  stop: vi.fn(),
-}));
-
 const fetchMocks = vi.hoisted(() => ({
-  fetchWithResponse: vi.fn(),
-  fetchWithoutResponse: vi.fn(),
+  serviceGet: vi.fn(),
+  userRequestVoid: vi.fn(),
 }));
 
-// Lightweight in-memory router to avoid the React 18/19 version conflict that
-// arises when importing MemoryRouter from the globally-resolved react-router v7.
 const navState = vi.hoisted(() => {
   let path = "/";
   const listeners: (() => void)[] = [];
@@ -69,18 +62,13 @@ vi.mock("react-router-dom", () => ({
       routePath === "/" ? navState.path === "/" : navState.path !== "/";
     return matches ? <>{element}</> : null;
   },
+  Navigate: () => null,
   useNavigate: () => (to: string) => navState.navigate(to),
   useParams: () => navState.getParams(),
+  useLocation: () => ({ pathname: navState.path, state: null }),
 }));
 
-vi.mock("@/shared/hooks/usePolling.tsx", () => ({
-  usePolling: vi.fn((options: { shouldContinue: (r: View[]) => boolean }) => {
-    pollingCapture.shouldContinue = options.shouldContinue;
-    return { start: pollingCapture.start, stop: pollingCapture.stop };
-  }),
-}));
-
-vi.mock("@/shared/api/EasyFetch.ts", () => fetchMocks);
+vi.mock("@/shared/api/httpClient.ts", () => fetchMocks);
 
 vi.mock("@/features/views/components/views-page/views-list.tsx", () => ({
   ViewsList: (props: Parameters<typeof MockViewsList>[0]) => (
@@ -88,11 +76,14 @@ vi.mock("@/features/views/components/views-page/views-list.tsx", () => ({
   ),
 }));
 
-vi.mock("@/features/views/components/views-page/create-view.tsx", () => ({
-  CreateView: (props: Parameters<typeof MockCreateView>[0]) => (
-    <MockCreateView {...props} />
-  ),
-}));
+vi.mock(
+  "@/features/views/components/views-page/actions/create-view.tsx",
+  () => ({
+    CreateView: (props: Parameters<typeof MockCreateView>[0]) => (
+      <MockCreateView {...props} />
+    ),
+  }),
+);
 
 vi.mock("@/features/views/components/view-detail/view-detail.tsx", () => ({
   ViewDetail: (props: { onBack: () => void }) => <MockViewDetail {...props} />,
@@ -102,36 +93,59 @@ vi.mock("@/features/views/components/view-detail/view-detail.tsx", () => ({
 // Helpers
 // ---------------------------------------------------------------------------
 const createStore = () =>
-  configureStore({ reducer: { loading: loadingReducer } });
+  configureStore({
+    reducer: { auth: authReducer },
+    preloadedState: {
+      auth: { accessToken: "test-token", refreshToken: "test-refresh" },
+    },
+  });
+
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, staleTime: Infinity, gcTime: 0 },
+    },
+  });
 
 const renderApp = () => {
   const store = createStore();
+  const testQueryClient = createTestQueryClient();
+
   function TestRouter() {
     const [, tick] = useState(0);
     useEffect(() => navState.subscribe(() => tick((n) => n + 1)), []);
     return <App />;
   }
-  return render(
+
+  const result = render(
     <Provider store={store}>
-      <TestRouter />
+      <QueryClientProvider client={testQueryClient}>
+        <TestRouter />
+      </QueryClientProvider>
     </Provider>,
   );
+
+  return { ...result, queryClient: testQueryClient };
 };
 
 const renderWithViews = async (views = [makeSimpleView("v1", "My View")]) => {
-  fetchMocks.fetchWithResponse.mockResolvedValue({ records: views });
+  fetchMocks.serviceGet.mockResolvedValue({ records: views });
   const result = renderApp();
-  await waitFor(() => screen.getByTestId("views-list"));
+  // Wait for the async query to resolve and views to appear
+  if (views.length > 0) {
+    await waitFor(() => screen.getByTestId(`view-item-${views[0].id}`));
+  } else {
+    await waitFor(() => screen.getByTestId("views-list"));
+  }
   return result;
 };
 
 describe("App", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    pollingCapture.shouldContinue = null;
     navState.reset();
-    fetchMocks.fetchWithResponse.mockResolvedValue({ records: [] });
-    fetchMocks.fetchWithoutResponse.mockResolvedValue(undefined);
+    fetchMocks.serviceGet.mockResolvedValue({ records: [] });
+    fetchMocks.userRequestVoid.mockResolvedValue(undefined);
   });
 
   afterEach(() => vi.unstubAllEnvs());
@@ -160,15 +174,10 @@ describe("App", () => {
   });
 
   describe("fetching views on mount", () => {
-    it("calls fetchWithResponse with the correct endpoint", async () => {
+    it("calls serviceGet with the correct endpoint", async () => {
       renderApp();
       await waitFor(() =>
-        expect(fetchMocks.fetchWithResponse).toHaveBeenCalledWith(
-          "GET",
-          "/views?game=wow",
-          undefined,
-          expect.stringContaining("Bearer"),
-        ),
+        expect(fetchMocks.serviceGet).toHaveBeenCalledWith("/views?game=wow"),
       );
     });
 
@@ -211,28 +220,6 @@ describe("App", () => {
 
       expect(screen.getByTestId("view-item-pending-id")).toBeInTheDocument();
     });
-
-    it("starts polling when VITE_FEATURE_FLAG_POLLING_ENABLED is true", async () => {
-      vi.stubEnv("VITE_FEATURE_FLAG_POLLING_ENABLED", "true");
-      renderApp();
-      await waitFor(() => screen.getByTestId("list-create-btn"));
-
-      await userEvent.click(screen.getByTestId("list-create-btn"));
-      await userEvent.click(screen.getByTestId("submit-create"));
-
-      expect(pollingCapture.start).toHaveBeenCalled();
-    });
-
-    it("does not start polling when VITE_FEATURE_FLAG_POLLING_ENABLED is not true", async () => {
-      vi.stubEnv("VITE_FEATURE_FLAG_POLLING_ENABLED", "false");
-      renderApp();
-      await waitFor(() => screen.getByTestId("list-create-btn"));
-
-      await userEvent.click(screen.getByTestId("list-create-btn"));
-      await userEvent.click(screen.getByTestId("submit-create"));
-
-      expect(pollingCapture.start).not.toHaveBeenCalled();
-    });
   });
 
   describe("handleViewClick", () => {
@@ -263,21 +250,18 @@ describe("App", () => {
         expect(screen.queryByTestId("view-detail")).not.toBeInTheDocument();
       });
     });
-
-    it("stops polling when navigating back", async () => {
-      await goToViewDetail();
-      await userEvent.click(screen.getByTestId("back-btn"));
-
-      expect(pollingCapture.stop).toHaveBeenCalled();
-    });
   });
 
   describe("handleDeleteView", () => {
     it("removes the view from the list optimistically", async () => {
       await renderWithViews();
+      // Backend confirms deletion — refetch should not restore the view
+      fetchMocks.serviceGet.mockResolvedValue({ records: [] });
       await userEvent.click(screen.getByTestId("delete-v1"));
 
-      expect(screen.queryByTestId("view-item-v1")).not.toBeInTheDocument();
+      await waitFor(() =>
+        expect(screen.queryByTestId("view-item-v1")).not.toBeInTheDocument(),
+      );
     });
 
     it("calls the DELETE API with the correct viewId", async () => {
@@ -285,64 +269,57 @@ describe("App", () => {
       await userEvent.click(screen.getByTestId("delete-v1"));
 
       await waitFor(() =>
-        expect(fetchMocks.fetchWithoutResponse).toHaveBeenCalledWith(
+        expect(fetchMocks.userRequestVoid).toHaveBeenCalledWith(
           "DELETE",
           "/views/v1",
-          undefined,
-          expect.stringContaining("Bearer"),
         ),
       );
     });
 
     it("re-fetches views when the DELETE API call fails", async () => {
-      fetchMocks.fetchWithoutResponse.mockRejectedValue(
-        new Error("Network error"),
-      );
+      fetchMocks.userRequestVoid.mockRejectedValue(new Error("Network error"));
       await renderWithViews();
-      const callsBefore = fetchMocks.fetchWithResponse.mock.calls.length;
+      const callsBefore = fetchMocks.serviceGet.mock.calls.length;
 
       await userEvent.click(screen.getByTestId("delete-v1"));
 
       await waitFor(() =>
-        expect(fetchMocks.fetchWithResponse.mock.calls.length).toBeGreaterThan(
+        expect(fetchMocks.serviceGet.mock.calls.length).toBeGreaterThan(
           callsBefore,
         ),
       );
     });
   });
 
-  describe("reconcileViews (via polling shouldContinue)", () => {
+  describe("reconcileViews", () => {
     it("keeps pending views that are not yet present in the backend", async () => {
-      renderApp();
+      const { queryClient } = renderApp();
       await waitFor(() => screen.getByTestId("list-create-btn"));
 
       await userEvent.click(screen.getByTestId("list-create-btn"));
       await userEvent.click(screen.getByTestId("submit-create"));
 
-      act(() => {
-        pollingCapture.shouldContinue!([]);
+      // Simulate backend returning no views yet
+      await act(async () => {
+        queryClient.setQueryData(["views"], []);
       });
 
       expect(screen.getByTestId("view-item-pending-id")).toBeInTheDocument();
     });
 
     it("replaces a pending view with the synced one when it appears in the backend", async () => {
-      renderApp();
+      const { queryClient } = renderApp();
       await waitFor(() => screen.getByTestId("list-create-btn"));
 
       await userEvent.click(screen.getByTestId("list-create-btn"));
       await userEvent.click(screen.getByTestId("submit-create"));
 
-      const backendViews: View[] = [
-        {
-          id: "real-id",
-          simpleView: makeSimpleView("real-id", "Pending View"),
-          isSynced: true,
-        },
-      ];
-
-      act(() => {
-        pollingCapture.shouldContinue!(backendViews);
+      // Simulate backend now returning the real view
+      fetchMocks.serviceGet.mockResolvedValue({
+        records: [makeSimpleView("real-id", "Pending View")],
+      });
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: ["views"] });
       });
 
       await waitFor(() => {
@@ -351,17 +328,6 @@ describe("App", () => {
         ).not.toBeInTheDocument();
         expect(screen.getByTestId("view-item-real-id")).toBeInTheDocument();
       });
-    });
-  });
-
-  describe("cleanup", () => {
-    it("stops polling when the component unmounts", async () => {
-      const { unmount } = renderApp();
-      await waitFor(() => screen.getByTestId("views-list"));
-
-      unmount();
-
-      expect(pollingCapture.stop).toHaveBeenCalled();
     });
   });
 });

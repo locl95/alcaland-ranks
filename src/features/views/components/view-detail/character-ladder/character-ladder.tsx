@@ -17,56 +17,16 @@ export function CharacterLadder({
   season,
 }: Readonly<CharacterLadderProps>) {
   const [isLadderOpen, setIsLadderOpen] = useState(true);
-  const [expandedCharacters, setExpandedCharacters] = useState<Set<number>>(
-    new Set(),
-  );
-
   const sortedCharacters = [...characters].sort((a, b) => b.score - a.score);
   const sortedCachedCharacters = [...cachedCharacters].sort(
     (a, b) => b.score - a.score,
   );
 
-  const hasHistoricalData = cachedCharacters.length > 0;
-
-  const getCachedProfile = (
-    character: RaiderioProfile,
-  ): RaiderioProfile | undefined =>
-    cachedCharacters.find((c) => c.id === character.id);
-
-  const getLadderPositionChange = (
-    character: RaiderioProfile,
-  ): number | null => {
-    if (!hasHistoricalData) return null;
-    const currentIndex = sortedCharacters.findIndex(
-      (c) => c.id === character.id,
-    );
-    const previousIndex = sortedCachedCharacters.findIndex(
-      (c) => c.id === character.id,
-    );
-    if (currentIndex === -1 || previousIndex === -1) return null;
-    return previousIndex + 1 - (currentIndex + 1);
-  };
-
-  const toggleCharacter = (characterId: number) => {
-    setExpandedCharacters((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(characterId)) {
-        newSet.delete(characterId);
-      } else {
-        newSet.add(characterId);
-      }
-      return newSet;
-    });
-  };
-
   return (
     <div className="ladder-card">
       <div
         className="ladder-header"
-        onClick={() => {
-          if (isLadderOpen) setExpandedCharacters(new Set());
-          setIsLadderOpen(!isLadderOpen);
-        }}
+        onClick={() => setIsLadderOpen(!isLadderOpen)}
       >
         <div className="ladder-title">
           <img src={keystone} alt="" aria-hidden={true} className="keystone-icon" />
@@ -85,14 +45,11 @@ export function CharacterLadder({
         <div className="ladder-content">
           {sortedCharacters.map((character, index) => (
             <LadderRow
+              key={character.id}
               index={index}
               character={character}
-              cachedCharacter={getCachedProfile(character)}
+              cachedCharacters={sortedCachedCharacters}
               season={season}
-              isExpanded={expandedCharacters.has(character.id)}
-              hasHistoricalData={hasHistoricalData}
-              positionChange={getLadderPositionChange(character)}
-              onToggle={() => toggleCharacter(character.id)}
             />
           ))}
         </div>
