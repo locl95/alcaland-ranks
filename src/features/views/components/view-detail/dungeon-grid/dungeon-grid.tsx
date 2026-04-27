@@ -10,7 +10,10 @@ import {
   formatDate,
 } from "@/features/views/api/raiderio.ts";
 import { KEYSTONE_DISPLAY } from "@/features/views/constants/keystone.ts";
-import { CLASS_COLORS}  from "@/features/views/constants/class-colors.ts";
+import { DUNGEON_IMAGES } from "@/features/views/constants/dungeon-images.ts";
+import { CLASS_COLORS } from "@/features/views/constants/class-colors.ts";
+import { SPEC_IMAGES, getSpecImageKey } from "@/features/views/constants/spec-images.ts";
+import { ROLE_IMAGES } from "@/features/views/constants/role-images.ts";
 import { getClassSlug, getScoreClass } from "@/features/views/utils.ts";
 
 interface DungeonGridProps {
@@ -26,6 +29,7 @@ interface CharacterDungeonScore {
 
 
 const ROLE_ORDER: Record<string, number> = { tank: 0, healer: 1, dps: 2 };
+const ROLE_LABEL: Record<string, string> = { tank: "Tank", healer: "Healer", dps: "Damage dealer" };
 
 
 const openRaiderIO = (name: string, realmSlug: string, region: string) => {
@@ -124,7 +128,14 @@ export function DungeonGrid({
           <div key={dungeon.challenge_mode_id} className="dungeon-card">
             <div className="dungeon-header">
               <div className="dungeon-title">{dungeon.name}</div>
-              <div className="dungeon-abbreviation">{dungeon.short_name}</div>
+              <div className="dungeon-header-thumb">
+                <img
+                  src={DUNGEON_IMAGES[dungeon.short_name.toLowerCase()]}
+                  alt={dungeon.name}
+                  className="dungeon-header-thumb-img"
+                />
+                <span className="dungeon-header-thumb-name">{dungeon.short_name}</span>
+              </div>
             </div>
             <div className="dungeon-content">
               {characterScores.map(({ character, bestRun }) => {
@@ -154,17 +165,26 @@ export function DungeonGrid({
                       <div className="character-run-left">
                         {isHighest && <Crown className="crown-icon" />}
                         <div className="character-run-info">
-                          <p
-                            className={`character-run-name ${isHighest ? "highest" : "normal"}`}
-                          >
-                            {character.name}
-                          </p>
-                          <p
-                            className="character-run-class"
-                            style={{ color: CLASS_COLORS[getClassSlug(character.class)] ?? "#94a3b8" }}
-                          >
-                            {run?.spec?.name ?? character.spec}
-                          </p>
+                          <div className="character-run-name-row">
+                            {(() => {
+                              const specName = run?.spec?.name ?? character.spec;
+                              const specImg = SPEC_IMAGES[getSpecImageKey(character.class, specName)];
+                              return specImg ? (
+                                <img
+                                  src={specImg}
+                                  alt={specName}
+                                  title={specName}
+                                  className="spec-icon"
+                                />
+                              ) : null;
+                            })()}
+                            <p
+                              className={`character-run-name ${isHighest ? "highest" : "normal"}`}
+                              style={{ color: CLASS_COLORS[getClassSlug(character.class)] ?? "#dde4ee" }}
+                            >
+                              {character.name}
+                            </p>
+                          </div>
                         </div>
                       </div>
 
@@ -229,6 +249,27 @@ export function DungeonGrid({
                                     key={`${entry.character.name}-${entry.character.realm.slug}`}
                                     className="run-details-row"
                                   >
+                                    <div className="run-details-icons">
+                                      {ROLE_IMAGES[entry.role] && (
+                                        <img
+                                          src={ROLE_IMAGES[entry.role]}
+                                          alt={ROLE_LABEL[entry.role] ?? entry.role}
+                                          title={ROLE_LABEL[entry.role] ?? entry.role}
+                                          className="role-icon"
+                                        />
+                                      )}
+                                      {(() => {
+                                        const specImg = SPEC_IMAGES[getSpecImageKey(entry.character.class.name, entry.character.spec.name)];
+                                        return specImg ? (
+                                          <img
+                                            src={specImg}
+                                            alt={entry.character.spec.name}
+                                            title={entry.character.spec.name}
+                                            className="spec-icon"
+                                          />
+                                        ) : null;
+                                      })()}
+                                    </div>
                                     <div
                                       className="run-details-character-info"
                                       onClick={(e) => {
@@ -241,17 +282,12 @@ export function DungeonGrid({
                                       }}
                                     >
                                       <span className="run-details-name">
-                                        {entry.character.name}
-                                        {" · "}
                                         <span
                                           style={{
-                                            color:
-                                              CLASS_COLORS[
-                                                getClassSlug(entry.character.class.name)
-                                              ] ?? "#94a3b8",
+                                            color: CLASS_COLORS[getClassSlug(entry.character.class.name)] ?? "#94a3b8",
                                           }}
                                         >
-                                          {entry.character.spec.name}
+                                          {entry.character.name}
                                         </span>
                                       </span>
                                       <span className="run-details-realm">

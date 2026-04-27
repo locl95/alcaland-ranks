@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
-import keystone from "@/assets/keystone.png";
+import keystone from "@/assets/keystone.webp";
 import "./character-ladder.css";
 import { useState } from "react";
 import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";

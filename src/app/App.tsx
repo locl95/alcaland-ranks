@@ -70,6 +70,7 @@ export function App() {
       if (context?.previous) {
         queryClient.setQueryData(viewKeys.list(), context.previous);
       }
+      queryClient.invalidateQueries({ queryKey: viewKeys.list() });
     },
   });
 

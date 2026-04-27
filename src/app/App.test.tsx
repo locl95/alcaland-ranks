@@ -7,7 +7,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
 import authReducer from "@/app/authSlice.ts";
-import type { View } from "@/features/views/model/view.ts";
+
 import {
   MockViewsList,
   MockCreateView,
