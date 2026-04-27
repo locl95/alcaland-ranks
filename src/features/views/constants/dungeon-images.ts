@@ -1,19 +1,19 @@
-import aaPng from "@/assets/dungeons/aa.png";
-import mcPng from "@/assets/dungeons/mc.png";
-import mtPng from "@/assets/dungeons/mt.png";
-import npxPng from "@/assets/dungeons/npx.png";
-import posPng from "@/assets/dungeons/pos.png";
-import seatPng from "@/assets/dungeons/seat.png";
-import srPng from "@/assets/dungeons/sr.png";
-import wsPng from "@/assets/dungeons/ws.png";
+import aaWebp from "@/assets/dungeons/aa.webp";
+import mcWebp from "@/assets/dungeons/mc.webp";
+import mtWebp from "@/assets/dungeons/mt.webp";
+import npxWebp from "@/assets/dungeons/npx.webp";
+import posWebp from "@/assets/dungeons/pos.webp";
+import seatWebp from "@/assets/dungeons/seat.webp";
+import srWebp from "@/assets/dungeons/sr.webp";
+import wsWebp from "@/assets/dungeons/ws.webp";
 
 export const DUNGEON_IMAGES: Record<string, string> = {
-  aa: aaPng,
-  mc: mcPng,
-  mt: mtPng,
-  npx: npxPng,
-  pos: posPng,
-  seat: seatPng,
-  sr: srPng,
-  ws: wsPng,
+  aa: aaWebp,
+  mc: mcWebp,
+  mt: mtWebp,
+  npx: npxWebp,
+  pos: posWebp,
+  seat: seatWebp,
+  sr: srWebp,
+  ws: wsWebp,
 };

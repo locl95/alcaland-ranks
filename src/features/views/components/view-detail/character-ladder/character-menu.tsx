@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import "./character-menu.css";
-import { MoreHorizontal } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
 import raiderio2 from "@/assets/raiderio.png";
-import summoned from "@/assets/summoned.png";
+import summoned from "@/assets/summoned.webp";
 
 interface CharacterMenuProps {
   character: RaiderioProfile;
@@ -54,7 +54,7 @@ export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
           setIsOpen(!isOpen);
         }}
       >
-        <MoreHorizontal className="chevron-icon" />
+        <ExternalLink className="chevron-icon" />
       </button>
       {isOpen && (
         <div className="char-menu-dropdown">
