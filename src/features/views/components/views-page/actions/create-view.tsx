@@ -109,9 +109,7 @@ export function CreateView({
       .filter((c) => c.mode === "added");
   }, [characters]);
 
-  const canSubmit = useCallback(() => {
-    return name.trim() && characters.some((c) => c.mode === "added");
-  }, [name, characters]);
+  const canSubmit = !!name.trim() && characters.some((c) => c.mode === "added");
 
   const handleCreateView = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,7 +236,7 @@ export function CreateView({
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={!canSubmit()}
+              disabled={!canSubmit}
             >
               Create
             </button>

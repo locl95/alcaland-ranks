@@ -26,6 +26,13 @@
 .ladder-rank {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.rank-number {
+    display: flex;
+    align-items: center;
     justify-content: center;
     width: 2rem;
     height: 2rem;
@@ -266,10 +273,18 @@
     }
 
     .ladder-rank {
+        gap: 0.375rem;
+    }
+
+    .rank-number {
         width: 1.5rem;
         height: 1.5rem;
         font-size: 0.6875rem;
-        flex-shrink: 0;
+    }
+
+    .ladder-rank .class-icon {
+        width: 1.5rem;
+        height: 1.5rem;
     }
 
     .ladder-character-info {

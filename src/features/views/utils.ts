@@ -51,3 +51,18 @@ export const formatRankChange = (change: number): string => {
   const formatted = Math.round(Math.abs(change)).toLocaleString();
   return change > 0 ? `+${formatted}` : `-${formatted}`;
 };
+
+export function formatClearTime(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+export function formatDate(date: string | Date): string {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+}

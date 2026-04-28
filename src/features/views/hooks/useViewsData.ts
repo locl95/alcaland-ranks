@@ -49,13 +49,6 @@ export function useViewsData(isAuthenticated: boolean) {
       return { previous };
     },
 
-    onSuccess: (_, viewId) => {
-      queryClient.setQueryData<View[]>(
-        viewKeys.ownList(),
-        (old) => old?.filter((v) => v.id !== viewId) ?? [],
-      );
-    },
-
     onError: (_, __, context) => {
       if (context?.previous) {
         queryClient.setQueryData(viewKeys.ownList(), context.previous);
