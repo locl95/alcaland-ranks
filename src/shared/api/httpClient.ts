@@ -26,7 +26,7 @@ export async function serviceGet<T>(endpoint: string): Promise<T> {
 // ---------------------------------------------------------------------------
 
 let isRefreshing = false;
-let refreshQueue: Array<(token: string) => void> = [];
+let refreshQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
 
 async function refreshAccessToken(): Promise<string> {
   const refreshToken = selectRefreshToken(store.getState());
@@ -68,16 +68,17 @@ async function sendUserRequest(method: string, endpoint: string, body?: object):
       isRefreshing = true;
       try {
         const newToken = await refreshAccessToken();
-        refreshQueue.forEach((resolve) => resolve(newToken));
+        refreshQueue.forEach(({ resolve }) => resolve(newToken));
         refreshQueue = [];
       } catch (error) {
+        refreshQueue.forEach(({ reject }) => reject(error));
         refreshQueue = [];
         throw error;
       } finally {
         isRefreshing = false;
       }
     } else {
-      await new Promise<string>((resolve) => refreshQueue.push(resolve));
+      await new Promise<string>((resolve, reject) => refreshQueue.push({ resolve, reject }));
     }
 
     const newToken = selectAccessToken(store.getState());
