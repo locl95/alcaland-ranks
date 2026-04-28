@@ -131,7 +131,6 @@ export function ViewsPage() {
         <ViewsList
           views={views}
           isLoadingViews={isLoadingViews}
-          username={username}
           onViewClick={handleViewClick}
           onCreateView={handleCreateClick}
           onDeleteView={handleDeleteView}
