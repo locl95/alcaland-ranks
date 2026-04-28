@@ -27,9 +27,10 @@ interface ViewEditMeta {
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
+export function ViewDetail() {
   const { viewId } = useParams();
   const navigate = useNavigate();
+  const onBack = () => navigate("/");
   const location = useLocation();
   const queryClient = useQueryClient();
   const username = useAppSelector(selectUsername);
