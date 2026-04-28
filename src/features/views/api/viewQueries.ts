@@ -1,10 +1,11 @@
-import { serviceGet } from "@/shared/api/httpClient.ts";
+import { serviceGet, userRequest } from "@/shared/api/httpClient.ts";
 import { GetViewsResponse } from "@/features/views/api/view-types.ts";
 import { Season, ViewData } from "@/features/views/api/raiderio.ts";
 import { View } from "@/features/views/model/view.ts";
 
 export const viewKeys = {
-  list: () => ["views"] as const,
+  list: () => ["views", "featured"] as const,
+  ownList: () => ["views", "own"] as const,
   data: (viewId: string) => ["viewData", viewId] as const,
   cachedData: (viewId: string) => ["viewCachedData", viewId] as const,
   static: () => ["wowStatic"] as const,
@@ -13,7 +14,12 @@ export const viewKeys = {
 };
 
 export const fetchViews = async (): Promise<View[]> => {
-  const res = await serviceGet<GetViewsResponse>("/views?game=wow");
+  const res = await serviceGet<GetViewsResponse>("/views?game=wow&featured=true");
+  return res.records.map((v) => ({ id: v.id, simpleView: v, isSynced: true }));
+};
+
+export const fetchOwnViews = async (): Promise<View[]> => {
+  const res = await userRequest<GetViewsResponse>("GET", "/views?game=wow");
   return res.records.map((v) => ({ id: v.id, simpleView: v, isSynced: true }));
 };
 

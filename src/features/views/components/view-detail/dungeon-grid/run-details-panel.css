@@ -1,0 +1,52 @@
+.run-details-panel {
+    background: rgba(5, 17, 31, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.35);
+    border-top: none;
+    border-radius: 0 0 0.5rem 0.5rem;
+    padding: 0.625rem 0.75rem;
+}
+
+.run-details-top {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.4rem;
+}
+
+.run-details-deaths {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #f87171;
+}
+
+.skull-icon {
+    width: 0.8rem;
+    height: 0.8rem;
+}
+
+.run-details-roster {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.run-details-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.4rem;
+}
+
+.run-details-date {
+    font-size: 0.7rem;
+    color: #475569;
+}
+
+.run-details-unavailable {
+    font-size: 0.75rem;
+    color: #334155;
+    text-align: center;
+    padding: 0.5rem 0;
+    font-style: italic;
+}

@@ -35,18 +35,20 @@ export function LadderRow({
   return (
     <div className="ladder-row">
       <div className="ladder-row-inner" onClick={() => setIsExpanded((prev) => !prev)}>
-        <div className="ladder-rank">{index + 1}</div>
+        <div className="ladder-rank">
+          <span className="rank-number">{index + 1}</span>
+          {!isSyncing && (
+            <img
+              src={CLASS_IMAGES[getClassImageKey(character.class)]}
+              alt={character.class}
+              title={character.class}
+              className={`class-icon ${getClassSlug(character.class)}`}
+            />
+          )}
+        </div>
 
         <div className="ladder-character-info">
           <div className="ladder-character-name-row">
-            {!isSyncing && (
-              <img
-                src={CLASS_IMAGES[getClassImageKey(character.class)]}
-                alt={character.class}
-                title={character.class}
-                className={`class-icon ${getClassSlug(character.class)}`}
-              />
-            )}
             <p className="ladder-character-name">{character.name}</p>
             {showPositionChange && (
               <span

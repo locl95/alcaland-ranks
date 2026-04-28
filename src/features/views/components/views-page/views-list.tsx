@@ -1,11 +1,12 @@
 import { Plus, User, Users, Loader2, Trash2 } from "lucide-react";
 import "./views-list.css";
+import { useAppSelector } from "@/app/hooks.ts";
+import { selectUsername } from "@/app/authSlice.ts";
 import { View } from "@/features/views/model/view.ts";
 
 interface ViewsListProps {
   views: View[];
   isLoadingViews: boolean;
-  username: string | null;
   onViewClick: (viewId: string) => void;
   onCreateView: () => void;
   onDeleteView: (viewId: string) => void;
@@ -14,11 +15,11 @@ interface ViewsListProps {
 export function ViewsList({
   views,
   isLoadingViews,
-  username,
   onViewClick,
   onCreateView,
   onDeleteView,
 }: Readonly<ViewsListProps>) {
+  const username = useAppSelector(selectUsername);
   const viewsSyncing = views.some((v) => !v.isSynced);
 
   if (isLoadingViews && views.length === 0) return null;
@@ -41,24 +42,21 @@ export function ViewsList({
     <div className="views-list-container-box">
       {views.map((view, index) => {
         const isPending = !view.isSynced;
+        const isLast = index === views.length - 1;
 
         return (
           <div
             key={view.id}
-            className={`
-        view-row
-        ${index !== views.length - 1 ? "with-border" : ""}
-        ${isPending ? "view-row-pending" : ""}
-      `}
+            className={["view-row", !isLast && "with-border", isPending && "view-row-pending"]
+              .filter(Boolean)
+              .join(" ")}
             onClick={() => !isPending && onViewClick(view.id)}
           >
             <div className="view-row-content">
               <h3 className="view-row-title">{view.simpleView.name}</h3>
 
               {isPending && (
-                <p className="view-row-description">
-                  "Synchronizing with server..."
-                </p>
+                <p className="view-row-description">Synchronizing with server...</p>
               )}
 
               {!isPending && (
@@ -70,7 +68,6 @@ export function ViewsList({
                       {view.simpleView.entitiesIds.length === 1 ? "" : "s"}
                     </span>
                   </div>
-
                   <div className="view-row-meta-item">
                     <User className="view-row-icon" />
                     <span>{view.simpleView.owner}</span>
@@ -79,10 +76,7 @@ export function ViewsList({
               )}
             </div>
 
-            <div
-              className="view-row-actions"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="view-row-actions" onClick={(e) => e.stopPropagation()}>
               {isPending && <Loader2 className="loading-icon" />}
 
               {!isPending && username === view.simpleView.owner && (

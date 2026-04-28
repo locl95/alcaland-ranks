@@ -28,5 +28,4 @@ export const CLASS_IMAGES: Record<string, string> = {
   warrior,
 };
 
-export const getClassImageKey = (className: string): string =>
-  className.toLowerCase().replace(/\s+/g, "");
+export { normalizeKey as getClassImageKey } from "@/features/views/utils.ts";
