@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { viewKeys } from "@/features/views/api/viewQueries.ts";
 import { Plus, User, LogOut } from "lucide-react";
 import {
   DropdownMenu,
@@ -22,9 +24,16 @@ export function ViewsPage() {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const username = useAppSelector(selectUsername);
 
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"featured" | "own">(
     isAuthenticated ? "own" : "featured",
   );
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setActiveTab("featured");
+    }
+  }, [isAuthenticated]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const { featuredViews, isLoadingFeatured, ownViews, isLoadingOwn, createView, deleteView } =
@@ -62,6 +71,7 @@ export function ViewsPage() {
 
   const handleLogout = async () => {
     await logout();
+    queryClient.removeQueries({ queryKey: viewKeys.ownList() });
     navigate("/");
   };
 
