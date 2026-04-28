@@ -16,6 +16,8 @@ interface ViewsPageProps {
   isLoadingViews: boolean;
   isAuthenticated: boolean;
   username: string | null;
+  activeTab: "featured" | "own";
+  onTabChange: (tab: "featured" | "own") => void;
   onViewClick: (viewId: string) => void;
   onCreateView: (pendingView: View) => void;
   onDeleteView: (viewId: string) => void;
@@ -28,6 +30,8 @@ export function ViewsPage({
   isLoadingViews,
   isAuthenticated,
   username,
+  activeTab,
+  onTabChange,
   onViewClick,
   onCreateView,
   onDeleteView,
@@ -46,6 +50,14 @@ export function ViewsPage({
     setIsCreateDialogOpen(true);
   };
 
+  const handleOwnTabClick = () => {
+    if (!isAuthenticated) {
+      onLoginRequired();
+      return;
+    }
+    onTabChange("own");
+  };
+
   return (
     <div className="views-list-container">
       <div className="views-list-content">
@@ -55,17 +67,15 @@ export function ViewsPage({
           </div>
 
           <div className="views-header-actions">
-            {views.length > 0 && (
-              <button
-                onClick={handleCreateClick}
-                className="create-view-btn"
-                disabled={isSyncing}
-                title={isSyncing ? "Wait for sync to complete" : undefined}
-              >
-                <Plus className="icon-lg" />
-                Ladder
-              </button>
-            )}
+            <button
+              onClick={handleCreateClick}
+              className="create-view-btn"
+              disabled={isSyncing}
+              title={isSyncing ? "Wait for sync to complete" : undefined}
+            >
+              <Plus className="icon-lg" />
+              Ladder
+            </button>
 
             {isAuthenticated && username && (
               <DropdownMenu>
@@ -92,6 +102,23 @@ export function ViewsPage({
         <div className="views-season">
           <span className="views-season-label">Current season</span>
           <span className="views-season-value">Midnight Season 1</span>
+        </div>
+
+        <div className="views-tab-toggle-wrapper">
+          <div className="views-tab-toggle">
+            <button
+              className={`views-tab-btn${activeTab === "featured" ? " views-tab-btn--active" : ""}`}
+              onClick={() => onTabChange("featured")}
+            >
+              Featured ladders
+            </button>
+            <button
+              className={`views-tab-btn${activeTab === "own" ? " views-tab-btn--active" : ""}`}
+              onClick={handleOwnTabClick}
+            >
+              Own ladders
+            </button>
+          </div>
         </div>
 
         <ViewsList

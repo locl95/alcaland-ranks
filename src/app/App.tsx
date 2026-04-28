@@ -1,6 +1,7 @@
 import { Routes, Route, useNavigate, Navigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "./hooks";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { userRequestVoid } from "@/shared/api/httpClient.ts";
 import { ViewDetail } from "@/features/views/components/view-detail/view-detail.tsx";
 import { View } from "@/features/views/model/view.ts";
@@ -11,7 +12,7 @@ import { ViewsPage } from "@/features/views/components/views-page/views-page.tsx
 import { LoginPage } from "@/features/auth/LoginPage.tsx";
 import { selectIsAuthenticated, selectUsername } from "@/app/authSlice.ts";
 import { logout } from "@/features/auth/authApi.ts";
-import { viewKeys, fetchViews } from "@/features/views/api/viewQueries.ts";
+import { viewKeys, fetchViews, fetchOwnViews } from "@/features/views/api/viewQueries.ts";
 
 export function App() {
   const queryClient = useQueryClient();
@@ -20,22 +21,31 @@ export function App() {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const username = useAppSelector(selectUsername);
 
-  const { data: views = [], isLoading: isLoadingViews } = useQuery({
+  const [activeTab, setActiveTab] = useState<"featured" | "own">(
+    isAuthenticated ? "own" : "featured",
+  );
+
+  const { data: featuredViews = [], isLoading: isLoadingFeatured } = useQuery({
     queryKey: viewKeys.list(),
+    queryFn: fetchViews,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+
+  const { data: ownViews = [], isLoading: isLoadingOwn } = useQuery({
+    queryKey: viewKeys.ownList(),
     queryFn: async () => {
-      const serverData = await fetchViews();
-      const cached = queryClient.getQueryData<View[]>(viewKeys.list()) ?? [];
+      const serverData = await fetchOwnViews();
+      const cached = queryClient.getQueryData<View[]>(viewKeys.ownList()) ?? [];
 
-      // Once the server confirms the view (even with 0 entities), trust the server response
-      const merged = serverData.map((v) => v);
-
-      // Include pending views the server hasn't returned at all yet
       const unconfirmed = cached.filter(
         (c) => !c.isSynced && !serverData.some((s) => s.simpleView.name === c.simpleView.name),
       );
 
-      return [...merged, ...unconfirmed];
+      return [...serverData, ...unconfirmed];
     },
+    enabled: isAuthenticated,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -45,15 +55,18 @@ export function App() {
     },
   });
 
+  const views = activeTab === "featured" ? featuredViews : ownViews;
+  const isLoadingViews = activeTab === "featured" ? isLoadingFeatured : isLoadingOwn;
+
   const deleteViewMutation = useMutation({
     mutationFn: (viewId: string) =>
       userRequestVoid("DELETE", `/views/${viewId}`),
 
     onMutate: async (viewId) => {
-      await queryClient.cancelQueries({ queryKey: viewKeys.list() });
-      const previous = queryClient.getQueryData<View[]>(viewKeys.list());
+      await queryClient.cancelQueries({ queryKey: viewKeys.ownList() });
+      const previous = queryClient.getQueryData<View[]>(viewKeys.ownList());
       queryClient.setQueryData<View[]>(
-        viewKeys.list(),
+        viewKeys.ownList(),
         (old) => old?.filter((v) => v.id !== viewId) ?? [],
       );
       return { previous };
@@ -61,27 +74,25 @@ export function App() {
 
     onSuccess: (_, viewId) => {
       queryClient.setQueryData<View[]>(
-        viewKeys.list(),
+        viewKeys.ownList(),
         (old) => old?.filter((v) => v.id !== viewId) ?? [],
       );
     },
 
     onError: (_, __, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(viewKeys.list(), context.previous);
+        queryClient.setQueryData(viewKeys.ownList(), context.previous);
       }
-      queryClient.invalidateQueries({ queryKey: viewKeys.list() });
+      queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
     },
   });
 
   const handleCreateView = (pendingView: View) => {
-    queryClient.setQueryData<View[]>(viewKeys.list(), (old) => [
+    queryClient.setQueryData<View[]>(viewKeys.ownList(), (old) => [
       ...(old ?? []),
       pendingView,
     ]);
-    // Kick off a fetch immediately; the queryFn will preserve the pending view
-    // until the server confirms it, and refetchInterval keeps polling after.
-    queryClient.refetchQueries({ queryKey: viewKeys.list() });
+    queryClient.refetchQueries({ queryKey: viewKeys.ownList() });
   };
 
   const handleViewClick = (viewId: string) => {
@@ -127,13 +138,15 @@ export function App() {
               <ViewsPage
                 views={views}
                 isLoadingViews={isLoadingViews}
-              isAuthenticated={isAuthenticated}
-              username={username}
-              onViewClick={handleViewClick}
-              onDeleteView={handleDeleteView}
-              onCreateView={handleCreateView}
-              onLoginRequired={handleLoginRequired}
-              onLogout={handleLogout}
+                isAuthenticated={isAuthenticated}
+                username={username}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                onViewClick={handleViewClick}
+                onDeleteView={handleDeleteView}
+                onCreateView={handleCreateView}
+                onLoginRequired={handleLoginRequired}
+                onLogout={handleLogout}
               />
             }
           />

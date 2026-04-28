@@ -171,13 +171,13 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
       queryClient.setQueryData(viewKeys.syncError(safeViewId), null);
       setExpectedCount(characters.length);
       await queryClient.cancelQueries({ queryKey: viewKeys.data(safeViewId) });
-      await queryClient.cancelQueries({ queryKey: viewKeys.list() });
+      await queryClient.cancelQueries({ queryKey: viewKeys.ownList() });
 
       queryClient.setQueryData<ViewEditMeta>(viewKeys.editMeta(safeViewId), {
         pendingCharacters: characters,
       });
 
-      queryClient.setQueryData<View[]>(viewKeys.list(), (old) =>
+      queryClient.setQueryData<View[]>(viewKeys.ownList(), (old) =>
         old?.map((v) =>
           v.id === viewId
             ? {
@@ -194,7 +194,7 @@ export function ViewDetail({ onBack }: Readonly<{ onBack: () => void }>) {
 
     onError: () => {
       queryClient.setQueryData(viewKeys.editMeta(safeViewId), null);
-      queryClient.invalidateQueries({ queryKey: viewKeys.list() });
+      queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
     },
   });
 

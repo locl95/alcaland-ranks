@@ -132,8 +132,8 @@
 }
 
 .spec-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1rem;
+    height: 1rem;
     border-radius: 0.2rem;
     object-fit: cover;
     flex-shrink: 0;
@@ -293,8 +293,8 @@
 }
 
 .role-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1rem;
+    height: 1rem;
     object-fit: contain;
     flex-shrink: 0;
 }
