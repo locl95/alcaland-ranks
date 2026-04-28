@@ -1,3 +1,4 @@
+import "./roster-row.css";
 import { RunDetailsRosterEntry } from "@/features/views/api/raiderio.ts";
 import { SPEC_IMAGES, getSpecImageKey } from "@/features/views/constants/spec-images.ts";
 import { ROLE_IMAGES } from "@/features/views/constants/role-images.ts";

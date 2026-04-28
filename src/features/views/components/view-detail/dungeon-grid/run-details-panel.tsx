@@ -1,3 +1,4 @@
+import "./run-details-panel.css";
 import { Skull } from "lucide-react";
 import { MythicPlusRun, RunDetails, formatDate } from "@/features/views/api/raiderio.ts";
 import { RosterRow } from "./roster-row.tsx";

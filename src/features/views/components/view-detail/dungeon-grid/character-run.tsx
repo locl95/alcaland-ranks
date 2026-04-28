@@ -1,3 +1,4 @@
+import "./character-run.css";
 import { useState } from "react";
 import { Crown } from "lucide-react";
 import { MythicPlusBestRun, RaiderioProfile, formatClearTime } from "@/features/views/api/raiderio.ts";

@@ -1,3 +1,4 @@
+import "./dungeon-card.css";
 import { MythicPlusBestRun, MythicPlusRun, RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
 import { DUNGEON_IMAGES } from "@/features/views/constants/dungeon-images.ts";
 import { CharacterRun } from "./character-run.tsx";
