@@ -3,8 +3,7 @@ import { Plus, X } from "lucide-react";
 import "./create-view.css";
 import { View } from "@/features/views/model/view.ts";
 import { userRequest } from "@/shared/api/httpClient.ts";
-import { EU_REALMS } from "@/features/views/constants/euRealms.ts";
-import { NA_REALMS } from "@/features/views/constants/naRealms.ts";
+import { RealmSelect } from "@/features/views/components/shared/realm-select.tsx";
 
 interface CharacterRow {
   name: string;
@@ -204,32 +203,12 @@ export function CreateView({
                   }
                 />
 
-                <select
-                  className="form-select form-select-region"
-                  value={char.region}
-                  onChange={(e) => {
-                    updateCharacter(index, "region", e.target.value);
-                    updateCharacter(index, "realm", "");
-                  }}
-                >
-                  <option value="eu">EU</option>
-                  <option value="us">NA</option>
-                </select>
-
-                <select
-                  className="form-select"
-                  value={char.realm}
-                  onChange={(e) =>
-                    updateCharacter(index, "realm", e.target.value)
-                  }
-                >
-                  <option value="">Realm</option>
-                  {(char.region === "us" ? NA_REALMS : EU_REALMS).map((r) => (
-                    <option key={r.slug} value={r.slug}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
+                <RealmSelect
+                  region={char.region}
+                  realm={char.realm}
+                  onRegionChange={(v) => updateCharacter(index, "region", v)}
+                  onRealmChange={(v) => updateCharacter(index, "realm", v)}
+                />
 
                 {char.mode === "add" ? (
                   <button

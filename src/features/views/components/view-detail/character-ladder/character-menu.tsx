@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./character-menu.css";
 import { ExternalLink } from "lucide-react";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
+import { openExternalProfile } from "@/features/views/utils.ts";
 import raiderio2 from "@/assets/raiderio.png";
 import summoned from "@/assets/summoned.webp";
 
@@ -23,27 +24,6 @@ export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const openRaiderIO = () => {
-    const realm = character.realm.replace(/\s+/g, "-");
-    const name = character.name.toLowerCase();
-    const region = character.region.toLowerCase();
-    window.open(
-      `https://raider.io/characters/${region}/${realm}/${name}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
-  };
-
-  const openSummonedIO = () => {
-    const realm = character.realm.replace(/\s+/g, "-");
-    const name = character.name.toLowerCase();
-    const region = character.region.toLowerCase();
-    window.open(
-      `https://summoned.io/${region}/${realm}/${name}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
-  };
 
   return (
     <div className="char-menu-wrapper" ref={menuRef}>
@@ -62,7 +42,7 @@ export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
             className="char-menu-item"
             onClick={(e) => {
               e.stopPropagation();
-              openRaiderIO();
+              openExternalProfile(character, "raiderio");
               setIsOpen(false);
             }}
           >
@@ -78,7 +58,7 @@ export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
             className="char-menu-item"
             onClick={(e) => {
               e.stopPropagation();
-              openSummonedIO();
+              openExternalProfile(character, "summoned");
               setIsOpen(false);
             }}
           >

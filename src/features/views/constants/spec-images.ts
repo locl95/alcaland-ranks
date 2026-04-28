@@ -1,3 +1,5 @@
+import { normalizeKey } from "@/features/views/utils.ts";
+
 const modules = import.meta.glob("@/assets/specs/*.webp", {
   eager: true,
   import: "default",
@@ -11,4 +13,4 @@ export const SPEC_IMAGES: Record<string, string> = Object.fromEntries(
 );
 
 export const getSpecImageKey = (className: string, specName: string): string =>
-  `${className.toLowerCase().replace(/\s+/g, "")}_${specName.toLowerCase().replace(/\s+/g, "")}`;
+  `${normalizeKey(className)}_${normalizeKey(specName)}`;

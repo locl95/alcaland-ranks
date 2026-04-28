@@ -3,8 +3,7 @@ import { Plus, Trash2, X } from "lucide-react";
 import "./edit-view.css";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
 import { getClassSlug } from "@/features/views/utils.ts";
-import { EU_REALMS } from "@/features/views/constants/euRealms.ts";
-import { NA_REALMS } from "@/features/views/constants/naRealms.ts";
+import { RealmSelect } from "@/features/views/components/shared/realm-select.tsx";
 
 interface EditViewProps {
   isOpen: boolean;
@@ -131,30 +130,12 @@ export function EditView({
               onKeyDown={(e) => e.key === "Enter" && addCharacter()}
             />
 
-            <select
-              className="form-select form-select-region"
-              value={newRegion}
-              onChange={(e) => {
-                setNewRegion(e.target.value);
-                setNewRealm("");
-              }}
-            >
-              <option value="eu">EU</option>
-              <option value="us">NA</option>
-            </select>
-
-            <select
-              className="form-select"
-              value={newRealm}
-              onChange={(e) => setNewRealm(e.target.value)}
-            >
-              <option value="">Realm</option>
-              {(newRegion === "us" ? NA_REALMS : EU_REALMS).map((r) => (
-                <option key={r.slug} value={r.slug}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
+            <RealmSelect
+              region={newRegion}
+              realm={newRealm}
+              onRegionChange={setNewRegion}
+              onRealmChange={setNewRealm}
+            />
 
             <button
               type="button"

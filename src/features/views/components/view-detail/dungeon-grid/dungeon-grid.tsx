@@ -14,7 +14,7 @@ import { DUNGEON_IMAGES } from "@/features/views/constants/dungeon-images.ts";
 import { CLASS_COLORS } from "@/features/views/constants/class-colors.ts";
 import { SPEC_IMAGES, getSpecImageKey } from "@/features/views/constants/spec-images.ts";
 import { ROLE_IMAGES } from "@/features/views/constants/role-images.ts";
-import { getClassSlug, getScoreClass } from "@/features/views/utils.ts";
+import { getClassSlug, getScoreClass, openExternalProfile } from "@/features/views/utils.ts";
 
 interface DungeonGridProps {
   raiderioProfiles: RaiderioProfile[];
@@ -32,13 +32,6 @@ const ROLE_ORDER: Record<string, number> = { tank: 0, healer: 1, dps: 2 };
 const ROLE_LABEL: Record<string, string> = { tank: "Tank", healer: "Healer", dps: "Damage dealer" };
 
 
-const openRaiderIO = (name: string, realmSlug: string, region: string) => {
-  window.open(
-    `https://raider.io/characters/${region.toLowerCase()}/${realmSlug}/${name.toLowerCase()}`,
-    "_blank",
-    "noopener,noreferrer",
-  );
-};
 
 export function DungeonGrid({
   raiderioProfiles,
@@ -274,10 +267,9 @@ export function DungeonGrid({
                                       className="run-details-character-info"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        openRaiderIO(
-                                          entry.character.name,
-                                          entry.character.realm.slug,
-                                          character.region,
+                                        openExternalProfile(
+                                          { name: entry.character.name, realm: entry.character.realm.slug, region: character.region },
+                                          "raiderio",
                                         );
                                       }}
                                     >

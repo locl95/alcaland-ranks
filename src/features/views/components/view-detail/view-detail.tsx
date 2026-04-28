@@ -9,6 +9,7 @@ import { View } from "@/features/views/model/view.ts";
 import { selectUsername } from "@/app/authSlice.ts";
 import { userRequestVoid } from "@/shared/api/httpClient.ts";
 import { ViewRequest } from "@/features/views/api/view-types.ts";
+import { haveSameCharacters } from "@/features/views/utils.ts";
 import { CharacterLadder } from "./character-ladder/character-ladder.tsx";
 import { DungeonGrid } from "./dungeon-grid/dungeon-grid.tsx";
 import { EditView } from "./actions/edit-view.tsx";
@@ -142,12 +143,6 @@ export function ViewDetail() {
   const cachedProfiles = cachedData?.data ?? [];
   const viewName = rawViewData?.viewName ?? "";
   const initialized = !isLoading;
-
-  const haveSameCharacters = (a: RaiderioProfile[], b: RaiderioProfile[]): boolean => {
-    if (a.length !== b.length) return false;
-    const idsA = new Set(a.map((c) => c.id));
-    return b.every((c) => idsA.has(c.id));
-  };
 
   const saveMutation = useMutation({
     mutationFn: (characters: RaiderioProfile[]) => {
