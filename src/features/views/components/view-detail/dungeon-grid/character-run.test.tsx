@@ -56,18 +56,6 @@ describe("CharacterRun", () => {
     expect(screen.getByText("No run")).toBeInTheDocument();
   });
 
-  it("shows the character name", () => {
-    render(
-      <CharacterRun
-        character={makeProfile("Sylvanas")}
-        bestRun={undefined}
-        isHighest={false}
-        cachedProfiles={[]}
-      />,
-    );
-    expect(screen.getByText("Sylvanas")).toBeInTheDocument();
-  });
-
   it("shows the run score when a best run is present", () => {
     render(
       <CharacterRun

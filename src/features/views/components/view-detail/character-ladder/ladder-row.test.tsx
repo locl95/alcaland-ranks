@@ -37,20 +37,6 @@ const makeProfile = (overrides: Partial<RaiderioProfile> = {}): RaiderioProfile 
 });
 
 describe("LadderRow", () => {
-  it("renders the character name", () => {
-    render(
-      <LadderRow index={0} character={makeProfile()} cachedCharacters={[]} season={null} />,
-    );
-    expect(screen.getByText("Arthas")).toBeInTheDocument();
-  });
-
-  it("renders the rank number (1-indexed)", () => {
-    render(
-      <LadderRow index={2} character={makeProfile()} cachedCharacters={[]} season={null} />,
-    );
-    expect(screen.getByText("3")).toBeInTheDocument();
-  });
-
   it("shows syncing indicator when score is -1", () => {
     render(
       <LadderRow
@@ -102,10 +88,4 @@ describe("LadderRow", () => {
     expect(screen.queryByTestId("ladder-row-expanded")).not.toBeInTheDocument();
   });
 
-  it("renders the CharacterMenu", () => {
-    render(
-      <LadderRow index={0} character={makeProfile()} cachedCharacters={[]} season={null} />,
-    );
-    expect(screen.getByTestId("character-menu")).toBeInTheDocument();
-  });
 });

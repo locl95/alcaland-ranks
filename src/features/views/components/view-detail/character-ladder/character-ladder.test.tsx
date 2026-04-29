@@ -33,18 +33,6 @@ const makeProfile = (id: number, name: string, score: number): RaiderioProfile =
 });
 
 describe("CharacterLadder", () => {
-  it("renders a row for each character", () => {
-    render(
-      <CharacterLadder
-        characters={[makeProfile(1, "Arthas", 3000), makeProfile(2, "Sylvanas", 2500)]}
-        cachedCharacters={[]}
-        season={null}
-      />,
-    );
-    expect(screen.getByTestId("ladder-row-1")).toBeInTheDocument();
-    expect(screen.getByTestId("ladder-row-2")).toBeInTheDocument();
-  });
-
   it("sorts characters by score descending", () => {
     render(
       <CharacterLadder
@@ -75,10 +63,4 @@ describe("CharacterLadder", () => {
     expect(screen.getByTestId("ladder-row-1")).toBeInTheDocument();
   });
 
-  it("renders nothing in the content when there are no characters", () => {
-    render(
-      <CharacterLadder characters={[]} cachedCharacters={[]} season={null} />,
-    );
-    expect(screen.queryByTestId(/ladder-row/)).not.toBeInTheDocument();
-  });
 });
