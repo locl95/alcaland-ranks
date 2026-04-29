@@ -6,6 +6,7 @@
 
 - [ ] I have manually tested the affected feature in the browser
 
-## Notes
+## Dependencies
 
-<!-- Anything reviewers should know? -->
+- [ ] Backend merge request: <!-- link or merge request name -->
+
