@@ -283,3 +283,9 @@
   background: rgba(51, 65, 85, 0.3);
   color: #94a3b8;
 }
+
+.form-error {
+  font-size: 0.875rem;
+  color: #f87171;
+  margin-top: 0.5rem;
+}

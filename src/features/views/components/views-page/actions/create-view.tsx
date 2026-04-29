@@ -1,16 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import "./create-view.css";
 import { View } from "@/features/views/model/view.ts";
-import { userRequest } from "@/shared/api/httpClient.ts";
 import { RealmSelect } from "@/features/views/components/shared/realm-select.tsx";
-
-interface CharacterRow {
-  name: string;
-  realm: string;
-  region: string;
-  mode: "add" | "added";
-}
+import { useCreateViewForm } from "@/features/views/hooks/useCreateViewForm.ts";
 
 interface CreateViewDialogProps {
   open: boolean;
@@ -23,22 +16,21 @@ export function CreateView({
   onOpenChange,
   onCreateView,
 }: Readonly<CreateViewDialogProps>) {
-  const [name, setName] = useState("");
-
-  const [characters, setCharacters] = useState<CharacterRow[]>([
-    { name: "", realm: "", region: "eu", mode: "add" },
-  ]);
-
-  const resetForm = useCallback(() => {
-    setName("");
-    setCharacters([{ name: "", realm: "", region: "eu", mode: "add" }]);
-  }, []);
+  const {
+    name,
+    setName,
+    characters,
+    canSubmit,
+    error,
+    updateCharacter,
+    addCharacter,
+    removeCharacter,
+    handleSubmit,
+  } = useCreateViewForm(open, () => onOpenChange(false), onCreateView);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && open) {
-        onOpenChange(false);
-      }
+      if (e.key === "Escape") onOpenChange(false);
     };
 
     if (open) {
@@ -52,132 +44,21 @@ export function CreateView({
     };
   }, [open, onOpenChange]);
 
-  useEffect(() => {
-    if (!open) {
-      resetForm();
-    }
-  }, [open, resetForm]);
-
-  const updateCharacter = useCallback(
-    (index: number, field: string, value: string) => {
-      setCharacters((prev) => {
-        const updated = [...prev];
-        updated[index] = { ...updated[index], [field]: value };
-        return updated;
-      });
-    },
-    [],
-  );
-
-  const addCharacter = useCallback((index: number) => {
-    setCharacters((prev) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], mode: "added" };
-
-      updated.push({
-        name: "",
-        realm: "",
-        region: "eu",
-        mode: "add",
-      });
-
-      return updated;
-    });
-  }, []);
-
-  const removeCharacter = useCallback((index: number) => {
-    setCharacters((prev) => {
-      const updated = prev.filter((_, i) => i !== index);
-
-      return updated.length ? updated : [{ name: "", realm: "", region: "eu", mode: "add" }];
-    });
-  }, []);
-
-  const getAddedCharacters = useCallback(() => {
-    return characters
-      .map((c, i, arr) => {
-        if (
-          i === arr.length - 1 &&
-          c.mode === "add" &&
-          c.name.trim() &&
-          c.realm.trim()
-        ) {
-          return { ...c, mode: "added" };
-        }
-        return c;
-      })
-      .filter((c) => c.mode === "added");
-  }, [characters]);
-
-  const canSubmit = !!name.trim() && characters.some((c) => c.mode === "added");
-
-  const handleCreateView = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const addedCharacters = getAddedCharacters();
-
-    const request = {
-      name,
-      entities: addedCharacters.map((c) => ({
-        name: c.name,
-        region: c.region,
-        realm: c.realm,
-        type: "com.kos.entities.domain.WowEntityRequest",
-      })),
-      published: true,
-      featured: false,
-      game: "WOW",
-    };
-
-    try {
-      await userRequest("POST", `/views`, request);
-
-      onCreateView({
-        id: "",
-        simpleView: {
-          id: "",
-          name,
-          owner: "",
-          published: false,
-          entitiesIds: [],
-          game: "WOW",
-          featured: false,
-          extraArguments: null,
-        },
-        isSynced: false,
-      });
-    } catch (error) {
-      console.error("Failed to create view", error);
-    } finally {
-      onOpenChange(false);
-    }
-  };
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onOpenChange(false);
-    }
-  };
-
   if (!open) return null;
 
   return (
-    <div className="dialog-overlay" onClick={handleOverlayClick}>
+    <div className="dialog-overlay" onClick={(e) => e.target === e.currentTarget && onOpenChange(false)}>
       <div className="dialog-content">
         <div className="dialog-header">
           <div>
             <h1 className="dialog-title">Create new m+ ladder</h1>
           </div>
-          <button
-            type="button"
-            className="dialog-close-btn"
-            onClick={() => { resetForm(); onOpenChange(false); }}
-          >
+          <button type="button" className="dialog-close-btn" onClick={() => onOpenChange(false)}>
             <X size={20} />
           </button>
         </div>
 
-        <form className="dialog-form" onSubmit={handleCreateView}>
+        <form className="dialog-form" onSubmit={handleSubmit}>
           <div className="form-content">
             <div className="form-field">
               <label className="form-label">Ladder name</label>
@@ -196,9 +77,7 @@ export function CreateView({
                   className="form-input"
                   placeholder="Name"
                   value={char.name}
-                  onChange={(e) =>
-                    updateCharacter(index, "name", e.target.value)
-                  }
+                  onChange={(e) => updateCharacter(index, "name", e.target.value)}
                 />
 
                 <RealmSelect
@@ -230,14 +109,12 @@ export function CreateView({
                 )}
               </div>
             ))}
+
+            {error && <p className="form-error">{error}</p>}
           </div>
 
           <div className="dialog-footer">
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={!canSubmit}
-            >
+            <button type="submit" className="btn btn-primary" disabled={!canSubmit}>
               Create
             </button>
           </div>
