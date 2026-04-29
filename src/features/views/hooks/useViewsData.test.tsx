@@ -146,6 +146,7 @@ describe("useViewsData", () => {
 
     it("restores the view in the cache when the API call fails", async () => {
       mockUserRequestVoid.mockRejectedValue(new Error("Server error"));
+      mockUserRequest.mockResolvedValue({ records: [makeSimpleView("v1", "My View")] });
       const { wrapper, queryClient } = makeWrapper();
       queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView("v1", "My View")]);
 
