@@ -6,7 +6,10 @@ import { CharacterMenu } from "./character-menu.tsx";
 import { LadderRowExpanded } from "./ladder-row-expanded.tsx";
 
 import { getClassSlug, getScoreClass } from "@/features/views/utils.ts";
-import { CLASS_IMAGES, getClassImageKey } from "@/features/views/constants/class-images.ts";
+import {
+  CLASS_IMAGES,
+  getClassImageKey,
+} from "@/features/views/constants/class-images.ts";
 
 interface LadderRowProps {
   index: number;
@@ -28,13 +31,22 @@ export function LadderRow({
   const positionChange =
     hasHistoricalData && cachedIndex !== -1 ? cachedIndex - index : null;
 
-  const showPositionChange = !isSyncing && hasHistoricalData && positionChange !== null && positionChange !== 0;
-  const cachedCharacter = cachedIndex !== -1 ? cachedCharacters[cachedIndex] : undefined;
-  const scoreGain = !isSyncing && cachedCharacter ? character.score - cachedCharacter.score : 0;
+  const showPositionChange =
+    !isSyncing &&
+    hasHistoricalData &&
+    positionChange !== null &&
+    positionChange !== 0;
+  const cachedCharacter =
+    cachedIndex !== -1 ? cachedCharacters[cachedIndex] : undefined;
+  const scoreGain =
+    !isSyncing && cachedCharacter ? character.score - cachedCharacter.score : 0;
 
   return (
     <div className="ladder-row">
-      <div className="ladder-row-inner" onClick={() => setIsExpanded((prev) => !prev)}>
+      <div
+        className="ladder-row-inner"
+        onClick={() => setIsExpanded((prev) => !prev)}
+      >
         <div className="ladder-rank">
           <span className="rank-number">{index + 1}</span>
           {!isSyncing && (
@@ -64,7 +76,9 @@ export function LadderRow({
             <div className="ladder-character-meta">
               <span className="ladder-character-realm">{character.realm}</span>
               <span className={`ladder-region-badge ${character.region}`}>
-                {character.region === "us" ? "NA" : character.region.toUpperCase()}
+                {character.region === "us"
+                  ? "NA"
+                  : character.region.toUpperCase()}
               </span>
             </div>
           )}
@@ -81,11 +95,15 @@ export function LadderRow({
           <>
             <div className="ladder-score">
               <div className="ladder-score-value-row">
-                <p className={`ladder-score-value ${getScoreClass(character.score)}`}>
+                <p
+                  className={`ladder-score-value ${getScoreClass(character.score)}`}
+                >
                   {character.score.toLocaleString()}
                 </p>
                 {scoreGain > 0 && (
-                  <span className="score-improvement">+{Math.round(scoreGain)}</span>
+                  <span className="score-improvement">
+                    +{Math.round(scoreGain)}
+                  </span>
                 )}
               </div>
               <p className="ladder-score-label">M+ Score</p>

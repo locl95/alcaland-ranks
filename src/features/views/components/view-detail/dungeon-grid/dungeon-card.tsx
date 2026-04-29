@@ -1,5 +1,10 @@
 import "./dungeon-card.css";
-import { MythicPlusBestRun, MythicPlusRun, RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
+import {
+  MythicPlusBestRun,
+  MythicPlusRun,
+  RaiderioProfile,
+  Season,
+} from "@/features/views/api/raiderio.ts";
 import { DUNGEON_IMAGES } from "@/features/views/constants/dungeon-images.ts";
 import { CharacterRun } from "./character-run.tsx";
 
@@ -31,7 +36,9 @@ export function DungeonCard({
             alt={dungeon.name}
             className="dungeon-header-thumb-img"
           />
-          <span className="dungeon-header-thumb-name">{dungeon.short_name}</span>
+          <span className="dungeon-header-thumb-name">
+            {dungeon.short_name}
+          </span>
         </div>
       </div>
       <div className="dungeon-content">

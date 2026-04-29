@@ -5,7 +5,13 @@ import { CharacterLadder } from "./character-ladder.tsx";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
 
 vi.mock("./ladder-row.tsx", () => ({
-  LadderRow: ({ character, index }: { character: RaiderioProfile; index: number }) => (
+  LadderRow: ({
+    character,
+    index,
+  }: {
+    character: RaiderioProfile;
+    index: number;
+  }) => (
     <div data-testid={`ladder-row-${character.id}`}>
       #{index + 1} {character.name}
     </div>
@@ -14,7 +20,11 @@ vi.mock("./ladder-row.tsx", () => ({
 
 vi.mock("@/assets/keystone.webp", () => ({ default: "keystone.webp" }));
 
-const makeProfile = (id: number, name: string, score: number): RaiderioProfile => ({
+const makeProfile = (
+  id: number,
+  name: string,
+  score: number,
+): RaiderioProfile => ({
   id,
   name,
   realm: "Tarren Mill",
@@ -62,5 +72,4 @@ describe("CharacterLadder", () => {
     await userEvent.click(screen.getByText("Ladder"));
     expect(screen.getByTestId("ladder-row-1")).toBeInTheDocument();
   });
-
 });

@@ -38,7 +38,11 @@ vi.mock("@/features/views/components/shared/realm-select.tsx", () => ({
   ),
 }));
 
-const makeProfile = (id: number, name: string, score = 2000): RaiderioProfile => ({
+const makeProfile = (
+  id: number,
+  name: string,
+  score = 2000,
+): RaiderioProfile => ({
   id,
   name,
   realm: "Tarren Mill",
@@ -59,13 +63,20 @@ const makeProfile = (id: number, name: string, score = 2000): RaiderioProfile =>
 describe("EditView", () => {
   it("renders nothing when closed", () => {
     const { container } = render(
-      <EditView isOpen={false} characters={[]} onClose={vi.fn()} onSave={vi.fn()} />,
+      <EditView
+        isOpen={false}
+        characters={[]}
+        onClose={vi.fn()}
+        onSave={vi.fn()}
+      />,
     );
     expect(container).toBeEmptyDOMElement();
   });
 
   it("renders the dialog when open", () => {
-    render(<EditView isOpen characters={[]} onClose={vi.fn()} onSave={vi.fn()} />);
+    render(
+      <EditView isOpen characters={[]} onClose={vi.fn()} onSave={vi.fn()} />,
+    );
     expect(screen.getByText("Edit your ladder")).toBeInTheDocument();
   });
 
@@ -109,7 +120,9 @@ describe("EditView", () => {
 
   it("calls onClose when the X button is clicked", async () => {
     const onClose = vi.fn();
-    render(<EditView isOpen characters={[]} onClose={onClose} onSave={vi.fn()} />);
+    render(
+      <EditView isOpen characters={[]} onClose={onClose} onSave={vi.fn()} />,
+    );
     await userEvent.click(document.querySelector(".edit-view-close-btn")!);
     expect(onClose).toHaveBeenCalledOnce();
   });
@@ -117,7 +130,9 @@ describe("EditView", () => {
   it("Done button calls onSave but not onClose", async () => {
     const onClose = vi.fn();
     const onSave = vi.fn();
-    render(<EditView isOpen characters={[]} onClose={onClose} onSave={onSave} />);
+    render(
+      <EditView isOpen characters={[]} onClose={onClose} onSave={onSave} />,
+    );
     await userEvent.click(screen.getByText("Done"));
     expect(onSave).toHaveBeenCalledOnce();
     expect(onClose).not.toHaveBeenCalled();
@@ -134,29 +149,38 @@ describe("EditView", () => {
       />,
     );
     await userEvent.click(screen.getByText("Done"));
-    expect(onSave).toHaveBeenCalledWith(expect.arrayContaining([
-      expect.objectContaining({ name: "Arthas" }),
-    ]));
+    expect(onSave).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.objectContaining({ name: "Arthas" })]),
+    );
   });
 
   it("calls onClose when clicking the overlay", async () => {
     const onClose = vi.fn();
-    render(<EditView isOpen characters={[]} onClose={onClose} onSave={vi.fn()} />);
+    render(
+      <EditView isOpen characters={[]} onClose={onClose} onSave={vi.fn()} />,
+    );
     await userEvent.click(document.querySelector(".edit-view-overlay")!);
     expect(onClose).toHaveBeenCalledOnce();
   });
 
   it("disables the add button when name or realm is empty", () => {
-    render(<EditView isOpen characters={[]} onClose={vi.fn()} onSave={vi.fn()} />);
+    render(
+      <EditView isOpen characters={[]} onClose={vi.fn()} onSave={vi.fn()} />,
+    );
     expect(screen.getByTitle("Add")).toBeDisabled();
   });
 
   it("adds a character and passes it to onSave", async () => {
     const onSave = vi.fn();
-    render(<EditView isOpen characters={[]} onClose={vi.fn()} onSave={onSave} />);
+    render(
+      <EditView isOpen characters={[]} onClose={vi.fn()} onSave={onSave} />,
+    );
 
     await userEvent.type(screen.getByPlaceholderText("Name"), "Arthas");
-    await userEvent.selectOptions(screen.getByTestId("realm-select"), "tarren-mill");
+    await userEvent.selectOptions(
+      screen.getByTestId("realm-select"),
+      "tarren-mill",
+    );
     await userEvent.click(screen.getByTitle("Add"));
     await userEvent.click(screen.getByText("Done"));
 

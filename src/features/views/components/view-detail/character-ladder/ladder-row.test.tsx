@@ -17,7 +17,9 @@ vi.mock("@/features/views/constants/class-images.ts", () => ({
   getClassImageKey: () => "warrior",
 }));
 
-const makeProfile = (overrides: Partial<RaiderioProfile> = {}): RaiderioProfile => ({
+const makeProfile = (
+  overrides: Partial<RaiderioProfile> = {},
+): RaiderioProfile => ({
   id: 1,
   name: "Arthas",
   realm: "Tarren Mill",
@@ -51,14 +53,24 @@ describe("LadderRow", () => {
 
   it("does not show syncing indicator for normal characters", () => {
     render(
-      <LadderRow index={0} character={makeProfile()} cachedCharacters={[]} season={null} />,
+      <LadderRow
+        index={0}
+        character={makeProfile()}
+        cachedCharacters={[]}
+        season={null}
+      />,
     );
     expect(screen.queryByText("Character is syncing")).not.toBeInTheDocument();
   });
 
   it("shows score for non-syncing characters", () => {
     render(
-      <LadderRow index={0} character={makeProfile({ score: 3000 })} cachedCharacters={[]} season={null} />,
+      <LadderRow
+        index={0}
+        character={makeProfile({ score: 3000 })}
+        cachedCharacters={[]}
+        season={null}
+      />,
     );
     expect(screen.getByText("3,000")).toBeInTheDocument();
   });
@@ -79,7 +91,12 @@ describe("LadderRow", () => {
 
   it("toggles LadderRowExpanded on row click", async () => {
     render(
-      <LadderRow index={0} character={makeProfile()} cachedCharacters={[]} season={null} />,
+      <LadderRow
+        index={0}
+        character={makeProfile()}
+        cachedCharacters={[]}
+        season={null}
+      />,
     );
     expect(screen.queryByTestId("ladder-row-expanded")).not.toBeInTheDocument();
     await userEvent.click(screen.getByText("Arthas"));
@@ -87,5 +104,4 @@ describe("LadderRow", () => {
     await userEvent.click(screen.getByText("Arthas"));
     expect(screen.queryByTestId("ladder-row-expanded")).not.toBeInTheDocument();
   });
-
 });

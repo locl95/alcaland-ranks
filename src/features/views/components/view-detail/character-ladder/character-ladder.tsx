@@ -29,7 +29,12 @@ export function CharacterLadder({
         onClick={() => setIsLadderOpen(!isLadderOpen)}
       >
         <div className="ladder-title">
-          <img src={keystone} alt="" aria-hidden={true} className="keystone-icon" />
+          <img
+            src={keystone}
+            alt=""
+            aria-hidden={true}
+            className="keystone-icon"
+          />
           Ladder
         </div>
         <button className="ladder-toggle-btn">

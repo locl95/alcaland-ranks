@@ -7,7 +7,10 @@ interface SyncErrorDialogProps {
   onClose: () => void;
 }
 
-export function SyncErrorDialog({ failedCharacters, onClose }: Readonly<SyncErrorDialogProps>) {
+export function SyncErrorDialog({
+  failedCharacters,
+  onClose,
+}: Readonly<SyncErrorDialogProps>) {
   if (failedCharacters.length === 0) return null;
 
   return (
@@ -16,7 +19,9 @@ export function SyncErrorDialog({ failedCharacters, onClose }: Readonly<SyncErro
         <div className="sync-error-header">
           <div className="sync-error-title-row">
             <AlertTriangle className="sync-error-icon" />
-            <h2 className="sync-error-title">Some characters couldn't be synced</h2>
+            <h2 className="sync-error-title">
+              Some characters couldn't be synced
+            </h2>
           </div>
           <button onClick={onClose} className="sync-error-close-btn">
             <X size={20} />
@@ -25,13 +30,17 @@ export function SyncErrorDialog({ failedCharacters, onClose }: Readonly<SyncErro
 
         <div className="sync-error-body">
           <p className="sync-error-description">
-            The following characters were not found or couldn't be processed by the backend.
-            Please check that the name, realm, and region are correct and that the character exists.
+            The following characters were not found or couldn't be processed by
+            the backend. Please check that the name, realm, and region are
+            correct and that the character exists.
           </p>
 
           <ul className="sync-error-list">
             {failedCharacters.map((c) => (
-              <li key={`${c.region}-${c.realm}-${c.name}`} className="sync-error-char-row">
+              <li
+                key={`${c.region}-${c.realm}-${c.name}`}
+                className="sync-error-char-row"
+              >
                 <span className="sync-error-char-name">{c.name}</span>
                 <span className="sync-error-char-meta">
                   {c.region.toUpperCase()} · {c.realm}

@@ -8,6 +8,7 @@ Built with React + TypeScript + Vite. Data is served by [serresiete-backend](htt
 
 - Node 20+
 - pnpm 9+
+- prettier formatter
 
 ## Setup
 

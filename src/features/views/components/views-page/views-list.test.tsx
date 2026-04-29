@@ -9,18 +9,27 @@ import { ViewsList } from "./views-list.tsx";
 import { View } from "@/features/views/model/view.ts";
 import { SimpleView } from "@/features/views/api/view-types.ts";
 
-const makeSimpleView = (id: string, name: string, owner = "testuser"): SimpleView => ({
+const makeSimpleView = (
+  id: string,
+  name: string,
+  owner = "testuser",
+): SimpleView => ({
   id,
   name,
   owner,
   published: false,
-  entitiesIds: ["char1", "char2"],
+  entitiesIds: [1, 2],
   game: "WOW",
   featured: false,
   extraArguments: null,
 });
 
-const makeView = (id: string, name: string, isSynced = true, owner = "testuser"): View => ({
+const makeView = (
+  id: string,
+  name: string,
+  isSynced = true,
+  owner = "testuser",
+): View => ({
   id,
   simpleView: makeSimpleView(id, name, owner),
   isSynced,
@@ -30,7 +39,11 @@ const makeStore = (username: string | null = "testuser") =>
   configureStore({
     reducer: { auth: authReducer },
     preloadedState: {
-      auth: { accessToken: username ? "token" : null, refreshToken: null, username },
+      auth: {
+        accessToken: username ? "token" : null,
+        refreshToken: null,
+        username,
+      },
     },
   });
 
@@ -99,7 +112,9 @@ describe("ViewsList", () => {
   describe("pending views", () => {
     it("shows syncing message for pending views", () => {
       renderList([makeView("", "Pending", false)]);
-      expect(screen.getByText("Synchronizing with server...")).toBeInTheDocument();
+      expect(
+        screen.getByText("Synchronizing with server..."),
+      ).toBeInTheDocument();
     });
 
     it("does not call onViewClick when clicking a pending view", async () => {
@@ -111,12 +126,16 @@ describe("ViewsList", () => {
 
   describe("delete button", () => {
     it("shows delete button for owned views", () => {
-      renderList([makeView("v1", "My Ladder", true, "testuser")], { username: "testuser" });
+      renderList([makeView("v1", "My Ladder", true, "testuser")], {
+        username: "testuser",
+      });
       expect(screen.getByTitle("Delete view")).toBeInTheDocument();
     });
 
     it("does not show delete button for views owned by others", () => {
-      renderList([makeView("v1", "Other Ladder", true, "otherown")], { username: "testuser" });
+      renderList([makeView("v1", "Other Ladder", true, "otherown")], {
+        username: "testuser",
+      });
       expect(screen.queryByTitle("Delete view")).not.toBeInTheDocument();
     });
 

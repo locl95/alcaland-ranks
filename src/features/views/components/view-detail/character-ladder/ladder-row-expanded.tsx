@@ -18,18 +18,18 @@ export function LadderRowExpanded({
 }: Readonly<LadderRowExpandedProps>) {
   return (
     <div className="ladder-row-expanded">
-        {season && (
-            <DungeonThumbnails
-                season={season}
-                bestRuns={character.mythicPlusBestRuns}
-            />
-        )}
-
-        <RecentRuns
-            recentRuns={character.mythicPlusRecentRuns ?? []}
-            bestRuns={character.mythicPlusBestRuns}
-            characterClass={character.class}
+      {season && (
+        <DungeonThumbnails
+          season={season}
+          bestRuns={character.mythicPlusBestRuns}
         />
+      )}
+
+      <RecentRuns
+        recentRuns={character.mythicPlusRecentRuns ?? []}
+        bestRuns={character.mythicPlusBestRuns}
+        characterClass={character.class}
+      />
 
       {character.quantile != null && (
         <div className="quantile-banner">

@@ -7,7 +7,11 @@ import { configureStore } from "@reduxjs/toolkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ViewsPage } from "./views-page.tsx";
 import authReducer from "@/app/authSlice.ts";
-import { MockViewsList, MockCreateView, makeSimpleView } from "@/app/App.mocks.tsx";
+import {
+  MockViewsList,
+  MockCreateView,
+  makeSimpleView,
+} from "@/app/App.mocks.tsx";
 
 // ---------------------------------------------------------------------------
 // Hoisted mocks
@@ -23,12 +27,16 @@ const navState = vi.hoisted(() => {
   const listeners: (() => void)[] = [];
 
   return {
-    get path() { return path; },
+    get path() {
+      return path;
+    },
     navigate(to: string) {
       path = to;
       listeners.slice().forEach((l) => l());
     },
-    reset() { path = "/"; },
+    reset() {
+      path = "/";
+    },
     subscribe(l: () => void) {
       listeners.push(l);
       return () => {
@@ -59,11 +67,14 @@ vi.mock("@/features/views/components/views-page/views-list.tsx", () => ({
   ),
 }));
 
-vi.mock("@/features/views/components/views-page/actions/create-view.tsx", () => ({
-  CreateView: (props: Parameters<typeof MockCreateView>[0]) => (
-    <MockCreateView {...props} />
-  ),
-}));
+vi.mock(
+  "@/features/views/components/views-page/actions/create-view.tsx",
+  () => ({
+    CreateView: (props: Parameters<typeof MockCreateView>[0]) => (
+      <MockCreateView {...props} />
+    ),
+  }),
+);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -73,14 +84,20 @@ const createStore = (authenticated = true) =>
     reducer: { auth: authReducer },
     preloadedState: {
       auth: authenticated
-        ? { accessToken: "test-token", refreshToken: "test-refresh", username: null }
+        ? {
+            accessToken: "test-token",
+            refreshToken: "test-refresh",
+            username: null,
+          }
         : { accessToken: null, refreshToken: null, username: null },
     },
   });
 
 const createTestQueryClient = () =>
   new QueryClient({
-    defaultOptions: { queries: { retry: false, staleTime: Infinity, gcTime: 0 } },
+    defaultOptions: {
+      queries: { retry: false, staleTime: Infinity, gcTime: 0 },
+    },
   });
 
 const renderViewsPage = (authenticated = true) => {
@@ -172,9 +189,7 @@ describe("ViewsPage", () => {
 
     it("does not fetch own views when unauthenticated", async () => {
       renderViewsPage(false);
-      await waitFor(() =>
-        expect(fetchMocks.serviceGet).toHaveBeenCalled(),
-      );
+      await waitFor(() => expect(fetchMocks.serviceGet).toHaveBeenCalled());
       expect(fetchMocks.userRequest).not.toHaveBeenCalled();
     });
 
@@ -201,7 +216,9 @@ describe("ViewsPage", () => {
       await userEvent.click(screen.getByTestId("list-create-btn"));
       await userEvent.click(screen.getByTestId("close-dialog"));
 
-      expect(screen.queryByTestId("create-view-dialog")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("create-view-dialog"),
+      ).not.toBeInTheDocument();
     });
 
     it("redirects unauthenticated users to login when clicking create", async () => {
@@ -252,7 +269,10 @@ describe("ViewsPage", () => {
       await userEvent.click(screen.getByTestId("delete-v1"));
 
       await waitFor(() =>
-        expect(fetchMocks.userRequestVoid).toHaveBeenCalledWith("DELETE", "/views/v1"),
+        expect(fetchMocks.userRequestVoid).toHaveBeenCalledWith(
+          "DELETE",
+          "/views/v1",
+        ),
       );
     });
 
@@ -264,7 +284,9 @@ describe("ViewsPage", () => {
       await userEvent.click(screen.getByTestId("delete-v1"));
 
       await waitFor(() =>
-        expect(fetchMocks.userRequest.mock.calls.length).toBeGreaterThan(callsBefore),
+        expect(fetchMocks.userRequest.mock.calls.length).toBeGreaterThan(
+          callsBefore,
+        ),
       );
     });
   });
@@ -299,7 +321,9 @@ describe("ViewsPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByTestId("view-item-pending-id")).not.toBeInTheDocument();
+        expect(
+          screen.queryByTestId("view-item-pending-id"),
+        ).not.toBeInTheDocument();
         expect(screen.getByTestId("view-item-real-id")).toBeInTheDocument();
       });
     });

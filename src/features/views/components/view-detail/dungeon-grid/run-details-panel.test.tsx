@@ -1,7 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { RunDetailsPanel } from "./run-details-panel.tsx";
-import { MythicPlusRun, RunDetails, RunDetailsRosterEntry } from "@/features/views/api/raiderio.ts";
+import {
+  MythicPlusRun,
+  RunDetails,
+  RunDetailsRosterEntry,
+} from "@/features/views/api/raiderio.ts";
 
 vi.mock("./roster-row.tsx", () => ({
   RosterRow: ({ entry }: { entry: RunDetailsRosterEntry }) => (
@@ -10,7 +14,8 @@ vi.mock("./roster-row.tsx", () => ({
 }));
 
 vi.mock("@/features/views/api/raiderio.ts", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/features/views/api/raiderio.ts")>();
+  const actual =
+    await importOriginal<typeof import("@/features/views/api/raiderio.ts")>();
   return { ...actual, formatDate: () => "15-03-2024" };
 });
 
@@ -22,6 +27,7 @@ const makeRun = (): MythicPlusRun => ({
   num_keystone_upgrades: 3,
   completed_at: "2024-03-15T20:00:00Z",
   clear_time_ms: 1800000,
+  par_time_ms: 2200000,
   score: 300,
   url: "https://raider.io/test",
   affixes: [],
@@ -44,13 +50,19 @@ const makeDetails = (
   deathCount = 0,
 ): RunDetails => ({
   roster,
-  logged_details: { deaths: Array(deathCount).fill({ character_id: 1, approximate_died_at: 0 }) },
+  logged_details: {
+    deaths: Array(deathCount).fill({ character_id: 1, approximate_died_at: 0 }),
+  },
 });
 
 describe("RunDetailsPanel", () => {
   it("renders the unavailable message when details is null", () => {
-    render(<RunDetailsPanel run={makeRun()} details={null} characterRegion="eu" />);
-    expect(screen.getByText("Run details are currently unavailable.")).toBeInTheDocument();
+    render(
+      <RunDetailsPanel run={makeRun()} details={null} characterRegion="eu" />,
+    );
+    expect(
+      screen.getByText("Run details are currently unavailable."),
+    ).toBeInTheDocument();
   });
 
   it("shows death count from logged_details", () => {
@@ -61,7 +73,9 @@ describe("RunDetailsPanel", () => {
         characterRegion="eu"
       />,
     );
-    expect(screen.getByText(/x 3/, { selector: ".run-details-deaths" })).toBeInTheDocument();
+    expect(
+      screen.getByText(/x 3/, { selector: ".run-details-deaths" }),
+    ).toBeInTheDocument();
   });
 
   it("shows zero deaths when logged_details has no deaths", () => {
@@ -72,7 +86,9 @@ describe("RunDetailsPanel", () => {
         characterRegion="eu"
       />,
     );
-    expect(screen.getByText(/x 0/, { selector: ".run-details-deaths" })).toBeInTheDocument();
+    expect(
+      screen.getByText(/x 0/, { selector: ".run-details-deaths" }),
+    ).toBeInTheDocument();
   });
 
   it("shows the formatted run date", () => {
@@ -90,7 +106,10 @@ describe("RunDetailsPanel", () => {
     render(
       <RunDetailsPanel
         run={makeRun()}
-        details={makeDetails([makeEntry("Arthas", "dps"), makeEntry("Sylvanas", "healer")])}
+        details={makeDetails([
+          makeEntry("Arthas", "dps"),
+          makeEntry("Sylvanas", "healer"),
+        ])}
         characterRegion="eu"
       />,
     );

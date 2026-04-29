@@ -18,7 +18,9 @@ export function EditView({
   onClose,
   onSave,
 }: Readonly<EditViewProps>) {
-  const [editingCharacters, setEditingCharacters] = useState<RaiderioProfile[]>([]);
+  const [editingCharacters, setEditingCharacters] = useState<RaiderioProfile[]>(
+    [],
+  );
   const [newName, setNewName] = useState("");
   const [newRealm, setNewRealm] = useState("");
   const [newRegion, setNewRegion] = useState("eu");
@@ -54,7 +56,7 @@ export function EditView({
         class: { world: 0, region: 0, realm: 0 },
         specs: [],
       },
-      mythicPlusRecentRuns: []
+      mythicPlusRecentRuns: [],
     };
 
     setEditingCharacters((prev) => [...prev, newCharacter]);
@@ -71,9 +73,7 @@ export function EditView({
         <div className="edit-view-header">
           <div>
             <h2 className="edit-view-title">Edit your ladder</h2>
-            <p className="edit-view-subtitle">
-              Remove or add new characters
-            </p>
+            <p className="edit-view-subtitle">Remove or add new characters</p>
           </div>
           <button onClick={onClose} className="edit-view-close-btn">
             <X className="close-icon" />
@@ -99,9 +99,13 @@ export function EditView({
 
                   {character.score > -1 && (
                     <div className="character-edit-meta">
-                      <span className="character-edit-spec">{character.spec}</span>
+                      <span className="character-edit-spec">
+                        {character.spec}
+                      </span>
                       <span className="character-edit-separator">•</span>
-                      <span className="character-edit-realm">{character.realm}</span>
+                      <span className="character-edit-realm">
+                        {character.realm}
+                      </span>
                       <span className="character-edit-separator">•</span>
                       <span className="character-edit-score">
                         {character.score.toLocaleString()} M+

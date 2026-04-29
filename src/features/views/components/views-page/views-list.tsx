@@ -47,7 +47,11 @@ export function ViewsList({
         return (
           <div
             key={view.id}
-            className={["view-row", !isLast && "with-border", isPending && "view-row-pending"]
+            className={[
+              "view-row",
+              !isLast && "with-border",
+              isPending && "view-row-pending",
+            ]
               .filter(Boolean)
               .join(" ")}
             onClick={() => !isPending && onViewClick(view.id)}
@@ -56,7 +60,9 @@ export function ViewsList({
               <h3 className="view-row-title">{view.simpleView.name}</h3>
 
               {isPending && (
-                <p className="view-row-description">Synchronizing with server...</p>
+                <p className="view-row-description">
+                  Synchronizing with server...
+                </p>
               )}
 
               {!isPending && (
@@ -76,13 +82,18 @@ export function ViewsList({
               )}
             </div>
 
-            <div className="view-row-actions" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="view-row-actions"
+              onClick={(e) => e.stopPropagation()}
+            >
               {isPending && <Loader2 className="loading-icon" />}
 
               {!isPending && username === view.simpleView.owner && (
                 <button
                   className="view-row-delete-btn"
-                  title={viewsSyncing ? "Cannot delete while syncing" : "Delete view"}
+                  title={
+                    viewsSyncing ? "Cannot delete while syncing" : "Delete view"
+                  }
                   disabled={viewsSyncing}
                   onClick={() => onDeleteView(view.id)}
                 >

@@ -44,7 +44,9 @@ const makeView = (id: string, name: string, isSynced = true): View => ({
 
 const makeWrapper = () => {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false, staleTime: Infinity, gcTime: Infinity } },
+    defaultOptions: {
+      queries: { retry: false, staleTime: Infinity, gcTime: Infinity },
+    },
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -72,12 +74,16 @@ describe("useViewsData", () => {
       renderHook(() => useViewsData(false), { wrapper });
 
       await waitFor(() =>
-        expect(mockServiceGet).toHaveBeenCalledWith("/views?game=wow&featured=true"),
+        expect(mockServiceGet).toHaveBeenCalledWith(
+          "/views?game=wow&featured=true",
+        ),
       );
     });
 
     it("returns the featured views from the API", async () => {
-      mockServiceGet.mockResolvedValue({ records: [makeSimpleView("v1", "Featured")] });
+      mockServiceGet.mockResolvedValue({
+        records: [makeSimpleView("v1", "Featured")],
+      });
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(false), { wrapper });
 
@@ -105,7 +111,9 @@ describe("useViewsData", () => {
     });
 
     it("returns the own views from the API", async () => {
-      mockUserRequest.mockResolvedValue({ records: [makeSimpleView("v1", "My View")] });
+      mockUserRequest.mockResolvedValue({
+        records: [makeSimpleView("v1", "My View")],
+      });
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(true), { wrapper });
 
@@ -133,29 +141,39 @@ describe("useViewsData", () => {
   describe("deleteView", () => {
     it("removes the view from the cache optimistically", async () => {
       const { wrapper, queryClient } = makeWrapper();
-      queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView("v1", "My View")]);
+      queryClient.setQueryData<View[]>(viewKeys.ownList(), [
+        makeView("v1", "My View"),
+      ]);
 
       const { result } = renderHook(() => useViewsData(true), { wrapper });
 
       await act(async () => result.current.deleteView("v1"));
 
       await waitFor(() =>
-        expect(result.current.ownViews.find((v) => v.id === "v1")).toBeUndefined(),
+        expect(
+          result.current.ownViews.find((v) => v.id === "v1"),
+        ).toBeUndefined(),
       );
     });
 
     it("restores the view in the cache when the API call fails", async () => {
       mockUserRequestVoid.mockRejectedValue(new Error("Server error"));
-      mockUserRequest.mockResolvedValue({ records: [makeSimpleView("v1", "My View")] });
+      mockUserRequest.mockResolvedValue({
+        records: [makeSimpleView("v1", "My View")],
+      });
       const { wrapper, queryClient } = makeWrapper();
-      queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView("v1", "My View")]);
+      queryClient.setQueryData<View[]>(viewKeys.ownList(), [
+        makeView("v1", "My View"),
+      ]);
 
       const { result } = renderHook(() => useViewsData(true), { wrapper });
 
       await act(async () => result.current.deleteView("v1"));
 
       await waitFor(() =>
-        expect(result.current.ownViews.find((v) => v.id === "v1")).toBeDefined(),
+        expect(
+          result.current.ownViews.find((v) => v.id === "v1"),
+        ).toBeDefined(),
       );
     });
   });
@@ -176,7 +194,9 @@ describe("useViewsData", () => {
       });
 
       await waitFor(() =>
-        expect(result.current.ownViews).toContainEqual(expect.objectContaining({ isSynced: false })),
+        expect(result.current.ownViews).toContainEqual(
+          expect.objectContaining({ isSynced: false }),
+        ),
       );
     });
   });
