@@ -231,3 +231,13 @@
     width: 1.125rem;
     height: 1.125rem;
 }
+
+@media (max-width: 640px) {
+    .view-row-title {
+        font-size: 0.875rem;
+    }
+
+    .view-row {
+        padding: 0.875rem 1rem;
+    }
+}

@@ -186,3 +186,34 @@
   color: #64748b;
   font-size: 0.875rem;
 }
+
+@media (max-width: 640px) {
+  .view-detail-container {
+    padding: 1rem;
+  }
+
+  .view-detail-header {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .header-view-title {
+    font-size: 1rem;
+    margin: 0 0.5rem;
+  }
+
+  .header-back-button,
+  .header-edit-button {
+    padding: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .header-button-text {
+    display: none;
+  }
+
+  .header-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}

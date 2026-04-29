@@ -91,7 +91,7 @@ export function ViewsPage() {
               title={isSyncing ? "Wait for sync to complete" : undefined}
             >
               <Plus className="icon-lg" />
-              Ladder
+              <span className="create-view-btn-label">Ladder</span>
             </button>
 
             {isAuthenticated && username && (
@@ -127,13 +127,13 @@ export function ViewsPage() {
               className={`views-tab-btn${activeTab === "featured" ? " views-tab-btn--active" : ""}`}
               onClick={() => setActiveTab("featured")}
             >
-              Featured ladders
+              Featured
             </button>
             <button
               className={`views-tab-btn${activeTab === "own" ? " views-tab-btn--active" : ""}`}
               onClick={handleOwnTabClick}
             >
-              Own ladders
+              Own
             </button>
           </div>
         </div>

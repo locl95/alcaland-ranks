@@ -19,7 +19,7 @@ test.describe('unauthenticated', () => {
 
   test('redirects to login when clicking own ladders tab without auth', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: 'Own ladders' }).click();
+    await page.getByRole('button', { name: 'Own' }).click();
     await expect(page).toHaveURL('/login');
   });
 });
