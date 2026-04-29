@@ -15,7 +15,7 @@ export function makeSimpleView(id: string, name: string, owner = 'testuser'): Si
     name,
     owner,
     published: false,
-    entitiesIds: ['char1', 'char2'],
+    entitiesIds: [1, 2],
     game: 'WOW',
     featured: false,
     extraArguments: null,
