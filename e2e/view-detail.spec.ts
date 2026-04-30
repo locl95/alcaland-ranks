@@ -83,7 +83,7 @@ test.describe('view detail', () => {
 
     await page.getByPlaceholder('Name').fill('Sylvanas');
     await page.locator('select').nth(1).selectOption('silvermoon');
-    await page.getByRole('button', { name: 'Add' }).click();
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
     await page.getByRole('button', { name: 'Done' }).click();
 
     await expect(page.getByText('Edit your ladder')).not.toBeVisible();
@@ -123,7 +123,7 @@ test.describe('view detail', () => {
 
     await page.getByPlaceholder('Name').fill('Sylvanas');
     await page.locator('select').nth(1).selectOption('silvermoon');
-    await page.getByRole('button', { name: 'Add' }).click();
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
     await page.getByRole('button', { name: 'Done' }).click();
 
     await expect(page.getByText('Edit your ladder')).not.toBeVisible();

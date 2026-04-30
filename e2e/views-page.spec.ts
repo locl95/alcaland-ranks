@@ -62,7 +62,7 @@ test.describe('create view', () => {
     await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
     await page.getByPlaceholder('Name').fill('Arthas');
     await page.locator('select').nth(1).selectOption('tarren-mill');
-    await page.getByRole('button', { name: 'Add' }).click();
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
 
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
@@ -90,7 +90,7 @@ test.describe('create view', () => {
     await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
     await page.getByPlaceholder('Name').fill('Arthas');
     await page.locator('select').nth(1).selectOption('tarren-mill');
-    await page.getByRole('button', { name: 'Add' }).click();
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
 
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
