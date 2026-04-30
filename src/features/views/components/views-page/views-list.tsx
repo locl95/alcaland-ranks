@@ -30,11 +30,11 @@ export function ViewsList({
         <Users className="views-empty-icon" />
         <h3 className="views-empty-title">No views yet</h3>
         <p className="views-empty-text">
-          Create your first view to start tracking characters
+          Create your first ladder to start tracking characters
         </p>
         <button onClick={onCreateView} className="create-view-btn">
           <Plus className="view-row-icon" />
-          Create Your First View
+          Create your first ladder
         </button>
       </div>
     </div>

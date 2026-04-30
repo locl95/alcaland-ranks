@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { seedAuth, mockFeaturedViews, mockOwnViews, makeSimpleView } from './helpers';
+import { seedAuth } from './mocks/authMocks';
+import { makeSimpleView, mockFeaturedViews, mockOwnViews } from './mocks/viewMocks';
 
-const API = 'http://localhost:8080/api';
-
-const VALID_VIEW_ID = '12345678-1234-1234-1234-123456789012';
+import { API, VALID_VIEW_ID } from './constants';
 
 test.describe('unauthenticated', () => {
   test.beforeEach(async ({ page }) => {
@@ -58,12 +57,12 @@ test.describe('create view', () => {
     await page.route(`${API}/views`, (route) => route.fulfill({ json: {} }));
 
     await page.goto('/');
-    await page.getByRole('button', { name: 'Create Your First View' }).click();
+    await page.getByRole('button', { name: 'Create your first ladder' }).click();
 
     await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
     await page.getByPlaceholder('Name').fill('Arthas');
     await page.locator('select').nth(1).selectOption('tarren-mill');
-    await page.getByTitle('Add').click();
+    await page.getByRole('button', { name: 'Add' }).click();
 
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
@@ -86,12 +85,12 @@ test.describe('create view', () => {
     });
 
     await page.goto('/');
-    await page.getByRole('button', { name: 'Create Your First View' }).click();
+    await page.getByRole('button', { name: 'Create your first ladder' }).click();
 
     await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
     await page.getByPlaceholder('Name').fill('Arthas');
     await page.locator('select').nth(1).selectOption('tarren-mill');
-    await page.getByTitle('Add').click();
+    await page.getByRole('button', { name: 'Add' }).click();
 
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 

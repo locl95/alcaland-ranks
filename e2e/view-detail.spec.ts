@@ -1,18 +1,13 @@
 import { test, expect } from '@playwright/test';
-import {
-  seedAuth,
-  mockFeaturedViews,
-  mockOwnViews,
-  makeSimpleView,
-  mockCharacter,
-  mockSeason,
-} from './helpers';
+import { seedAuth } from './mocks/authMocks';
+import { makeSimpleView, mockFeaturedViews, mockOwnViews } from './mocks/viewMocks';
+import { mockCharacter, mockSeason } from './mocks/raiderioMocks';
 
-const API = 'http://localhost:8080/api';
-const VALID_VIEW_ID = '12345678-1234-1234-1234-123456789012';
+import { API, VALID_VIEW_ID } from './constants';
+import {ViewData} from "../src/features/views/api/raiderio";
 
-const viewData = { data: [mockCharacter], viewName: 'My Ladder' };
-const emptyViewData = { data: [], viewName: 'My Ladder' };
+const viewData: ViewData = { data: [mockCharacter], viewName: 'My Ladder' };
+const emptyViewData: ViewData = { data: [], viewName: 'My Ladder' };
 
 async function mockViewDetailApis(page: Parameters<typeof seedAuth>[0], data = viewData) {
   await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
@@ -63,8 +58,8 @@ test.describe('view detail', () => {
     await page.getByRole('button', { name: 'Edit' }).click();
     await expect(page.getByText('Edit your ladder')).toBeVisible();
 
-    await page.getByText('Delete').click();
-    await page.getByText('Done').click();
+    await page.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('button', { name: 'Done' }).click();
 
     await expect(page.getByText('Edit your ladder')).not.toBeVisible();
     await expect(page.getByText('Arthas')).toHaveCount(0);
@@ -88,8 +83,8 @@ test.describe('view detail', () => {
 
     await page.getByPlaceholder('Name').fill('Sylvanas');
     await page.locator('select').nth(1).selectOption('silvermoon');
-    await page.getByTitle('Add').click();
-    await page.getByText('Done').click();
+    await page.getByRole('button', { name: 'Add' }).click();
+    await page.getByRole('button', { name: 'Done' }).click();
 
     await expect(page.getByText('Edit your ladder')).not.toBeVisible();
     await expect(page.getByText('Arthas').first()).toBeVisible();
@@ -101,7 +96,7 @@ test.describe('view detail', () => {
     await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
 
-    const mockSylvanas = {
+    const mockAddedCharacter = {
       ...mockCharacter,
       id: 2,
       name: 'Sylvanas',
@@ -111,7 +106,7 @@ test.describe('view detail', () => {
 
     let saved = false;
     await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
-      route.fulfill({ json: saved ? { data: [mockCharacter, mockSylvanas], viewName: 'My Ladder' } : viewData }),
+      route.fulfill({ json: saved ? { data: [mockCharacter, mockAddedCharacter], viewName: 'My Ladder' } : viewData }),
     );
     await page.route(`${API}/views/${VALID_VIEW_ID}`, async (route) => {
       saved = true;
@@ -128,8 +123,8 @@ test.describe('view detail', () => {
 
     await page.getByPlaceholder('Name').fill('Sylvanas');
     await page.locator('select').nth(1).selectOption('silvermoon');
-    await page.getByTitle('Add').click();
-    await page.getByText('Done').click();
+    await page.getByRole('button', { name: 'Add' }).click();
+    await page.getByRole('button', { name: 'Done' }).click();
 
     await expect(page.getByText('Edit your ladder')).not.toBeVisible();
     await expect(page.getByText('Arthas').first()).toBeVisible();

@@ -80,7 +80,7 @@ describe("ViewsList", () => {
 
     it("calls onCreateView when clicking the create button in empty state", async () => {
       const { onCreateView } = renderList([]);
-      await userEvent.click(screen.getByText("Create Your First View"));
+      await userEvent.click(screen.getByText("Create your first ladder"));
       expect(onCreateView).toHaveBeenCalledOnce();
     });
 
