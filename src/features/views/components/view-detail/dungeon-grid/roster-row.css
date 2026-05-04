@@ -14,8 +14,8 @@
 
 .role-icon,
 .run-details-icons .spec-icon {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 1.125rem;
+    height: 1.125rem;
     object-fit: contain;
     flex-shrink: 0;
 }

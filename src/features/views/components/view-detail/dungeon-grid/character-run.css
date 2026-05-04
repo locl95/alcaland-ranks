@@ -76,7 +76,7 @@
 .spec-icon {
     width: 1.75rem;
     height: 1.75rem;
-    border-radius: 0.2rem;
+    border-radius: 0.25rem;
     object-fit: cover;
     flex-shrink: 0;
     box-shadow: 0 0 0 1px #475569;
