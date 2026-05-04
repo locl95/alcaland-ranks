@@ -1,4 +1,4 @@
-import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import "./ladder-row.css";
 import { memo, useState } from "react";
 import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
@@ -110,13 +110,6 @@ export const LadderRow = memo(function LadderRow({
             </div>
             <div className="ladder-actions">
               <CharacterMenu character={character} />
-              <button className="expand-btn">
-                {isExpanded ? (
-                  <ChevronUp className="chevron-icon" />
-                ) : (
-                  <ChevronDown className="chevron-icon" />
-                )}
-              </button>
             </div>
           </>
         )}

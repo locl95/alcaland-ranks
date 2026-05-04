@@ -54,8 +54,6 @@
 }
 
 .dungeon-content {
-    padding: 0.875rem 1.25rem 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
 }
