@@ -48,9 +48,10 @@ export function CharacterRun({
   const scoreImprovement = bestRun
     ? getScoreImprovement(cachedProfiles, character, bestRun)
     : 0;
-  const timeDelta = run
-    ? formatTimeDelta(run.clear_time_ms, run.par_time_ms)
-    : null;
+  const timeDelta =
+    run && run.par_time_ms != null
+      ? formatTimeDelta(run.clear_time_ms, run.par_time_ms)
+      : null;
 
   return (
     <div className="character-run-wrapper">

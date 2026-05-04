@@ -1,6 +1,6 @@
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import "./ladder-row.css";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
 import { CharacterMenu } from "./character-menu.tsx";
 import { LadderRowExpanded } from "./ladder-row-expanded.tsx";
@@ -18,7 +18,7 @@ interface LadderRowProps {
   season: Season | null;
 }
 
-export function LadderRow({
+export const LadderRow = memo(function LadderRow({
   index,
   character,
   cachedCharacters,
@@ -131,4 +131,4 @@ export function LadderRow({
       )}
     </div>
   );
-}
+});

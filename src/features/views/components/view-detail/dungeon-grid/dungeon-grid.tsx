@@ -1,4 +1,5 @@
 import "./dungeon-grid.css";
+import { memo, useMemo } from "react";
 import {
   MythicPlusRun,
   RaiderioProfile,
@@ -40,30 +41,34 @@ function getWinningRun(
   return scores.find((s) => s.bestRun)?.bestRun?.run;
 }
 
-export function DungeonGrid({
+export const DungeonGrid = memo(function DungeonGrid({
   raiderioProfiles,
   raiderioCachedProfiles,
   season,
 }: Readonly<DungeonGridProps>) {
-  return (
-    <div className="dungeon-grid">
-      {season.dungeons.map((dungeon) => {
+  const dungeonData = useMemo(
+    () =>
+      season.dungeons.map((dungeon) => {
         const characterScores = getCharacterScoresForDungeon(
           raiderioProfiles,
           dungeon.short_name,
         );
-        const winningRun = getWinningRun(characterScores);
+        return { dungeon, characterScores, winningRun: getWinningRun(characterScores) };
+      }),
+    [raiderioProfiles, season.dungeons],
+  );
 
-        return (
-          <DungeonCard
-            key={dungeon.challenge_mode_id}
-            dungeon={dungeon}
-            characterScores={characterScores}
-            winningRun={winningRun}
-            cachedProfiles={raiderioCachedProfiles}
-          />
-        );
-      })}
+  return (
+    <div className="dungeon-grid">
+      {dungeonData.map(({ dungeon, characterScores, winningRun }) => (
+        <DungeonCard
+          key={dungeon.challenge_mode_id}
+          dungeon={dungeon}
+          characterScores={characterScores}
+          winningRun={winningRun}
+          cachedProfiles={raiderioCachedProfiles}
+        />
+      ))}
     </div>
   );
-}
+});
