@@ -6,7 +6,12 @@ import { RealmSelect } from "./realm-select.tsx";
 describe("RealmSelect", () => {
   it("renders EU and NA region options", () => {
     render(
-      <RealmSelect region="eu" realm="" onRegionChange={vi.fn()} onRealmChange={vi.fn()} />,
+      <RealmSelect
+        region="eu"
+        realm=""
+        onRegionChange={vi.fn()}
+        onRealmChange={vi.fn()}
+      />,
     );
     expect(screen.getByRole("option", { name: "EU" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "NA" })).toBeInTheDocument();
@@ -59,7 +64,12 @@ describe("RealmSelect", () => {
 
   it("shows NA realms when region is us", () => {
     render(
-      <RealmSelect region="us" realm="" onRegionChange={vi.fn()} onRealmChange={vi.fn()} />,
+      <RealmSelect
+        region="us"
+        realm=""
+        onRegionChange={vi.fn()}
+        onRealmChange={vi.fn()}
+      />,
     );
     expect(screen.getByRole("option", { name: "Aegwynn" })).toBeInTheDocument();
   });

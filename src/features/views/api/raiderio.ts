@@ -27,6 +27,7 @@ export interface MythicPlusRun {
   num_keystone_upgrades: number;
   completed_at: string;
   clear_time_ms: number;
+  par_time_ms: number;
   score: number;
   url: string;
   affixes: Affix[];

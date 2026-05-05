@@ -1,8 +1,6 @@
 .run-details-panel {
-    background: rgba(5, 17, 31, 0.6);
-    border: 1px solid rgba(51, 65, 85, 0.35);
-    border-top: none;
-    border-radius: 0 0 0.5rem 0.5rem;
+    background: rgba(5, 17, 31, 0.4);
+    border-top: 1px solid rgba(51, 65, 85, 0.35);
     padding: 0.625rem 0.75rem;
 }
 

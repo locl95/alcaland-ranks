@@ -3,9 +3,9 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 8vh 1rem 1rem;
+  padding: 1rem;
   z-index: 50;
   animation: fadeIn 0.2s ease-out;
   backdrop-filter: blur(2px);

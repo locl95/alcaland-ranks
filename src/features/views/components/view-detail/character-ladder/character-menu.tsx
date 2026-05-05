@@ -24,7 +24,6 @@ export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
   return (
     <div className="char-menu-wrapper" ref={menuRef}>
       <button

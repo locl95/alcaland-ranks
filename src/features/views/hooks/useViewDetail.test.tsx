@@ -29,7 +29,10 @@ const VALID_ID = "12345678-1234-1234-1234-123456789012";
 const INVALID_ID = "not-a-uuid";
 const OWNER = "viewowner";
 
-const makeProfile = (name: string, id = Date.now() + Math.random()): RaiderioProfile => ({
+const makeProfile = (
+  name: string,
+  id = Date.now() + Math.random(),
+): RaiderioProfile => ({
   id,
   name,
   realm: "Tarren Mill",
@@ -51,11 +54,17 @@ const makeWrapper = (username: string | null = null) => {
   const store = configureStore({
     reducer: { auth: authReducer },
     preloadedState: {
-      auth: { accessToken: username ? "token" : null, refreshToken: null, username },
+      auth: {
+        accessToken: username ? "token" : null,
+        refreshToken: null,
+        username,
+      },
     },
   });
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false, staleTime: Infinity, gcTime: Infinity } },
+    defaultOptions: {
+      queries: { retry: false, staleTime: Infinity, gcTime: Infinity },
+    },
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -67,9 +76,18 @@ const makeWrapper = (username: string | null = null) => {
   return { wrapper, queryClient, store };
 };
 
-const seedCache = (queryClient: QueryClient, profiles: RaiderioProfile[] = []) => {
-  queryClient.setQueryData(viewKeys.data(VALID_ID), { data: profiles, viewName: "Test View" });
-  queryClient.setQueryData(viewKeys.cachedData(VALID_ID), { data: [], viewName: "Test View" });
+const seedCache = (
+  queryClient: QueryClient,
+  profiles: RaiderioProfile[] = [],
+) => {
+  queryClient.setQueryData(viewKeys.data(VALID_ID), {
+    data: profiles,
+    viewName: "Test View",
+  });
+  queryClient.setQueryData(viewKeys.cachedData(VALID_ID), {
+    data: [],
+    viewName: "Test View",
+  });
   queryClient.setQueryData(viewKeys.static(), null);
 };
 
@@ -90,19 +108,17 @@ describe("useViewDetail", () => {
   describe("UUID validation", () => {
     it("marks an invalid UUID as invalid", () => {
       const { wrapper } = makeWrapper();
-      const { result } = renderHook(
-        () => useViewDetail(INVALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(INVALID_ID, OWNER, 0), {
+        wrapper,
+      });
       expect(result.current.isViewIdValid).toBe(false);
     });
 
     it("marks a valid UUID as valid", () => {
       const { wrapper } = makeWrapper();
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
       expect(result.current.isViewIdValid).toBe(true);
     });
   });
@@ -112,10 +128,9 @@ describe("useViewDetail", () => {
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient);
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.initialized).toBe(true));
     });
@@ -126,10 +141,9 @@ describe("useViewDetail", () => {
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, []);
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.initialized).toBe(true));
       expect(result.current.profiles).toEqual([]);
@@ -140,10 +154,9 @@ describe("useViewDetail", () => {
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
       expect(result.current.profiles[0].name).toBe("Arthas");
@@ -158,13 +171,15 @@ describe("useViewDetail", () => {
         pendingCharacters: [charA, charB],
       });
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(2));
-      expect(result.current.profiles.map((p) => p.name)).toEqual(["Arthas", "Sylvanas"]);
+      expect(result.current.profiles.map((p) => p.name)).toEqual([
+        "Arthas",
+        "Sylvanas",
+      ]);
     });
 
     it("returns API data when backend catches up with pending characters", async () => {
@@ -175,10 +190,9 @@ describe("useViewDetail", () => {
         pendingCharacters: [charA],
       });
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.editMeta).toBeNull();
@@ -193,10 +207,9 @@ describe("useViewDetail", () => {
       const { wrapper, queryClient } = makeWrapper(OWNER);
       seedCache(queryClient);
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       expect(result.current.canEdit).toBe(true);
     });
@@ -205,10 +218,9 @@ describe("useViewDetail", () => {
       const { wrapper, queryClient } = makeWrapper("otheruser");
       seedCache(queryClient);
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       expect(result.current.canEdit).toBe(false);
     });
@@ -217,10 +229,9 @@ describe("useViewDetail", () => {
       const { wrapper, queryClient } = makeWrapper(null);
       seedCache(queryClient);
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       expect(result.current.canEdit).toBe(false);
     });
@@ -233,10 +244,9 @@ describe("useViewDetail", () => {
       seedCache(queryClient);
       queryClient.setQueryData(viewKeys.syncError(VALID_ID), [charA]);
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.syncError).toEqual([charA]));
 
@@ -252,10 +262,9 @@ describe("useViewDetail", () => {
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
@@ -270,10 +279,9 @@ describe("useViewDetail", () => {
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
@@ -298,12 +306,13 @@ describe("useViewDetail", () => {
       const charA = makeProfile("Arthas");
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, []);
-      queryClient.setQueryData(viewKeys.editMeta(VALID_ID), { pendingCharacters: [charA] });
+      queryClient.setQueryData(viewKeys.editMeta(VALID_ID), {
+        pendingCharacters: [charA],
+      });
 
-      const { result } = renderHook(
-        () => useViewDetail(VALID_ID, OWNER, 0),
-        { wrapper },
-      );
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, 0), {
+        wrapper,
+      });
 
       await waitFor(() => expect(result.current.initialized).toBe(true));
 

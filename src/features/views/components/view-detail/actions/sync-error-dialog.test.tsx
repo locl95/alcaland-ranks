@@ -32,9 +32,14 @@ describe("SyncErrorDialog", () => {
 
   it("renders the dialog when failedCharacters has entries", () => {
     render(
-      <SyncErrorDialog failedCharacters={[makeProfile("Arthas")]} onClose={vi.fn()} />,
+      <SyncErrorDialog
+        failedCharacters={[makeProfile("Arthas")]}
+        onClose={vi.fn()}
+      />,
     );
-    expect(screen.getByText("Some characters couldn't be synced")).toBeInTheDocument();
+    expect(
+      screen.getByText("Some characters couldn't be synced"),
+    ).toBeInTheDocument();
   });
 
   it("lists all failed character names", () => {
@@ -50,21 +55,36 @@ describe("SyncErrorDialog", () => {
 
   it("calls onClose when the close button is clicked", async () => {
     const onClose = vi.fn();
-    render(<SyncErrorDialog failedCharacters={[makeProfile("Arthas")]} onClose={onClose} />);
+    render(
+      <SyncErrorDialog
+        failedCharacters={[makeProfile("Arthas")]}
+        onClose={onClose}
+      />,
+    );
     await userEvent.click(screen.getByText("Got it"));
     expect(onClose).toHaveBeenCalledOnce();
   });
 
   it("calls onClose when clicking the overlay", async () => {
     const onClose = vi.fn();
-    render(<SyncErrorDialog failedCharacters={[makeProfile("Arthas")]} onClose={onClose} />);
+    render(
+      <SyncErrorDialog
+        failedCharacters={[makeProfile("Arthas")]}
+        onClose={onClose}
+      />,
+    );
     await userEvent.click(document.querySelector(".sync-error-overlay")!);
     expect(onClose).toHaveBeenCalledOnce();
   });
 
   it("does not call onClose when clicking inside the dialog content", async () => {
     const onClose = vi.fn();
-    render(<SyncErrorDialog failedCharacters={[makeProfile("Arthas")]} onClose={onClose} />);
+    render(
+      <SyncErrorDialog
+        failedCharacters={[makeProfile("Arthas")]}
+        onClose={onClose}
+      />,
+    );
     await userEvent.click(document.querySelector(".sync-error-content")!);
     expect(onClose).not.toHaveBeenCalled();
   });

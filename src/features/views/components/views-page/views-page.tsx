@@ -36,11 +36,18 @@ export function ViewsPage() {
   }, [isAuthenticated]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  const { featuredViews, isLoadingFeatured, ownViews, isLoadingOwn, createView, deleteView } =
-    useViewsData(isAuthenticated);
+  const {
+    featuredViews,
+    isLoadingFeatured,
+    ownViews,
+    isLoadingOwn,
+    createView,
+    deleteView,
+  } = useViewsData(isAuthenticated);
 
   const views = activeTab === "featured" ? featuredViews : ownViews;
-  const isLoadingViews = activeTab === "featured" ? isLoadingFeatured : isLoadingOwn;
+  const isLoadingViews =
+    activeTab === "featured" ? isLoadingFeatured : isLoadingOwn;
   const isSyncing = views.some((v) => !v.isSynced);
 
   const requireAuth = (action: () => void) => {
@@ -61,13 +68,15 @@ export function ViewsPage() {
     });
   };
 
-  const handleCreateClick = () => requireAuth(() => setIsCreateDialogOpen(true));
+  const handleCreateClick = () =>
+    requireAuth(() => setIsCreateDialogOpen(true));
 
   const handleOwnTabClick = () => requireAuth(() => setActiveTab("own"));
 
   const handleCreateView = (pendingView: View) => createView(pendingView);
 
-  const handleDeleteView = (viewId: string) => requireAuth(() => deleteView(viewId));
+  const handleDeleteView = (viewId: string) =>
+    requireAuth(() => deleteView(viewId));
 
   const handleLogout = async () => {
     await logout();
@@ -91,7 +100,7 @@ export function ViewsPage() {
               title={isSyncing ? "Wait for sync to complete" : undefined}
             >
               <Plus className="icon-lg" />
-              Ladder
+              <span className="create-view-btn-label">Ladder</span>
             </button>
 
             {isAuthenticated && username && (
@@ -127,13 +136,13 @@ export function ViewsPage() {
               className={`views-tab-btn${activeTab === "featured" ? " views-tab-btn--active" : ""}`}
               onClick={() => setActiveTab("featured")}
             >
-              Featured ladders
+              Featured
             </button>
             <button
               className={`views-tab-btn${activeTab === "own" ? " views-tab-btn--active" : ""}`}
               onClick={handleOwnTabClick}
             >
-              Own ladders
+              Own
             </button>
           </div>
         </div>

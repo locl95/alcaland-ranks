@@ -59,6 +59,16 @@ export function formatClearTime(ms: number): string {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
+export function formatTimeDelta(clearMs: number, parMs: number): { text: string; timed: boolean } {
+  const diffMs = Math.abs(parMs - clearMs);
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const sign = clearMs <= parMs ? "-" : "+";
+  const text = `${sign}${minutes}:${String(seconds).padStart(2, "0")}`;
+  return { text, timed: clearMs <= parMs };
+}
+
 export function formatDate(date: string | Date): string {
   const d = new Date(date);
   const day = String(d.getDate()).padStart(2, "0");

@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN, mockFeaturedViews, mockOwnViews } from './helpers';
+import { TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN } from './mocks/authMocks';
+import { mockFeaturedViews, mockOwnViews } from './mocks/viewMocks';
 
-const API = 'http://localhost:8080/api';
+import { API } from './constants';
 
 test.beforeEach(async ({ page }) => {
   await mockFeaturedViews(page);

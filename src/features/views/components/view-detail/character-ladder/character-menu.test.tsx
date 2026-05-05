@@ -5,7 +5,8 @@ import { CharacterMenu } from "./character-menu.tsx";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
 
 vi.mock("@/features/views/utils.ts", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/features/views/utils.ts")>();
+  const actual =
+    await importOriginal<typeof import("@/features/views/utils.ts")>();
   return { ...actual, openExternalProfile: vi.fn() };
 });
 

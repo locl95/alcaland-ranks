@@ -47,13 +47,20 @@ export function CreateView({
   if (!open) return null;
 
   return (
-    <div className="dialog-overlay" onClick={(e) => e.target === e.currentTarget && onOpenChange(false)}>
+    <div
+      className="dialog-overlay"
+      onClick={(e) => e.target === e.currentTarget && onOpenChange(false)}
+    >
       <div className="dialog-content">
         <div className="dialog-header">
           <div>
             <h1 className="dialog-title">Create new m+ ladder</h1>
           </div>
-          <button type="button" className="dialog-close-btn" onClick={() => onOpenChange(false)}>
+          <button
+            type="button"
+            className="dialog-close-btn"
+            onClick={() => onOpenChange(false)}
+          >
             <X size={20} />
           </button>
         </div>
@@ -77,7 +84,9 @@ export function CreateView({
                   className="form-input"
                   placeholder="Name"
                   value={char.name}
-                  onChange={(e) => updateCharacter(index, "name", e.target.value)}
+                  onChange={(e) =>
+                    updateCharacter(index, "name", e.target.value)
+                  }
                 />
 
                 <RealmSelect
@@ -114,7 +123,11 @@ export function CreateView({
           </div>
 
           <div className="dialog-footer">
-            <button type="submit" className="btn btn-primary" disabled={!canSubmit}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!canSubmit}
+            >
               Create
             </button>
           </div>

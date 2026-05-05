@@ -39,7 +39,9 @@ vi.mock("@/shared/components/spinner", () => ({
 const makeStore = () =>
   configureStore({
     reducer: { auth: authReducer },
-    preloadedState: { auth: { accessToken: null, refreshToken: null, username: null } },
+    preloadedState: {
+      auth: { accessToken: null, refreshToken: null, username: null },
+    },
   });
 
 const renderPage = () => {
@@ -63,7 +65,10 @@ const renderPage = () => {
 describe("LoginPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    authMocks.login.mockResolvedValue({ accessToken: "acc", refreshToken: "ref" });
+    authMocks.login.mockResolvedValue({
+      accessToken: "acc",
+      refreshToken: "ref",
+    });
     navMock.from = "/";
   });
 
@@ -99,7 +104,9 @@ describe("LoginPage", () => {
     await userEvent.type(screen.getByLabelText("Password"), "secret");
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
-    await waitFor(() => expect(navMock.navigate).toHaveBeenCalledWith("/", { replace: true }));
+    await waitFor(() =>
+      expect(navMock.navigate).toHaveBeenCalledWith("/", { replace: true }),
+    );
     expect(store.getState().auth.accessToken).toBe("acc");
   });
 
@@ -111,7 +118,9 @@ describe("LoginPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
     await waitFor(() =>
-      expect(screen.getByText("Invalid username or password.")).toBeInTheDocument(),
+      expect(
+        screen.getByText("Invalid username or password."),
+      ).toBeInTheDocument(),
     );
     expect(navMock.navigate).not.toHaveBeenCalled();
   });
@@ -138,7 +147,9 @@ describe("LoginPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
     await waitFor(() =>
-      expect(navMock.navigate).toHaveBeenCalledWith("/my-ladder", { replace: true }),
+      expect(navMock.navigate).toHaveBeenCalledWith("/my-ladder", {
+        replace: true,
+      }),
     );
   });
 });

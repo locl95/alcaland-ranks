@@ -2,7 +2,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { CharacterRun } from "./character-run.tsx";
-import { MythicPlusBestRun, RaiderioProfile } from "@/features/views/api/raiderio.ts";
+import {
+  MythicPlusBestRun,
+  RaiderioProfile,
+} from "@/features/views/api/raiderio.ts";
 
 vi.mock("./run-details-panel.tsx", () => ({
   RunDetailsPanel: () => <div data-testid="run-details-panel" />,
@@ -123,11 +126,20 @@ describe("CharacterRun", () => {
 
   it("shows score improvement when cached score is lower", () => {
     const profile = makeProfile("Arthas", 42);
-    const cachedProfile = { ...profile, mythicPlusBestRuns: [
-      { run: { short_name: "SIEGE", score: 180 }, details: [] } as unknown as MythicPlusBestRun,
-    ] };
+    const cachedProfile = {
+      ...profile,
+      mythicPlusBestRuns: [
+        {
+          run: { short_name: "SIEGE", score: 180 },
+          details: [],
+        } as unknown as MythicPlusBestRun,
+      ],
+    };
     profile.mythicPlusBestRuns = [
-      { run: { short_name: "SIEGE", score: 200 }, details: [] } as unknown as MythicPlusBestRun,
+      {
+        run: { short_name: "SIEGE", score: 200 },
+        details: [],
+      } as unknown as MythicPlusBestRun,
     ];
 
     render(

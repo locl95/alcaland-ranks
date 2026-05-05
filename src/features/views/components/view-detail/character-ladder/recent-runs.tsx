@@ -8,8 +8,7 @@ import {
   formatDate,
 } from "@/features/views/api/raiderio.ts";
 import { KEYSTONE_DISPLAY } from "@/features/views/constants/keystone.ts";
-import {CLASS_COLORS} from "@/features/views/constants/class-colors.ts";
-
+import { CLASS_COLORS } from "@/features/views/constants/class-colors.ts";
 
 import { getClassSlug } from "@/features/views/utils.ts";
 
@@ -33,10 +32,7 @@ export function RecentRuns({
 
   return (
     <div className="recent-runs-section">
-      <button
-        className="recent-runs-toggle"
-        onClick={() => setIsOpen(!isOpen)}
-      >
+      <button className="recent-runs-toggle" onClick={() => setIsOpen(!isOpen)}>
         <span>Recent mythic+ activity</span>
         {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
@@ -61,10 +57,13 @@ export function RecentRuns({
                   {run.spec.name}
                 </span>
                 {(() => {
-                  const { prefix, className } = KEYSTONE_DISPLAY[run.num_keystone_upgrades] ?? KEYSTONE_DISPLAY[0];
+                  const { prefix, className } =
+                    KEYSTONE_DISPLAY[run.num_keystone_upgrades] ??
+                    KEYSTONE_DISPLAY[0];
                   return (
                     <span className={`recent-run-level ${className}`}>
-                      {prefix}{run.mythic_level}
+                      {prefix}
+                      {run.mythic_level}
                     </span>
                   );
                 })()}
@@ -91,9 +90,13 @@ export function RecentRuns({
               onClick={() => setShowAll(!showAll)}
             >
               {showAll ? (
-                <><ChevronUp size={13} /> Show less</>
+                <>
+                  <ChevronUp size={13} /> Show less
+                </>
               ) : (
-                <><ChevronDown size={13} /> Show {recentRuns.length - 5} more</>
+                <>
+                  <ChevronDown size={13} /> Show {recentRuns.length - 5} more
+                </>
               )}
             </button>
           )}

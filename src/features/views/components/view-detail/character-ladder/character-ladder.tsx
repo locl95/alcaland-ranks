@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import keystone from "@/assets/keystone.webp";
 import "./character-ladder.css";
-import { useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
 import { LadderRow } from "./ladder-row.tsx";
 
@@ -11,15 +11,19 @@ interface CharacterLadderProps {
   season: Season | null;
 }
 
-export function CharacterLadder({
+export const CharacterLadder = memo(function CharacterLadder({
   characters,
   cachedCharacters,
   season,
 }: Readonly<CharacterLadderProps>) {
   const [isLadderOpen, setIsLadderOpen] = useState(true);
-  const sortedCharacters = [...characters].sort((a, b) => b.score - a.score);
-  const sortedCachedCharacters = [...cachedCharacters].sort(
-    (a, b) => b.score - a.score,
+  const sortedCharacters = useMemo(
+    () => [...characters].sort((a, b) => b.score - a.score),
+    [characters],
+  );
+  const sortedCachedCharacters = useMemo(
+    () => [...cachedCharacters].sort((a, b) => b.score - a.score),
+    [cachedCharacters],
   );
 
   return (
@@ -29,7 +33,12 @@ export function CharacterLadder({
         onClick={() => setIsLadderOpen(!isLadderOpen)}
       >
         <div className="ladder-title">
-          <img src={keystone} alt="" aria-hidden={true} className="keystone-icon" />
+          <img
+            src={keystone}
+            alt=""
+            aria-hidden={true}
+            className="keystone-icon"
+          />
           Ladder
         </div>
         <button className="ladder-toggle-btn">
@@ -56,4 +65,4 @@ export function CharacterLadder({
       )}
     </div>
   );
-}
+});

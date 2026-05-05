@@ -30,11 +30,11 @@ export function ViewsList({
         <Users className="views-empty-icon" />
         <h3 className="views-empty-title">No views yet</h3>
         <p className="views-empty-text">
-          Create your first view to start tracking characters
+          Create your first ladder to start tracking characters
         </p>
         <button onClick={onCreateView} className="create-view-btn">
           <Plus className="view-row-icon" />
-          Create Your First View
+          Create your first ladder
         </button>
       </div>
     </div>
@@ -47,7 +47,11 @@ export function ViewsList({
         return (
           <div
             key={view.id}
-            className={["view-row", !isLast && "with-border", isPending && "view-row-pending"]
+            className={[
+              "view-row",
+              !isLast && "with-border",
+              isPending && "view-row-pending",
+            ]
               .filter(Boolean)
               .join(" ")}
             onClick={() => !isPending && onViewClick(view.id)}
@@ -56,7 +60,9 @@ export function ViewsList({
               <h3 className="view-row-title">{view.simpleView.name}</h3>
 
               {isPending && (
-                <p className="view-row-description">Synchronizing with server...</p>
+                <p className="view-row-description">
+                  Synchronizing with server...
+                </p>
               )}
 
               {!isPending && (
@@ -76,13 +82,18 @@ export function ViewsList({
               )}
             </div>
 
-            <div className="view-row-actions" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="view-row-actions"
+              onClick={(e) => e.stopPropagation()}
+            >
               {isPending && <Loader2 className="loading-icon" />}
 
               {!isPending && username === view.simpleView.owner && (
                 <button
                   className="view-row-delete-btn"
-                  title={viewsSyncing ? "Cannot delete while syncing" : "Delete view"}
+                  title={
+                    viewsSyncing ? "Cannot delete while syncing" : "Delete view"
+                  }
                   disabled={viewsSyncing}
                   onClick={() => onDeleteView(view.id)}
                 >

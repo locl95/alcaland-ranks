@@ -1,17 +1,34 @@
 .ladder-row {
     display: flex;
     flex-direction: column;
-    background: rgba(15, 30, 55, 0.4);
-    border: 1px solid rgba(51, 65, 85, 0.35);
-    border-radius: 0.5rem;
-    transition: background 0.2s, border-color 0.2s;
-    overflow: visible;
+    background: transparent;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.35);
+    transition: background 0.2s;
     position: relative;
 }
 
+.ladder-row:last-child {
+    border-bottom: none;
+}
+
+.ladder-row::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #38bdf8;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+}
+
+.ladder-row:hover::before {
+    transform: scaleY(1);
+}
+
 .ladder-row:hover {
-    background: rgba(56, 189, 248, 0.05);
-    border-color: rgba(51, 65, 85, 0.5);
+    background: rgba(56, 189, 248, 0.04);
 }
 
 .ladder-row-inner {
@@ -249,20 +266,6 @@
     gap: 0.75rem;
 }
 
-.expand-btn {
-    background: transparent;
-    border: none;
-    color: #475569;
-    cursor: pointer;
-    padding: 0.25rem;
-    display: flex;
-    align-items: center;
-    transition: color 0.2s;
-}
-
-.expand-btn:hover {
-    color: #94a3b8;
-}
 
 @media (max-width: 640px) {
     .ladder-row-inner {

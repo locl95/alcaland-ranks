@@ -166,7 +166,9 @@ describe("useCreateViewForm", () => {
 
       await act(async () => result.current.handleSubmit(makeSubmitEvent()));
 
-      expect(result.current.error).toBe("Failed to create ladder. Please try again.");
+      expect(result.current.error).toBe(
+        "Failed to create ladder. Please try again.",
+      );
       expect(onClose).not.toHaveBeenCalled();
       expect(onCreateView).not.toHaveBeenCalled();
     });

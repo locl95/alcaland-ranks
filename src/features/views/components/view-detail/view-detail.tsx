@@ -13,7 +13,10 @@ export function ViewDetail() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const locationState = location.state as { owner?: string; entitiesCount?: number } | null;
+  const locationState = location.state as {
+    owner?: string;
+    entitiesCount?: number;
+  } | null;
   const owner = locationState?.owner ?? null;
   const entitiesCount = locationState?.entitiesCount ?? 0;
 
@@ -33,7 +36,6 @@ export function ViewDetail() {
     saveCharacters,
     clearSyncError,
   } = useViewDetail(viewId, owner, entitiesCount);
-
 
   useEffect(() => {
     if (viewId && !isViewIdValid) {
@@ -74,7 +76,8 @@ export function ViewDetail() {
             <Loader2 className="syncing-icon" />
             <h3 className="syncing-title">Syncing characters…</h3>
             <p className="syncing-text">
-              Your characters are being prepared. This usually takes a few seconds.
+              Your characters are being prepared. This usually takes a few
+              seconds.
             </p>
           </div>
         ) : profiles.length === 0 ? (
@@ -85,7 +88,10 @@ export function ViewDetail() {
               Add characters to start tracking their Mythic+ progress
             </p>
             {canEdit && (
-              <button className="empty-add-btn" onClick={() => setIsEditOpen(true)}>
+              <button
+                className="empty-add-btn"
+                onClick={() => setIsEditOpen(true)}
+              >
                 Add Your First Character
               </button>
             )}
