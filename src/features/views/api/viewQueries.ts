@@ -13,12 +13,12 @@ export const viewKeys = {
 
 export const fetchViews = async (): Promise<View[]> => {
   const res = await serviceGet<GetViewsResponse>("/views?game=wow&featured=true");
-  return res.records.map((v) => ({ id: v.id, simpleView: v, status: "synced" }));
+  return res.records.map((v) => ({ operationId: null, simpleView: v, status: "synced" }));
 };
 
 export const fetchOwnViews = async (): Promise<View[]> => {
   const res = await userRequest<GetViewsResponse>("GET", "/views?game=wow");
-  return res.records.map((v) => ({ id: v.id, simpleView: v, status: "synced" }));
+  return res.records.map((v) => ({ operationId: null, simpleView: v, status: "synced" }));
 };
 
 export const fetchViewData = (viewId: string): Promise<ViewData> =>

@@ -17,14 +17,13 @@ export const MockViewsList = ({
 }) => (
   <div data-testid="views-list">
     {views.map((v) => (
-      <div key={v.id} data-testid={`view-item-${v.id}`}>
-        {deletingViewId === v.id && <span data-testid={`deleting-${v.id}`}>Deleting…</span>}
-        <button data-testid={`open-${v.id}`} onClick={() => onViewClick(v.id)}>
+      <div key={v.simpleView.id} data-testid={`view-item-${v.simpleView.id}`}>
+        <button data-testid={`open-${v.simpleView.id}`} onClick={() => onViewClick(v.simpleView.id)}>
           Open {v.simpleView.name}
         </button>
         <button
-          data-testid={`delete-${v.id}`}
-          onClick={() => onDeleteView(v.id)}
+          data-testid={`delete-${v.simpleView.id}`}
+          onClick={() => onDeleteView(v.simpleView.id)}
         >
           Delete {v.simpleView.name}
         </button>
@@ -51,7 +50,7 @@ export const MockCreateView = ({
         data-testid="submit-create"
         onClick={() =>
           onCreateView({
-            id: "pending-id",
+            operationId: "pending-id",
             simpleView: makeSimpleView("pending-id", "Pending View"),
             status: "pending",
           })

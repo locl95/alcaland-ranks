@@ -69,14 +69,14 @@ export function EditView({
   if (!isOpen) return null;
 
   return (
-    <div className="edit-view-overlay" onClick={onClose}>
+    <div className="edit-view-overlay" data-testid="edit-view-overlay" onClick={onClose}>
       <div className="edit-view-content" onClick={(e) => e.stopPropagation()}>
         <div className="edit-view-header">
           <div>
             <h2 className="edit-view-title">Edit your ladder</h2>
             <p className="edit-view-subtitle">Remove or add new characters</p>
           </div>
-          <button onClick={onClose} className="edit-view-close-btn">
+          <button onClick={onClose} className="edit-view-close-btn" aria-label="Close">
             <X className="close-icon" />
           </button>
         </div>

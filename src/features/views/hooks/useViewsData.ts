@@ -8,6 +8,7 @@ export function useViewsData(isAuthenticated: boolean) {
   const queryClient = useQueryClient();
   const [pendingViews, setPendingViews] = useState<View[]>([]);
   const [deletingViewId, setDeletingViewId] = useState<string | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const { data: featuredViews = [], isLoading: isLoadingFeatured } = useQuery({
     queryKey: viewKeys.list(),
@@ -24,27 +25,44 @@ export function useViewsData(isAuthenticated: boolean) {
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    refetchInterval: pendingViews.length > 0 ? 3000 : false,
   });
 
   const ownViews = useMemo(() => {
-    const serverNames = new Set(serverOwnViews.map((v) => v.simpleView.name));
-    const stillPending = pendingViews.filter((v) => !serverNames.has(v.simpleView.name));
-    return [...serverOwnViews, ...stillPending];
-  }, [serverOwnViews, pendingViews]);
+    const serverIds = new Set(serverOwnViews.map((v) => v.simpleView.id));
+    const stillPending = pendingViews.filter((v) => !serverIds.has(v.simpleView.id));
+    const all = [...serverOwnViews, ...stillPending];
+    return deletingViewId ? all.filter((v) => v.simpleView.id !== deletingViewId) : all;
+  }, [serverOwnViews, pendingViews, deletingViewId]);
 
   const createView = (pendingView: View) => {
     setPendingViews((prev) => [...prev, pendingView]);
 
-    pollOperation(pendingView.id)
+    pollOperation(pendingView.operationId!)
       .then((result) => {
-        setPendingViews((prev) => prev.filter((v) => v.id !== pendingView.id));
-        if (result.status === "COMPLETED") {
+        if (result.status === "COMPLETED" && result.resourceId) {
+          // Update simpleView.id to the real view ID so the ID-based dedup in the
+          // memo can remove the pending entry once the server refetch returns it.
+          setPendingViews((prev) =>
+            prev.map((v) =>
+              v.operationId === pendingView.operationId
+                ? { ...v, simpleView: { ...v.simpleView, id: result.resourceId! } }
+                : v,
+            ),
+          );
           queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+        } else {
+          setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
+          if (result.status === "COMPLETED") {
+            queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+          } else {
+            setCreateError("Failed to create ladder. Please try again.");
+          }
         }
       })
       .catch(() => {
-        setPendingViews((prev) => prev.filter((v) => v.id !== pendingView.id));
+        // Network error after POST succeeded — view may exist on server.
+        setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
+        queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
       });
   };
 
@@ -69,5 +87,7 @@ export function useViewsData(isAuthenticated: boolean) {
     createView,
     deleteView,
     deletingViewId,
+    createError,
+    clearCreateError: () => setCreateError(null),
   };
 }

@@ -30,7 +30,7 @@ const makeView = (
   status: View["status"] = "synced",
   owner = "testuser",
 ): View => ({
-  id,
+  operationId: status === "pending" ? id : null,
   simpleView: makeSimpleView(id, name, owner),
   status,
 });
@@ -61,6 +61,7 @@ const renderList = (
       <ViewsList
         views={views}
         isLoadingViews={isLoadingViews}
+        deletingViewId={null}
         onViewClick={onViewClick}
         onCreateView={onCreateView}
         onDeleteView={onDeleteView}

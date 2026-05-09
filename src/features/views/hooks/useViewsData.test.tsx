@@ -43,7 +43,7 @@ const makeSimpleView = (id: string, name: string): SimpleView => ({
 });
 
 const makeView = (id: string, name: string, status: View["status"] = "synced"): View => ({
-  id,
+  operationId: status === "pending" ? id : null,
   simpleView: makeSimpleView(id, name),
   status,
 });
@@ -86,7 +86,7 @@ describe("useViewsData", () => {
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(false), { wrapper });
       await waitFor(() => expect(result.current.featuredViews).toHaveLength(1));
-      expect(result.current.featuredViews[0].id).toBe("v1");
+      expect(result.current.featuredViews[0].simpleView.id).toBe("v1");
     });
   });
 
@@ -109,7 +109,7 @@ describe("useViewsData", () => {
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(true), { wrapper });
       await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
-      expect(result.current.ownViews[0].id).toBe("v1");
+      expect(result.current.ownViews[0].simpleView.id).toBe("v1");
     });
   });
 
@@ -143,12 +143,12 @@ describe("useViewsData", () => {
 
       await waitFor(() => {
         const view = result.current.ownViews.find((v) => v.simpleView.name === "New View");
-        expect(view?.id).toBe("real-view-id");
+        expect(view?.simpleView.id).toBe("real-view-id");
         expect(view?.status).toBe("synced");
       });
     });
 
-    it("removes the pending view when the operation fails", async () => {
+    it("removes the pending view and sets createError when the operation fails", async () => {
       mockPollOperation.mockResolvedValue({ id: "op-123", status: "FAILED" });
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(true), { wrapper });
@@ -158,7 +158,41 @@ describe("useViewsData", () => {
       const pending = makeView("op-123", "New View", "pending");
       act(() => result.current.createView(pending));
 
-      await waitFor(() => expect(result.current.ownViews.find((v) => v.id === "op-123")).toBeUndefined());
+      await waitFor(() => {
+        expect(result.current.ownViews.find((v) => v.operationId === "op-123")).toBeUndefined();
+        expect(result.current.createError).not.toBeNull();
+      });
+    });
+
+    it("clears createError when clearCreateError is called", async () => {
+      mockPollOperation.mockResolvedValue({ id: "op-123", status: "FAILED" });
+      const { wrapper } = makeWrapper();
+      const { result } = renderHook(() => useViewsData(true), { wrapper });
+
+      await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
+
+      act(() => result.current.createView(makeView("op-123", "New View", "pending")));
+      await waitFor(() => expect(result.current.createError).not.toBeNull());
+
+      act(() => result.current.clearCreateError());
+      await waitFor(() => expect(result.current.createError).toBeNull());
+    });
+
+    it("removes the pending view and invalidates when polling throws a network error", async () => {
+      mockPollOperation.mockRejectedValue(new Error("Network error"));
+      const { wrapper, queryClient } = makeWrapper();
+      const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+      const { result } = renderHook(() => useViewsData(true), { wrapper });
+
+      await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
+
+      act(() => result.current.createView(makeView("op-123", "New View", "pending")));
+
+      await waitFor(() => {
+        expect(result.current.ownViews.find((v) => v.operationId === "op-123")).toBeUndefined();
+        expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: viewKeys.ownList() });
+      });
+      expect(result.current.createError).toBeNull();
     });
 
     it("keeps pending views in the list when a server refetch does not yet include them", async () => {
@@ -186,6 +220,22 @@ describe("useViewsData", () => {
   });
 
   describe("deleteView", () => {
+    it("removes the view from ownViews immediately on delete", async () => {
+      mockUserRequest.mockImplementation((method: string) => {
+        if (method === "DELETE") return new Promise(() => {});
+        return Promise.resolve({ records: [makeSimpleView("v1", "My View")] });
+      });
+      const { wrapper, queryClient } = makeWrapper();
+      queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView("v1", "My View")]);
+
+      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
+
+      act(() => { result.current.deleteView("v1"); });
+
+      expect(result.current.ownViews).toHaveLength(0);
+    });
+
     it("sets deletingViewId while the operation is in flight", async () => {
       let resolveDelete!: (v: { id: string }) => void;
       mockUserRequest.mockImplementation((method: string) => {

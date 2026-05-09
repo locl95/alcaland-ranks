@@ -44,20 +44,19 @@ export function ViewsList({
     <div className="views-list-container-box">
       {views.map((view, index) => {
         const isPending = view.status === "pending";
-        const isDeleting = deletingViewId === view.id;
-        const isDisabled = isPending || isDeleting;
+        const isDisabled = isPending;
         const isLast = index === views.length - 1;
 
         return (
           <div
-            key={view.id}
+            key={view.simpleView.id}
             className={[
               "view-row",
               !isLast && "with-border",
               isDisabled && "view-row-pending",
             ].filter(Boolean)
               .join(" ")}
-            onClick={() => !isDisabled && onViewClick(view.id)}
+            onClick={() => !isDisabled && onViewClick(view.simpleView.id)}
           >
             <div className="view-row-content">
               <h3 className="view-row-title">{view.simpleView.name}</h3>
@@ -66,10 +65,6 @@ export function ViewsList({
                 <p className="view-row-description">
                   Synchronizing with server...
                 </p>
-              )}
-
-              {isDeleting && (
-                <p className="view-row-description">Deleting...</p>
               )}
 
               {!isDisabled && (
@@ -100,7 +95,7 @@ export function ViewsList({
                   className="view-row-delete-btn"
                   title={pendingViews || !!deletingViewId ? "Cannot delete while syncing" : "Delete view"}
                   disabled={pendingViews || !!deletingViewId}
-                  onClick={() => onDeleteView(view.id)}
+                  onClick={() => onDeleteView(view.simpleView.id)}
                 >
                   <Trash2 className="view-row-menu-icon" />
                 </button>

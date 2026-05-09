@@ -84,7 +84,7 @@ export function useCreateViewForm(
       });
 
       onCreateView({
-        id: operationId,
+        operationId,
         simpleView: {
           id: operationId,
           name,

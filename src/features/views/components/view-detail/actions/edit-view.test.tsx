@@ -123,7 +123,7 @@ describe("EditView", () => {
     render(
       <EditView isOpen characters={[]} onClose={onClose} onSave={vi.fn()} />,
     );
-    await userEvent.click(document.querySelector(".edit-view-close-btn")!);
+    await userEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(onClose).toHaveBeenCalledOnce();
   });
 
@@ -159,7 +159,7 @@ describe("EditView", () => {
     render(
       <EditView isOpen characters={[]} onClose={onClose} onSave={vi.fn()} />,
     );
-    await userEvent.click(document.querySelector(".edit-view-overlay")!);
+    await userEvent.click(screen.getByTestId("edit-view-overlay"));
     expect(onClose).toHaveBeenCalledOnce();
   });
 

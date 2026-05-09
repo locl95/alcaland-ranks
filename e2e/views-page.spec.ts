@@ -54,7 +54,11 @@ test.describe('create view', () => {
   });
 
   test('submits the form and shows the pending view in the list', async ({ page }) => {
-    await page.route(`${API}/views`, (route) => route.fulfill({ json: {} }));
+    await page.route(`${API}/views`, (route) => route.fulfill({ json: { id: 'op-123' } }));
+    // Keep the poll alive so the pending view stays visible during the assertion.
+    await page.route(`${API}/operations/op-123`, (route) =>
+      route.fulfill({ json: { id: 'op-123', status: 'PENDING' } }),
+    );
 
     await page.goto('/');
     await page.getByRole('button', { name: 'Create your first ladder' }).click();
@@ -81,8 +85,11 @@ test.describe('create view', () => {
     );
     await page.route(`${API}/views`, (route) => {
       created = true;
-      route.fulfill({ json: {} });
+      route.fulfill({ json: { id: 'op-123' } });
     });
+    await page.route(`${API}/operations/op-123`, (route) =>
+      route.fulfill({ json: { id: 'op-123', status: 'COMPLETED', resourceId: VALID_VIEW_ID } }),
+    );
 
     await page.goto('/');
     await page.getByRole('button', { name: 'Create your first ladder' }).click();
@@ -103,7 +110,7 @@ test.describe('create view', () => {
 });
 
 test.describe('delete view', () => {
-  test('removes the view from the list optimistically', async ({ page }) => {
+  test('removes the view from the list immediately on delete', async ({ page }) => {
     await seedAuth(page);
     await mockFeaturedViews(page);
 
@@ -113,8 +120,11 @@ test.describe('delete view', () => {
     );
     await page.route(`${API}/views/${VALID_VIEW_ID}`, async (route) => {
       deleted = true;
-      await route.fulfill({ status: 204 });
+      await route.fulfill({ json: { id: 'del-op-123' } });
     });
+    await page.route(`${API}/operations/del-op-123`, (route) =>
+      route.fulfill({ json: { id: 'del-op-123', status: 'COMPLETED' } }),
+    );
 
     await page.goto('/');
     await expect(page.getByText('My Ladder')).toBeVisible();

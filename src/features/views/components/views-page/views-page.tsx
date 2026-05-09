@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { viewKeys } from "@/features/views/api/viewQueries.ts";
-import { Plus, User, LogOut } from "lucide-react";
+import { Plus, User, LogOut, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,6 @@ import { useAppSelector } from "@/app/hooks.ts";
 import { selectIsAuthenticated, selectUsername } from "@/app/authSlice.ts";
 import { logout } from "@/features/auth/authApi.ts";
 import { useViewsData } from "@/features/views/hooks/useViewsData.ts";
-import { View } from "@/features/views/model/view.ts";
 import { ViewsList } from "./views-list.tsx";
 import { CreateView } from "./actions/create-view.tsx";
 import "./views-page.css";
@@ -44,6 +43,8 @@ export function ViewsPage() {
     createView,
     deleteView,
     deletingViewId,
+    createError,
+    clearCreateError,
   } = useViewsData(isAuthenticated);
 
   const views = activeTab === "featured" ? featuredViews : ownViews;
@@ -60,7 +61,7 @@ export function ViewsPage() {
   };
 
   const handleViewClick = (viewId: string) => {
-    const view = views.find((v) => v.id === viewId);
+    const view = views.find((v) => v.simpleView.id === viewId);
     navigate(`/${viewId}`, {
       state: {
         owner: view?.simpleView.owner,
@@ -73,8 +74,6 @@ export function ViewsPage() {
     requireAuth(() => setIsCreateDialogOpen(true));
 
   const handleOwnTabClick = () => requireAuth(() => setActiveTab("own"));
-
-  const handleCreateView = (pendingView: View) => createView(pendingView);
 
   const handleDeleteView = (viewId: string) =>
     requireAuth(() => deleteView(viewId));
@@ -148,6 +147,15 @@ export function ViewsPage() {
           </div>
         </div>
 
+        {createError && (
+          <div className="create-error-banner" role="alert">
+            <span>{createError}</span>
+            <button className="create-error-dismiss" onClick={clearCreateError} aria-label="Dismiss">
+              <X size={16} />
+            </button>
+          </div>
+        )}
+
         <ViewsList
           views={views}
           isLoadingViews={isLoadingViews}
@@ -161,7 +169,7 @@ export function ViewsPage() {
       <CreateView
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
-        onCreateView={handleCreateView}
+        onCreateView={createView}
       />
     </div>
   );

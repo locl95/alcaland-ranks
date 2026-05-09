@@ -46,8 +46,11 @@ test.describe('view detail', () => {
     );
     await page.route(`${API}/views/${VALID_VIEW_ID}`, async (route) => {
       saved = true;
-      await route.fulfill({ status: 204 });
+      await route.fulfill({ json: { id: 'edit-op-123' } });
     });
+    await page.route(`${API}/operations/edit-op-123`, (route) =>
+      route.fulfill({ json: { id: 'edit-op-123', status: 'COMPLETED' } }),
+    );
 
     // navigate from views-page so location.state carries the owner → canEdit = true
     await page.goto('/');
@@ -61,8 +64,7 @@ test.describe('view detail', () => {
     await page.getByRole('button', { name: 'Delete' }).click();
     await page.getByRole('button', { name: 'Done' }).click();
 
-    await expect(page.getByText('Edit your ladder')).not.toBeVisible();
-    await expect(page.getByText('Arthas')).toHaveCount(0);
+    await expect(page.getByText('No characters in this ladder')).toBeVisible();
   });
 
   test('edit: adding a character shows it as syncing in the ladder', async ({ page }) => {
@@ -70,7 +72,11 @@ test.describe('view detail', () => {
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
 
     await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) =>
-      route.fulfill({ status: 204 }),
+      route.fulfill({ json: { id: 'edit-op-123' } }),
+    );
+    // Keep the poll alive so the syncing indicator stays visible during the assertion.
+    await page.route(`${API}/operations/edit-op-123`, (route) =>
+      route.fulfill({ json: { id: 'edit-op-123', status: 'PENDING' } }),
     );
 
     await page.goto('/');
@@ -89,7 +95,7 @@ test.describe('view detail', () => {
     await expect(page.getByText('Edit your ladder')).not.toBeVisible();
     await expect(page.getByText('Arthas').first()).toBeVisible();
     await expect(page.getByText('Sylvanas').first()).toBeVisible();
-    await expect(page.getByText('Character is syncing')).toBeVisible();
+    await expect(page.getByText('Syncing…')).toBeVisible();
   });
 
   test('edit: added character is reconciled after refetch returns real score', async ({ page }) => {
@@ -110,8 +116,11 @@ test.describe('view detail', () => {
     );
     await page.route(`${API}/views/${VALID_VIEW_ID}`, async (route) => {
       saved = true;
-      await route.fulfill({ status: 204 });
+      await route.fulfill({ json: { id: 'edit-op-123' } });
     });
+    await page.route(`${API}/operations/edit-op-123`, (route) =>
+      route.fulfill({ json: { id: 'edit-op-123', status: 'COMPLETED' } }),
+    );
 
     await page.goto('/');
     await page.getByText('My Ladder').click();
@@ -129,6 +138,6 @@ test.describe('view detail', () => {
     await expect(page.getByText('Edit your ladder')).not.toBeVisible();
     await expect(page.getByText('Arthas').first()).toBeVisible();
     await expect(page.getByText('Sylvanas').first()).toBeVisible();
-    await expect(page.getByText('Character is syncing')).not.toBeVisible();
+    await expect(page.getByText('Syncing…')).not.toBeVisible();
   });
 });

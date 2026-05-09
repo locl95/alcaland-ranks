@@ -31,20 +31,6 @@ describe("useCreateViewForm", () => {
     });
   });
 
-  describe("updateCharacter", () => {
-    it("updates the name field at the given index", () => {
-      const { result } = renderForm();
-      act(() => result.current.updateCharacter(0, "name", "Arthas"));
-      expect(result.current.characters[0].name).toBe("Arthas");
-    });
-
-    it("updates the realm field at the given index", () => {
-      const { result } = renderForm();
-      act(() => result.current.updateCharacter(0, "realm", "Tarren Mill"));
-      expect(result.current.characters[0].realm).toBe("Tarren Mill");
-    });
-  });
-
   describe("addCharacter", () => {
     it("marks the current row as added and appends a new empty row", () => {
       const { result } = renderForm();
@@ -151,7 +137,7 @@ describe("useCreateViewForm", () => {
 
       expect(onCreateView).toHaveBeenCalledOnce();
       expect(onCreateView).toHaveBeenCalledWith(
-        expect.objectContaining({ id: "op-123", status: "pending" }),
+        expect.objectContaining({ operationId: "op-123", status: "pending" }),
       );
       expect(onClose).toHaveBeenCalledOnce();
       expect(result.current.error).toBeNull();

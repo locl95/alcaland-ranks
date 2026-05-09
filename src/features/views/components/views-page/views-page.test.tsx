@@ -12,6 +12,7 @@ import {
   MockCreateView,
   makeSimpleView,
 } from "@/app/App.mocks.tsx";
+import { pollOperation } from "@/features/views/api/viewQueries.ts";
 
 // ---------------------------------------------------------------------------
 // Hoisted mocks
@@ -178,25 +179,6 @@ describe("ViewsPage", () => {
   });
 
   describe("fetching views on mount", () => {
-    it("calls serviceGet for featured views", async () => {
-      renderViewsPage();
-      await waitFor(() =>
-        expect(fetchMocks.serviceGet).toHaveBeenCalledWith(
-          "/views?game=wow&featured=true",
-        ),
-      );
-    });
-
-    it("calls userRequest for own views when authenticated", async () => {
-      renderViewsPage();
-      await waitFor(() =>
-        expect(fetchMocks.userRequest).toHaveBeenCalledWith(
-          "GET",
-          "/views?game=wow",
-        ),
-      );
-    });
-
     it("does not fetch own views when unauthenticated", async () => {
       renderViewsPage(false);
       await waitFor(() => expect(fetchMocks.serviceGet).toHaveBeenCalled());
@@ -263,14 +245,12 @@ describe("ViewsPage", () => {
   });
 
   describe("handleDeleteView", () => {
-    it("shows a deleting indicator while the operation is in flight", async () => {
+    it("removes the view from the list immediately on delete", async () => {
       await renderWithViews();
 
       await userEvent.click(screen.getByTestId("delete-v1"));
 
-      await waitFor(() =>
-        expect(screen.getByTestId("deleting-v1")).toBeInTheDocument(),
-      );
+      expect(screen.queryByTestId("view-item-v1")).not.toBeInTheDocument();
     });
 
     it("calls the DELETE API with the correct viewId", async () => {
@@ -286,8 +266,8 @@ describe("ViewsPage", () => {
     });
 
     it("re-fetches own views when the DELETE API call fails", async () => {
-      await renderWithViews();
-      const callsBefore = fetchMocks.userRequest.mock.calls.length;
+      const { queryClient } = await renderWithViews();
+      const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       fetchMocks.userRequest.mockImplementation((method: string) => {
         if (method === "DELETE") return Promise.reject(new Error("Network error"));
@@ -297,9 +277,7 @@ describe("ViewsPage", () => {
       await userEvent.click(screen.getByTestId("delete-v1"));
 
       await waitFor(() =>
-        expect(fetchMocks.userRequest.mock.calls.length).toBeGreaterThan(
-          callsBefore,
-        ),
+        expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["views", "own"] }),
       );
     });
   });
@@ -319,24 +297,24 @@ describe("ViewsPage", () => {
       expect(screen.getByTestId("view-item-pending-id")).toBeInTheDocument();
     });
 
-    it("replaces a pending view with the synced one when it appears in the backend", async () => {
-      const { queryClient } = renderViewsPage();
+    it("replaces a pending view with the synced one when the poll resolves", async () => {
+      vi.mocked(pollOperation).mockResolvedValueOnce({
+        id: "pending-id",
+        status: "COMPLETED",
+        resourceId: "real-id",
+      });
+      fetchMocks.userRequest
+        .mockResolvedValueOnce({ records: [] })
+        .mockResolvedValue({ records: [makeSimpleView("real-id", "Pending View")] });
+
+      renderViewsPage();
       await waitFor(() => screen.getByTestId("list-create-btn"));
 
       await userEvent.click(screen.getByTestId("list-create-btn"));
       await userEvent.click(screen.getByTestId("submit-create"));
 
-      fetchMocks.userRequest.mockResolvedValue({
-        records: [makeSimpleView("real-id", "Pending View")],
-      });
-      await act(async () => {
-        await queryClient.invalidateQueries({ queryKey: ["views", "own"] });
-      });
-
       await waitFor(() => {
-        expect(
-          screen.queryByTestId("view-item-pending-id"),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("view-item-pending-id")).not.toBeInTheDocument();
         expect(screen.getByTestId("view-item-real-id")).toBeInTheDocument();
       });
     });

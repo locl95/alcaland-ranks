@@ -14,8 +14,8 @@ export function SyncErrorDialog({
   if (failedCharacters.length === 0) return null;
 
   return (
-    <div className="sync-error-overlay" onClick={onClose}>
-      <div className="sync-error-content" onClick={(e) => e.stopPropagation()}>
+    <div className="sync-error-overlay" data-testid="sync-error-overlay" onClick={onClose}>
+      <div className="sync-error-content" data-testid="sync-error-content" onClick={(e) => e.stopPropagation()}>
         <div className="sync-error-header">
           <div className="sync-error-title-row">
             <AlertTriangle className="sync-error-icon" />

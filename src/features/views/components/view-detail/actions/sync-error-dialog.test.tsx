@@ -73,7 +73,7 @@ describe("SyncErrorDialog", () => {
         onClose={onClose}
       />,
     );
-    await userEvent.click(document.querySelector(".sync-error-overlay")!);
+    await userEvent.click(screen.getByTestId("sync-error-overlay"));
     expect(onClose).toHaveBeenCalledOnce();
   });
 
@@ -85,7 +85,7 @@ describe("SyncErrorDialog", () => {
         onClose={onClose}
       />,
     );
-    await userEvent.click(document.querySelector(".sync-error-content")!);
+    await userEvent.click(screen.getByTestId("sync-error-content"));
     expect(onClose).not.toHaveBeenCalled();
   });
 });
