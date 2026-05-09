@@ -28,11 +28,11 @@ export function ViewDetail() {
     viewName,
     season,
     initialized,
-    editMeta,
+    hasReceivedData,
+    isSyncing,
     syncError,
     canEdit,
     isViewIdValid,
-    expectedCount,
     saveCharacters,
     clearSyncError,
   } = useViewDetail(viewId, owner, entitiesCount);
@@ -43,9 +43,9 @@ export function ViewDetail() {
     }
   }, [viewId, isViewIdValid, navigate]);
 
-  const handleSavedCharacters = async (characters: typeof profiles) => {
-    await saveCharacters(characters);
+  const handleSavedCharacters = (characters: typeof profiles) => {
     setIsEditOpen(false);
+    saveCharacters(characters);
   };
 
   if (!initialized) return null;
@@ -62,8 +62,8 @@ export function ViewDetail() {
             <button
               className="header-edit-button"
               onClick={() => setIsEditOpen(!isEditOpen)}
-              disabled={!!editMeta}
-              title={editMeta ? "Wait for sync to complete" : undefined}
+              disabled={isSyncing}
+              title={isSyncing ? "Wait for sync to complete" : undefined}
             >
               <Edit className="header-icon" />
               <span className="header-button-text">Edit</span>
@@ -71,19 +71,17 @@ export function ViewDetail() {
           )}
         </div>
 
-        {profiles.length === 0 && expectedCount > 0 ? (
+        {profiles.length === 0 && !hasReceivedData && entitiesCount > 0 ? (
           <div className="syncing-state">
             <Loader2 className="syncing-icon" />
             <h3 className="syncing-title">Syncing characters…</h3>
             <p className="syncing-text">
-              Your characters are being prepared. This usually takes a few
-              seconds.
+              Your characters are being prepared. This usually takes a few seconds.
             </p>
           </div>
         ) : profiles.length === 0 ? (
           <div className="empty-state">
-            <Trophy className="empty-icon" />
-            <h3 className="empty-title">No characters in this view</h3>
+            <h3 className="empty-title">No characters in this ladder</h3>
             <p className="empty-text">
               Add characters to start tracking their Mythic+ progress
             </p>
@@ -92,7 +90,7 @@ export function ViewDetail() {
                 className="empty-add-btn"
                 onClick={() => setIsEditOpen(true)}
               >
-                Add Your First Character
+                + Add
               </button>
             )}
           </div>

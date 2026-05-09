@@ -80,6 +80,31 @@
   cursor: not-allowed;
 }
 
+.header-syncing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.header-syncing-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  animation: spin 0.8s linear infinite;
+}
+
+.header-syncing-label {
+  font-size: 0.875rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .header-edit-button.active {
   background: rgba(22, 163, 74, 0.12);
   border-color: rgba(22, 163, 74, 0.4);

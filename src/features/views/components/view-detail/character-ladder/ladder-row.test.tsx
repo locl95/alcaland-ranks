@@ -39,16 +39,28 @@ const makeProfile = (
 });
 
 describe("LadderRow", () => {
-  it("shows syncing indicator when score is -1", () => {
+  it("shows Syncing… indicator when score is null and class is empty (new character)", () => {
     render(
       <LadderRow
         index={0}
-        character={makeProfile({ score: -1 })}
+        character={makeProfile({ score: null, class: "", spec: "" })}
         cachedCharacters={[]}
         season={null}
       />,
     );
-    expect(screen.getByText("Character is syncing")).toBeInTheDocument();
+    expect(screen.getByText("Syncing…")).toBeInTheDocument();
+  });
+
+  it("shows Deleting… indicator when score is null and class is set (existing character being deleted)", () => {
+    render(
+      <LadderRow
+        index={0}
+        character={makeProfile({ score: null, class: "Warrior" })}
+        cachedCharacters={[]}
+        season={null}
+      />,
+    );
+    expect(screen.getByText("Deleting…")).toBeInTheDocument();
   });
 
   it("does not show syncing indicator for normal characters", () => {
@@ -60,7 +72,8 @@ describe("LadderRow", () => {
         season={null}
       />,
     );
-    expect(screen.queryByText("Character is syncing")).not.toBeInTheDocument();
+    expect(screen.queryByText("Syncing…")).not.toBeInTheDocument();
+    expect(screen.queryByText("Deleting…")).not.toBeInTheDocument();
   });
 
   it("shows score for non-syncing characters", () => {

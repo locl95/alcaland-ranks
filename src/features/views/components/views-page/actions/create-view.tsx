@@ -22,6 +22,7 @@ export function CreateView({
     characters,
     canSubmit,
     error,
+    isSubmitting,
     updateCharacter,
     addCharacter,
     removeCharacter,
@@ -128,7 +129,7 @@ export function CreateView({
               className="btn btn-primary"
               disabled={!canSubmit}
             >
-              Create
+              {isSubmitting ? "Creating..." : "Create"}
             </button>
           </div>
         </form>

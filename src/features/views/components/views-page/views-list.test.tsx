@@ -27,12 +27,12 @@ const makeSimpleView = (
 const makeView = (
   id: string,
   name: string,
-  isSynced = true,
+  status: View["status"] = "synced",
   owner = "testuser",
 ): View => ({
   id,
   simpleView: makeSimpleView(id, name, owner),
-  isSynced,
+  status,
 });
 
 const makeStore = (username: string | null = "testuser") =>
@@ -111,14 +111,14 @@ describe("ViewsList", () => {
 
   describe("pending views", () => {
     it("shows syncing message for pending views", () => {
-      renderList([makeView("", "Pending", false)]);
+      renderList([makeView("", "Pending", "pending")]);
       expect(
         screen.getByText("Synchronizing with server..."),
       ).toBeInTheDocument();
     });
 
     it("does not call onViewClick when clicking a pending view", async () => {
-      const { onViewClick } = renderList([makeView("", "Pending", false)]);
+      const { onViewClick } = renderList([makeView("", "Pending", "pending")]);
       await userEvent.click(screen.getByText("Pending"));
       expect(onViewClick).not.toHaveBeenCalled();
     });
@@ -126,14 +126,14 @@ describe("ViewsList", () => {
 
   describe("delete button", () => {
     it("shows delete button for owned views", () => {
-      renderList([makeView("v1", "My Ladder", true, "testuser")], {
+      renderList([makeView("v1", "My Ladder", "synced", "testuser")], {
         username: "testuser",
       });
       expect(screen.getByTitle("Delete view")).toBeInTheDocument();
     });
 
     it("does not show delete button for views owned by others", () => {
-      renderList([makeView("v1", "Other Ladder", true, "otherown")], {
+      renderList([makeView("v1", "Other Ladder", "synced", "otherown")], {
         username: "testuser",
       });
       expect(screen.queryByTitle("Delete view")).not.toBeInTheDocument();
@@ -147,8 +147,8 @@ describe("ViewsList", () => {
 
     it("disables delete when another view is syncing", () => {
       renderList([
-        makeView("", "Pending", false, "testuser"),
-        makeView("v2", "My Ladder", true, "testuser"),
+        makeView("", "Pending", "pending", "testuser"),
+        makeView("v2", "My Ladder", "synced", "testuser"),
       ]);
       expect(screen.getByTitle("Cannot delete while syncing")).toBeDisabled();
     });

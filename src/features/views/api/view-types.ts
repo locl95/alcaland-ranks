@@ -38,3 +38,12 @@ export interface ViewRequest {
   featured: boolean;
   game: string;
 }
+
+export type OperationStatus = "PENDING" | "COMPLETED" | "FAILED";
+
+export interface OperationResult {
+  id: string;
+  status: OperationStatus;
+  resourceId?: string;
+  reason?: string;
+}

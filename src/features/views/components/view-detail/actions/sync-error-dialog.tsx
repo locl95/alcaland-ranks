@@ -30,9 +30,8 @@ export function SyncErrorDialog({
 
         <div className="sync-error-body">
           <p className="sync-error-description">
-            The following characters were not found or couldn't be processed by
-            the backend. Please check that the name, realm, and region are
-            correct and that the character exists.
+            The following characters were not found or couldn't be processed.
+            Please check that the name, realm, and region are correct.
           </p>
 
           <ul className="sync-error-list">

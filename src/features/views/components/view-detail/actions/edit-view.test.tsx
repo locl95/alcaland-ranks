@@ -41,7 +41,7 @@ vi.mock("@/features/views/components/shared/realm-select.tsx", () => ({
 const makeProfile = (
   id: number,
   name: string,
-  score = 2000,
+  score: number | null = 2000,
 ): RaiderioProfile => ({
   id,
   name,
@@ -93,11 +93,11 @@ describe("EditView", () => {
     expect(screen.getByText("Sylvanas")).toBeInTheDocument();
   });
 
-  it("excludes syncing characters (score === -1) from the list", () => {
+  it("excludes syncing characters (score === null) from the list", () => {
     render(
       <EditView
         isOpen
-        characters={[makeProfile(1, "Arthas", -1)]}
+        characters={[makeProfile(1, "Arthas", null)]}
         onClose={vi.fn()}
         onSave={vi.fn()}
       />,
@@ -114,7 +114,7 @@ describe("EditView", () => {
         onSave={vi.fn()}
       />,
     );
-    await userEvent.click(screen.getByText("Delete"));
+    await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     expect(screen.queryByText("Arthas")).not.toBeInTheDocument();
   });
 

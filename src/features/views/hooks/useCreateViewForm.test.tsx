@@ -17,7 +17,7 @@ const renderForm = (open = true) =>
 describe("useCreateViewForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUserRequest.mockResolvedValue(undefined);
+    mockUserRequest.mockResolvedValue({ id: "op-123" });
   });
 
   describe("initial state", () => {
@@ -138,7 +138,7 @@ describe("useCreateViewForm", () => {
     const makeSubmitEvent = () =>
       ({ preventDefault: vi.fn() }) as unknown as React.FormEvent;
 
-    it("calls onCreateView and onClose on success", async () => {
+    it("calls onCreateView with a pending view and calls onClose on success", async () => {
       const { result } = renderForm();
       act(() => {
         result.current.setName("My Ladder");
@@ -150,11 +150,14 @@ describe("useCreateViewForm", () => {
       await act(async () => result.current.handleSubmit(makeSubmitEvent()));
 
       expect(onCreateView).toHaveBeenCalledOnce();
+      expect(onCreateView).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "op-123", status: "pending" }),
+      );
       expect(onClose).toHaveBeenCalledOnce();
       expect(result.current.error).toBeNull();
     });
 
-    it("sets error and does not call onClose on API failure", async () => {
+    it("sets error and does not call onClose when the POST fails", async () => {
       mockUserRequest.mockRejectedValue(new Error("Network error"));
       const { result } = renderForm();
       act(() => {

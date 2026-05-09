@@ -19,12 +19,14 @@ export function useCreateViewForm(
   const [name, setName] = useState("");
   const [characters, setCharacters] = useState<CharacterRow[]>([EMPTY_ROW]);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!open) {
       setName("");
       setCharacters([EMPTY_ROW]);
       setError(null);
+      setIsSubmitting(false);
     }
   }, [open]);
 
@@ -52,11 +54,12 @@ export function useCreateViewForm(
     });
   };
 
-  const canSubmit = !!name.trim() && characters.some((c) => c.mode === "added");
+  const canSubmit = !isSubmitting && !!name.trim() && characters.some((c) => c.mode === "added");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsSubmitting(true);
 
     const addedCharacters = characters
       .map((c, i, arr) =>
@@ -67,7 +70,7 @@ export function useCreateViewForm(
       .filter((c) => c.mode === "added");
 
     try {
-      await userRequest("POST", "/views", {
+      const { id: operationId } = await userRequest<{ id: string }>("POST", "/views", {
         name,
         entities: addedCharacters.map((c) => ({
           name: c.name,
@@ -81,23 +84,25 @@ export function useCreateViewForm(
       });
 
       onCreateView({
-        id: "",
+        id: operationId,
         simpleView: {
-          id: "",
+          id: operationId,
           name,
           owner: "",
-          published: false,
-          entitiesIds: [],
+          published: true,
+          entitiesIds: addedCharacters.map((_, i) => i),
           game: "WOW",
           featured: false,
           extraArguments: null,
         },
-        isSynced: false,
+        status: "pending",
       });
 
       onClose();
     } catch {
       setError("Failed to create ladder. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -107,6 +112,7 @@ export function useCreateViewForm(
     characters,
     canSubmit,
     error,
+    isSubmitting,
     updateCharacter,
     addCharacter,
     removeCharacter,

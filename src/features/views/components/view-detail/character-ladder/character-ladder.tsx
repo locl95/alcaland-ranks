@@ -18,11 +18,11 @@ export const CharacterLadder = memo(function CharacterLadder({
 }: Readonly<CharacterLadderProps>) {
   const [isLadderOpen, setIsLadderOpen] = useState(true);
   const sortedCharacters = useMemo(
-    () => [...characters].sort((a, b) => b.score - a.score),
+    () => [...characters].sort((a, b) => (b.score ?? -1) - (a.score ?? -1)),
     [characters],
   );
   const sortedCachedCharacters = useMemo(
-    () => [...cachedCharacters].sort((a, b) => b.score - a.score),
+    () => [...cachedCharacters].sort((a, b) => (b.score ?? -1) - (a.score ?? -1)),
     [cachedCharacters],
   );
 

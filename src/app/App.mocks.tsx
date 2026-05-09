@@ -4,11 +4,13 @@ import type { SimpleView } from "@/features/views/api/view-types.ts";
 
 export const MockViewsList = ({
   views,
+  deletingViewId,
   onViewClick,
   onCreateView,
   onDeleteView,
 }: {
   views: View[];
+  deletingViewId: string | null;
   onViewClick: (id: string) => void;
   onCreateView: () => void;
   onDeleteView: (id: string) => void;
@@ -16,6 +18,7 @@ export const MockViewsList = ({
   <div data-testid="views-list">
     {views.map((v) => (
       <div key={v.id} data-testid={`view-item-${v.id}`}>
+        {deletingViewId === v.id && <span data-testid={`deleting-${v.id}`}>Deleting…</span>}
         <button data-testid={`open-${v.id}`} onClick={() => onViewClick(v.id)}>
           Open {v.simpleView.name}
         </button>
@@ -50,7 +53,7 @@ export const MockCreateView = ({
           onCreateView({
             id: "pending-id",
             simpleView: makeSimpleView("pending-id", "Pending View"),
-            isSynced: false,
+            status: "pending",
           })
         }
       >

@@ -50,6 +50,16 @@ const navState = vi.hoisted(() => {
 // ---------------------------------------------------------------------------
 // Module mocks
 // ---------------------------------------------------------------------------
+vi.mock("@/features/views/api/viewQueries.ts", async () => {
+  const actual = await vi.importActual<typeof import("@/features/views/api/viewQueries.ts")>(
+    "@/features/views/api/viewQueries.ts",
+  );
+  return {
+    ...actual,
+    pollOperation: vi.fn().mockReturnValue(new Promise(() => {})),
+  };
+});
+
 vi.mock("react-router-dom", () => ({
   useNavigate: () => (to: string) => navState.navigate(to),
   useLocation: () => ({ pathname: navState.path, state: null }),
@@ -253,14 +263,13 @@ describe("ViewsPage", () => {
   });
 
   describe("handleDeleteView", () => {
-    it("removes the view from the list optimistically", async () => {
+    it("shows a deleting indicator while the operation is in flight", async () => {
       await renderWithViews();
-      fetchMocks.userRequest.mockResolvedValue({ records: [] });
 
       await userEvent.click(screen.getByTestId("delete-v1"));
 
       await waitFor(() =>
-        expect(screen.queryByTestId("view-item-v1")).not.toBeInTheDocument(),
+        expect(screen.getByTestId("deleting-v1")).toBeInTheDocument(),
       );
     });
 
@@ -269,7 +278,7 @@ describe("ViewsPage", () => {
       await userEvent.click(screen.getByTestId("delete-v1"));
 
       await waitFor(() =>
-        expect(fetchMocks.userRequestVoid).toHaveBeenCalledWith(
+        expect(fetchMocks.userRequest).toHaveBeenCalledWith(
           "DELETE",
           "/views/v1",
         ),
@@ -277,9 +286,13 @@ describe("ViewsPage", () => {
     });
 
     it("re-fetches own views when the DELETE API call fails", async () => {
-      fetchMocks.userRequestVoid.mockRejectedValue(new Error("Network error"));
       await renderWithViews();
       const callsBefore = fetchMocks.userRequest.mock.calls.length;
+
+      fetchMocks.userRequest.mockImplementation((method: string) => {
+        if (method === "DELETE") return Promise.reject(new Error("Network error"));
+        return Promise.resolve({ records: [makeSimpleView("v1", "My View")] });
+      });
 
       await userEvent.click(screen.getByTestId("delete-v1"));
 

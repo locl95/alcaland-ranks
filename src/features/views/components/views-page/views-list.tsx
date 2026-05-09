@@ -7,6 +7,7 @@ import { View } from "@/features/views/model/view.ts";
 interface ViewsListProps {
   views: View[];
   isLoadingViews: boolean;
+  deletingViewId: string | null;
   onViewClick: (viewId: string) => void;
   onCreateView: () => void;
   onDeleteView: (viewId: string) => void;
@@ -15,12 +16,13 @@ interface ViewsListProps {
 export function ViewsList({
   views,
   isLoadingViews,
+  deletingViewId,
   onViewClick,
   onCreateView,
   onDeleteView,
 }: Readonly<ViewsListProps>) {
   const username = useAppSelector(selectUsername);
-  const viewsSyncing = views.some((v) => !v.isSynced);
+  const pendingViews = views.some((v) => v.status === "pending");
 
   if (isLoadingViews && views.length === 0) return null;
 
@@ -41,7 +43,9 @@ export function ViewsList({
   ) : (
     <div className="views-list-container-box">
       {views.map((view, index) => {
-        const isPending = !view.isSynced;
+        const isPending = view.status === "pending";
+        const isDeleting = deletingViewId === view.id;
+        const isDisabled = isPending || isDeleting;
         const isLast = index === views.length - 1;
 
         return (
@@ -50,11 +54,10 @@ export function ViewsList({
             className={[
               "view-row",
               !isLast && "with-border",
-              isPending && "view-row-pending",
-            ]
-              .filter(Boolean)
+              isDisabled && "view-row-pending",
+            ].filter(Boolean)
               .join(" ")}
-            onClick={() => !isPending && onViewClick(view.id)}
+            onClick={() => !isDisabled && onViewClick(view.id)}
           >
             <div className="view-row-content">
               <h3 className="view-row-title">{view.simpleView.name}</h3>
@@ -65,7 +68,11 @@ export function ViewsList({
                 </p>
               )}
 
-              {!isPending && (
+              {isDeleting && (
+                <p className="view-row-description">Deleting...</p>
+              )}
+
+              {!isDisabled && (
                 <div className="view-row-meta">
                   <div className="view-row-meta-item">
                     <Users className="view-row-icon" />
@@ -86,15 +93,13 @@ export function ViewsList({
               className="view-row-actions"
               onClick={(e) => e.stopPropagation()}
             >
-              {isPending && <Loader2 className="loading-icon" />}
+              {isDisabled && <Loader2 className="loading-icon" />}
 
-              {!isPending && username === view.simpleView.owner && (
+              {!isDisabled && username === view.simpleView.owner && (
                 <button
                   className="view-row-delete-btn"
-                  title={
-                    viewsSyncing ? "Cannot delete while syncing" : "Delete view"
-                  }
-                  disabled={viewsSyncing}
+                  title={pendingViews || !!deletingViewId ? "Cannot delete while syncing" : "Delete view"}
+                  disabled={pendingViews || !!deletingViewId}
                   onClick={() => onDeleteView(view.id)}
                 >
                   <Trash2 className="view-row-menu-icon" />

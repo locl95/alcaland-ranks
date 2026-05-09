@@ -113,6 +113,7 @@
     font-size: 1.0625rem;
     font-weight: 600;
     color: #dde4ee;
+    text-transform: capitalize;
 }
 
 .character-edit-class-badge {
@@ -154,6 +155,7 @@
 
 .character-edit-realm {
     color: #64748b;
+    text-transform: capitalize;
 }
 
 .character-edit-score {

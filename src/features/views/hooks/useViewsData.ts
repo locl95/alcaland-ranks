@@ -1,10 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { userRequestVoid } from "@/shared/api/httpClient.ts";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { userRequest } from "@/shared/api/httpClient.ts";
 import { View } from "@/features/views/model/view.ts";
-import { viewKeys, fetchViews, fetchOwnViews } from "@/features/views/api/viewQueries.ts";
+import { viewKeys, fetchViews, fetchOwnViews, pollOperation } from "@/features/views/api/viewQueries.ts";
 
 export function useViewsData(isAuthenticated: boolean) {
   const queryClient = useQueryClient();
+  const [pendingViews, setPendingViews] = useState<View[]>([]);
+  const [deletingViewId, setDeletingViewId] = useState<string | null>(null);
 
   const { data: featuredViews = [], isLoading: isLoadingFeatured } = useQuery({
     queryKey: viewKeys.list(),
@@ -14,55 +17,48 @@ export function useViewsData(isAuthenticated: boolean) {
     refetchOnReconnect: false,
   });
 
-  const { data: ownViews = [], isLoading: isLoadingOwn } = useQuery({
+  const { data: serverOwnViews = [], isLoading: isLoadingOwn } = useQuery({
     queryKey: viewKeys.ownList(),
-    queryFn: async () => {
-      const serverData = await fetchOwnViews();
-      const cached = queryClient.getQueryData<View[]>(viewKeys.ownList()) ?? [];
-
-      const unconfirmed = cached.filter(
-        (c) => !c.isSynced && !serverData.some((s) => s.simpleView.name === c.simpleView.name),
-      );
-
-      return [...serverData, ...unconfirmed];
-    },
+    queryFn: fetchOwnViews,
     enabled: isAuthenticated,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    refetchInterval: (query) => {
-      const data = (query.state.data as View[] | undefined) ?? [];
-      return data.some((v) => !v.isSynced) ? 3000 : false;
-    },
+    refetchInterval: pendingViews.length > 0 ? 3000 : false,
   });
 
-  const deleteViewMutation = useMutation({
-    mutationFn: (viewId: string) => userRequestVoid("DELETE", `/views/${viewId}`),
-
-    onMutate: async (viewId) => {
-      await queryClient.cancelQueries({ queryKey: viewKeys.ownList() });
-      const previous = queryClient.getQueryData<View[]>(viewKeys.ownList());
-      queryClient.setQueryData<View[]>(
-        viewKeys.ownList(),
-        (old) => old?.filter((v) => v.id !== viewId) ?? [],
-      );
-      return { previous };
-    },
-
-    onError: (_, __, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(viewKeys.ownList(), context.previous);
-      }
-      queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
-    },
-  });
+  const ownViews = useMemo(() => {
+    const serverNames = new Set(serverOwnViews.map((v) => v.simpleView.name));
+    const stillPending = pendingViews.filter((v) => !serverNames.has(v.simpleView.name));
+    return [...serverOwnViews, ...stillPending];
+  }, [serverOwnViews, pendingViews]);
 
   const createView = (pendingView: View) => {
-    queryClient.setQueryData<View[]>(viewKeys.ownList(), (old) => [
-      ...(old ?? []),
-      pendingView,
-    ]);
-    queryClient.refetchQueries({ queryKey: viewKeys.ownList() });
+    setPendingViews((prev) => [...prev, pendingView]);
+
+    pollOperation(pendingView.id)
+      .then((result) => {
+        setPendingViews((prev) => prev.filter((v) => v.id !== pendingView.id));
+        if (result.status === "COMPLETED") {
+          queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+        }
+      })
+      .catch(() => {
+        setPendingViews((prev) => prev.filter((v) => v.id !== pendingView.id));
+      });
+  };
+
+  const deleteView = async (viewId: string) => {
+    setDeletingViewId(viewId);
+    try {
+      const { id: operationId } = await userRequest<{ id: string }>("DELETE", `/views/${viewId}`);
+      await pollOperation(operationId);
+    } catch {
+      // network error - fall through to refresh
+    } finally {
+      setDeletingViewId(null);
+      queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+    }
   };
 
   return {
@@ -71,6 +67,7 @@ export function useViewsData(isAuthenticated: boolean) {
     ownViews,
     isLoadingOwn,
     createView,
-    deleteView: deleteViewMutation.mutate,
+    deleteView,
+    deletingViewId,
   };
 }

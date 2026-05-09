@@ -1,4 +1,4 @@
-import { AlertTriangle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import "./ladder-row.css";
 import { memo, useState } from "react";
 import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
@@ -25,7 +25,8 @@ export const LadderRow = memo(function LadderRow({
   season,
 }: Readonly<LadderRowProps>) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const isSyncing = character.score === -1;
+  const isSyncing = character.score === null;
+  const isBeingDeleted = isSyncing && character.class !== "";
   const hasHistoricalData = cachedCharacters.length > 0;
   const cachedIndex = cachedCharacters.findIndex((c) => c.id === character.id);
   const positionChange =
@@ -39,7 +40,9 @@ export const LadderRow = memo(function LadderRow({
   const cachedCharacter =
     cachedIndex !== -1 ? cachedCharacters[cachedIndex] : undefined;
   const scoreGain =
-    !isSyncing && cachedCharacter ? character.score - cachedCharacter.score : 0;
+    !isSyncing && cachedCharacter && cachedCharacter.score !== null
+      ? (character.score as number) - cachedCharacter.score
+      : 0;
 
   return (
     <div className="ladder-row">
@@ -86,19 +89,19 @@ export const LadderRow = memo(function LadderRow({
 
         {isSyncing ? (
           <div className="ladder-syncing-indicator">
-            <div className="syncing-warning-wrapper">
-              <AlertTriangle className="syncing-warning-icon" />
-              <span className="syncing-tooltip">Character is syncing</span>
-            </div>
+            <span className="ladder-syncing-label">
+              {isBeingDeleted ? "Deleting…" : "Syncing…"}
+            </span>
+            <Loader2 className="ladder-syncing-spinner" />
           </div>
         ) : (
           <>
             <div className="ladder-score">
               <div className="ladder-score-value-row">
                 <p
-                  className={`ladder-score-value ${getScoreClass(character.score)}`}
+                  className={`ladder-score-value ${getScoreClass(character.score!)}`}
                 >
-                  {character.score.toLocaleString()}
+                  {character.score!.toLocaleString()}
                 </p>
                 {scoreGain > 0 && (
                   <span className="score-improvement">

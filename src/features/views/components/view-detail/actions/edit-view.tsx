@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, X } from "lucide-react";
 import "./edit-view.css";
+import "../character-ladder/ladder-row.css";
 import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
 import { getClassSlug } from "@/features/views/utils.ts";
 import { RealmSelect } from "@/features/views/components/shared/realm-select.tsx";
@@ -27,7 +28,7 @@ export function EditView({
 
   useEffect(() => {
     if (isOpen) {
-      setEditingCharacters(characters.filter((c) => c.score > -1));
+      setEditingCharacters(characters.filter((c) => c.score !== null));
       setNewName("");
       setNewRealm("");
       setNewRegion("eu");
@@ -46,7 +47,7 @@ export function EditView({
       name: newName.trim(),
       realm: newRealm,
       region: newRegion,
-      score: -1,
+      score: null,
       class: "",
       spec: "",
       quantile: 0,
@@ -88,7 +89,7 @@ export function EditView({
                   <div className="character-edit-name-row">
                     <p className="character-edit-name">{character.name}</p>
 
-                    {character.score > -1 && (
+                    {character.score !== null && (
                       <span
                         className={`character-edit-class-badge ${getClassSlug(character.class)}`}
                       >
@@ -97,29 +98,35 @@ export function EditView({
                     )}
                   </div>
 
-                  {character.score > -1 && (
-                    <div className="character-edit-meta">
-                      <span className="character-edit-spec">
-                        {character.spec}
-                      </span>
-                      <span className="character-edit-separator">•</span>
-                      <span className="character-edit-realm">
-                        {character.realm}
-                      </span>
-                      <span className="character-edit-separator">•</span>
-                      <span className="character-edit-score">
-                        {character.score.toLocaleString()} M+
-                      </span>
-                    </div>
-                  )}
+                  <div className="character-edit-meta">
+                    {character.score !== null && (
+                      <>
+                        <span className="character-edit-spec">{character.spec}</span>
+                        <span className="character-edit-separator">•</span>
+                      </>
+                    )}
+                    <span className="character-edit-realm">{character.realm}</span>
+                    <span className="character-edit-separator">•</span>
+                    <span className={`ladder-region-badge ${character.region}`}>
+                      {character.region === "us" ? "NA" : character.region.toUpperCase()}
+                    </span>
+                    {character.score !== null && (
+                      <>
+                        <span className="character-edit-separator">•</span>
+                        <span className="character-edit-score">
+                          {character.score.toLocaleString()} M+
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 <button
                   onClick={() => deleteCharacter(character.id)}
                   className="character-delete-btn"
+                  aria-label="Delete"
                 >
                   <Trash2 className="delete-icon" />
-                  Delete
                 </button>
               </div>
             ))}

@@ -43,12 +43,13 @@ export function ViewsPage() {
     isLoadingOwn,
     createView,
     deleteView,
+    deletingViewId,
   } = useViewsData(isAuthenticated);
 
   const views = activeTab === "featured" ? featuredViews : ownViews;
   const isLoadingViews =
     activeTab === "featured" ? isLoadingFeatured : isLoadingOwn;
-  const isSyncing = views.some((v) => !v.isSynced);
+  const isSyncing = views.some((v) => v.status === "pending");
 
   const requireAuth = (action: () => void) => {
     if (!isAuthenticated) {
@@ -150,6 +151,7 @@ export function ViewsPage() {
         <ViewsList
           views={views}
           isLoadingViews={isLoadingViews}
+          deletingViewId={deletingViewId}
           onViewClick={handleViewClick}
           onCreateView={handleCreateClick}
           onDeleteView={handleDeleteView}
