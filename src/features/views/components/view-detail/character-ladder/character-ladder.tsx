@@ -1,9 +1,9 @@
-import { ChevronDown, ChevronUp } from "lucide-react";
-import keystone from "@/assets/keystone.webp";
-import "./character-ladder.css";
-import { memo, useMemo, useState } from "react";
-import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
-import { LadderRow } from "./ladder-row.tsx";
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import keystone from '@/assets/keystone.webp';
+import './character-ladder.css';
+import { memo, useMemo, useState } from 'react';
+import { RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
+import { LadderRow } from './ladder-row.tsx';
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];
@@ -28,17 +28,9 @@ export const CharacterLadder = memo(function CharacterLadder({
 
   return (
     <div className="ladder-card">
-      <div
-        className="ladder-header"
-        onClick={() => setIsLadderOpen(!isLadderOpen)}
-      >
+      <div className="ladder-header" onClick={() => setIsLadderOpen(!isLadderOpen)}>
         <div className="ladder-title">
-          <img
-            src={keystone}
-            alt=""
-            aria-hidden={true}
-            className="keystone-icon"
-          />
+          <img src={keystone} alt="" aria-hidden={true} className="keystone-icon" />
           Ladder
         </div>
         <button className="ladder-toggle-btn">

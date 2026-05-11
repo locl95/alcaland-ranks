@@ -74,6 +74,25 @@ test.describe('create view', () => {
     await expect(page.getByText('Synchronizing with server...')).toBeVisible();
   });
 
+  test('shows an error banner when the operation fails', async ({ page }) => {
+    await page.route(`${API}/views`, (route) => route.fulfill({ json: { id: 'op-fail-123' } }));
+    await page.route(`${API}/operations/op-fail-123`, (route) =>
+      route.fulfill({ json: { id: 'op-fail-123', status: 'FAILED' } }),
+    );
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Create your first ladder' }).click();
+
+    await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
+    await page.getByPlaceholder('Name').fill('Arthas');
+    await page.locator('select').nth(1).selectOption('tarren-mill');
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+    await page.getByRole('button', { name: 'Create', exact: true }).click();
+
+    await expect(page.getByRole('alert')).toBeVisible();
+    await expect(page.getByText('Failed to create ladder. Please try again.')).toBeVisible();
+  });
+
   test('replaces the pending view with the synced one after backend confirms it', async ({ page }) => {
     let created = false;
 

@@ -98,6 +98,33 @@ test.describe('view detail', () => {
     await expect(page.getByText('Syncing…')).toBeVisible();
   });
 
+  test('edit: shows sync error dialog when an added character is not found after poll completes', async ({ page }) => {
+    await mockFeaturedViews(page);
+    await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
+
+    await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) =>
+      route.fulfill({ json: { id: 'edit-op-fail' } }),
+    );
+    // Poll returns FAILED and the data mock still returns only Arthas → Sylvanas detected as failed.
+    await page.route(`${API}/operations/edit-op-fail`, (route) =>
+      route.fulfill({ json: { id: 'edit-op-fail', status: 'FAILED' } }),
+    );
+
+    await page.goto('/');
+    await page.getByText('My Ladder').click();
+
+    await expect(page.getByText('Arthas').first()).toBeVisible();
+
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByPlaceholder('Name').fill('Sylvanas');
+    await page.locator('select').nth(1).selectOption('silvermoon');
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+    await page.getByRole('button', { name: 'Done' }).click();
+
+    await expect(page.getByText("Some characters couldn't be synced")).toBeVisible();
+    await expect(page.getByText('Sylvanas')).toBeVisible();
+  });
+
   test('edit: added character is reconciled after refetch returns real score', async ({ page }) => {
     await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);

@@ -1,17 +1,17 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
-import { SyncErrorDialog } from "./sync-error-dialog.tsx";
-import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+import { SyncErrorDialog } from './sync-error-dialog.tsx';
+import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
 
 const makeProfile = (name: string): RaiderioProfile => ({
   id: Math.random(),
   name,
-  realm: "Tarren Mill",
-  region: "eu",
+  realm: 'Tarren Mill',
+  region: 'eu',
   score: 2000,
-  class: "Warrior",
-  spec: "Arms",
+  class: 'Warrior',
+  spec: 'Arms',
   quantile: 1,
   mythicPlusBestRuns: [],
   mythicPlusRecentRuns: [],
@@ -22,70 +22,46 @@ const makeProfile = (name: string): RaiderioProfile => ({
   },
 });
 
-describe("SyncErrorDialog", () => {
-  it("renders nothing when failedCharacters is empty", () => {
-    const { container } = render(
-      <SyncErrorDialog failedCharacters={[]} onClose={vi.fn()} />,
-    );
+describe('SyncErrorDialog', () => {
+  it('renders nothing when failedCharacters is empty', () => {
+    const { container } = render(<SyncErrorDialog failedCharacters={[]} onClose={vi.fn()} />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders the dialog when failedCharacters has entries", () => {
+  it('renders the dialog when failedCharacters has entries', () => {
+    render(<SyncErrorDialog failedCharacters={[makeProfile('Arthas')]} onClose={vi.fn()} />);
+    expect(screen.getByText("Some characters couldn't be synced")).toBeInTheDocument();
+  });
+
+  it('lists all failed character names', () => {
     render(
       <SyncErrorDialog
-        failedCharacters={[makeProfile("Arthas")]}
+        failedCharacters={[makeProfile('Arthas'), makeProfile('Sylvanas')]}
         onClose={vi.fn()}
       />,
     );
-    expect(
-      screen.getByText("Some characters couldn't be synced"),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Arthas')).toBeInTheDocument();
+    expect(screen.getByText('Sylvanas')).toBeInTheDocument();
   });
 
-  it("lists all failed character names", () => {
-    render(
-      <SyncErrorDialog
-        failedCharacters={[makeProfile("Arthas"), makeProfile("Sylvanas")]}
-        onClose={vi.fn()}
-      />,
-    );
-    expect(screen.getByText("Arthas")).toBeInTheDocument();
-    expect(screen.getByText("Sylvanas")).toBeInTheDocument();
-  });
-
-  it("calls onClose when the close button is clicked", async () => {
+  it('calls onClose when the close button is clicked', async () => {
     const onClose = vi.fn();
-    render(
-      <SyncErrorDialog
-        failedCharacters={[makeProfile("Arthas")]}
-        onClose={onClose}
-      />,
-    );
-    await userEvent.click(screen.getByText("Got it"));
+    render(<SyncErrorDialog failedCharacters={[makeProfile('Arthas')]} onClose={onClose} />);
+    await userEvent.click(screen.getByText('Got it'));
     expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it("calls onClose when clicking the overlay", async () => {
+  it('calls onClose when clicking the overlay', async () => {
     const onClose = vi.fn();
-    render(
-      <SyncErrorDialog
-        failedCharacters={[makeProfile("Arthas")]}
-        onClose={onClose}
-      />,
-    );
-    await userEvent.click(screen.getByTestId("sync-error-overlay"));
+    render(<SyncErrorDialog failedCharacters={[makeProfile('Arthas')]} onClose={onClose} />);
+    await userEvent.click(screen.getByTestId('sync-error-overlay'));
     expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it("does not call onClose when clicking inside the dialog content", async () => {
+  it('does not call onClose when clicking inside the dialog content', async () => {
     const onClose = vi.fn();
-    render(
-      <SyncErrorDialog
-        failedCharacters={[makeProfile("Arthas")]}
-        onClose={onClose}
-      />,
-    );
-    await userEvent.click(screen.getByTestId("sync-error-content"));
+    render(<SyncErrorDialog failedCharacters={[makeProfile('Arthas')]} onClose={onClose} />);
+    await userEvent.click(screen.getByTestId('sync-error-content'));
     expect(onClose).not.toHaveBeenCalled();
   });
 });

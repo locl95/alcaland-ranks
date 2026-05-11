@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { Plus, Trash2, X } from "lucide-react";
-import "./edit-view.css";
-import "../character-ladder/ladder-row.css";
-import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
-import { getClassSlug } from "@/features/views/utils.ts";
-import { RealmSelect } from "@/features/views/components/shared/realm-select.tsx";
+import { useEffect, useState } from 'react';
+import { Plus, Trash2, X } from 'lucide-react';
+import './edit-view.css';
+import '../character-ladder/ladder-row.css';
+import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { getClassSlug } from '@/features/views/utils.ts';
+import { RealmSelect } from '@/features/views/components/shared/realm-select.tsx';
 
 interface EditViewProps {
   isOpen: boolean;
@@ -13,25 +13,18 @@ interface EditViewProps {
   onSave: (characters: RaiderioProfile[]) => void;
 }
 
-export function EditView({
-  isOpen,
-  characters,
-  onClose,
-  onSave,
-}: Readonly<EditViewProps>) {
-  const [editingCharacters, setEditingCharacters] = useState<RaiderioProfile[]>(
-    [],
-  );
-  const [newName, setNewName] = useState("");
-  const [newRealm, setNewRealm] = useState("");
-  const [newRegion, setNewRegion] = useState("eu");
+export function EditView({ isOpen, characters, onClose, onSave }: Readonly<EditViewProps>) {
+  const [editingCharacters, setEditingCharacters] = useState<RaiderioProfile[]>([]);
+  const [newName, setNewName] = useState('');
+  const [newRealm, setNewRealm] = useState('');
+  const [newRegion, setNewRegion] = useState('eu');
 
   useEffect(() => {
     if (isOpen) {
       setEditingCharacters(characters.filter((c) => c.score !== null));
-      setNewName("");
-      setNewRealm("");
-      setNewRegion("eu");
+      setNewName('');
+      setNewRealm('');
+      setNewRegion('eu');
     }
   }, [isOpen, characters]);
 
@@ -48,8 +41,8 @@ export function EditView({
       realm: newRealm,
       region: newRegion,
       score: null,
-      class: "",
-      spec: "",
+      class: '',
+      spec: '',
       quantile: 0,
       mythicPlusBestRuns: [],
       mythicPlusRanks: {
@@ -61,9 +54,9 @@ export function EditView({
     };
 
     setEditingCharacters((prev) => [...prev, newCharacter]);
-    setNewName("");
-    setNewRealm("");
-    setNewRegion("eu");
+    setNewName('');
+    setNewRealm('');
+    setNewRegion('eu');
   };
 
   if (!isOpen) return null;
@@ -108,7 +101,7 @@ export function EditView({
                     <span className="character-edit-realm">{character.realm}</span>
                     <span className="character-edit-separator">•</span>
                     <span className={`ladder-region-badge ${character.region}`}>
-                      {character.region === "us" ? "NA" : character.region.toUpperCase()}
+                      {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
                     </span>
                     {character.score !== null && (
                       <>
@@ -138,7 +131,7 @@ export function EditView({
               placeholder="Name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addCharacter()}
+              onKeyDown={(e) => e.key === 'Enter' && addCharacter()}
             />
 
             <RealmSelect
@@ -161,10 +154,7 @@ export function EditView({
         </div>
 
         <div className="edit-view-footer">
-          <button
-            onClick={() => onSave(editingCharacters)}
-            className="manage-done-btn"
-          >
+          <button onClick={() => onSave(editingCharacters)} className="manage-done-btn">
             Done
           </button>
         </div>

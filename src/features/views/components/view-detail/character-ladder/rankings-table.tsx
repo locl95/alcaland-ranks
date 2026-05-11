@@ -1,16 +1,13 @@
-import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
-import { getRankChange, formatRankChange } from "@/features/views/utils.ts";
-import "./rankings-table.css";
+import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { getRankChange, formatRankChange } from '@/features/views/utils.ts';
+import './rankings-table.css';
 
 interface RankingsTableProps {
   character: RaiderioProfile;
   cachedProfile: RaiderioProfile | undefined;
 }
 
-export function RankingsTable({
-  character,
-  cachedProfile,
-}: Readonly<RankingsTableProps>) {
+export function RankingsTable({ character, cachedProfile }: Readonly<RankingsTableProps>) {
   return (
     <div className="rankings-section">
       <h4 className="rankings-section-title">Rankings</h4>
@@ -25,25 +22,20 @@ export function RankingsTable({
             </tr>
           </thead>
           <tbody>
-            {(["overall", "class"] as const).map((rankType) => (
+            {(['overall', 'class'] as const).map((rankType) => (
               <tr key={rankType} className="rankings-tr">
                 <td className="rankings-td-label">
-                  {rankType === "overall" ? "Overall" : character.class}
+                  {rankType === 'overall' ? 'Overall' : character.class}
                 </td>
-                {(["world", "region", "realm"] as const).map((key) => {
+                {(['world', 'region', 'realm'] as const).map((key) => {
                   const current = character.mythicPlusRanks[rankType][key];
-                  const previous =
-                    cachedProfile?.mythicPlusRanks[rankType][key];
+                  const previous = cachedProfile?.mythicPlusRanks[rankType][key];
                   const change = getRankChange(current, previous);
                   return (
                     <td key={key} className="rankings-td">
-                      <span className="ranking-value">
-                        #{Math.round(current).toLocaleString()}
-                      </span>
+                      <span className="ranking-value">#{Math.round(current).toLocaleString()}</span>
                       {change !== null && change !== 0 && (
-                        <span
-                          className={`rank-change ${change > 0 ? "improved" : "declined"}`}
-                        >
+                        <span className={`rank-change ${change > 0 ? 'improved' : 'declined'}`}>
                           {formatRankChange(change)}
                         </span>
                       )}

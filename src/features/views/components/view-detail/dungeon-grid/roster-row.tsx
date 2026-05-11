@@ -1,21 +1,14 @@
-import "./roster-row.css";
-import { RunDetailsRosterEntry } from "@/features/views/api/raiderio.ts";
-import {
-  SPEC_IMAGES,
-  getSpecImageKey,
-} from "@/features/views/constants/spec-images.ts";
-import { ROLE_IMAGES } from "@/features/views/constants/role-images.ts";
-import { CLASS_COLORS } from "@/features/views/constants/class-colors.ts";
-import {
-  getClassSlug,
-  getScoreClass,
-  openExternalProfile,
-} from "@/features/views/utils.ts";
+import './roster-row.css';
+import { RunDetailsRosterEntry } from '@/features/views/api/raiderio.ts';
+import { SPEC_IMAGES, getSpecImageKey } from '@/features/views/constants/spec-images.ts';
+import { ROLE_IMAGES } from '@/features/views/constants/role-images.ts';
+import { CLASS_COLORS } from '@/features/views/constants/class-colors.ts';
+import { getClassSlug, getScoreClass, openExternalProfile } from '@/features/views/utils.ts';
 
 const ROLE_LABEL: Record<string, string> = {
-  tank: "Tank",
-  healer: "Healer",
-  dps: "Damage dealer",
+  tank: 'Tank',
+  healer: 'Healer',
+  dps: 'Damage dealer',
 };
 
 interface RosterRowProps {
@@ -23,14 +16,9 @@ interface RosterRowProps {
   characterRegion: string;
 }
 
-export function RosterRow({
-  entry,
-  characterRegion,
-}: Readonly<RosterRowProps>) {
+export function RosterRow({ entry, characterRegion }: Readonly<RosterRowProps>) {
   const specImg =
-    SPEC_IMAGES[
-      getSpecImageKey(entry.character.class.name, entry.character.spec.name)
-    ];
+    SPEC_IMAGES[getSpecImageKey(entry.character.class.name, entry.character.spec.name)];
 
   return (
     <div className="run-details-row">
@@ -62,16 +50,14 @@ export function RosterRow({
               realm: entry.character.realm.slug,
               region: characterRegion,
             },
-            "raiderio",
+            'raiderio',
           );
         }}
       >
         <span className="run-details-name">
           <span
             style={{
-              color:
-                CLASS_COLORS[getClassSlug(entry.character.class.name)] ??
-                "#94a3b8",
+              color: CLASS_COLORS[getClassSlug(entry.character.class.name)] ?? '#94a3b8',
             }}
           >
             {entry.character.name}

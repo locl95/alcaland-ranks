@@ -1,8 +1,13 @@
-import { useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { userRequest } from "@/shared/api/httpClient.ts";
-import { View } from "@/features/views/model/view.ts";
-import { viewKeys, fetchViews, fetchOwnViews, pollOperation } from "@/features/views/api/viewQueries.ts";
+import { useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { userRequest } from '@/shared/api/httpClient.ts';
+import { View } from '@/features/views/model/view.ts';
+import {
+  viewKeys,
+  fetchViews,
+  fetchOwnViews,
+  pollOperation,
+} from '@/features/views/api/viewQueries.ts';
 
 export function useViewsData(isAuthenticated: boolean) {
   const queryClient = useQueryClient();
@@ -31,7 +36,9 @@ export function useViewsData(isAuthenticated: boolean) {
     const serverIds = new Set(serverOwnViews.map((v) => v.simpleView.id));
     const stillPending = pendingViews.filter((v) => !serverIds.has(v.simpleView.id));
     const all = [...serverOwnViews, ...stillPending];
-    return deletingViewId ? all.filter((v) => v.simpleView.id !== deletingViewId) : all;
+    return deletingViewId
+      ? all.map((v) => (v.simpleView.id === deletingViewId ? { ...v, status: 'deleting' as const } : v))
+      : all;
   }, [serverOwnViews, pendingViews, deletingViewId]);
 
   const createView = (pendingView: View) => {
@@ -39,7 +46,7 @@ export function useViewsData(isAuthenticated: boolean) {
 
     pollOperation(pendingView.operationId!)
       .then((result) => {
-        if (result.status === "COMPLETED" && result.resourceId) {
+        if (result.status === 'COMPLETED' && result.resourceId) {
           // Update simpleView.id to the real view ID so the ID-based dedup in the
           // memo can remove the pending entry once the server refetch returns it.
           setPendingViews((prev) =>
@@ -52,10 +59,10 @@ export function useViewsData(isAuthenticated: boolean) {
           queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
         } else {
           setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
-          if (result.status === "COMPLETED") {
+          if (result.status === 'COMPLETED') {
             queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
           } else {
-            setCreateError("Failed to create ladder. Please try again.");
+            setCreateError('Failed to create ladder. Please try again.');
           }
         }
       })
@@ -69,7 +76,7 @@ export function useViewsData(isAuthenticated: boolean) {
   const deleteView = async (viewId: string) => {
     setDeletingViewId(viewId);
     try {
-      const { id: operationId } = await userRequest<{ id: string }>("DELETE", `/views/${viewId}`);
+      const { id: operationId } = await userRequest<{ id: string }>('DELETE', `/views/${viewId}`);
       await pollOperation(operationId);
     } catch {
       // network error - fall through to refresh

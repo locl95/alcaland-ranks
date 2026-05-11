@@ -1,11 +1,7 @@
-import "./run-details-panel.css";
-import { Skull } from "lucide-react";
-import {
-  MythicPlusRun,
-  RunDetails,
-  formatDate,
-} from "@/features/views/api/raiderio.ts";
-import { RosterRow } from "./roster-row.tsx";
+import './run-details-panel.css';
+import { Skull } from 'lucide-react';
+import { MythicPlusRun, RunDetails, formatDate } from '@/features/views/api/raiderio.ts';
+import { RosterRow } from './roster-row.tsx';
 
 const ROLE_ORDER: Record<string, number> = { tank: 0, healer: 1, dps: 2 };
 
@@ -15,17 +11,11 @@ interface RunDetailsPanelProps {
   characterRegion: string;
 }
 
-export function RunDetailsPanel({
-  run,
-  details,
-  characterRegion,
-}: Readonly<RunDetailsPanelProps>) {
+export function RunDetailsPanel({ run, details, characterRegion }: Readonly<RunDetailsPanelProps>) {
   if (!details) {
     return (
       <div className="run-details-panel">
-        <div className="run-details-unavailable">
-          Run details are currently unavailable.
-        </div>
+        <div className="run-details-unavailable">Run details are currently unavailable.</div>
       </div>
     );
   }

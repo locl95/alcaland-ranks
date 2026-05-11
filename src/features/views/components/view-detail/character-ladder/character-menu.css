@@ -1,59 +1,61 @@
 .char-menu-wrapper {
-    position: relative;
+  position: relative;
 }
 
 .char-menu-btn {
-    background: transparent;
-    border: none;
-    color: #475569;
-    cursor: pointer;
-    padding: 0.25rem;
-    display: flex;
-    align-items: center;
-    border-radius: 0.25rem;
-    transition: color 0.2s;
+  background: transparent;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  border-radius: 0.25rem;
+  transition: color 0.2s;
 }
 
 .char-menu-btn:hover {
-    color: #94a3b8;
+  color: #94a3b8;
 }
 
 .char-menu-dropdown {
-    position: absolute;
-    right: 0;
-    top: calc(100% + 0.375rem);
-    background: #0b1929;
-    border: 1px solid rgba(51, 65, 85, 0.6);
-    border-radius: 0.375rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    z-index: 100;
-    min-width: 9rem;
-    overflow: hidden;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.375rem);
+  background: #0b1929;
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 0.375rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  min-width: 9rem;
+  overflow: hidden;
 }
 
 .char-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    font-size: 0.875rem;
-    cursor: pointer;
-    text-align: left;
-    transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .char-menu-item:hover {
-    background: rgba(56, 189, 248, 0.06);
-    color: #e2e8f0;
+  background: rgba(56, 189, 248, 0.06);
+  color: #e2e8f0;
 }
 
 .char-menu-icon {
-    width: 1.125rem;
-    height: 1.125rem;
-    object-fit: contain;
-    flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  object-fit: contain;
+  flex-shrink: 0;
 }

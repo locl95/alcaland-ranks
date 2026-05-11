@@ -1,5 +1,5 @@
-import kosggLogo from "@/assets/kosgg.png";
-import "./footer.css";
+import kosggLogo from '@/assets/kosgg.png';
+import './footer.css';
 
 export function Footer() {
   return (

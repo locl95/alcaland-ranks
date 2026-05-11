@@ -1,22 +1,22 @@
-import { useState, FormEvent } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useAppDispatch } from "@/app/hooks";
-import { setTokens } from "@/app/authSlice";
-import { login } from "@/features/auth/authApi";
-import { ApiError } from "@/shared/api/ApiError";
-import { Spinner } from "@/shared/components/spinner";
-import "./LoginPage.css";
+import { useState, FormEvent } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAppDispatch } from '@/app/hooks';
+import { setTokens } from '@/app/authSlice';
+import { login } from '@/features/auth/authApi';
+import { ApiError } from '@/shared/api/ApiError';
+import { Spinner } from '@/shared/components/spinner';
+import './LoginPage.css';
 
 export function LoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const from = (location.state as { from?: string } | null)?.from ?? "/";
+  const from = (location.state as { from?: string } | null)?.from ?? '/';
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,9 +29,9 @@ export function LoginPage() {
       navigate(from, { replace: true });
     } catch (err) {
       if (err instanceof ApiError && err.statusCode === 401) {
-        setError("Invalid username or password.");
+        setError('Invalid username or password.');
       } else {
-        setError("Unable to connect to the server. Try again later.");
+        setError('Unable to connect to the server. Try again later.');
       }
     } finally {
       setIsLoading(false);

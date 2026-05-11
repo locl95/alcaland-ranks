@@ -44,7 +44,7 @@ export interface MythicPlusRecentRun extends MythicPlusRun {
   spec: RecentRunSpec;
 }
 
-export { formatClearTime, formatDate } from "@/features/views/utils.ts";
+export { formatClearTime, formatDate } from '@/features/views/utils.ts';
 
 export interface RaiderioProfile {
   id: number;

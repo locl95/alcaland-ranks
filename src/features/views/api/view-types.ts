@@ -6,7 +6,7 @@ export interface ViewMetadata {
   totalCount?: number | null;
 }
 
-export type Game = "WOW";
+export type Game = 'WOW';
 
 export interface SimpleView {
   id: string;
@@ -39,7 +39,7 @@ export interface ViewRequest {
   game: string;
 }
 
-export type OperationStatus = "PENDING" | "COMPLETED" | "FAILED";
+export type OperationStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 
 export interface OperationResult {
   id: string;

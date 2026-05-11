@@ -1,5 +1,5 @@
-import { EU_REALMS } from "@/features/views/constants/euRealms.ts";
-import { NA_REALMS } from "@/features/views/constants/naRealms.ts";
+import { EU_REALMS } from '@/features/views/constants/euRealms.ts';
+import { NA_REALMS } from '@/features/views/constants/naRealms.ts';
 
 interface RealmSelectProps {
   region: string;
@@ -16,7 +16,7 @@ export function RealmSelect({
 }: Readonly<RealmSelectProps>) {
   const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onRegionChange(e.target.value);
-    onRealmChange("");
+    onRealmChange('');
   };
 
   return (
@@ -30,13 +30,9 @@ export function RealmSelect({
         <option value="us">NA</option>
       </select>
 
-      <select
-        className="form-select"
-        value={realm}
-        onChange={(e) => onRealmChange(e.target.value)}
-      >
+      <select className="form-select" value={realm} onChange={(e) => onRealmChange(e.target.value)}>
         <option value="">Realm</option>
-        {(region === "us" ? NA_REALMS : EU_REALMS).map((r) => (
+        {(region === 'us' ? NA_REALMS : EU_REALMS).map((r) => (
           <option key={r.slug} value={r.slug}>
             {r.label}
           </option>

@@ -1,9 +1,9 @@
-import { useEffect } from "react";
-import { Plus, X } from "lucide-react";
-import "./create-view.css";
-import { View } from "@/features/views/model/view.ts";
-import { RealmSelect } from "@/features/views/components/shared/realm-select.tsx";
-import { useCreateViewForm } from "@/features/views/hooks/useCreateViewForm.ts";
+import { useEffect } from 'react';
+import { Plus, X } from 'lucide-react';
+import './create-view.css';
+import { View } from '@/features/views/model/view.ts';
+import { RealmSelect } from '@/features/views/components/shared/realm-select.tsx';
+import { useCreateViewForm } from '@/features/views/hooks/useCreateViewForm.ts';
 
 interface CreateViewDialogProps {
   open: boolean;
@@ -11,11 +11,7 @@ interface CreateViewDialogProps {
   onCreateView: (newView: View) => void;
 }
 
-export function CreateView({
-  open,
-  onOpenChange,
-  onCreateView,
-}: Readonly<CreateViewDialogProps>) {
+export function CreateView({ open, onOpenChange, onCreateView }: Readonly<CreateViewDialogProps>) {
   const {
     name,
     setName,
@@ -31,17 +27,17 @@ export function CreateView({
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onOpenChange(false);
+      if (e.key === 'Escape') onOpenChange(false);
     };
 
     if (open) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
     };
   }, [open, onOpenChange]);
 
@@ -57,11 +53,7 @@ export function CreateView({
           <div>
             <h1 className="dialog-title">Create new m+ ladder</h1>
           </div>
-          <button
-            type="button"
-            className="dialog-close-btn"
-            onClick={() => onOpenChange(false)}
-          >
+          <button type="button" className="dialog-close-btn" onClick={() => onOpenChange(false)}>
             <X size={20} />
           </button>
         </div>
@@ -85,19 +77,17 @@ export function CreateView({
                   className="form-input"
                   placeholder="Name"
                   value={char.name}
-                  onChange={(e) =>
-                    updateCharacter(index, "name", e.target.value)
-                  }
+                  onChange={(e) => updateCharacter(index, 'name', e.target.value)}
                 />
 
                 <RealmSelect
                   region={char.region}
                   realm={char.realm}
-                  onRegionChange={(v) => updateCharacter(index, "region", v)}
-                  onRealmChange={(v) => updateCharacter(index, "realm", v)}
+                  onRegionChange={(v) => updateCharacter(index, 'region', v)}
+                  onRealmChange={(v) => updateCharacter(index, 'realm', v)}
                 />
 
-                {char.mode === "add" ? (
+                {char.mode === 'add' ? (
                   <button
                     type="button"
                     className="btn-icon btn-icon-primary"
@@ -124,12 +114,8 @@ export function CreateView({
           </div>
 
           <div className="dialog-footer">
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={!canSubmit}
-            >
-              {isSubmitting ? "Creating..." : "Create"}
+            <button type="submit" className="btn btn-primary" disabled={!canSubmit}>
+              {isSubmitting ? 'Creating...' : 'Create'}
             </button>
           </div>
         </form>

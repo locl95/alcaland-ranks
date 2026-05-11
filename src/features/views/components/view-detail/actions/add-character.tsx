@@ -1,7 +1,7 @@
-import { useState, FormEvent } from "react";
-import { X } from "lucide-react";
-import { EU_REALMS } from "@/features/views/constants/euRealms.ts";
-import "./add-character.css";
+import { useState, FormEvent } from 'react';
+import { X } from 'lucide-react';
+import { EU_REALMS } from '@/features/views/constants/euRealms.ts';
+import './add-character.css';
 
 interface AddCharacterWindowProps {
   isOpen: boolean;
@@ -9,28 +9,24 @@ interface AddCharacterWindowProps {
   onAdd: (characterName: string, realm: string) => void;
 }
 
-export function AddCharacter({
-  isOpen,
-  onClose,
-  onAdd,
-}: Readonly<AddCharacterWindowProps>) {
-  const [characterName, setCharacterName] = useState("");
-  const [realm, setRealm] = useState("");
+export function AddCharacter({ isOpen, onClose, onAdd }: Readonly<AddCharacterWindowProps>) {
+  const [characterName, setCharacterName] = useState('');
+  const [realm, setRealm] = useState('');
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (characterName.trim() && realm) {
       onAdd(characterName.trim(), realm);
-      setCharacterName("");
-      setRealm("");
+      setCharacterName('');
+      setRealm('');
       onClose();
     }
   };
 
   const handleClose = () => {
-    setCharacterName("");
-    setRealm("");
+    setCharacterName('');
+    setRealm('');
     onClose();
   };
 
@@ -38,10 +34,7 @@ export function AddCharacter({
 
   return (
     <div className="add-character-overlay" onClick={handleClose}>
-      <div
-        className="add-character-content"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="add-character-content" onClick={(e) => e.stopPropagation()}>
         <div className="add-character-header">
           <h2 className="add-character-title">Add Character</h2>
           <button onClick={handleClose} className="add-character-close-btn">
