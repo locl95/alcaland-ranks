@@ -26,7 +26,6 @@ cp .env.e2e .env
 |---|---|
 | `VITE_API_HOST` | Base URL of serresiete-backend (e.g. `http://localhost:8080`) |
 | `VITE_SERVICE_TOKEN` | Service JWT for read-only endpoints |
-| `VITE_FEATURE_FLAG_POLLING_ENABLED` | Enable background polling (`true` / `false`) |
 
 ## Development
 
@@ -84,6 +83,16 @@ Playwright uses Chromium only. Browsers are installed separately:
 ```bash
 pnpm exec playwright install chromium
 ```
+
+## Formatting
+
+The project uses [Prettier](https://prettier.io/) for code formatting. Configuration lives in `.prettierrc`.
+
+```bash
+pnpm format
+```
+
+This formats all `src/**/*.{ts,tsx,css}` files in place.
 
 ## CI
 
