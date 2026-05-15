@@ -37,7 +37,9 @@ export function useViewsData(isAuthenticated: boolean) {
     const stillPending = pendingViews.filter((v) => !serverIds.has(v.simpleView.id));
     const all = [...serverOwnViews, ...stillPending];
     return deletingViewId
-      ? all.map((v) => (v.simpleView.id === deletingViewId ? { ...v, status: 'deleting' as const } : v))
+      ? all.map((v) =>
+          v.simpleView.id === deletingViewId ? { ...v, status: 'deleting' as const } : v,
+        )
       : all;
   }, [serverOwnViews, pendingViews, deletingViewId]);
 

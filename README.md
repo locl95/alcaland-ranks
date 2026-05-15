@@ -16,10 +16,10 @@ Built with React + TypeScript + Vite. Data is served by [serresiete-backend](htt
 pnpm install
 ```
 
-Copy `.env.e2e` to `.env` and fill in your values:
+Copy `.env.acceptance` to `.env` and fill in your values:
 
 ```bash
-cp .env.e2e .env
+cp .env.acceptance .env
 ```
 
 | Variable | Description |
@@ -61,11 +61,11 @@ pnpm test:run
 
 ### E2E tests — Playwright 1.59
 
-Tests live in `e2e/`. All backend calls are intercepted with `page.route()` — no running backend needed.
+Tests live in `acceptance/`. All backend calls are intercepted with `page.route()` — no running backend needed.
 
 ```bash
 # run headless (used in CI)
-pnpm test:e2e
+pnpm test:acceptance
 
 # run with a visible browser window
 pnpm exec playwright test --headed
