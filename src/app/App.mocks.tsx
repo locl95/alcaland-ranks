@@ -18,6 +18,7 @@ export const MockViewsList = ({
   <div data-testid="views-list">
     {views.map((v) => (
       <div key={v.simpleView.id} data-testid={`view-item-${v.simpleView.id}`}>
+        {v.status === 'deleting' && <span>Deleting...</span>}
         <button
           data-testid={`open-${v.simpleView.id}`}
           onClick={() => onViewClick(v.simpleView.id)}

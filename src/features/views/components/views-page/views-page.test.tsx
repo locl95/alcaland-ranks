@@ -226,12 +226,27 @@ describe('ViewsPage', () => {
   });
 
   describe('handleDeleteView', () => {
-    it('removes the view from the list immediately on delete', async () => {
+    it('the deleted view shows Deleting... message', async () => {
       await renderWithViews();
 
       await userEvent.click(screen.getByTestId('delete-v1'));
 
-      expect(screen.queryByTestId('view-item-v1')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('view-item-v1')).toBeInTheDocument();
+      expect(screen.getByText('Deleting...')).toBeInTheDocument();
+    });
+
+    it('hides the view when the delete operation completes', async () => {
+      vi.mocked(pollOperation).mockResolvedValueOnce({ id: 'op-id', status: 'COMPLETED' });
+      await renderWithViews();
+
+      fetchMocks.userRequest.mockImplementation((method: string) => {
+        if (method === 'DELETE') return Promise.resolve({ id: 'op-id' });
+        return Promise.resolve({ records: [] });
+      });
+
+      await userEvent.click(screen.getByTestId('delete-v1'));
+
+      await waitFor(() => expect(screen.queryByTestId('view-item-v1')).not.toBeInTheDocument());
     });
 
     it('calls the DELETE API with the correct viewId', async () => {
