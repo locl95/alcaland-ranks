@@ -26,8 +26,8 @@ jobs:
 
       - run: pnpm test:run
 
-  e2e:
-    name: E2E tests
+  acceptance:
+    name: Acceptance tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
