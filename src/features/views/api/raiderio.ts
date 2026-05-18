@@ -44,14 +44,14 @@ export interface MythicPlusRecentRun extends MythicPlusRun {
   spec: RecentRunSpec;
 }
 
-export { formatClearTime, formatDate } from "@/features/views/utils.ts";
+export { formatClearTime, formatDate } from '@/features/views/utils.ts';
 
 export interface RaiderioProfile {
   id: number;
   name: string;
   realm: string;
   region: string;
-  score: number;
+  score: number | null;
   class: string;
   spec: string;
   quantile: number;

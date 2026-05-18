@@ -1,30 +1,32 @@
-import { useEffect, useState } from "react";
-import { View } from "@/features/views/model/view.ts";
-import { userRequest } from "@/shared/api/httpClient.ts";
+import { useEffect, useState } from 'react';
+import { View } from '@/features/views/model/view.ts';
+import { userRequest } from '@/shared/api/httpClient.ts';
 
 export interface CharacterRow {
   name: string;
   realm: string;
   region: string;
-  mode: "add" | "added";
+  mode: 'add' | 'added';
 }
 
-const EMPTY_ROW: CharacterRow = { name: "", realm: "", region: "eu", mode: "add" };
+const EMPTY_ROW: CharacterRow = { name: '', realm: '', region: 'eu', mode: 'add' };
 
 export function useCreateViewForm(
   open: boolean,
   onClose: () => void,
   onCreateView: (view: View) => void,
 ) {
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const [characters, setCharacters] = useState<CharacterRow[]>([EMPTY_ROW]);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!open) {
-      setName("");
+      setName('');
       setCharacters([EMPTY_ROW]);
       setError(null);
+      setIsSubmitting(false);
     }
   }, [open]);
 
@@ -39,7 +41,7 @@ export function useCreateViewForm(
   const addCharacter = (index: number) => {
     setCharacters((prev) => {
       const updated = [...prev];
-      updated[index] = { ...updated[index], mode: "added" };
+      updated[index] = { ...updated[index], mode: 'added' };
       updated.push({ ...EMPTY_ROW });
       return updated;
     });
@@ -52,52 +54,55 @@ export function useCreateViewForm(
     });
   };
 
-  const canSubmit = !!name.trim() && characters.some((c) => c.mode === "added");
+  const canSubmit = !isSubmitting && !!name.trim() && characters.some((c) => c.mode === 'added');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsSubmitting(true);
 
     const addedCharacters = characters
       .map((c, i, arr) =>
-        i === arr.length - 1 && c.mode === "add" && c.name.trim() && c.realm.trim()
-          ? { ...c, mode: "added" as const }
+        i === arr.length - 1 && c.mode === 'add' && c.name.trim() && c.realm.trim()
+          ? { ...c, mode: 'added' as const }
           : c,
       )
-      .filter((c) => c.mode === "added");
+      .filter((c) => c.mode === 'added');
 
     try {
-      await userRequest("POST", "/views", {
+      const { id: operationId } = await userRequest<{ id: string }>('POST', '/views', {
         name,
         entities: addedCharacters.map((c) => ({
           name: c.name,
           region: c.region,
           realm: c.realm,
-          type: "com.kos.entities.domain.WowEntityRequest",
+          type: 'com.kos.entities.domain.WowEntityRequest',
         })),
         published: true,
         featured: false,
-        game: "WOW",
+        game: 'WOW',
       });
 
       onCreateView({
-        id: "",
+        operationId,
         simpleView: {
-          id: "",
+          id: operationId,
           name,
-          owner: "",
-          published: false,
-          entitiesIds: [],
-          game: "WOW",
+          owner: '',
+          published: true,
+          entitiesIds: addedCharacters.map((_, i) => i),
+          game: 'WOW',
           featured: false,
           extraArguments: null,
         },
-        isSynced: false,
+        status: 'pending',
       });
 
       onClose();
     } catch {
-      setError("Failed to create ladder. Please try again.");
+      setError('Failed to create ladder. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -107,6 +112,7 @@ export function useCreateViewForm(
     characters,
     canSubmit,
     error,
+    isSubmitting,
     updateCharacter,
     addCharacter,
     removeCharacter,

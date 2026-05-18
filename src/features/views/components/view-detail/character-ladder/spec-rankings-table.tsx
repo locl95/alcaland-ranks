@@ -1,16 +1,13 @@
-import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
-import { getRankChange, formatRankChange } from "@/features/views/utils.ts";
-import "./spec-rankings-table.css";
+import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { getRankChange, formatRankChange } from '@/features/views/utils.ts';
+import './spec-rankings-table.css';
 
 interface SpecRankingsTableProps {
   character: RaiderioProfile;
   cachedProfile: RaiderioProfile | undefined;
 }
 
-export function SpecRankingsTable({
-  character,
-  cachedProfile,
-}: Readonly<SpecRankingsTableProps>) {
+export function SpecRankingsTable({ character, cachedProfile }: Readonly<SpecRankingsTableProps>) {
   const specs = character.mythicPlusRanks.specs.filter((s) => s.score > 0);
 
   if (specs.length === 0) return null;
@@ -40,7 +37,7 @@ export function SpecRankingsTable({
                   <td className="spec-td spec-td--score">
                     {Math.round(spec.score).toLocaleString()}
                   </td>
-                  {(["world", "region", "realm"] as const).map((key) => {
+                  {(['world', 'region', 'realm'] as const).map((key) => {
                     const change = getRankChange(spec[key], cachedSpec?.[key]);
                     return (
                       <td key={key} className="spec-td spec-td--rank">
@@ -48,9 +45,7 @@ export function SpecRankingsTable({
                           #{Math.round(spec[key]).toLocaleString()}
                         </span>
                         {change !== null && change !== 0 && (
-                          <span
-                            className={`rank-change ${change > 0 ? "improved" : "declined"}`}
-                          >
+                          <span className={`rank-change ${change > 0 ? 'improved' : 'declined'}`}>
                             {formatRankChange(change)}
                           </span>
                         )}

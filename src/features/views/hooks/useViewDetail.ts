@@ -1,59 +1,51 @@
-import { useMemo, useRef, useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAppSelector } from "@/app/hooks.ts";
-import { selectUsername } from "@/app/authSlice.ts";
-import { userRequestVoid } from "@/shared/api/httpClient.ts";
-import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
-import { View } from "@/features/views/model/view.ts";
-import { ViewRequest } from "@/features/views/api/view-types.ts";
-import { haveSameCharacters } from "@/features/views/utils.ts";
+import { useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAppSelector } from '@/app/hooks.ts';
+import { selectUsername } from '@/app/authSlice.ts';
+import { userRequest } from '@/shared/api/httpClient.ts';
+import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { OperationResult, ViewRequest } from '@/features/views/api/view-types.ts';
+import { haveSameCharacters } from '@/features/views/utils.ts';
 import {
   viewKeys,
   fetchViewData,
   fetchCachedViewData,
   fetchWowStatic,
-} from "@/features/views/api/viewQueries.ts";
-
-interface ViewEditMeta {
-  pendingCharacters: RaiderioProfile[];
-}
+  pollOperation,
+} from '@/features/views/api/viewQueries.ts';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const MAX_EDIT_POLLS = 5;
-const characterKey = (c: { name: string }) => c.name.toLowerCase();
+const getCharacterName = (c: { name: string }) => c.name.toLowerCase();
+const REFETCH_INTERVAL = 2000;
 
-export function useViewDetail(
-  viewId: string | undefined,
-  owner: string | null,
-  initialEntitiesCount: number,
-) {
+export function useViewDetail(viewId: string | undefined, owner: string | null) {
   const queryClient = useQueryClient();
   const username = useAppSelector(selectUsername);
 
-  const [expectedCount, setExpectedCount] = useState(initialEntitiesCount);
-  const editPollCountRef = useRef(0);
-  const lastSeenDataUpdatedAt = useRef(0);
+  // Pending chars drive the ladder's syncing state for both adds and deletes:
+  //   - Add: new chars have score: null → shown as "syncing" in the ladder.
+  //   - Delete: removed chars are kept in the list with score: null → shown as
+  //     "syncing" until the operation resolves, then drop out of the ladder.
+  const [pendingCharacters, setPendingCharacters] = useState<RaiderioProfile[] | null>(null);
+  const [syncError, setSyncError] = useState<RaiderioProfile[] | null>(null);
 
-  const isViewIdValid = !!viewId && UUID_REGEX.test(viewId);
-  const safeViewId = viewId ?? "";
+  const isValidViewId = !!viewId && UUID_REGEX.test(viewId);
+  const safeViewId = viewId ?? '';
 
-  const { data: rawViewData, isLoading, dataUpdatedAt } = useQuery({
+  const { data: viewData, isLoading } = useQuery({
     queryKey: viewKeys.data(safeViewId),
     queryFn: () => fetchViewData(safeViewId),
-    enabled: isViewIdValid,
+    enabled: isValidViewId,
     refetchInterval: (query) => {
-      const hasPendingScore = query.state.data?.data.some((c) => c.score === -1);
-      const hasEditMeta = !!queryClient.getQueryData<ViewEditMeta>(viewKeys.editMeta(safeViewId));
-      const isSyncingInitial =
-        !hasEditMeta && expectedCount > 0 && (query.state.data?.data.length ?? 0) === 0;
-      return hasPendingScore || hasEditMeta || isSyncingInitial ? 3000 : false;
+      const hasPendingCharacters = query.state.data?.data?.some((c) => c.score === null);
+      return hasPendingCharacters ? REFETCH_INTERVAL : false;
     },
   });
 
-  const { data: cachedData } = useQuery({
+  const { data: cachedViewData } = useQuery({
     queryKey: viewKeys.cachedData(safeViewId),
     queryFn: () => fetchCachedViewData(safeViewId),
-    enabled: isViewIdValid,
+    enabled: isValidViewId,
     staleTime: Infinity,
   });
 
@@ -63,141 +55,87 @@ export function useViewDetail(
     staleTime: Infinity,
   });
 
-  const { data: editMeta } = useQuery({
-    queryKey: viewKeys.editMeta(safeViewId),
-    queryFn: () => null as ViewEditMeta | null,
-    enabled: false,
-    staleTime: Infinity,
-    gcTime: 5 * 60 * 1000,
-    initialData: null,
-  });
-
-  const { data: syncError } = useQuery({
-    queryKey: viewKeys.syncError(safeViewId),
-    queryFn: () => null as RaiderioProfile[] | null,
-    enabled: false,
-    staleTime: Infinity,
-    gcTime: 5 * 60 * 1000,
-    initialData: null,
-  });
-
-  // Pure: compute which profiles to display
   const profiles = useMemo(() => {
-    const apiData = rawViewData?.data ?? [];
-    if (!editMeta) return apiData;
+    const raiderioProfiles = viewData?.data ?? [];
+    if (!pendingCharacters) return raiderioProfiles;
+    const raiderioProfilesMap = new Map(raiderioProfiles.map((c) => [getCharacterName(c), c]));
+    return pendingCharacters.map((c) => {
+      // Preserve score: null — it signals a pending add or a pending delete.
+      // Without this, the API version (with a real score) would overwrite the indicator.
+      if (c.score === null) return c;
+      return raiderioProfilesMap.get(getCharacterName(c)) ?? c;
+    });
+  }, [viewData, pendingCharacters]);
 
-    const { pendingCharacters } = editMeta;
-    const apiByKey = new Map(apiData.map((c) => [characterKey(c), c]));
-    const pendingKeys = new Set(pendingCharacters.map(characterKey));
+  function handleSaveCharacters(characters: RaiderioProfile[], request: ViewRequest) {
+    const submittedCharacters = new Set(characters.map(getCharacterName));
+    const deletedCharacters = profiles
+      .filter((p) => !submittedCharacters.has(getCharacterName(p)))
+      .map((p) => ({ ...p, score: null }));
+    setPendingCharacters([...characters, ...deletedCharacters]);
 
-    const backendCaughtUp =
-      apiData.every((c) => pendingKeys.has(characterKey(c))) &&
-      pendingCharacters.every((c) => apiByKey.has(characterKey(c)));
-
-    if (backendCaughtUp) return apiData;
-
-    return pendingCharacters.map((c) => apiByKey.get(characterKey(c)) ?? c);
-  }, [rawViewData, editMeta]);
-
-  // Side effects: clear editMeta on sync completion or poll timeout
-  useEffect(() => {
-    if (!editMeta) return;
-
-    const apiData = rawViewData?.data ?? [];
-    const { pendingCharacters } = editMeta;
-    const apiByKey = new Map(apiData.map((c) => [characterKey(c), c]));
-    const pendingKeys = new Set(pendingCharacters.map(characterKey));
-
-    const backendCaughtUp =
-      apiData.every((c) => pendingKeys.has(characterKey(c))) &&
-      pendingCharacters.every((c) => apiByKey.has(characterKey(c)));
-
-    if (backendCaughtUp) {
-      editPollCountRef.current = 0;
-      queryClient.setQueryData(viewKeys.editMeta(safeViewId), null);
-      return;
-    }
-
-    if (dataUpdatedAt > lastSeenDataUpdatedAt.current) {
-      lastSeenDataUpdatedAt.current = dataUpdatedAt;
-      editPollCountRef.current += 1;
-      if (editPollCountRef.current >= MAX_EDIT_POLLS) {
-        editPollCountRef.current = 0;
-        const failed = pendingCharacters.filter((c) => !apiByKey.has(characterKey(c)));
-        if (failed.length > 0) {
-          queryClient.setQueryData(viewKeys.syncError(safeViewId), failed);
+    async function reconcileView(operation: OperationResult) {
+      setPendingCharacters(null);
+      queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+      const refetchedViewData = await fetchViewData(safeViewId).catch(() => null);
+      if (refetchedViewData) {
+        queryClient.setQueryData(viewKeys.data(safeViewId), refetchedViewData);
+        if (operation.status === 'FAILED') {
+          const synced = new Set((refetchedViewData.data ?? []).map(getCharacterName));
+          const failedAdds = characters.filter((c) => !synced.has(getCharacterName(c)));
+          const failedDeletes = (refetchedViewData.data ?? []).filter(
+            (c) => !submittedCharacters.has(getCharacterName(c)),
+          );
+          const failed = [...failedAdds, ...failedDeletes];
+          if (failed.length > 0) setSyncError(failed);
         }
-        queryClient.setQueryData(viewKeys.editMeta(safeViewId), null);
+      } else {
+        queryClient.invalidateQueries({ queryKey: viewKeys.data(safeViewId) });
       }
     }
-  }, [rawViewData, editMeta, dataUpdatedAt, queryClient, safeViewId]);
 
-  const saveMutation = useMutation({
-    mutationFn: (characters: RaiderioProfile[]) => {
-      const request: ViewRequest = {
-        name: rawViewData?.viewName ?? "",
-        entities: characters.map((c) => ({
-          name: c.name,
-          region: c.region,
-          realm: c.realm,
-          type: "com.kos.entities.domain.WowEntityRequest",
-        })),
-        published: true,
-        featured: false,
-        game: "WOW",
-      };
-      return userRequestVoid("PUT", `/views/${safeViewId}`, request);
-    },
-
-    onMutate: async (characters) => {
-      editPollCountRef.current = 0;
-      lastSeenDataUpdatedAt.current = dataUpdatedAt;
-      queryClient.setQueryData(viewKeys.syncError(safeViewId), null);
-      setExpectedCount(characters.length);
-      await queryClient.cancelQueries({ queryKey: viewKeys.data(safeViewId) });
-      await queryClient.cancelQueries({ queryKey: viewKeys.ownList() });
-
-      queryClient.setQueryData<ViewEditMeta>(viewKeys.editMeta(safeViewId), {
-        pendingCharacters: characters,
+    userRequest<{ id: string }>('PUT', `/views/${safeViewId}`, request)
+      .then(({ id: operationId }) => pollOperation(operationId))
+      .then(async (operation) => {
+        await reconcileView(operation);
+      })
+      .catch(() => {
+        setPendingCharacters(null);
+        queryClient.invalidateQueries({ queryKey: viewKeys.data(safeViewId) });
       });
+  }
 
-      queryClient.setQueryData<View[]>(viewKeys.ownList(), (old) =>
-        old?.map((v) =>
-          v.id === safeViewId
-            ? { ...v, simpleView: { ...v.simpleView, entitiesIds: characters.map((_, i) => i) } }
-            : v,
-        ) ?? [],
-      );
-    },
+  const saveCharacters = (characters: RaiderioProfile[]) => {
+    if (haveSameCharacters(characters, profiles)) return;
+    setSyncError(null);
 
-    onError: () => {
-      queryClient.setQueryData(viewKeys.editMeta(safeViewId), null);
-      queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
-    },
-  });
+    const request: ViewRequest = {
+      name: viewData?.viewName ?? '',
+      entities: characters.map((c) => ({
+        name: c.name,
+        region: c.region,
+        realm: c.realm,
+        type: 'com.kos.entities.domain.WowEntityRequest',
+      })),
+      published: true,
+      featured: false,
+      game: 'WOW',
+    };
 
-  const saveCharacters = async (characters: RaiderioProfile[]) => {
-    if (!haveSameCharacters(characters, profiles)) {
-      await saveMutation.mutateAsync(characters);
-    }
-  };
-
-  const clearSyncError = () => {
-    queryClient.setQueryData(viewKeys.syncError(safeViewId), null);
+    handleSaveCharacters(characters, request);
   };
 
   return {
     profiles,
-    cachedProfiles: cachedData?.data ?? [],
-    viewName: rawViewData?.viewName ?? "",
+    cachedProfiles: cachedViewData?.data ?? [],
+    viewName: viewData?.viewName ?? '',
     season: season ?? null,
     initialized: !isLoading,
-    editMeta,
+    isSyncing: pendingCharacters !== null,
     syncError,
     canEdit: username !== null && username === owner,
-    isViewIdValid,
-    expectedCount,
+    isViewIdValid: isValidViewId,
     saveCharacters,
-    clearSyncError,
+    clearSyncError: () => setSyncError(null),
   };
 }

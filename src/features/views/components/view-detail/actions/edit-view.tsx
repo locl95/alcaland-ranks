@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { Plus, Trash2, X } from "lucide-react";
-import "./edit-view.css";
-import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
-import { getClassSlug } from "@/features/views/utils.ts";
-import { RealmSelect } from "@/features/views/components/shared/realm-select.tsx";
+import { useEffect, useState } from 'react';
+import { Plus, Trash2, X } from 'lucide-react';
+import './edit-view.css';
+import '../character-ladder/ladder-row.css';
+import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { getClassSlug } from '@/features/views/utils.ts';
+import { RealmSelect } from '@/features/views/components/shared/realm-select.tsx';
 
 interface EditViewProps {
   isOpen: boolean;
@@ -12,25 +13,18 @@ interface EditViewProps {
   onSave: (characters: RaiderioProfile[]) => void;
 }
 
-export function EditView({
-  isOpen,
-  characters,
-  onClose,
-  onSave,
-}: Readonly<EditViewProps>) {
-  const [editingCharacters, setEditingCharacters] = useState<RaiderioProfile[]>(
-    [],
-  );
-  const [newName, setNewName] = useState("");
-  const [newRealm, setNewRealm] = useState("");
-  const [newRegion, setNewRegion] = useState("eu");
+export function EditView({ isOpen, characters, onClose, onSave }: Readonly<EditViewProps>) {
+  const [editingCharacters, setEditingCharacters] = useState<RaiderioProfile[]>([]);
+  const [newName, setNewName] = useState('');
+  const [newRealm, setNewRealm] = useState('');
+  const [newRegion, setNewRegion] = useState('eu');
 
   useEffect(() => {
     if (isOpen) {
-      setEditingCharacters(characters.filter((c) => c.score > -1));
-      setNewName("");
-      setNewRealm("");
-      setNewRegion("eu");
+      setEditingCharacters(characters.filter((c) => c.score !== null));
+      setNewName('');
+      setNewRealm('');
+      setNewRegion('eu');
     }
   }, [isOpen, characters]);
 
@@ -46,9 +40,9 @@ export function EditView({
       name: newName.trim(),
       realm: newRealm,
       region: newRegion,
-      score: -1,
-      class: "",
-      spec: "",
+      score: null,
+      class: '',
+      spec: '',
       quantile: 0,
       mythicPlusBestRuns: [],
       mythicPlusRanks: {
@@ -60,22 +54,22 @@ export function EditView({
     };
 
     setEditingCharacters((prev) => [...prev, newCharacter]);
-    setNewName("");
-    setNewRealm("");
-    setNewRegion("eu");
+    setNewName('');
+    setNewRealm('');
+    setNewRegion('eu');
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="edit-view-overlay" onClick={onClose}>
+    <div className="edit-view-overlay" data-testid="edit-view-overlay" onClick={onClose}>
       <div className="edit-view-content" onClick={(e) => e.stopPropagation()}>
         <div className="edit-view-header">
           <div>
             <h2 className="edit-view-title">Edit your ladder</h2>
             <p className="edit-view-subtitle">Remove or add new characters</p>
           </div>
-          <button onClick={onClose} className="edit-view-close-btn">
+          <button onClick={onClose} className="edit-view-close-btn" aria-label="Close">
             <X className="close-icon" />
           </button>
         </div>
@@ -88,7 +82,7 @@ export function EditView({
                   <div className="character-edit-name-row">
                     <p className="character-edit-name">{character.name}</p>
 
-                    {character.score > -1 && (
+                    {character.score !== null && (
                       <span
                         className={`character-edit-class-badge ${getClassSlug(character.class)}`}
                       >
@@ -97,29 +91,35 @@ export function EditView({
                     )}
                   </div>
 
-                  {character.score > -1 && (
-                    <div className="character-edit-meta">
-                      <span className="character-edit-spec">
-                        {character.spec}
-                      </span>
-                      <span className="character-edit-separator">•</span>
-                      <span className="character-edit-realm">
-                        {character.realm}
-                      </span>
-                      <span className="character-edit-separator">•</span>
-                      <span className="character-edit-score">
-                        {character.score.toLocaleString()} M+
-                      </span>
-                    </div>
-                  )}
+                  <div className="character-edit-meta">
+                    {character.score !== null && (
+                      <>
+                        <span className="character-edit-spec">{character.spec}</span>
+                        <span className="character-edit-separator">•</span>
+                      </>
+                    )}
+                    <span className="character-edit-realm">{character.realm}</span>
+                    <span className="character-edit-separator">•</span>
+                    <span className={`ladder-region-badge ${character.region}`}>
+                      {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
+                    </span>
+                    {character.score !== null && (
+                      <>
+                        <span className="character-edit-separator">•</span>
+                        <span className="character-edit-score">
+                          {character.score.toLocaleString()} M+
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 <button
                   onClick={() => deleteCharacter(character.id)}
                   className="character-delete-btn"
+                  aria-label="Delete"
                 >
                   <Trash2 className="delete-icon" />
-                  Delete
                 </button>
               </div>
             ))}
@@ -131,7 +131,7 @@ export function EditView({
               placeholder="Name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addCharacter()}
+              onKeyDown={(e) => e.key === 'Enter' && addCharacter()}
             />
 
             <RealmSelect
@@ -154,10 +154,7 @@ export function EditView({
         </div>
 
         <div className="edit-view-footer">
-          <button
-            onClick={() => onSave(editingCharacters)}
-            className="manage-done-btn"
-          >
+          <button onClick={() => onSave(editingCharacters)} className="manage-done-btn">
             Done
           </button>
         </div>

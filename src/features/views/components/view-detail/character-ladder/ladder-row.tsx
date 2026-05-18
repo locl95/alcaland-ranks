@@ -1,15 +1,12 @@
-import { AlertTriangle } from "lucide-react";
-import "./ladder-row.css";
-import { memo, useState } from "react";
-import { RaiderioProfile, Season } from "@/features/views/api/raiderio.ts";
-import { CharacterMenu } from "./character-menu.tsx";
-import { LadderRowExpanded } from "./ladder-row-expanded.tsx";
+import { Loader2 } from 'lucide-react';
+import './ladder-row.css';
+import { memo, useState } from 'react';
+import { RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
+import { CharacterMenu } from './character-menu.tsx';
+import { LadderRowExpanded } from './ladder-row-expanded.tsx';
 
-import { getClassSlug, getScoreClass } from "@/features/views/utils.ts";
-import {
-  CLASS_IMAGES,
-  getClassImageKey,
-} from "@/features/views/constants/class-images.ts";
+import { getClassSlug, getScoreClass } from '@/features/views/utils.ts';
+import { CLASS_IMAGES, getClassImageKey } from '@/features/views/constants/class-images.ts';
 
 interface LadderRowProps {
   index: number;
@@ -25,28 +22,23 @@ export const LadderRow = memo(function LadderRow({
   season,
 }: Readonly<LadderRowProps>) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const isSyncing = character.score === -1;
+  const isSyncing = character.score === null;
+  const isBeingDeleted = isSyncing && character.class !== '';
   const hasHistoricalData = cachedCharacters.length > 0;
   const cachedIndex = cachedCharacters.findIndex((c) => c.id === character.id);
-  const positionChange =
-    hasHistoricalData && cachedIndex !== -1 ? cachedIndex - index : null;
+  const positionChange = hasHistoricalData && cachedIndex !== -1 ? cachedIndex - index : null;
 
   const showPositionChange =
-    !isSyncing &&
-    hasHistoricalData &&
-    positionChange !== null &&
-    positionChange !== 0;
-  const cachedCharacter =
-    cachedIndex !== -1 ? cachedCharacters[cachedIndex] : undefined;
+    !isSyncing && hasHistoricalData && positionChange !== null && positionChange !== 0;
+  const cachedCharacter = cachedIndex !== -1 ? cachedCharacters[cachedIndex] : undefined;
   const scoreGain =
-    !isSyncing && cachedCharacter ? character.score - cachedCharacter.score : 0;
+    !isSyncing && cachedCharacter && cachedCharacter.score !== null
+      ? (character.score as number) - cachedCharacter.score
+      : 0;
 
   return (
     <div className="ladder-row">
-      <div
-        className="ladder-row-inner"
-        onClick={() => setIsExpanded((prev) => !prev)}
-      >
+      <div className="ladder-row-inner" onClick={() => setIsExpanded((prev) => !prev)}>
         <div className="ladder-rank">
           <span className="rank-number">{index + 1}</span>
           {!isSyncing && (
@@ -64,11 +56,9 @@ export const LadderRow = memo(function LadderRow({
             <p className="ladder-character-name">{character.name}</p>
             {showPositionChange && (
               <span
-                className={`ladder-position-change ${positionChange > 0 ? "improved" : "declined"}`}
+                className={`ladder-position-change ${positionChange > 0 ? 'improved' : 'declined'}`}
               >
-                {positionChange > 0
-                  ? `↑ ${positionChange}`
-                  : `↓ ${Math.abs(positionChange)}`}
+                {positionChange > 0 ? `↑ ${positionChange}` : `↓ ${Math.abs(positionChange)}`}
               </span>
             )}
           </div>
@@ -76,9 +66,7 @@ export const LadderRow = memo(function LadderRow({
             <div className="ladder-character-meta">
               <span className="ladder-character-realm">{character.realm}</span>
               <span className={`ladder-region-badge ${character.region}`}>
-                {character.region === "us"
-                  ? "NA"
-                  : character.region.toUpperCase()}
+                {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
               </span>
             </div>
           )}
@@ -86,24 +74,20 @@ export const LadderRow = memo(function LadderRow({
 
         {isSyncing ? (
           <div className="ladder-syncing-indicator">
-            <div className="syncing-warning-wrapper">
-              <AlertTriangle className="syncing-warning-icon" />
-              <span className="syncing-tooltip">Character is syncing</span>
-            </div>
+            <span className="ladder-syncing-label">
+              {isBeingDeleted ? 'Deleting…' : 'Syncing…'}
+            </span>
+            <Loader2 className="ladder-syncing-spinner" />
           </div>
         ) : (
           <>
             <div className="ladder-score">
               <div className="ladder-score-value-row">
-                <p
-                  className={`ladder-score-value ${getScoreClass(character.score)}`}
-                >
-                  {character.score.toLocaleString()}
+                <p className={`ladder-score-value ${getScoreClass(character.score!)}`}>
+                  {character.score!.toLocaleString()}
                 </p>
                 {scoreGain > 0 && (
-                  <span className="score-improvement">
-                    +{Math.round(scoreGain)}
-                  </span>
+                  <span className="score-improvement">+{Math.round(scoreGain)}</span>
                 )}
               </div>
               <p className="ladder-score-label">M+ Score</p>

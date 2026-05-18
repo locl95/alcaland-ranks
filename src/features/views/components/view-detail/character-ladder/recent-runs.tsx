@@ -1,16 +1,16 @@
-import { useState } from "react";
-import "./recent-runs.css";
-import { ChevronDown, ChevronUp, Crown } from "lucide-react";
+import { useState } from 'react';
+import './recent-runs.css';
+import { ChevronDown, ChevronUp, Crown } from 'lucide-react';
 import {
   MythicPlusBestRun,
   MythicPlusRecentRun,
   formatClearTime,
   formatDate,
-} from "@/features/views/api/raiderio.ts";
-import { KEYSTONE_DISPLAY } from "@/features/views/constants/keystone.ts";
-import { CLASS_COLORS } from "@/features/views/constants/class-colors.ts";
+} from '@/features/views/api/raiderio.ts';
+import { KEYSTONE_DISPLAY } from '@/features/views/constants/keystone.ts';
+import { CLASS_COLORS } from '@/features/views/constants/class-colors.ts';
 
-import { getClassSlug } from "@/features/views/utils.ts";
+import { getClassSlug } from '@/features/views/utils.ts';
 
 interface RecentRunsProps {
   recentRuns: MythicPlusRecentRun[];
@@ -18,11 +18,7 @@ interface RecentRunsProps {
   characterClass: string;
 }
 
-export function RecentRuns({
-  recentRuns,
-  bestRuns,
-  characterClass,
-}: Readonly<RecentRunsProps>) {
+export function RecentRuns({ recentRuns, bestRuns, characterClass }: Readonly<RecentRunsProps>) {
   const [isOpen, setIsOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const runs = showAll ? recentRuns : recentRuns.slice(0, 5);
@@ -58,8 +54,7 @@ export function RecentRuns({
                 </span>
                 {(() => {
                   const { prefix, className } =
-                    KEYSTONE_DISPLAY[run.num_keystone_upgrades] ??
-                    KEYSTONE_DISPLAY[0];
+                    KEYSTONE_DISPLAY[run.num_keystone_upgrades] ?? KEYSTONE_DISPLAY[0];
                   return (
                     <span className={`recent-run-level ${className}`}>
                       {prefix}
@@ -67,28 +62,21 @@ export function RecentRuns({
                     </span>
                   );
                 })()}
-                <span className="recent-run-time">
-                  {formatClearTime(run.clear_time_ms)}
-                </span>
+                <span className="recent-run-time">{formatClearTime(run.clear_time_ms)}</span>
                 <span
-                  className={`recent-run-status ${run.num_keystone_upgrades > 0 ? "timed" : "depleted"}`}
+                  className={`recent-run-status ${run.num_keystone_upgrades > 0 ? 'timed' : 'depleted'}`}
                 >
-                  {run.num_keystone_upgrades > 0 ? "Timed" : "Depleted"}
+                  {run.num_keystone_upgrades > 0 ? 'Timed' : 'Depleted'}
                   {bestRunIds.has(run.keystone_run_id) && (
                     <Crown size={11} className="recent-run-crown" />
                   )}
                 </span>
-                <span className="recent-run-date">
-                  {formatDate(run.completed_at)}
-                </span>
+                <span className="recent-run-date">{formatDate(run.completed_at)}</span>
               </a>
             ))
           )}
           {hasMore && (
-            <button
-              className="recent-runs-show-more"
-              onClick={() => setShowAll(!showAll)}
-            >
+            <button className="recent-runs-show-more" onClick={() => setShowAll(!showAll)}>
               {showAll ? (
                 <>
                   <ChevronUp size={13} /> Show less

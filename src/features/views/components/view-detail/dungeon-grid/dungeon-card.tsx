@@ -1,12 +1,12 @@
-import "./dungeon-card.css";
+import './dungeon-card.css';
 import {
   MythicPlusBestRun,
   MythicPlusRun,
   RaiderioProfile,
   Season,
-} from "@/features/views/api/raiderio.ts";
-import { DUNGEON_IMAGES } from "@/features/views/constants/dungeon-images.ts";
-import { CharacterRun } from "./character-run.tsx";
+} from '@/features/views/api/raiderio.ts';
+import { DUNGEON_IMAGES } from '@/features/views/constants/dungeon-images.ts';
+import { CharacterRun } from './character-run.tsx';
 
 export interface CharacterDungeonScore {
   character: RaiderioProfile;
@@ -14,7 +14,7 @@ export interface CharacterDungeonScore {
 }
 
 interface DungeonCardProps {
-  dungeon: Season["dungeons"][number];
+  dungeon: Season['dungeons'][number];
   characterScores: CharacterDungeonScore[];
   winningRun: MythicPlusRun | undefined;
   cachedProfiles: RaiderioProfile[];
@@ -36,9 +36,7 @@ export function DungeonCard({
             alt={dungeon.name}
             className="dungeon-header-thumb-img"
           />
-          <span className="dungeon-header-thumb-name">
-            {dungeon.short_name}
-          </span>
+          <span className="dungeon-header-thumb-name">{dungeon.short_name}</span>
         </div>
       </div>
       <div className="dungeon-content">

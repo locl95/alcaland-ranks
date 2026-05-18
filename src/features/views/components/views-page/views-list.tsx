@@ -1,12 +1,13 @@
-import { Plus, User, Users, Loader2, Trash2 } from "lucide-react";
-import "./views-list.css";
-import { useAppSelector } from "@/app/hooks.ts";
-import { selectUsername } from "@/app/authSlice.ts";
-import { View } from "@/features/views/model/view.ts";
+import { Plus, User, Users, Loader2, Trash2 } from 'lucide-react';
+import './views-list.css';
+import { useAppSelector } from '@/app/hooks.ts';
+import { selectUsername } from '@/app/authSlice.ts';
+import { View } from '@/features/views/model/view.ts';
 
 interface ViewsListProps {
   views: View[];
   isLoadingViews: boolean;
+  deletingViewId: string | null;
   onViewClick: (viewId: string) => void;
   onCreateView: () => void;
   onDeleteView: (viewId: string) => void;
@@ -15,12 +16,13 @@ interface ViewsListProps {
 export function ViewsList({
   views,
   isLoadingViews,
+  deletingViewId,
   onViewClick,
   onCreateView,
   onDeleteView,
 }: Readonly<ViewsListProps>) {
   const username = useAppSelector(selectUsername);
-  const viewsSyncing = views.some((v) => !v.isSynced);
+  const pendingViews = views.some((v) => v.status === 'pending');
 
   if (isLoadingViews && views.length === 0) return null;
 
@@ -29,9 +31,7 @@ export function ViewsList({
       <div className="views-empty-content">
         <Users className="views-empty-icon" />
         <h3 className="views-empty-title">No views yet</h3>
-        <p className="views-empty-text">
-          Create your first ladder to start tracking characters
-        </p>
+        <p className="views-empty-text">Create your first ladder to start tracking characters</p>
         <button onClick={onCreateView} className="create-view-btn">
           <Plus className="view-row-icon" />
           Create your first ladder
@@ -41,37 +41,32 @@ export function ViewsList({
   ) : (
     <div className="views-list-container-box">
       {views.map((view, index) => {
-        const isPending = !view.isSynced;
+        const isPending = view.status === 'pending';
+        const isDeleting = view.status === 'deleting';
+        const isDisabled = isPending || isDeleting;
         const isLast = index === views.length - 1;
 
         return (
           <div
-            key={view.id}
-            className={[
-              "view-row",
-              !isLast && "with-border",
-              isPending && "view-row-pending",
-            ]
+            key={view.simpleView.id}
+            className={['view-row', !isLast && 'with-border', isDisabled && 'view-row-pending']
               .filter(Boolean)
-              .join(" ")}
-            onClick={() => !isPending && onViewClick(view.id)}
+              .join(' ')}
+            onClick={() => !isDisabled && onViewClick(view.simpleView.id)}
           >
             <div className="view-row-content">
               <h3 className="view-row-title">{view.simpleView.name}</h3>
 
-              {isPending && (
-                <p className="view-row-description">
-                  Synchronizing with server...
-                </p>
-              )}
+              {isPending && <p className="view-row-description">Synchronizing with server...</p>}
+              {isDeleting && <p className="view-row-description">Deleting...</p>}
 
-              {!isPending && (
+              {!isDisabled && (
                 <div className="view-row-meta">
                   <div className="view-row-meta-item">
                     <Users className="view-row-icon" />
                     <span>
                       {view.simpleView.entitiesIds.length} character
-                      {view.simpleView.entitiesIds.length === 1 ? "" : "s"}
+                      {view.simpleView.entitiesIds.length === 1 ? '' : 's'}
                     </span>
                   </div>
                   <div className="view-row-meta-item">
@@ -82,20 +77,17 @@ export function ViewsList({
               )}
             </div>
 
-            <div
-              className="view-row-actions"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {isPending && <Loader2 className="loading-icon" />}
+            <div className="view-row-actions" onClick={(e) => e.stopPropagation()}>
+              {isDisabled && <Loader2 className="loading-icon" />}
 
-              {!isPending && username === view.simpleView.owner && (
+              {!isDisabled && username === view.simpleView.owner && (
                 <button
                   className="view-row-delete-btn"
                   title={
-                    viewsSyncing ? "Cannot delete while syncing" : "Delete view"
+                    pendingViews || !!deletingViewId ? 'Cannot delete while syncing' : 'Delete view'
                   }
-                  disabled={viewsSyncing}
-                  onClick={() => onDeleteView(view.id)}
+                  disabled={pendingViews || !!deletingViewId}
+                  onClick={() => onDeleteView(view.simpleView.id)}
                 >
                   <Trash2 className="view-row-menu-icon" />
                 </button>

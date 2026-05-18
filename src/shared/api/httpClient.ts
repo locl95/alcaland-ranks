@@ -1,5 +1,10 @@
 import { store } from '@/app/store';
-import { setAccessToken, clearTokens, selectRefreshToken, selectAccessToken } from '@/app/authSlice';
+import {
+  setAccessToken,
+  clearTokens,
+  selectRefreshToken,
+  selectAccessToken,
+} from '@/app/authSlice';
 import { ApiError } from '@/shared/api/ApiError';
 
 const BASE_URL = `${import.meta.env.VITE_API_HOST}/api`;
@@ -45,7 +50,7 @@ async function refreshAccessToken(): Promise<string> {
     throw new ApiError(response.status, 'Session expired');
   }
 
-  const data = await response.json() as { accessToken: string };
+  const data = (await response.json()) as { accessToken: string };
   store.dispatch(setAccessToken(data.accessToken));
   return data.accessToken;
 }
@@ -104,6 +109,10 @@ export async function userRequest<T>(method: string, endpoint: string, body?: ob
   return response.json() as Promise<T>;
 }
 
-export async function userRequestVoid(method: string, endpoint: string, body?: object): Promise<void> {
+export async function userRequestVoid(
+  method: string,
+  endpoint: string,
+  body?: object,
+): Promise<void> {
   await sendUserRequest(method, endpoint, body);
 }

@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import "./character-menu.css";
-import { ExternalLink } from "lucide-react";
-import { RaiderioProfile } from "@/features/views/api/raiderio.ts";
-import { openExternalProfile } from "@/features/views/utils.ts";
-import raiderio2 from "@/assets/raiderio.png";
-import summoned from "@/assets/summoned.webp";
+import { useEffect, useRef, useState } from 'react';
+import './character-menu.css';
+import { ExternalLink } from 'lucide-react';
+import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { openExternalProfile } from '@/features/views/utils.ts';
+import raiderio2 from '@/assets/raiderio.png';
+import summoned from '@/assets/summoned.webp';
 
 interface CharacterMenuProps {
   character: RaiderioProfile;
@@ -20,8 +20,8 @@ export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
@@ -41,32 +41,22 @@ export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
             className="char-menu-item"
             onClick={(e) => {
               e.stopPropagation();
-              openExternalProfile(character, "raiderio");
+              openExternalProfile(character, 'raiderio');
               setIsOpen(false);
             }}
           >
-            <img
-              src={raiderio2}
-              alt=""
-              aria-hidden={true}
-              className="char-menu-icon"
-            />
+            <img src={raiderio2} alt="" aria-hidden={true} className="char-menu-icon" />
             Raider.io
           </button>
           <button
             className="char-menu-item"
             onClick={(e) => {
               e.stopPropagation();
-              openExternalProfile(character, "summoned");
+              openExternalProfile(character, 'summoned');
               setIsOpen(false);
             }}
           >
-            <img
-              src={summoned}
-              alt=""
-              aria-hidden={true}
-              className="char-menu-icon"
-            />
+            <img src={summoned} alt="" aria-hidden={true} className="char-menu-icon" />
             Summoned.io
           </button>
         </div>

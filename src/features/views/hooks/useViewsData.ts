@@ -1,10 +1,19 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { userRequestVoid } from "@/shared/api/httpClient.ts";
-import { View } from "@/features/views/model/view.ts";
-import { viewKeys, fetchViews, fetchOwnViews } from "@/features/views/api/viewQueries.ts";
+import { useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { userRequest } from '@/shared/api/httpClient.ts';
+import { View } from '@/features/views/model/view.ts';
+import {
+  viewKeys,
+  fetchViews,
+  fetchOwnViews,
+  pollOperation,
+} from '@/features/views/api/viewQueries.ts';
 
 export function useViewsData(isAuthenticated: boolean) {
   const queryClient = useQueryClient();
+  const [pendingViews, setPendingViews] = useState<View[]>([]);
+  const [deletingViewId, setDeletingViewId] = useState<string | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const { data: featuredViews = [], isLoading: isLoadingFeatured } = useQuery({
     queryKey: viewKeys.list(),
@@ -14,55 +23,69 @@ export function useViewsData(isAuthenticated: boolean) {
     refetchOnReconnect: false,
   });
 
-  const { data: ownViews = [], isLoading: isLoadingOwn } = useQuery({
+  const { data: serverOwnViews = [], isLoading: isLoadingOwn } = useQuery({
     queryKey: viewKeys.ownList(),
-    queryFn: async () => {
-      const serverData = await fetchOwnViews();
-      const cached = queryClient.getQueryData<View[]>(viewKeys.ownList()) ?? [];
-
-      const unconfirmed = cached.filter(
-        (c) => !c.isSynced && !serverData.some((s) => s.simpleView.name === c.simpleView.name),
-      );
-
-      return [...serverData, ...unconfirmed];
-    },
+    queryFn: fetchOwnViews,
     enabled: isAuthenticated,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    refetchInterval: (query) => {
-      const data = (query.state.data as View[] | undefined) ?? [];
-      return data.some((v) => !v.isSynced) ? 3000 : false;
-    },
   });
 
-  const deleteViewMutation = useMutation({
-    mutationFn: (viewId: string) => userRequestVoid("DELETE", `/views/${viewId}`),
-
-    onMutate: async (viewId) => {
-      await queryClient.cancelQueries({ queryKey: viewKeys.ownList() });
-      const previous = queryClient.getQueryData<View[]>(viewKeys.ownList());
-      queryClient.setQueryData<View[]>(
-        viewKeys.ownList(),
-        (old) => old?.filter((v) => v.id !== viewId) ?? [],
-      );
-      return { previous };
-    },
-
-    onError: (_, __, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(viewKeys.ownList(), context.previous);
-      }
-      queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
-    },
-  });
+  const ownViews = useMemo(() => {
+    const serverIds = new Set(serverOwnViews.map((v) => v.simpleView.id));
+    const stillPending = pendingViews.filter((v) => !serverIds.has(v.simpleView.id));
+    const all = [...serverOwnViews, ...stillPending];
+    return deletingViewId
+      ? all.map((v) =>
+          v.simpleView.id === deletingViewId ? { ...v, status: 'deleting' as const } : v,
+        )
+      : all;
+  }, [serverOwnViews, pendingViews, deletingViewId]);
 
   const createView = (pendingView: View) => {
-    queryClient.setQueryData<View[]>(viewKeys.ownList(), (old) => [
-      ...(old ?? []),
-      pendingView,
-    ]);
-    queryClient.refetchQueries({ queryKey: viewKeys.ownList() });
+    setPendingViews((prev) => [...prev, pendingView]);
+
+    pollOperation(pendingView.operationId!)
+      .then((result) => {
+        if (result.status === 'COMPLETED' && result.resourceId) {
+          // Update simpleView.id to the real view ID so the ID-based dedup in the
+          // memo can remove the pending entry once the server refetch returns it.
+          setPendingViews((prev) =>
+            prev.map((v) =>
+              v.operationId === pendingView.operationId
+                ? { ...v, simpleView: { ...v.simpleView, id: result.resourceId! } }
+                : v,
+            ),
+          );
+          queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+        } else {
+          setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
+          if (result.status === 'COMPLETED') {
+            queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+          } else {
+            setCreateError('Failed to create ladder. Please try again.');
+          }
+        }
+      })
+      .catch(() => {
+        // Network error after POST succeeded — view may exist on server.
+        setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
+        queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+      });
+  };
+
+  const deleteView = async (viewId: string) => {
+    setDeletingViewId(viewId);
+    try {
+      const { id: operationId } = await userRequest<{ id: string }>('DELETE', `/views/${viewId}`);
+      await pollOperation(operationId);
+    } catch {
+      // network error - fall through to refresh
+    } finally {
+      setDeletingViewId(null);
+      queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+    }
   };
 
   return {
@@ -71,6 +94,9 @@ export function useViewsData(isAuthenticated: boolean) {
     ownViews,
     isLoadingOwn,
     createView,
-    deleteView: deleteViewMutation.mutate,
+    deleteView,
+    deletingViewId,
+    createError,
+    clearCreateError: () => setCreateError(null),
   };
 }

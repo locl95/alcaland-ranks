@@ -16,17 +16,16 @@ Built with React + TypeScript + Vite. Data is served by [serresiete-backend](htt
 pnpm install
 ```
 
-Copy `.env.e2e` to `.env` and fill in your values:
+Copy `.env.acceptance` to `.env` and fill in your values:
 
 ```bash
-cp .env.e2e .env
+cp .env.acceptance .env
 ```
 
 | Variable | Description |
 |---|---|
 | `VITE_API_HOST` | Base URL of serresiete-backend (e.g. `http://localhost:8080`) |
 | `VITE_SERVICE_TOKEN` | Service JWT for read-only endpoints |
-| `VITE_FEATURE_FLAG_POLLING_ENABLED` | Enable background polling (`true` / `false`) |
 
 ## Development
 
@@ -62,11 +61,11 @@ pnpm test:run
 
 ### E2E tests — Playwright 1.59
 
-Tests live in `e2e/`. All backend calls are intercepted with `page.route()` — no running backend needed.
+Tests live in `acceptance/`. All backend calls are intercepted with `page.route()` — no running backend needed.
 
 ```bash
 # run headless (used in CI)
-pnpm test:e2e
+pnpm test:acceptance
 
 # run with a visible browser window
 pnpm exec playwright test --headed
@@ -84,6 +83,16 @@ Playwright uses Chromium only. Browsers are installed separately:
 ```bash
 pnpm exec playwright install chromium
 ```
+
+## Formatting
+
+The project uses [Prettier](https://prettier.io/) for code formatting. Configuration lives in `.prettierrc`.
+
+```bash
+pnpm format
+```
+
+This formats all `src/**/*.{ts,tsx,css}` files in place.
 
 ## CI
 
