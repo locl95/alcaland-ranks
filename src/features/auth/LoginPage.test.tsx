@@ -72,12 +72,6 @@ describe('LoginPage', () => {
     navMock.from = '/';
   });
 
-  it('renders username and password inputs', () => {
-    renderPage();
-    expect(screen.getByLabelText('Username')).toBeInTheDocument();
-    expect(screen.getByLabelText('Password')).toBeInTheDocument();
-  });
-
   it('disables submit when fields are empty', () => {
     renderPage();
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeDisabled();

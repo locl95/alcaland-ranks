@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { createSyncTask, pollSyncTask } from '@/features/views/api/taskApi';
+import { viewKeys } from '@/features/views/api/viewQueries.ts';
 
 function formatCountdown(seconds: number): string {
   if (seconds >= 60) {
@@ -31,6 +33,7 @@ export interface SyncViewResult {
 }
 
 export function useSyncView(viewId: string | undefined): SyncViewResult {
+  const queryClient = useQueryClient();
   const abortRef = useRef<AbortController | null>(null);
 
   const [isRunning, setIsRunning] = useState(false);
@@ -86,6 +89,7 @@ export function useSyncView(viewId: string | undefined): SyncViewResult {
         const syncedAt = new Date().toISOString();
         setLastSyncedAt(syncedAt);
         localStorage.setItem(storageKey(viewId, 'lastSyncedAt'), syncedAt);
+        queryClient.invalidateQueries({ queryKey: viewKeys.data(viewId) });
 
         if (retryAfterStr) {
           const date = new Date(retryAfterStr);
@@ -113,7 +117,7 @@ export function useSyncView(viewId: string | undefined): SyncViewResult {
   return {
     isRunning,
     isDisabled: isRunning || secondsLeft !== null,
-    countdownLabel: secondsLeft !== null ? formatCountdown(secondsLeft) : null,
+    countdownLabel: secondsLeft === null ? null : formatCountdown(secondsLeft),
     statusMessage,
     lastSyncedAt,
     triggerSync,

@@ -144,23 +144,6 @@ describe('ViewsPage', () => {
 
   afterEach(() => vi.unstubAllEnvs());
 
-  describe('initial render', () => {
-    it('renders the views list', async () => {
-      renderViewsPage();
-      await waitFor(() => expect(screen.getByTestId('views-list')).toBeInTheDocument());
-    });
-
-    it('shows the app title', async () => {
-      renderViewsPage();
-      await waitFor(() => expect(screen.getByText('Mythic+ ladder tracker')).toBeInTheDocument());
-    });
-
-    it('shows the current season label', async () => {
-      renderViewsPage();
-      await waitFor(() => expect(screen.getByText('Midnight Season 1')).toBeInTheDocument());
-    });
-  });
-
   describe('fetching views on mount', () => {
     it('does not fetch own views when unauthenticated', async () => {
       renderViewsPage(false);

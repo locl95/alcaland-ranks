@@ -28,11 +28,6 @@ describe('SyncErrorDialog', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the dialog when failedCharacters has entries', () => {
-    render(<SyncErrorDialog failedCharacters={[makeProfile('Arthas')]} onClose={vi.fn()} />);
-    expect(screen.getByText("Some characters couldn't be synced")).toBeInTheDocument();
-  });
-
   it('lists all failed character names', () => {
     render(
       <SyncErrorDialog

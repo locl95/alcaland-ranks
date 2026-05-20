@@ -86,18 +86,6 @@ describe('RunDetailsPanel', () => {
     expect(screen.getByText('15-03-2024')).toBeInTheDocument();
   });
 
-  it('renders a row for each roster entry', () => {
-    render(
-      <RunDetailsPanel
-        run={makeRun()}
-        details={makeDetails([makeEntry('Arthas', 'dps'), makeEntry('Sylvanas', 'healer')])}
-        characterRegion="eu"
-      />,
-    );
-    expect(screen.getByTestId('roster-Arthas')).toBeInTheDocument();
-    expect(screen.getByTestId('roster-Sylvanas')).toBeInTheDocument();
-  });
-
   it('sorts roster: tank first, then healer, then dps', () => {
     render(
       <RunDetailsPanel

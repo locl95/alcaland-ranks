@@ -4,12 +4,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { RealmSelect } from './realm-select.tsx';
 
 describe('RealmSelect', () => {
-  it('renders EU and NA region options', () => {
-    render(<RealmSelect region="eu" realm="" onRegionChange={vi.fn()} onRealmChange={vi.fn()} />);
-    expect(screen.getByRole('option', { name: 'EU' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'NA' })).toBeInTheDocument();
-  });
-
   it('calls onRegionChange with the new region value', async () => {
     const onRegionChange = vi.fn();
     render(

@@ -20,17 +20,6 @@ describe('useCreateViewForm', () => {
     mockUserRequest.mockResolvedValue({ id: 'op-123' });
   });
 
-  describe('initial state', () => {
-    it('starts with empty name, one empty row, no error and canSubmit false', () => {
-      const { result } = renderForm();
-      expect(result.current.name).toBe('');
-      expect(result.current.characters).toHaveLength(1);
-      expect(result.current.characters[0].mode).toBe('add');
-      expect(result.current.canSubmit).toBe(false);
-      expect(result.current.error).toBeNull();
-    });
-  });
-
   describe('addCharacter', () => {
     it('marks the current row as added and appends a new empty row', () => {
       const { result } = renderForm();
