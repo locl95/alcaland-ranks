@@ -2,6 +2,7 @@ import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from '@/shared/components/toaster/ToastProvider.tsx';
 import { useViewsData } from './useViewsData.ts';
 import { viewKeys } from '@/features/views/api/viewQueries.ts';
 import { View } from '@/features/views/model/view.ts';
@@ -56,7 +57,9 @@ const makeWrapper = () => {
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>{children}</ToastProvider>
+    </QueryClientProvider>
   );
 
   return { wrapper, queryClient };

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/shared/components/toaster/toast.ts';
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectUsername } from '@/app/authSlice.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
@@ -21,6 +22,7 @@ const REFETCH_INTERVAL = 2000;
 export function useViewDetail(viewId: string | undefined, owner: string | null) {
   const queryClient = useQueryClient();
   const username = useAppSelector(selectUsername);
+  const { showError } = useToast();
 
   // Pending chars drive the ladder's syncing state for both adds and deletes:
   //   - Add: new chars have score: null → shown as "syncing" in the ladder.
@@ -102,6 +104,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
       .catch(() => {
         setPendingCharacters(null);
         queryClient.invalidateQueries({ queryKey: viewKeys.data(safeViewId) });
+        showError('Failed to save changes — please try again');
       });
   }
 

@@ -57,7 +57,7 @@ export function useSyncView(viewId: string | undefined): SyncViewResult {
     if (!retryAfter) return;
     const id = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(id);
-  }, [retryAfter]);
+  }, [retryAfter, setTick]);
 
   // Derived — no separate state needed
   const secondsLeft =

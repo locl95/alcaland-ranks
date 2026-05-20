@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from '@/shared/components/toaster/ToastProvider.tsx';
 import { ViewsPage } from './views-page.tsx';
 import authReducer from '@/app/authSlice.ts';
 import { MockViewsList, MockCreateView, makeSimpleView } from '@/app/App.mocks.tsx';
@@ -113,7 +114,9 @@ const renderViewsPage = (authenticated = true) => {
   const result = render(
     <Provider store={store}>
       <QueryClientProvider client={testQueryClient}>
-        <Wrapper />
+        <ToastProvider>
+          <Wrapper />
+        </ToastProvider>
       </QueryClientProvider>
     </Provider>,
   );
