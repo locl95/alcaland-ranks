@@ -32,8 +32,7 @@ vi.mock('./dungeon-grid/dungeon-grid.tsx', () => ({
   DungeonGrid: () => <div data-testid="dungeon-grid" />,
 }));
 vi.mock('./actions/edit-view.tsx', () => ({
-  EditView: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="edit-view" /> : null,
+  EditView: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="edit-view" /> : null),
 }));
 vi.mock('./actions/sync-error-dialog.tsx', () => ({
   SyncErrorDialog: () => null,

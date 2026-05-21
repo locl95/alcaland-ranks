@@ -1,5 +1,10 @@
 import { store } from '@/app/store';
-import { clearTokens, selectAccessToken, selectRefreshToken, setAccessToken } from '@/app/authSlice';
+import {
+  clearTokens,
+  selectAccessToken,
+  selectRefreshToken,
+  setAccessToken,
+} from '@/app/authSlice';
 import { ApiError } from '@/shared/api/ApiError';
 
 const BASE_URL = `${import.meta.env.VITE_API_HOST}/api`;
