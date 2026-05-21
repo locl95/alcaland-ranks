@@ -48,7 +48,12 @@
   --ring: oklch(0.439 0 0);
 }
 
-* {
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
   border-color: var(--border);
   outline-color: color-mix(in oklch, var(--ring) 50%, transparent);
 }
