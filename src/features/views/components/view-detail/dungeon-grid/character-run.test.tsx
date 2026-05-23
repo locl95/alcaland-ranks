@@ -33,14 +33,20 @@ const makeProfile = (name = 'Arthas', id = 1): RaiderioProfile => ({
 
 const makeBestRun = (score = 200, level = 20): MythicPlusBestRun => ({
   run: {
+    keystone_run_id: 1,
+    dungeon: 'Siege of Orgrimmar',
     short_name: 'SIEGE',
-    score,
     mythic_level: level,
     num_keystone_upgrades: 3,
+    completed_at: '2024-01-01T00:00:00Z',
     clear_time_ms: 1800000,
-    spec: { name: 'Arms' },
+    par_time_ms: 1800000,
+    score,
+    url: '',
+    affixes: [],
+    spec: { name: 'Arms', id: 0, role: 'dps' },
   },
-  details: [],
+  details: { roster: [] },
 });
 
 describe('CharacterRun', () => {

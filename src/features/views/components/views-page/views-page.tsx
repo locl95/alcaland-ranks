@@ -12,6 +12,7 @@ import {
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectIsAuthenticated, selectUsername } from '@/app/authSlice.ts';
 import { logout } from '@/features/auth/authApi.ts';
+import { useStaticData } from '@/features/views/hooks/useStaticData.ts';
 import { useViewsData } from '@/features/views/hooks/useViewsData.ts';
 import { ViewsList } from './views-list.tsx';
 import { CreateView } from './actions/create-view.tsx';
@@ -34,6 +35,8 @@ export function ViewsPage() {
     }
   }, [isAuthenticated]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  const { data: season } = useStaticData();
 
   const {
     featuredViews,
@@ -124,7 +127,7 @@ export function ViewsPage() {
 
         <div className="views-season">
           <span className="views-season-label">Current season</span>
-          <span className="views-season-value">Midnight Season 1</span>
+          <span className="views-season-value">{season?.name}</span>
         </div>
 
         <div className="views-tab-toggle-wrapper">

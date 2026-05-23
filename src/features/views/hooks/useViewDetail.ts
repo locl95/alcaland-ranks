@@ -11,9 +11,9 @@ import {
   viewKeys,
   fetchViewData,
   fetchCachedViewData,
-  fetchWowStatic,
   pollOperation,
 } from '@/features/views/api/viewQueries.ts';
+import { useStaticData } from '@/features/views/hooks/useStaticData.ts';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const getCharacterName = (c: { name: string }) => c.name.toLowerCase();
@@ -51,11 +51,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
     staleTime: Infinity,
   });
 
-  const { data: season } = useQuery({
-    queryKey: viewKeys.static(),
-    queryFn: fetchWowStatic,
-    staleTime: Infinity,
-  });
+  const { data: season } = useStaticData();
 
   const profiles = useMemo(() => {
     const raiderioProfiles = viewData?.data ?? [];
