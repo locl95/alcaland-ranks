@@ -14,12 +14,31 @@ const SERVICE_TOKEN = import.meta.env.VITE_SERVICE_TOKEN;
 // Service token — read-only operations, no refresh needed
 // ---------------------------------------------------------------------------
 
-export async function serviceGet<T>(endpoint: string): Promise<T> {
+export async function serviceGet<T>(endpoint: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${SERVICE_TOKEN}`,
     },
+    signal,
+  });
+
+  if (!response.ok) throw new ApiError(response.status, response.statusText);
+  return response.json() as Promise<T>;
+}
+
+export async function serviceRequest<T>(
+  method: string,
+  endpoint: string,
+  body?: object,
+): Promise<T> {
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${SERVICE_TOKEN}`,
+    },
+    body: body ? JSON.stringify(body) : undefined,
   });
 
   if (!response.ok) throw new ApiError(response.status, response.statusText);

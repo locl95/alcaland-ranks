@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { seedAuth } from './mocks/authMocks';
-import { makeSimpleView, mockFeaturedViews, mockOwnViews } from './mocks/viewMocks';
+import { makeSimpleView, mockFeaturedViews, mockOwnViews, mockStaticData } from './mocks/viewMocks';
 
 import { API, VALID_VIEW_ID } from './constants';
 
 test.describe('unauthenticated', () => {
   test.beforeEach(async ({ page }) => {
+    await mockStaticData(page);
     await mockFeaturedViews(page, [makeSimpleView('f1', 'Featured Ladder', 'someone')]);
     await mockOwnViews(page);
   });
@@ -14,6 +15,11 @@ test.describe('unauthenticated', () => {
     await page.goto('/');
     await expect(page.getByText('Mythic+ ladder tracker')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Featured Ladder' })).toBeVisible();
+  });
+
+  test('shows the current season name from the API', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByText('Midnight Season 1')).toBeVisible();
   });
 
   test('redirects to login when clicking own ladders tab without auth', async ({ page }) => {
@@ -26,6 +32,7 @@ test.describe('unauthenticated', () => {
 test.describe('authenticated', () => {
   test.beforeEach(async ({ page }) => {
     await seedAuth(page);
+    await mockStaticData(page);
     await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
   });
@@ -49,6 +56,7 @@ test.describe('authenticated', () => {
 test.describe('create view', () => {
   test.beforeEach(async ({ page }) => {
     await seedAuth(page);
+    await mockStaticData(page);
     await mockFeaturedViews(page);
     await mockOwnViews(page, []);
   });
@@ -131,6 +139,7 @@ test.describe('create view', () => {
 test.describe('delete view', () => {
   test('removes the view from the list immediately on delete', async ({ page }) => {
     await seedAuth(page);
+    await mockStaticData(page);
     await mockFeaturedViews(page);
 
     let deleted = false;

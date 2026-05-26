@@ -1,5 +1,10 @@
 import { store } from '@/app/store';
-import { clearTokens, selectAccessToken } from '@/app/authSlice';
+import {
+  clearTokens,
+  selectAccessToken,
+  selectRefreshToken,
+  setAccessToken,
+} from '@/app/authSlice';
 import { ApiError } from '@/shared/api/ApiError';
 
 const BASE_URL = `${import.meta.env.VITE_API_HOST}/api`;
@@ -16,6 +21,26 @@ export async function login(
 
   if (!response.ok) throw new ApiError(response.status, 'Invalid credentials');
   return (await response.json()) as { accessToken: string; refreshToken: string };
+}
+
+export async function bootstrapAuth(): Promise<void> {
+  const refreshToken = selectRefreshToken(store.getState());
+  if (!refreshToken) return;
+
+  try {
+    const response = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${refreshToken}` },
+    });
+    if (!response.ok) {
+      store.dispatch(clearTokens());
+      return;
+    }
+    const { accessToken } = (await response.json()) as { accessToken: string };
+    store.dispatch(setAccessToken(accessToken));
+  } catch {
+    // Network error — keep the refresh token, auth will recover on next userRequest
+  }
 }
 
 export async function logout(): Promise<void> {

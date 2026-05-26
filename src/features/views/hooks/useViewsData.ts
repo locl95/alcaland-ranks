@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/shared/components/toaster/toast.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
 import { View } from '@/features/views/model/view.ts';
 import {
@@ -11,6 +12,7 @@ import {
 
 export function useViewsData(isAuthenticated: boolean) {
   const queryClient = useQueryClient();
+  const { showError } = useToast();
   const [pendingViews, setPendingViews] = useState<View[]>([]);
   const [deletingViewId, setDeletingViewId] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -81,7 +83,7 @@ export function useViewsData(isAuthenticated: boolean) {
       const { id: operationId } = await userRequest<{ id: string }>('DELETE', `/views/${viewId}`);
       await pollOperation(operationId);
     } catch {
-      // network error - fall through to refresh
+      showError('Failed to delete ladder — please try again');
     } finally {
       setDeletingViewId(null);
       queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });

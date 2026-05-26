@@ -27,7 +27,7 @@ export function DungeonCard({
   cachedProfiles,
 }: Readonly<DungeonCardProps>) {
   return (
-    <div className="dungeon-card">
+    <div className="dungeon-card" id={`dungeon-card-${dungeon.short_name.toLowerCase()}`}>
       <div className="dungeon-header">
         <div className="dungeon-title">{dungeon.name}</div>
         <div className="dungeon-header-thumb">

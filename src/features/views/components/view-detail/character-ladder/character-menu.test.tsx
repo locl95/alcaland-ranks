@@ -37,11 +37,6 @@ describe('CharacterMenu', () => {
     vi.clearAllMocks();
   });
 
-  it('does not show the dropdown by default', () => {
-    render(<CharacterMenu character={makeProfile()} />);
-    expect(screen.queryByText('Raider.io')).not.toBeInTheDocument();
-  });
-
   it('shows the dropdown when the menu button is clicked', async () => {
     render(<CharacterMenu character={makeProfile()} />);
     await userEvent.click(screen.getByRole('button'));

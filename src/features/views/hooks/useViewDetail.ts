@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/shared/components/toaster/toast.ts';
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectUsername } from '@/app/authSlice.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
@@ -10,9 +11,9 @@ import {
   viewKeys,
   fetchViewData,
   fetchCachedViewData,
-  fetchWowStatic,
   pollOperation,
 } from '@/features/views/api/viewQueries.ts';
+import { useStaticData } from '@/features/views/hooks/useStaticData.ts';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const getCharacterName = (c: { name: string }) => c.name.toLowerCase();
@@ -21,6 +22,7 @@ const REFETCH_INTERVAL = 2000;
 export function useViewDetail(viewId: string | undefined, owner: string | null) {
   const queryClient = useQueryClient();
   const username = useAppSelector(selectUsername);
+  const { showError } = useToast();
 
   // Pending chars drive the ladder's syncing state for both adds and deletes:
   //   - Add: new chars have score: null → shown as "syncing" in the ladder.
@@ -49,11 +51,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
     staleTime: Infinity,
   });
 
-  const { data: season } = useQuery({
-    queryKey: viewKeys.static(),
-    queryFn: fetchWowStatic,
-    staleTime: Infinity,
-  });
+  const { data: season } = useStaticData();
 
   const profiles = useMemo(() => {
     const raiderioProfiles = viewData?.data ?? [];
@@ -102,6 +100,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
       .catch(() => {
         setPendingCharacters(null);
         queryClient.invalidateQueries({ queryKey: viewKeys.data(safeViewId) });
+        showError('Failed to save changes — please try again');
       });
   }
 

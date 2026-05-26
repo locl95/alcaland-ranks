@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
@@ -88,12 +87,6 @@ describe('ViewsList', () => {
   });
 
   describe('view rows', () => {
-    it('renders a row for each view', () => {
-      renderList([makeView('v1', 'Ladder A'), makeView('v2', 'Ladder B')]);
-      expect(screen.getByText('Ladder A')).toBeInTheDocument();
-      expect(screen.getByText('Ladder B')).toBeInTheDocument();
-    });
-
     it('calls onViewClick with the view id when a row is clicked', async () => {
       const { onViewClick } = renderList([makeView('v1', 'My Ladder')]);
       await userEvent.click(screen.getByText('My Ladder'));

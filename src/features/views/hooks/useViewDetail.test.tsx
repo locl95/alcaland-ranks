@@ -3,6 +3,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
+import { ToastProvider } from '@/shared/components/toaster/ToastProvider.tsx';
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '@/app/authSlice.ts';
 import { useViewDetail } from './useViewDetail.ts';
@@ -82,7 +83,9 @@ const makeWrapper = (username: string | null = null) => {
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <Provider store={store}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>{children}</ToastProvider>
+      </QueryClientProvider>
     </Provider>
   );
 

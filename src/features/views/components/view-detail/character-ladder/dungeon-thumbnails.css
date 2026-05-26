@@ -14,6 +14,12 @@
   overflow: hidden;
   flex-shrink: 0;
   box-shadow: 0 0 0 1px #475569;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+
+.dungeon-thumb:hover {
+  box-shadow: 0 0 0 2px #7dd3fc;
 }
 
 .dungeon-thumb-img {

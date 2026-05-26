@@ -53,7 +53,9 @@ export const LadderRow = memo(function LadderRow({
 
         <div className="ladder-character-info">
           <div className="ladder-character-name-row">
-            <p className="ladder-character-name">{character.name}</p>
+            <p className="ladder-character-name">
+              {character.name.charAt(0).toUpperCase() + character.name.slice(1)}
+            </p>
             {showPositionChange && (
               <span
                 className={`ladder-position-change ${positionChange > 0 ? 'improved' : 'declined'}`}

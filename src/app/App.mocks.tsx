@@ -4,7 +4,7 @@ import type { SimpleView } from '@/features/views/api/view-types.ts';
 
 export const MockViewsList = ({
   views,
-  deletingViewId,
+  deletingViewId: _deletingViewId,
   onViewClick,
   onCreateView,
   onDeleteView,

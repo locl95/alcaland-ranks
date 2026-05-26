@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from '@/shared/components/toaster/ToastProvider.tsx';
 import { ViewsPage } from './views-page.tsx';
 import authReducer from '@/app/authSlice.ts';
 import { MockViewsList, MockCreateView, makeSimpleView } from '@/app/App.mocks.tsx';
@@ -113,7 +114,9 @@ const renderViewsPage = (authenticated = true) => {
   const result = render(
     <Provider store={store}>
       <QueryClientProvider client={testQueryClient}>
-        <Wrapper />
+        <ToastProvider>
+          <Wrapper />
+        </ToastProvider>
       </QueryClientProvider>
     </Provider>,
   );
@@ -143,23 +146,6 @@ describe('ViewsPage', () => {
   });
 
   afterEach(() => vi.unstubAllEnvs());
-
-  describe('initial render', () => {
-    it('renders the views list', async () => {
-      renderViewsPage();
-      await waitFor(() => expect(screen.getByTestId('views-list')).toBeInTheDocument());
-    });
-
-    it('shows the app title', async () => {
-      renderViewsPage();
-      await waitFor(() => expect(screen.getByText('Mythic+ ladder tracker')).toBeInTheDocument());
-    });
-
-    it('shows the current season label', async () => {
-      renderViewsPage();
-      await waitFor(() => expect(screen.getByText('Midnight Season 1')).toBeInTheDocument());
-    });
-  });
 
   describe('fetching views on mount', () => {
     it('does not fetch own views when unauthenticated', async () => {

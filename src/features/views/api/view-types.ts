@@ -17,6 +17,7 @@ export interface SimpleView {
   game: Game;
   featured: boolean;
   extraArguments?: ViewExtraArguments | null;
+  lastSyncedAt?: string | null;
 }
 
 export interface GetViewsResponse {

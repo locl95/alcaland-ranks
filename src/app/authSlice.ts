@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/app/store';
 
-const STORAGE_KEY_ACCESS = 'auth.accessToken';
 const STORAGE_KEY_REFRESH = 'auth.refreshToken';
 
 interface AuthState {
@@ -19,12 +18,10 @@ function extractUsername(token: string): string | null {
   }
 }
 
-const storedAccessToken = localStorage.getItem(STORAGE_KEY_ACCESS);
-
 const initialState: AuthState = {
-  accessToken: storedAccessToken,
+  accessToken: null,
   refreshToken: localStorage.getItem(STORAGE_KEY_REFRESH),
-  username: storedAccessToken ? extractUsername(storedAccessToken) : null,
+  username: null,
 };
 
 export const authSlice = createSlice({
@@ -38,7 +35,6 @@ export const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.username = extractUsername(action.payload.accessToken);
-      localStorage.setItem(STORAGE_KEY_ACCESS, action.payload.accessToken);
       if (action.payload.refreshToken) {
         localStorage.setItem(STORAGE_KEY_REFRESH, action.payload.refreshToken);
       } else {
@@ -48,13 +44,11 @@ export const authSlice = createSlice({
     setAccessToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload;
       state.username = extractUsername(action.payload);
-      localStorage.setItem(STORAGE_KEY_ACCESS, action.payload);
     },
     clearTokens: (state) => {
       state.accessToken = null;
       state.refreshToken = null;
       state.username = null;
-      localStorage.removeItem(STORAGE_KEY_ACCESS);
       localStorage.removeItem(STORAGE_KEY_REFRESH);
     },
   },

@@ -18,6 +18,11 @@ export function DungeonThumbnails({ season, bestRuns }: Readonly<DungeonThumbnai
             key={dungeon.challenge_mode_id}
             className="dungeon-thumb"
             title={bestRun?.run.dungeon ?? dungeon.name}
+            onClick={() =>
+              document
+                .getElementById(`dungeon-card-${dungeon.short_name.toLowerCase()}`)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }
           >
             <span className="dungeon-thumb-level">{bestRun ? bestRun.run.mythic_level : ''}</span>
             {img && <img src={img} alt={dungeon.name} className="dungeon-thumb-img" />}
