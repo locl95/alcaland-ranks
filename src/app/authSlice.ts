@@ -1,11 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/app/store';
 
-const STORAGE_KEY_REFRESH = 'auth.refreshToken';
-
 interface AuthState {
   accessToken: string | null;
-  refreshToken: string | null;
   username: string | null;
 }
 
@@ -20,7 +17,6 @@ function extractUsername(token: string): string | null {
 
 const initialState: AuthState = {
   accessToken: null,
-  refreshToken: localStorage.getItem(STORAGE_KEY_REFRESH),
   username: null,
 };
 
@@ -28,18 +24,9 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setTokens: (
-      state,
-      action: PayloadAction<{ accessToken: string; refreshToken: string | null }>,
-    ) => {
+    setTokens: (state, action: PayloadAction<{ accessToken: string }>) => {
       state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
       state.username = extractUsername(action.payload.accessToken);
-      if (action.payload.refreshToken) {
-        localStorage.setItem(STORAGE_KEY_REFRESH, action.payload.refreshToken);
-      } else {
-        localStorage.removeItem(STORAGE_KEY_REFRESH);
-      }
     },
     setAccessToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload;
@@ -47,9 +34,7 @@ export const authSlice = createSlice({
     },
     clearTokens: (state) => {
       state.accessToken = null;
-      state.refreshToken = null;
       state.username = null;
-      localStorage.removeItem(STORAGE_KEY_REFRESH);
     },
   },
 });
@@ -57,7 +42,6 @@ export const authSlice = createSlice({
 export const { setTokens, setAccessToken, clearTokens } = authSlice.actions;
 
 export const selectAccessToken = (state: RootState) => state.auth.accessToken;
-export const selectRefreshToken = (state: RootState) => state.auth.refreshToken;
 export const selectIsAuthenticated = (state: RootState) => state.auth.accessToken !== null;
 export const selectUsername = (state: RootState) => state.auth.username;
 

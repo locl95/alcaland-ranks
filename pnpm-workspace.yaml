@@ -1,8 +1,14 @@
 packages:
   - '.'
 
+overrides:
+  vite: "6.3.5"
+
 minimumReleaseAge: 1440
 
 minimumReleaseAgeExclude:
   - react
   - react-dom
+
+allowBuilds:
+  esbuild: true

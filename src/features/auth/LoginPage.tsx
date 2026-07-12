@@ -24,8 +24,8 @@ export function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { accessToken, refreshToken } = await login(username, password);
-      dispatch(setTokens({ accessToken, refreshToken }));
+      const { accessToken } = await login(username, password);
+      dispatch(setTokens({ accessToken }));
       navigate(from, { replace: true });
     } catch (err) {
       if (err instanceof ApiError && err.statusCode === 401) {

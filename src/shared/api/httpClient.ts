@@ -1,10 +1,5 @@
 import { store } from '@/app/store';
-import {
-  setAccessToken,
-  clearTokens,
-  selectRefreshToken,
-  selectAccessToken,
-} from '@/app/authSlice';
+import { setAccessToken, clearTokens, selectAccessToken } from '@/app/authSlice';
 import { ApiError } from '@/shared/api/ApiError';
 
 const BASE_URL = `${import.meta.env.VITE_API_HOST}/api`;
@@ -53,15 +48,9 @@ let isRefreshing = false;
 let refreshQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
 
 async function refreshAccessToken(): Promise<string> {
-  const refreshToken = selectRefreshToken(store.getState());
-  if (!refreshToken) {
-    store.dispatch(clearTokens());
-    throw new ApiError(401, 'Session expired');
-  }
-
   const response = await fetch(`${BASE_URL}/auth/refresh`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${refreshToken}` },
+    credentials: 'include',
   });
 
   if (!response.ok) {
