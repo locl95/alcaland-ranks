@@ -170,11 +170,9 @@ export function ViewsPage() {
         />
       </div>
 
-      <CreateView
-        open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-        onCreateView={createView}
-      />
+      {isCreateDialogOpen && (
+        <CreateView onClose={() => setIsCreateDialogOpen(false)} onCreateView={createView} />
+      )}
     </div>
   );
 }

@@ -295,6 +295,28 @@ describe('useViewDetail', () => {
       await waitFor(() => expect(mockPollOperation).toHaveBeenCalledWith('op-123'));
     });
 
+    it('sends realm slugs, not the display names characters carry', async () => {
+      // Existing characters come back from the API with a display name; the realm
+      // picker produces a slug. Both must leave as slugs.
+      const existing = { ...makeProfile('Arthas'), realm: 'Tarren Mill' };
+      const added = { ...makeProfile('Sylvanas'), realm: 'silvermoon' };
+      const irregular = { ...makeProfile('Speedk'), realm: "Zul'jin" };
+
+      const { wrapper, queryClient } = makeWrapper();
+      seedCache(queryClient, [existing]);
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+
+      await waitFor(() => expect(result.current.profiles).toHaveLength(1));
+      await act(async () => result.current.saveCharacters([existing, added, irregular]));
+
+      const [, , request] = mockUserRequest.mock.calls.find(([method]) => method === 'PUT')!;
+      expect(request.entities.map((e: { realm: string }) => e.realm)).toEqual([
+        'tarren-mill',
+        'silvermoon',
+        'zuljin',
+      ]);
+    });
+
     it('clears isSyncing when the PUT request itself fails', async () => {
       const charA = makeProfile('Arthas');
       const charB = makeProfile('Sylvanas');

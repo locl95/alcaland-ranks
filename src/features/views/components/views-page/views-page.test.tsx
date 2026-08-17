@@ -170,7 +170,7 @@ describe('ViewsPage', () => {
       expect(screen.getByTestId('create-view-dialog')).toBeInTheDocument();
     });
 
-    it('closes the create dialog when onOpenChange(false) is called', async () => {
+    it('closes the create dialog when it requests to close', async () => {
       renderViewsPage();
       await waitFor(() => screen.getByTestId('list-create-btn'));
 
