@@ -13,6 +13,7 @@ vi.mock('@/shared/api/httpClient.ts', () => ({
 const notFound = (name: string, realm = 'tarren-mill') => ({
   exist: [],
   nonExisting: [{ name, region: 'eu', realm }],
+  unchecked: [],
 });
 
 vi.mock('@/features/views/components/shared/realm-select.tsx', () => ({
@@ -71,7 +72,7 @@ const makeProfile = (id: number, name: string, score: number | null = 2000): Rai
 describe('EditView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockCheckEntitiesExist.mockResolvedValue({ exist: [], nonExisting: [] });
+    mockCheckEntitiesExist.mockResolvedValue({ exist: [], nonExisting: [], unchecked: [] });
   });
 
   it('renders the dialog when open', () => {
@@ -215,7 +216,7 @@ describe('EditView', () => {
     await userEvent.selectOptions(screen.getByTestId('realm-select'), 'silvermoon');
     expect(screen.getByTitle('Add')).toBeEnabled();
 
-    await act(async () => resolveCheck({ exist: [], nonExisting: [] }));
+    await act(async () => resolveCheck({ exist: [], nonExisting: [], unchecked: [] }));
     expect(screen.getByTitle('Character found')).toBeInTheDocument();
   });
 
@@ -225,6 +226,24 @@ describe('EditView', () => {
     expect(screen.getByText('Done')).toBeEnabled();
     await userEvent.type(screen.getByPlaceholderText('Name'), 'Sylvanas');
     expect(screen.getByText('Done')).toBeDisabled();
+  });
+
+  it('keeps the character but marks it unverified when the backend could not check it', async () => {
+    mockCheckEntitiesExist.mockResolvedValue({
+      exist: [],
+      nonExisting: [],
+      unchecked: [{ name: 'Arthas', region: 'eu', realm: 'tarren-mill' }],
+    });
+    const onSave = vi.fn();
+    render(<EditView characters={[]} onClose={vi.fn()} onSave={onSave} />);
+
+    await userEvent.type(screen.getByPlaceholderText('Name'), 'Arthas');
+    await userEvent.selectOptions(screen.getByTestId('realm-select'), 'tarren-mill');
+    await userEvent.click(screen.getByTitle('Add'));
+
+    expect(await screen.findByTitle('Could not be verified')).toBeInTheDocument();
+    expect(screen.queryByTitle('Character found')).not.toBeInTheDocument();
+    expect(screen.getByText('Done')).toBeEnabled();
   });
 
   it('keeps the character but marks it unverified when the lookup fails', async () => {

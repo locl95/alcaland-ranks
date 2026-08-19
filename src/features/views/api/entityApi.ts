@@ -9,6 +9,7 @@ export interface EntityRef {
 export interface EntitiesExistResponse {
   exist: EntityRef[];
   nonExisting: EntityRef[];
+  unchecked: EntityRef[];
 }
 
 export async function checkEntitiesExist(entities: EntityRef[]): Promise<EntitiesExistResponse> {
@@ -29,9 +30,12 @@ export const entityKey = ({ name, realm, region }: EntityRef): string =>
   `${name.trim().toLowerCase()}|${realm}|${region}`;
 
 export async function verifyEntity(entity: EntityRef): Promise<VerifyResult> {
+  const key = entityKey(entity);
   try {
-    const { nonExisting } = await checkEntitiesExist([entity]);
-    return nonExisting.some((n) => entityKey(n) === entityKey(entity)) ? 'invalid' : 'valid';
+    const { nonExisting, unchecked } = await checkEntitiesExist([entity]);
+    if (nonExisting.some((n) => entityKey(n) === key)) return 'invalid';
+    if (unchecked.some((u) => entityKey(u) === key)) return 'unverified';
+    return 'valid';
   } catch {
     return 'unverified';
   }

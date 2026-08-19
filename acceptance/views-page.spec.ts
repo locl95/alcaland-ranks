@@ -112,7 +112,11 @@ test.describe('create view', () => {
   test('flags a character that does not exist and blocks submitting', async ({ page }) => {
     await page.route(`${API}/entities/exists`, (route) =>
       route.fulfill({
-        json: { exist: [], nonExisting: [{ name: 'Fake', region: 'eu', realm: 'tarren-mill' }] },
+        json: {
+          exist: [],
+          nonExisting: [{ name: 'Fake', region: 'eu', realm: 'tarren-mill' }],
+          unchecked: [],
+        },
       }),
     );
 

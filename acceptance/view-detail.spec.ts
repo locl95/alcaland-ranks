@@ -106,7 +106,11 @@ test.describe('view detail', () => {
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
     await page.route(`${API}/entities/exists`, (route) =>
       route.fulfill({
-        json: { exist: [], nonExisting: [{ name: 'Fake', region: 'eu', realm: 'silvermoon' }] },
+        json: {
+          exist: [],
+          nonExisting: [{ name: 'Fake', region: 'eu', realm: 'silvermoon' }],
+          unchecked: [],
+        },
       }),
     );
 
@@ -147,7 +151,7 @@ test.describe('view detail', () => {
     const after = await dialog.boundingBox();
     expect(after?.height).toBe(before?.height);
 
-    const metrics = await page.getByRole('listbox').evaluate((el) => {
+    const metrics = await page.getByRole('listbox').evaluate((el: HTMLElement) => {
       const style = getComputedStyle(el);
       const borders = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
       return {

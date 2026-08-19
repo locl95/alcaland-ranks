@@ -39,6 +39,7 @@ export async function mockEntitiesExist(page: Page) {
       json: {
         exist: entities.map(({ name, region, realm }) => ({ name, region, realm })),
         nonExisting: [],
+        unchecked: [],
       },
     });
   });

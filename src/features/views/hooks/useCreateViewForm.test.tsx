@@ -36,7 +36,7 @@ describe('useCreateViewForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUserRequest.mockResolvedValue({ id: 'op-123' });
-    mockCheckEntitiesExist.mockResolvedValue({ exist: [], nonExisting: [] });
+    mockCheckEntitiesExist.mockResolvedValue({ exist: [], nonExisting: [], unchecked: [] });
   });
 
   describe('addCharacter', () => {
@@ -71,6 +71,7 @@ describe('useCreateViewForm', () => {
       mockCheckEntitiesExist.mockResolvedValue({
         exist: [],
         nonExisting: [{ name: 'Fake', region: 'eu', realm: 'tarren-mill' }],
+        unchecked: [],
       });
       const { result } = renderForm();
       await addRow(result, 'Fake');
@@ -85,11 +86,25 @@ describe('useCreateViewForm', () => {
       mockCheckEntitiesExist.mockResolvedValue({
         exist: [],
         nonExisting: [{ name: 'FAKE', region: 'eu', realm: 'tarren-mill' }],
+        unchecked: [],
       });
       const { result } = renderForm();
       await addRow(result, 'fake');
 
       expect(result.current.characters[0].status).toBe('invalid');
+    });
+
+    it('marks the row unverified when the backend could not check it, never valid', async () => {
+      mockCheckEntitiesExist.mockResolvedValue({
+        exist: [],
+        nonExisting: [],
+        unchecked: [{ name: 'Arthas', region: 'eu', realm: 'tarren-mill' }],
+      });
+      const { result } = renderForm();
+      await addRow(result, 'Arthas');
+
+      expect(result.current.characters[0].status).toBe('unverified');
+      expect(result.current.errorMessage).toBeNull();
     });
 
     it('marks the row unverified when the lookup itself fails, never valid', async () => {
@@ -124,7 +139,7 @@ describe('useCreateViewForm', () => {
       expect(result.current.characters[0].status).toBe('draft');
 
       await act(async () => {
-        resolveCheck({ exist: [], nonExisting: [] });
+        resolveCheck({ exist: [], nonExisting: [], unchecked: [] });
       });
 
       expect(result.current.characters[0].name).toBe('Sylvanas');
@@ -195,7 +210,7 @@ describe('useCreateViewForm', () => {
       expect(result.current.characters[1].status).toBe('draft');
 
       await act(async () => {
-        resolveCheck({ exist: [], nonExisting: [] });
+        resolveCheck({ exist: [], nonExisting: [], unchecked: [] });
       });
       expect(result.current.characters[0].status).toBe('valid');
     });
@@ -229,10 +244,11 @@ describe('useCreateViewForm', () => {
         resolvers[1]({
           exist: [],
           nonExisting: [{ name: 'Fake', region: 'eu', realm: 'tarren-mill' }],
+          unchecked: [],
         });
       });
       await act(async () => {
-        resolvers[0]({ exist: [], nonExisting: [] });
+        resolvers[0]({ exist: [], nonExisting: [], unchecked: [] });
       });
 
       expect(result.current.characters[0].status).toBe('valid');
@@ -271,6 +287,7 @@ describe('useCreateViewForm', () => {
       mockCheckEntitiesExist.mockResolvedValue({
         exist: [],
         nonExisting: [{ name: 'Fake', region: 'eu', realm: 'tarren-mill' }],
+        unchecked: [],
       });
       const { result } = renderForm();
       const rowId = await addRow(result, 'Fake');
@@ -323,7 +340,7 @@ describe('useCreateViewForm', () => {
       expect(result.current.canSubmit).toBe(false);
 
       await act(async () => {
-        resolveCheck({ exist: [], nonExisting: [] });
+        resolveCheck({ exist: [], nonExisting: [], unchecked: [] });
       });
       expect(result.current.canSubmit).toBe(true);
     });
@@ -335,6 +352,7 @@ describe('useCreateViewForm', () => {
       mockCheckEntitiesExist.mockResolvedValue({
         exist: [],
         nonExisting: [{ name: 'Fake', region: 'eu', realm: 'tarren-mill' }],
+        unchecked: [],
       });
       const badId = await addRow(result, 'Fake');
 
