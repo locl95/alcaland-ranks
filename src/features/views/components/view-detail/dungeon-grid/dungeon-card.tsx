@@ -5,7 +5,6 @@ import {
   RaiderioProfile,
   Season,
 } from '@/features/views/api/raiderio.ts';
-import { DUNGEON_IMAGES } from '@/features/views/constants/dungeon-images.ts';
 import { CharacterRun } from './character-run.tsx';
 
 export interface CharacterDungeonScore {
@@ -31,11 +30,7 @@ export function DungeonCard({
       <div className="dungeon-header">
         <div className="dungeon-title">{dungeon.name}</div>
         <div className="dungeon-header-thumb">
-          <img
-            src={DUNGEON_IMAGES[dungeon.short_name.toLowerCase()]}
-            alt={dungeon.name}
-            className="dungeon-header-thumb-img"
-          />
+          <img src={dungeon.icon_url} alt={dungeon.name} className="dungeon-header-thumb-img" />
           <span className="dungeon-header-thumb-name">{dungeon.short_name}</span>
         </div>
       </div>

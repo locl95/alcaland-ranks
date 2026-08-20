@@ -69,6 +69,7 @@ export interface Dungeon {
   name: string;
   short_name: string;
   challenge_mode_id: number;
+  icon_url: string;
 }
 
 export interface Season {

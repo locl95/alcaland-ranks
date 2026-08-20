@@ -23,5 +23,12 @@ export const mockSeason: Season = {
   slug: 'midnight-season-1',
   name: 'Midnight Season 1',
   blizzard_season_id: 1,
-  dungeons: [{ name: 'Siege of Boralus', short_name: 'SIEGE', challenge_mode_id: 1 }],
+  dungeons: [
+    {
+      name: 'Siege of Boralus',
+      short_name: 'SIEGE',
+      challenge_mode_id: 1,
+      icon_url: 'https://cdn.raiderio.net/images/dungeons/siege-of-boralus.jpg',
+    },
+  ],
 };

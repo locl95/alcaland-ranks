@@ -3,6 +3,10 @@
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
+**Read `PROJECT_CONTEXT.md` first** — what this app is, its architecture, and the
+API/UI vocabulary split (`view` = "ladder", `entity` = "character") that causes most
+of the confusion here.
+
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
 ## 1. Think Before Coding
