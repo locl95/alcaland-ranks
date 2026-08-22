@@ -1,8 +1,15 @@
 import { test, expect } from '@playwright/test';
 import { seedAuth } from './mocks/authMocks';
-import { makeSimpleView, mockFeaturedViews, mockOwnViews, mockStaticData } from './mocks/viewMocks';
+import {
+  makeSimpleView,
+  mockEntitiesExist,
+  mockFeaturedViews,
+  mockOwnViews,
+  mockStaticData,
+} from './mocks/viewMocks';
 
 import { API, VALID_VIEW_ID } from './constants';
+import { pickRealm } from './helpers';
 
 test.describe('unauthenticated', () => {
   test.beforeEach(async ({ page }) => {
@@ -59,6 +66,7 @@ test.describe('create view', () => {
     await mockStaticData(page);
     await mockFeaturedViews(page);
     await mockOwnViews(page, []);
+    await mockEntitiesExist(page);
   });
 
   test('submits the form and shows the pending view in the list', async ({ page }) => {
@@ -73,7 +81,7 @@ test.describe('create view', () => {
 
     await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
     await page.getByPlaceholder('Name').fill('Arthas');
-    await page.locator('select').nth(1).selectOption('tarren-mill');
+    await pickRealm(page, 'Tarren Mill');
     await page.getByRole('button', { name: 'Add', exact: true }).click();
 
     await page.getByRole('button', { name: 'Create', exact: true }).click();
@@ -93,7 +101,7 @@ test.describe('create view', () => {
 
     await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
     await page.getByPlaceholder('Name').fill('Arthas');
-    await page.locator('select').nth(1).selectOption('tarren-mill');
+    await pickRealm(page, 'Tarren Mill');
     await page.getByRole('button', { name: 'Add', exact: true }).click();
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
@@ -101,7 +109,68 @@ test.describe('create view', () => {
     await expect(page.getByText('Failed to create ladder. Please try again.')).toBeVisible();
   });
 
-  test('replaces the pending view with the synced one after backend confirms it', async ({ page }) => {
+  test('flags a character that does not exist and blocks submitting', async ({ page }) => {
+    await page.route(`${API}/entities/exists`, (route) =>
+      route.fulfill({
+        json: {
+          exist: [],
+          nonExisting: [{ name: 'Fake', region: 'eu', realm: 'tarren-mill' }],
+          unchecked: [],
+        },
+      }),
+    );
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Create your first ladder' }).click();
+
+    await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
+    await page.getByPlaceholder('Name').first().fill('Fake');
+    await pickRealm(page, 'Tarren Mill');
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+
+    await expect(page.getByTitle('Character not found')).toBeVisible();
+    await expect(
+      page.getByText('Fake was not found. Check the name, realm and region.'),
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Create', exact: true })).toBeDisabled();
+
+    await page.getByTitle('Remove').click();
+    await expect(
+      page.getByText('Fake was not found. Check the name, realm and region.'),
+    ).toHaveCount(0);
+  });
+
+  test('shows a found indicator and only submits verified characters', async ({ page }) => {
+    await page.route(`${API}/views`, (route) => route.fulfill({ json: { id: 'op-123' } }));
+    await page.route(`${API}/operations/op-123`, (route) =>
+      route.fulfill({ json: { id: 'op-123', status: 'PENDING' } }),
+    );
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Create your first ladder' }).click();
+
+    await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
+    await page.getByPlaceholder('Name').first().fill('Arthas');
+    await pickRealm(page, 'Tarren Mill');
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+
+    await expect(page.getByTitle('Character found')).toBeVisible();
+
+    await page.getByPlaceholder('Name').last().fill('Sylvanas');
+    await expect(page.getByRole('button', { name: 'Create', exact: true })).toBeDisabled();
+
+    const request = page.waitForRequest((r) => r.url().endsWith('/views') && r.method() === 'POST');
+    await page.getByPlaceholder('Name').last().fill('');
+    await page.getByRole('button', { name: 'Create', exact: true }).click();
+
+    const entities = (await request).postDataJSON().entities;
+    expect(entities).toHaveLength(1);
+    expect(entities[0]).toMatchObject({ name: 'Arthas', realm: 'tarren-mill' });
+  });
+
+  test('replaces the pending view with the synced one after backend confirms it', async ({
+    page,
+  }) => {
     let created = false;
 
     // override the beforeEach mock — last registered route wins in Playwright
@@ -123,7 +192,7 @@ test.describe('create view', () => {
 
     await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
     await page.getByPlaceholder('Name').fill('Arthas');
-    await page.locator('select').nth(1).selectOption('tarren-mill');
+    await pickRealm(page, 'Tarren Mill');
     await page.getByRole('button', { name: 'Add', exact: true }).click();
 
     await page.getByRole('button', { name: 'Create', exact: true }).click();
@@ -144,7 +213,9 @@ test.describe('delete view', () => {
 
     let deleted = false;
     await page.route(`${API}/views?game=wow`, (route) =>
-      route.fulfill({ json: { records: deleted ? [] : [makeSimpleView(VALID_VIEW_ID, 'My Ladder')] } }),
+      route.fulfill({
+        json: { records: deleted ? [] : [makeSimpleView(VALID_VIEW_ID, 'My Ladder')] },
+      }),
     );
     await page.route(`${API}/views/${VALID_VIEW_ID}`, async (route) => {
       deleted = true;

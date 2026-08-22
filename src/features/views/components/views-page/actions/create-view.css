@@ -111,27 +111,6 @@
   font-weight: 500;
 }
 
-.form-input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  background: rgba(5, 17, 31, 0.8);
-  border: 1px solid rgba(71, 85, 105, 0.4);
-  border-radius: 0.375rem;
-  color: #f1f5f9;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: rgba(56, 189, 248, 0.5);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
-}
-
-.form-input::placeholder {
-  color: #475569;
-}
-
 .form-textarea {
   width: 100%;
   padding: 0.5rem 0.75rem;
@@ -215,85 +194,4 @@
 
 .character-row .form-input {
   flex: 1;
-}
-
-.form-select {
-  flex: 1;
-  padding: 0.5rem 0.75rem;
-  background: rgba(5, 17, 31, 0.8);
-  border: 1px solid rgba(71, 85, 105, 0.4);
-  border-radius: 0.375rem;
-  color: #f1f5f9;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  padding-right: 2rem;
-}
-
-.form-select:focus {
-  outline: none;
-  border-color: rgba(56, 189, 248, 0.5);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
-}
-
-.form-select option {
-  background: #0b1929;
-  color: #f1f5f9;
-}
-
-.form-select-region {
-  flex: 0 0 auto;
-  width: 5rem;
-}
-
-/* Icon-only action buttons */
-.btn-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  flex-shrink: 0;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.btn-icon:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.btn-icon-primary {
-  background: rgba(56, 189, 248, 0.12);
-  color: #7dd3fc;
-  border: 1px solid rgba(56, 189, 248, 0.25);
-}
-
-.btn-icon-primary:hover:not(:disabled) {
-  background: rgba(56, 189, 248, 0.2);
-  border-color: rgba(56, 189, 248, 0.4);
-  color: #bae6fd;
-}
-
-.btn-icon-outline {
-  background: transparent;
-  border: 1px solid rgba(71, 85, 105, 0.4);
-  color: #64748b;
-}
-
-.btn-icon-outline:hover {
-  background: rgba(51, 65, 85, 0.3);
-  color: #94a3b8;
-}
-
-.form-error {
-  font-size: 0.875rem;
-  color: #f87171;
-  margin-top: 0.5rem;
 }

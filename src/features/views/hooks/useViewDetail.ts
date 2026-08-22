@@ -6,7 +6,7 @@ import { selectUsername } from '@/app/authSlice.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
 import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
 import { OperationResult, ViewRequest } from '@/features/views/api/view-types.ts';
-import { haveSameCharacters } from '@/features/views/utils.ts';
+import { haveSameCharacters, toRealmSlug } from '@/features/views/utils.ts';
 import {
   viewKeys,
   fetchViewData,
@@ -113,7 +113,9 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
       entities: characters.map((c) => ({
         name: c.name,
         region: c.region,
-        realm: c.realm,
+        // Characters already on the ladder carry a realm display name while the
+        // picker produces a slug — the request must speak one language.
+        realm: toRealmSlug(c.realm, c.region),
         type: 'com.kos.entities.domain.WowEntityRequest',
       })),
       published: true,

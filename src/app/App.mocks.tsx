@@ -40,33 +40,30 @@ export const MockViewsList = ({
 );
 
 export const MockCreateView = ({
-  open,
   onCreateView,
-  onOpenChange,
+  onClose,
 }: {
-  open: boolean;
   onCreateView: (v: View) => void;
-  onOpenChange: (open: boolean) => void;
-}) =>
-  open ? (
-    <div data-testid="create-view-dialog">
-      <button
-        data-testid="submit-create"
-        onClick={() =>
-          onCreateView({
-            operationId: 'pending-id',
-            simpleView: makeSimpleView('pending-id', 'Pending View'),
-            status: 'pending',
-          })
-        }
-      >
-        Submit
-      </button>
-      <button data-testid="close-dialog" onClick={() => onOpenChange(false)}>
-        Close
-      </button>
-    </div>
-  ) : null;
+  onClose: () => void;
+}) => (
+  <div data-testid="create-view-dialog">
+    <button
+      data-testid="submit-create"
+      onClick={() =>
+        onCreateView({
+          operationId: 'pending-id',
+          simpleView: makeSimpleView('pending-id', 'Pending View'),
+          status: 'pending',
+        })
+      }
+    >
+      Submit
+    </button>
+    <button data-testid="close-dialog" onClick={onClose}>
+      Close
+    </button>
+  </div>
+);
 
 export const MockViewDetail = () => {
   const navigate = useNavigate();

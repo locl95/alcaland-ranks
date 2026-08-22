@@ -1,65 +1,35 @@
-import { useEffect, useState } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
+import '@/features/views/components/shared/form-controls.css';
 import './edit-view.css';
 import '../character-ladder/ladder-row.css';
 import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
 import { getClassSlug } from '@/features/views/utils.ts';
 import { RealmSelect } from '@/features/views/components/shared/realm-select.tsx';
+import { VerificationBadge } from '@/features/views/components/shared/verification-badge.tsx';
+import { useEditViewForm } from '@/features/views/hooks/useEditViewForm.ts';
 
 interface EditViewProps {
-  isOpen: boolean;
   characters: RaiderioProfile[];
   onClose: () => void;
   onSave: (characters: RaiderioProfile[]) => void;
 }
 
-export function EditView({ isOpen, characters, onClose, onSave }: Readonly<EditViewProps>) {
-  const [editingCharacters, setEditingCharacters] = useState<RaiderioProfile[]>([]);
-  const [newName, setNewName] = useState('');
-  const [newRealm, setNewRealm] = useState('');
-  const [newRegion, setNewRegion] = useState('eu');
-
-  useEffect(() => {
-    if (isOpen) {
-      setEditingCharacters(characters.filter((c) => c.score !== null));
-      setNewName('');
-      setNewRealm('');
-      setNewRegion('eu');
-    }
-  }, [isOpen, characters]);
-
-  const deleteCharacter = (id: number) => {
-    setEditingCharacters((prev) => prev.filter((c) => c.id !== id));
-  };
-
-  const addCharacter = () => {
-    if (!newName.trim() || !newRealm) return;
-
-    const newCharacter: RaiderioProfile = {
-      id: Date.now(),
-      name: newName.trim(),
-      realm: newRealm,
-      region: newRegion,
-      score: null,
-      class: '',
-      spec: '',
-      quantile: 0,
-      mythicPlusBestRuns: [],
-      mythicPlusRanks: {
-        overall: { world: 0, region: 0, realm: 0 },
-        class: { world: 0, region: 0, realm: 0 },
-        specs: [],
-      },
-      mythicPlusRecentRuns: [],
-    };
-
-    setEditingCharacters((prev) => [...prev, newCharacter]);
-    setNewName('');
-    setNewRealm('');
-    setNewRegion('eu');
-  };
-
-  if (!isOpen) return null;
+export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps>) {
+  const {
+    editingCharacters,
+    statuses,
+    newName,
+    newRealm,
+    newRegion,
+    setName,
+    setRealm,
+    setRegion,
+    errorMessage,
+    canSave,
+    addCharacter,
+    deleteCharacter,
+    save,
+  } = useEditViewForm(characters, onSave);
 
   return (
     <div className="edit-view-overlay" data-testid="edit-view-overlay" onClick={onClose}>
@@ -82,19 +52,19 @@ export function EditView({ isOpen, characters, onClose, onSave }: Readonly<EditV
                   <div className="character-edit-name-row">
                     <p className="character-edit-name">{character.name}</p>
 
-                    {character.score !== null && (
+                    {character.profile && (
                       <span
-                        className={`character-edit-class-badge ${getClassSlug(character.class)}`}
+                        className={`character-edit-class-badge ${getClassSlug(character.profile.class)}`}
                       >
-                        {character.class}
+                        {character.profile.class}
                       </span>
                     )}
                   </div>
 
                   <div className="character-edit-meta">
-                    {character.score !== null && (
+                    {character.profile && (
                       <>
-                        <span className="character-edit-spec">{character.spec}</span>
+                        <span className="character-edit-spec">{character.profile.spec}</span>
                         <span className="character-edit-separator">•</span>
                       </>
                     )}
@@ -103,16 +73,18 @@ export function EditView({ isOpen, characters, onClose, onSave }: Readonly<EditV
                     <span className={`ladder-region-badge ${character.region}`}>
                       {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
                     </span>
-                    {character.score !== null && (
+                    {character.profile?.score != null && (
                       <>
                         <span className="character-edit-separator">•</span>
                         <span className="character-edit-score">
-                          {character.score.toLocaleString()} M+
+                          {character.profile.score.toLocaleString()} M+
                         </span>
                       </>
                     )}
                   </div>
                 </div>
+
+                {statuses[character.id] && <VerificationBadge status={statuses[character.id]} />}
 
                 <button
                   onClick={() => deleteCharacter(character.id)}
@@ -130,15 +102,15 @@ export function EditView({ isOpen, characters, onClose, onSave }: Readonly<EditV
               className="form-input"
               placeholder="Name"
               value={newName}
-              onChange={(e) => setNewName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addCharacter()}
             />
 
             <RealmSelect
               region={newRegion}
               realm={newRealm}
-              onRegionChange={setNewRegion}
-              onRealmChange={setNewRealm}
+              onRegionChange={setRegion}
+              onRealmChange={setRealm}
             />
 
             <button
@@ -151,10 +123,17 @@ export function EditView({ isOpen, characters, onClose, onSave }: Readonly<EditV
               <Plus size={16} />
             </button>
           </div>
+
+          {errorMessage && <p className="form-error">{errorMessage}</p>}
         </div>
 
         <div className="edit-view-footer">
-          <button onClick={() => onSave(editingCharacters)} className="manage-done-btn">
+          <button
+            onClick={save}
+            className="manage-done-btn"
+            disabled={!canSave}
+            title={canSave ? undefined : 'Add and verify every character first'}
+          >
             Done
           </button>
         </div>

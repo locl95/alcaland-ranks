@@ -1,59 +1,53 @@
 import { useEffect } from 'react';
 import { Plus, X } from 'lucide-react';
+import { VerificationBadge } from '@/features/views/components/shared/verification-badge.tsx';
+import '@/features/views/components/shared/form-controls.css';
 import './create-view.css';
 import { View } from '@/features/views/model/view.ts';
 import { RealmSelect } from '@/features/views/components/shared/realm-select.tsx';
 import { useCreateViewForm } from '@/features/views/hooks/useCreateViewForm.ts';
 
 interface CreateViewDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   onCreateView: (newView: View) => void;
 }
 
-export function CreateView({ open, onOpenChange, onCreateView }: Readonly<CreateViewDialogProps>) {
+export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogProps>) {
   const {
     name,
     setName,
     characters,
     canSubmit,
-    error,
+    errorMessage,
     isSubmitting,
     updateCharacter,
     addCharacter,
     removeCharacter,
     handleSubmit,
-  } = useCreateViewForm(open, () => onOpenChange(false), onCreateView);
+  } = useCreateViewForm(onClose, onCreateView);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onOpenChange(false);
+      if (e.key === 'Escape') onClose();
     };
 
-    if (open) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
+    document.addEventListener('keydown', handleEscape);
+    document.body.style.overflow = 'hidden';
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [open, onOpenChange]);
-
-  if (!open) return null;
+  }, [onClose]);
 
   return (
-    <div
-      className="dialog-overlay"
-      onClick={(e) => e.target === e.currentTarget && onOpenChange(false)}
-    >
+    <div className="dialog-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="dialog-content">
         <div className="dialog-header">
           <div>
             <h1 className="dialog-title">Create new m+ ladder</h1>
           </div>
-          <button type="button" className="dialog-close-btn" onClick={() => onOpenChange(false)}>
+          <button type="button" className="dialog-close-btn" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
@@ -72,36 +66,40 @@ export function CreateView({ open, onOpenChange, onCreateView }: Readonly<Create
             <label className="form-label">Characters</label>
 
             {characters.map((char, index) => (
-              <div key={index} className="character-row">
+              <div key={char.id} className="character-row">
                 <input
                   className="form-input"
                   placeholder="Name"
                   value={char.name}
-                  onChange={(e) => updateCharacter(index, 'name', e.target.value)}
+                  onChange={(e) => updateCharacter(char.id, 'name', e.target.value)}
                 />
 
                 <RealmSelect
                   region={char.region}
                   realm={char.realm}
-                  onRegionChange={(v) => updateCharacter(index, 'region', v)}
-                  onRealmChange={(v) => updateCharacter(index, 'realm', v)}
+                  onRegionChange={(v) => updateCharacter(char.id, 'region', v)}
+                  onRealmChange={(v) => updateCharacter(char.id, 'realm', v)}
                 />
 
-                {char.mode === 'add' ? (
+                {char.status === 'draft' && (
                   <button
                     type="button"
                     className="btn-icon btn-icon-primary"
-                    onClick={() => addCharacter(index)}
+                    onClick={() => addCharacter(char.id)}
                     disabled={!char.name || !char.realm}
                     title="Add"
                   >
                     <Plus size={16} />
                   </button>
-                ) : (
+                )}
+
+                {char.status !== 'draft' && <VerificationBadge status={char.status} />}
+
+                {index < characters.length - 1 && (
                   <button
                     type="button"
                     className="btn-icon btn-icon-outline"
-                    onClick={() => removeCharacter(index)}
+                    onClick={() => removeCharacter(char.id)}
                     title="Remove"
                   >
                     <X size={16} />
@@ -110,11 +108,16 @@ export function CreateView({ open, onOpenChange, onCreateView }: Readonly<Create
               </div>
             ))}
 
-            {error && <p className="form-error">{error}</p>}
+            {errorMessage && <p className="form-error">{errorMessage}</p>}
           </div>
 
           <div className="dialog-footer">
-            <button type="submit" className="btn btn-primary" disabled={!canSubmit}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!canSubmit}
+              title={canSubmit ? undefined : 'Name the ladder and add at least one character'}
+            >
               {isSubmitting ? 'Creating...' : 'Create'}
             </button>
           </div>

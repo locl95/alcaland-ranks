@@ -1,4 +1,21 @@
+import { EU_REALMS } from '@/features/views/constants/euRealms.ts';
+import { NA_REALMS } from '@/features/views/constants/naRealms.ts';
+
 export const normalizeKey = (s: string): string => s.toLowerCase().replace(/\s+/g, '');
+
+export const formatNotFoundMessage = (names: string[]): string | null =>
+  names.length === 0
+    ? null
+    : `${names.join(', ')} ${names.length === 1 ? 'was' : 'were'} not found. Check the name, realm and region.`;
+
+export const formatDuplicateMessage = (name: string | null): string | null =>
+  name ? `${name} is already in this ladder.` : null;
+
+export const toRealmSlug = (realm: string, region: string): string => {
+  const realms = region.toLowerCase() === 'us' ? NA_REALMS : EU_REALMS;
+  const match = realms.find((r) => r.slug === realm || r.label === realm);
+  return match?.slug ?? realm.trim().toLowerCase().replace(/\s+/g, '-');
+};
 
 export const getClassSlug = (className: string): string =>
   className.toLowerCase().replace(/\s+/g, '-');

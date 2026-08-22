@@ -127,12 +127,13 @@ export function ViewDetail() {
         )}
       </div>
 
-      <EditView
-        isOpen={isEditOpen}
-        characters={profiles}
-        onClose={() => setIsEditOpen(false)}
-        onSave={handleSavedCharacters}
-      />
+      {isEditOpen && (
+        <EditView
+          characters={profiles}
+          onClose={() => setIsEditOpen(false)}
+          onSave={handleSavedCharacters}
+        />
+      )}
 
       <SyncErrorDialog failedCharacters={syncError ?? []} onClose={clearSyncError} />
     </div>

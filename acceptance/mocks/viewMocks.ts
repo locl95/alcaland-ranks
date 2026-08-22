@@ -17,9 +17,7 @@ export function makeSimpleView(id: string, name: string, owner = 'testuser'): Si
 }
 
 export async function mockStaticData(page: Page) {
-  await page.route(`${API}/sources/wow/static`, (route) =>
-    route.fulfill({ json: mockSeason }),
-  );
+  await page.route(`${API}/sources/wow/static`, (route) => route.fulfill({ json: mockSeason }));
 }
 
 export async function mockFeaturedViews(page: Page, views: SimpleView[] = []) {
@@ -29,7 +27,20 @@ export async function mockFeaturedViews(page: Page, views: SimpleView[] = []) {
 }
 
 export async function mockOwnViews(page: Page, views: SimpleView[] = []) {
-  await page.route(`${API}/views?game=wow`, (route) =>
-    route.fulfill({ json: { records: views } }),
-  );
+  await page.route(`${API}/views?game=wow`, (route) => route.fulfill({ json: { records: views } }));
+}
+
+export async function mockEntitiesExist(page: Page) {
+  await page.route(`${API}/entities/exists`, async (route) => {
+    const { entities } = route.request().postDataJSON() as {
+      entities: { name: string; region: string; realm: string }[];
+    };
+    await route.fulfill({
+      json: {
+        exist: entities.map(({ name, region, realm }) => ({ name, region, realm })),
+        nonExisting: [],
+        unchecked: [],
+      },
+    });
+  });
 }
