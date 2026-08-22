@@ -4,8 +4,8 @@ packages:
 overrides:
   vite: 6.3.5
 
-onlyBuiltDependencies:
-  - esbuild
+allowBuilds:
+  esbuild: true
 
 minimumReleaseAge: 1440
 
