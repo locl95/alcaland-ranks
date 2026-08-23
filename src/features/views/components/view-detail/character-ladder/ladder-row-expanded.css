@@ -1,34 +1,68 @@
 .ladder-row-expanded {
-  padding: 1.25rem 1.5rem;
-  border-top: 1px solid rgba(51, 65, 85, 0.35);
-  background: rgba(5, 17, 31, 0.3);
+  padding: 1.25rem 1.25rem 1.25rem 2rem;
+  border-top: 1px solid var(--rule-soft);
+  background: var(--void);
+  box-shadow: inset 3px 0 0 var(--tier);
+}
+
+/* Three columns so the thumbnails stay centred on the panel itself, not on
+   whatever space the cutoff badge leaves over. Column 3 is intentionally
+   empty; the explicit grid-column keeps the centring correct even when the
+   character has no quantile. */
+.expanded-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.expanded-top .quantile-banner {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.expanded-top .dungeon-thumbnails {
+  grid-column: 2;
 }
 
 .quantile-banner {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 1rem;
-  padding: 0.5rem 0.75rem;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  border-radius: 0.375rem;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.75rem;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--rad-md);
   width: fit-content;
 }
 
 .quantile-label {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--ink-3);
 }
 
 .quantile-value {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #818cf8;
+  font-family: var(--font-data);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--tier);
 }
 
 @media (max-width: 640px) {
   .ladder-row-expanded {
-    padding: 0.75rem 0.5rem;
+    padding: 0.875rem 0.5rem 0.875rem 1rem;
+  }
+
+  /* Too narrow to sit side by side — stack, cutoff first. */
+  .expanded-top {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .expanded-top .quantile-banner,
+  .expanded-top .dungeon-thumbnails {
+    grid-column: 1;
   }
 }

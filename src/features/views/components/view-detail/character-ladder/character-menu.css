@@ -5,32 +5,32 @@
 .char-menu-btn {
   background: transparent;
   border: none;
-  color: #475569;
+  color: var(--ink-4);
   cursor: pointer;
   padding: 0.25rem;
   display: flex;
   align-items: center;
-  border-radius: 0.25rem;
-  transition: color 0.2s;
+  border-radius: var(--rad-sm);
+  transition: color 0.18s;
 }
 
 .char-menu-btn:hover {
-  color: #94a3b8;
+  color: var(--beacon);
 }
 
+/* Fixed, not absolute: .ladder-card clips its children. */
 .char-menu-dropdown {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 0.375rem);
-  background: #0b1929;
-  border: 1px solid rgba(51, 65, 85, 0.6);
-  border-radius: 0.375rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  position: fixed;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--rad-md);
+  box-shadow: var(--lift);
   z-index: 100;
-  min-width: 9rem;
+  min-width: 9.5rem;
   overflow: hidden;
 }
 
+/* Kept in step with .user-menu-item in views-page.css. */
 .char-menu-item {
   display: flex;
   align-items: center;
@@ -39,8 +39,11 @@
   padding: 0.5rem 0.75rem;
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: var(--ink-2);
+  font-family: var(--font-ui);
   font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
   cursor: pointer;
   text-align: left;
   transition:
@@ -49,8 +52,13 @@
 }
 
 .char-menu-item:hover {
-  background: rgba(56, 189, 248, 0.06);
-  color: #e2e8f0;
+  background: var(--panel-3);
+  color: var(--ink);
+}
+
+.char-menu-btn-icon {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .char-menu-icon {

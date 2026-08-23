@@ -43,17 +43,23 @@ export const CharacterLadder = memo(function CharacterLadder({
       </div>
 
       {isLadderOpen && (
-        <div className="ladder-content">
-          {sortedCharacters.map((character, index) => (
-            <LadderRow
-              key={character.id}
-              index={index}
-              character={character}
-              cachedCharacters={sortedCachedCharacters}
-              season={season}
-            />
-          ))}
-        </div>
+        <>
+          <div className="ladder-cols">
+            <span className="eyebrow">Character</span>
+            <span className="eyebrow ladder-cols-score">M+ score</span>
+          </div>
+          <div className="ladder-content">
+            {sortedCharacters.map((character, index) => (
+              <LadderRow
+                key={character.id}
+                index={index}
+                character={character}
+                cachedCharacters={sortedCachedCharacters}
+                season={season}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

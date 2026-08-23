@@ -5,7 +5,7 @@ import { RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
 import { CharacterMenu } from './character-menu.tsx';
 import { LadderRowExpanded } from './ladder-row-expanded.tsx';
 
-import { getClassSlug, getScoreClass } from '@/features/views/utils.ts';
+import { getClassSlug, getScoreClass, getScoreTier } from '@/features/views/utils.ts';
 import { CLASS_IMAGES, getClassImageKey } from '@/features/views/constants/class-images.ts';
 
 interface LadderRowProps {
@@ -37,10 +37,22 @@ export const LadderRow = memo(function LadderRow({
       : 0;
 
   return (
-    <div className="ladder-row">
-      <div className="ladder-row-inner" onClick={() => setIsExpanded((prev) => !prev)}>
+    <div className="ladder-row" data-tier={isSyncing ? undefined : getScoreTier(character.score!)}>
+      <div
+        className="ladder-row-inner"
+        role="button"
+        tabIndex={0}
+        aria-expanded={isExpanded}
+        onClick={() => setIsExpanded((prev) => !prev)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded((prev) => !prev);
+          }
+        }}
+      >
         <div className="ladder-rank">
-          <span className="rank-number">{index + 1}</span>
+          <span className="rank-number num">{index + 1}</span>
           {!isSyncing && (
             <img
               src={CLASS_IMAGES[getClassImageKey(character.class)]}
@@ -85,14 +97,13 @@ export const LadderRow = memo(function LadderRow({
           <>
             <div className="ladder-score">
               <div className="ladder-score-value-row">
-                <p className={`ladder-score-value ${getScoreClass(character.score!)}`}>
+                {scoreGain > 0 && (
+                  <span className="score-improvement num">+{Math.round(scoreGain)}</span>
+                )}
+                <p className={`ladder-score-value num ${getScoreClass(character.score!)}`}>
                   {character.score!.toLocaleString()}
                 </p>
-                {scoreGain > 0 && (
-                  <span className="score-improvement">+{Math.round(scoreGain)}</span>
-                )}
               </div>
-              <p className="ladder-score-label">M+ Score</p>
             </div>
             <div className="ladder-actions">
               <CharacterMenu character={character} />

@@ -1,25 +1,24 @@
 .dungeon-thumbnails {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
   justify-content: center;
-  margin-bottom: 1.5rem;
+  gap: 0.5rem;
 }
 
 .dungeon-thumb {
   position: relative;
-  width: 80px;
-  height: 80px;
-  border-radius: 0.25rem;
+  width: 3.625rem;
+  height: 3.625rem;
+  border-radius: var(--rad-md);
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 0 0 1px #475569;
+  box-shadow: 0 0 0 1px var(--rule);
   cursor: pointer;
   transition: box-shadow 0.15s;
 }
 
 .dungeon-thumb:hover {
-  box-shadow: 0 0 0 2px #7dd3fc;
+  box-shadow: 0 0 0 2px var(--beacon);
 }
 
 .dungeon-thumb-img {
@@ -31,39 +30,38 @@
 
 .dungeon-thumb-level {
   position: absolute;
-  top: 0.2rem;
-  left: 0;
-  right: 0;
+  inset: 0 0 auto 0;
+  padding-top: 0.25rem;
   text-align: center;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #fbbf24;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+  font-family: var(--font-data);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95);
   line-height: 1;
 }
 
 .dungeon-thumb-name {
   position: absolute;
-  bottom: 0.2rem;
-  left: 0;
-  right: 0;
+  inset: auto 0 0 0;
+  padding: 0.4375rem 0.125rem 0.1875rem;
   text-align: center;
-  font-size: 0.625rem;
+  font-size: 0.5rem;
   font-weight: 700;
-  color: #fbbf24;
+  color: var(--ink);
   text-transform: uppercase;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
   line-height: 1;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
 }
 
 @media (max-width: 640px) {
-  .dungeon-thumbnails {
-    gap: 0.5rem;
+  .dungeon-thumb {
+    width: 2.875rem;
+    height: 2.875rem;
   }
 
-  .dungeon-thumb {
-    width: 60px;
-    height: 60px;
+  .dungeon-thumb-level {
+    font-size: 0.8125rem;
   }
 }

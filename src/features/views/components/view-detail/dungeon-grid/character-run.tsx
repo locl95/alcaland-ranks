@@ -43,6 +43,9 @@ export function CharacterRun({
   const scoreImprovement = bestRun ? getScoreImprovement(cachedProfiles, character, bestRun) : 0;
   const timeDelta =
     run && run.par_time_ms != null ? formatTimeDelta(run.clear_time_ms, run.par_time_ms) : null;
+  const keystone = run
+    ? (KEYSTONE_DISPLAY[run.num_keystone_upgrades] ?? KEYSTONE_DISPLAY[0])
+    : null;
 
   return (
     <div className="character-run-wrapper">
@@ -52,52 +55,44 @@ export function CharacterRun({
       >
         <div className="character-run-left">
           {isHighest && <Crown className="crown-icon" />}
-          <div className="character-run-info">
-            <div className="character-run-name-row">
-              {specImg && (
-                <img src={specImg} alt={specName} title={specName} className="spec-icon" />
-              )}
-              <p
-                className={`character-run-name ${isHighest ? 'highest' : 'normal'}`}
-                style={{
-                  color: CLASS_COLORS[getClassSlug(character.class)] ?? '#dde4ee',
-                }}
-              >
-                {character.name}
-              </p>
-            </div>
-          </div>
+          {specImg && <img src={specImg} alt={specName} title={specName} className="spec-icon" />}
+          <p
+            className={`character-run-name ${isHighest ? 'highest' : 'normal'}`}
+            style={{
+              color: CLASS_COLORS[getClassSlug(character.class)] ?? 'var(--ink)',
+            }}
+          >
+            {character.name}
+          </p>
         </div>
 
-        {run ? (
-          <div className="character-run-stats">
-            <div className="character-run-score-row">
-              <p className={`character-run-score ${isHighest ? 'highest' : 'normal'}`}>
-                {Math.round(run.score)}
-              </p>
+        {run && keystone ? (
+          <>
+            <div className="character-run-score-cell">
               {scoreImprovement > 0 && (
-                <span className="score-improvement">+{Math.round(scoreImprovement)}</span>
+                <span className="score-improvement num">+{Math.round(scoreImprovement)}</span>
               )}
+              <span className={`character-run-score num ${isHighest ? 'highest' : 'normal'}`}>
+                {Math.round(run.score)}
+              </span>
             </div>
-            <p
-              className={`character-run-level ${KEYSTONE_DISPLAY[run.num_keystone_upgrades].className}`}
-            >
-              {KEYSTONE_DISPLAY[run.num_keystone_upgrades].prefix}
+
+            <span className={`character-run-key num ${keystone.className}`}>
+              {keystone.prefix}
               {run.mythic_level}
-            </p>
-            <p className="character-run-class">
-              {formatClearTime(run.clear_time_ms)}{' '}
+            </span>
+
+            <span className="character-run-time num">
+              {formatClearTime(run.clear_time_ms)}
               {timeDelta && (
                 <span className={timeDelta.timed ? 'time-delta-timed' : 'time-delta-depleted'}>
-                  ({timeDelta.text})
+                  {timeDelta.text}
                 </span>
               )}
-            </p>
-          </div>
+            </span>
+          </>
         ) : (
-          <div className="character-run-no-data">
-            <p>No run</p>
-          </div>
+          <span className="character-run-no-data">No run</span>
         )}
       </div>
 

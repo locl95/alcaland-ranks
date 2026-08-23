@@ -1,4 +1,4 @@
-import { Plus, User, Users, Loader2, Trash2 } from 'lucide-react';
+import { ChevronRight, Plus, User, Users, Loader2, Trash2 } from 'lucide-react';
 import './views-list.css';
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectUsername } from '@/app/authSlice.ts';
@@ -40,19 +40,34 @@ export function ViewsList({
     </div>
   ) : (
     <div className="views-list-container-box">
+      <div className="views-list-head">
+        <span className="eyebrow">Ladder</span>
+        <span className="eyebrow views-list-head-stat">Characters</span>
+      </div>
       {views.map((view, index) => {
         const isPending = view.status === 'pending';
         const isDeleting = view.status === 'deleting';
         const isDisabled = isPending || isDeleting;
         const isLast = index === views.length - 1;
+        const characterCount = view.simpleView.entitiesIds.length;
+        const open = () => !isDisabled && onViewClick(view.simpleView.id);
 
         return (
           <div
             key={view.simpleView.id}
+            role="button"
+            tabIndex={isDisabled ? -1 : 0}
+            aria-disabled={isDisabled}
             className={['view-row', !isLast && 'with-border', isDisabled && 'view-row-pending']
               .filter(Boolean)
               .join(' ')}
-            onClick={() => !isDisabled && onViewClick(view.simpleView.id)}
+            onClick={open}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                open();
+              }
+            }}
           >
             <div className="view-row-content">
               <h3 className="view-row-title">{view.simpleView.name}</h3>
@@ -63,19 +78,18 @@ export function ViewsList({
               {!isDisabled && (
                 <div className="view-row-meta">
                   <div className="view-row-meta-item">
-                    <Users className="view-row-icon" />
-                    <span>
-                      {view.simpleView.entitiesIds.length} character
-                      {view.simpleView.entitiesIds.length === 1 ? '' : 's'}
-                    </span>
-                  </div>
-                  <div className="view-row-meta-item">
                     <User className="view-row-icon" />
                     <span>{view.simpleView.owner}</span>
                   </div>
                 </div>
               )}
             </div>
+
+            {!isDisabled && (
+              <div className="view-row-stat">
+                <span className="view-row-stat-value num">{characterCount}</span>
+              </div>
+            )}
 
             <div className="view-row-actions" onClick={(e) => e.stopPropagation()}>
               {isDisabled && <Loader2 className="loading-icon" />}
@@ -92,6 +106,8 @@ export function ViewsList({
                   <Trash2 className="view-row-menu-icon" />
                 </button>
               )}
+
+              {!isDisabled && <ChevronRight className="view-row-chevron" aria-hidden={true} />}
             </div>
           </div>
         );

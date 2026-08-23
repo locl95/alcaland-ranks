@@ -50,6 +50,10 @@ Feature-based folders under `src/features/`, with `src/shared/` for cross-cuttin
 - `src/app/App.tsx` — pure routing shell, no data logic
 - `src/app/App.css` — global layout. The background gradient and footer live in the
   `app-layout` div. **Do not add backgrounds or `min-height: 100vh` to page containers.**
+  Pages use the shared `.page` / `.page-inner` wrappers, which grow to fill the shell.
+- `src/styles/app/theme.css` — the design system: self-hosted fonts, colour tokens,
+  the CSS reset, and the shared `.num` / `.eyebrow` / `.score-*` helpers. See
+  "Design system" below. Components consume tokens; they don't hardcode colours.
 - `src/shared/api/httpClient.ts` — two request tiers:
   - `serviceGet` / `serviceRequest` — service token, public data
   - `userRequest` / `userRequestVoid` — user JWT, with 401 refresh + request queueing
@@ -77,6 +81,23 @@ the username is decoded from the access token's JWT payload.
 
 Migrating to httpOnly cookies is deferred — it needs backend changes that another
 project (osborno-gestiones) also depends on.
+
+### Design system
+
+Two rules carry most of it:
+
+**The rarity ramp is the colour system.** Grey → green → blue → purple → orange mirrors
+WoW item quality, and `getScoreTier` already maps M+ score onto it. It drives score
+text, the ladder row spine, and the expanded panel accent. Colour here means something —
+don't use a ramp colour decoratively.
+
+**Cyan (`--beacon`) is interaction only**: focus rings, the primary action, the active
+tab. It was previously on twelve different things, which is why nothing stood out.
+
+Typography is three faces: `--font-display` (Saira Condensed) for headings and character
+names, `--font-data` (IBM Plex Mono, via the `.num` class) for every number that gets
+compared against another number, and `--font-ui` (system) for labels and prose. The fonts
+are self-hosted `woff2` in `src/assets/fonts/`, latin subset only, ~67KB total — no CDN.
 
 ## Vocabulary: the API and the UI use different words
 
@@ -151,6 +172,4 @@ Two constraints this creates:
 ## Known rough edges
 
 - `authApi.ts` logout swallows errors — the server session may outlive the local one
-- `src/styles/app/theme.css` is ~111 lines of design tokens, only ~5 still referenced
-  (leftover from a removed Tailwind setup)
 - JWT in localStorage — a documented tradeoff, hard to avoid in a pure SPA

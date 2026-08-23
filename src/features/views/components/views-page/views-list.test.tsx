@@ -95,7 +95,8 @@ describe('ViewsList', () => {
 
     it('displays character count', () => {
       renderList([makeView('v1', 'My Ladder')]);
-      expect(screen.getByText('2 characters')).toBeInTheDocument();
+      expect(screen.getByText('2')).toBeInTheDocument();
+      expect(screen.getByText('Characters')).toBeInTheDocument();
     });
   });
 

@@ -57,8 +57,8 @@ export function ViewDetail() {
   if (!initialized) return null;
 
   return (
-    <div className="view-detail-container">
-      <div className="view-detail-content">
+    <div className="page">
+      <div className="page-inner page-inner--wide">
         <div className="view-detail-header">
           <button onClick={() => navigate('/')} className="header-back-button">
             <ArrowLeft className="header-icon" />

@@ -8,19 +8,19 @@
 }
 
 .verification-badge--checking {
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 
 .verification-badge--valid {
-  color: #4ade80;
+  color: var(--up);
 }
 
 .verification-badge--invalid {
-  color: #f87171;
+  color: var(--down);
 }
 
 .verification-badge--unverified {
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 
 .verification-badge-spin {

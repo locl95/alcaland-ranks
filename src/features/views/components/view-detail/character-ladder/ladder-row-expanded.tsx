@@ -18,21 +18,23 @@ export function LadderRowExpanded({
 }: Readonly<LadderRowExpandedProps>) {
   return (
     <div className="ladder-row-expanded">
-      {season && <DungeonThumbnails season={season} bestRuns={character.mythicPlusBestRuns} />}
+      <div className="expanded-top">
+        {character.quantile != null && (
+          <div className="quantile-banner">
+            <span className="quantile-label">Top</span>
+            <span className="quantile-value">{character.quantile.toFixed(2)}%</span>
+            <span className="quantile-label">of all players</span>
+          </div>
+        )}
+
+        {season && <DungeonThumbnails season={season} bestRuns={character.mythicPlusBestRuns} />}
+      </div>
 
       <RecentRuns
         recentRuns={character.mythicPlusRecentRuns ?? []}
         bestRuns={character.mythicPlusBestRuns}
         characterClass={character.class}
       />
-
-      {character.quantile != null && (
-        <div className="quantile-banner">
-          <span className="quantile-label">Top</span>
-          <span className="quantile-value">{character.quantile.toFixed(2)}%</span>
-          <span className="quantile-label">of all players</span>
-        </div>
-      )}
 
       <RankingsTable character={character} cachedProfile={cachedCharacter} />
 
