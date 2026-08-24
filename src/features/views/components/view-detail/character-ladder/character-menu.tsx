@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './character-menu.css';
 import { ExternalLink } from 'lucide-react';
 import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
@@ -37,6 +37,13 @@ export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
     });
   }, []);
 
+  // Layout effect, not effect: the menu is `position: fixed` with no placement
+  // until this runs, so measuring after paint shows it once at its static
+  // position before it snaps under the button.
+  useLayoutEffect(() => {
+    if (isOpen) updatePosition();
+  }, [isOpen, updatePosition]);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -50,7 +57,6 @@ export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscape);
 
-    updatePosition();
     window.addEventListener('scroll', updatePosition, true);
     window.addEventListener('resize', updatePosition);
 
