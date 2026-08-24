@@ -62,7 +62,6 @@
   align-items: center;
   gap: 1.25rem;
   padding: 1rem 1.25rem;
-  cursor: pointer;
   transition: background 0.18s;
   position: relative;
   animation: rowFadeIn 0.3s ease-out backwards;
@@ -98,21 +97,44 @@
 }
 
 .view-row:hover::before,
-.view-row:focus-visible::before {
+.view-row:has(.view-row-open:focus-visible)::before {
   transform: scaleX(1);
 }
 
 .view-row:hover,
-.view-row:focus-visible {
+.view-row:has(.view-row-open:focus-visible) {
   background: var(--panel-2);
-}
-
-.view-row:focus-visible {
-  outline: none;
 }
 
 .view-row.with-border {
   border-bottom: 1px solid var(--rule-soft);
+}
+
+/* The row opener is a <button>, so it has to be stripped back to a layout box.
+   It carries the click; the delete control sits beside it, not inside it. */
+.view-row-open {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.view-row-open:disabled {
+  cursor: not-allowed;
+}
+
+/* The row's own focus cue is the spine plus the lifted background, so the
+   default ring — which would stop short of the delete control — is dropped. */
+.view-row-open:focus-visible {
+  outline: none;
 }
 
 .view-row-content {
@@ -183,7 +205,6 @@
 
 .view-row-pending {
   opacity: 0.45;
-  cursor: not-allowed;
 }
 
 .view-row-pending:hover {
@@ -269,7 +290,7 @@
 }
 
 .view-row:hover .view-row-chevron,
-.view-row:focus-visible .view-row-chevron {
+.view-row:has(.view-row-open:focus-visible) .view-row-chevron {
   color: var(--beacon);
   transform: translateX(3px);
 }
@@ -277,6 +298,10 @@
 @media (max-width: 640px) {
   .view-row {
     padding: 0.875rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .view-row-open {
     gap: 0.75rem;
   }
 

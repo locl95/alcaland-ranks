@@ -98,6 +98,20 @@ describe('ViewsList', () => {
       expect(screen.getByText('2')).toBeInTheDocument();
       expect(screen.getByText('Characters')).toBeInTheDocument();
     });
+
+    it('opens the view from the keyboard', async () => {
+      const { onViewClick } = renderList([makeView('v1', 'My Ladder')]);
+      await userEvent.tab();
+      expect(screen.getByRole('button', { name: /My Ladder/ })).toHaveFocus();
+      await userEvent.keyboard('{Enter}');
+      expect(onViewClick).toHaveBeenCalledWith('v1');
+    });
+
+    it('keeps the delete control outside the row button', () => {
+      renderList([makeView('v1', 'My Ladder')]);
+      const row = screen.getByRole('button', { name: /My Ladder/ });
+      expect(row.querySelector('button')).toBeNull();
+    });
   });
 
   describe('pending views', () => {

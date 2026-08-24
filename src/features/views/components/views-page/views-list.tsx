@@ -50,49 +50,47 @@ export function ViewsList({
         const isDisabled = isPending || isDeleting;
         const isLast = index === views.length - 1;
         const characterCount = view.simpleView.entitiesIds.length;
-        const open = () => !isDisabled && onViewClick(view.simpleView.id);
 
         return (
           <div
             key={view.simpleView.id}
-            role="button"
-            tabIndex={isDisabled ? -1 : 0}
-            aria-disabled={isDisabled}
             className={['view-row', !isLast && 'with-border', isDisabled && 'view-row-pending']
               .filter(Boolean)
               .join(' ')}
             style={{ '--row-index': index } as React.CSSProperties}
-            onClick={open}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                open();
-              }
-            }}
           >
-            <div className="view-row-content">
-              <h3 className="view-row-title">{view.simpleView.name}</h3>
+            {/* A real button, not a div with role="button": the delete control is a
+                button too, and nesting one inside the other is invalid ARIA. */}
+            <button
+              type="button"
+              className="view-row-open"
+              disabled={isDisabled}
+              onClick={() => onViewClick(view.simpleView.id)}
+            >
+              <div className="view-row-content">
+                <h3 className="view-row-title">{view.simpleView.name}</h3>
 
-              {isPending && <p className="view-row-description">Synchronizing with server...</p>}
-              {isDeleting && <p className="view-row-description">Deleting...</p>}
+                {isPending && <p className="view-row-description">Synchronizing with server...</p>}
+                {isDeleting && <p className="view-row-description">Deleting...</p>}
+
+                {!isDisabled && (
+                  <div className="view-row-meta">
+                    <div className="view-row-meta-item">
+                      <User className="view-row-icon" />
+                      <span>{view.simpleView.owner}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {!isDisabled && (
-                <div className="view-row-meta">
-                  <div className="view-row-meta-item">
-                    <User className="view-row-icon" />
-                    <span>{view.simpleView.owner}</span>
-                  </div>
+                <div className="view-row-stat">
+                  <span className="view-row-stat-value num">{characterCount}</span>
                 </div>
               )}
-            </div>
+            </button>
 
-            {!isDisabled && (
-              <div className="view-row-stat">
-                <span className="view-row-stat-value num">{characterCount}</span>
-              </div>
-            )}
-
-            <div className="view-row-actions" onClick={(e) => e.stopPropagation()}>
+            <div className="view-row-actions">
               {isDisabled && <Loader2 className="loading-icon" />}
 
               {!isDisabled && username === view.simpleView.owner && (
