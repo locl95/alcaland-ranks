@@ -83,6 +83,9 @@ export function useEditViewForm(
 
   const deleteCharacter = (id: number) => {
     setEditingCharacters((prev) => prev.filter((c) => c.id !== id));
+    // Drop the status with it — otherwise a verification still in flight for a
+    // removed character lands back in state under an id nothing renders.
+    setStatuses(({ [id]: _removed, ...rest }) => rest);
   };
 
   const addCharacter = async () => {
