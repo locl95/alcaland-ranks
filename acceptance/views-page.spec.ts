@@ -9,7 +9,7 @@ import {
 } from './mocks/viewMocks';
 
 import { API, VALID_VIEW_ID } from './constants';
-import { pickRealm } from './helpers';
+import { expectListAnchoredToInput, pickRealm } from './helpers';
 
 test.describe('unauthenticated', () => {
   test.beforeEach(async ({ page }) => {
@@ -88,6 +88,61 @@ test.describe('create view', () => {
 
     await expect(page.getByRole('heading', { name: 'My New Ladder' })).toBeVisible();
     await expect(page.getByText('Synchronizing with server...')).toBeVisible();
+  });
+
+  // The realm list used to be mouse-only because Enter on it submitted the
+  // whole dialog. These two pin down that it no longer leaks either key.
+  test('Enter picks a realm instead of submitting the dialog', async ({ page }) => {
+    let createCalled = false;
+    await page.route(`${API}/views`, (route) => {
+      createCalled = true;
+      return route.fulfill({ json: { id: 'op-kbd' } });
+    });
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Create your first ladder' }).click();
+    await page.getByLabel('Realm').first().fill('sangu');
+    await expect(page.getByRole('option', { name: 'Sanguino' })).toBeVisible();
+
+    await page.keyboard.press('Enter');
+
+    await expect(page.getByLabel('Realm').first()).toHaveValue('Sanguino');
+    await expect(page.getByRole('listbox')).toHaveCount(0);
+    await expect(page.getByText('Create new m+ ladder')).toBeVisible();
+    expect(createCalled).toBe(false);
+  });
+
+  test('Escape closes the realm list before it closes the dialog', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Create your first ladder' }).click();
+    await page.getByLabel('Realm').first().fill('sangu');
+    await expect(page.getByRole('listbox')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('listbox')).toHaveCount(0);
+    await expect(page.getByText('Create new m+ ladder')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByText('Create new m+ ladder')).toHaveCount(0);
+  });
+
+  test('the realm list opens anchored to its input and does not grow the dialog', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Create your first ladder' }).click();
+
+    const input = page.getByLabel('Realm').first();
+    await input.fill('sa');
+    await expect(page.getByRole('listbox')).toBeVisible();
+    await expect(page.getByRole('option', { name: 'Sanguino' })).toBeVisible();
+
+    await expectListAnchoredToInput(page, input);
+
+    const panelScrolls = await page
+      .locator('.dialog-panel')
+      .evaluate((el) => el.scrollHeight > el.clientHeight);
+    expect(panelScrolls).toBe(false);
   });
 
   test('shows an error banner when the operation fails', async ({ page }) => {

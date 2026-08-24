@@ -1,24 +1,6 @@
-.sync-error-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(3, 6, 12, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-  backdrop-filter: blur(3px);
-}
-
-.sync-error-content {
-  background: var(--panel);
-  border: 1px solid var(--rule);
-  border-radius: var(--rad-lg);
-  width: 100%;
+/* Overlay, panel frame and close button live in shared/dialog.css. */
+.sync-error-panel {
   max-width: 32rem;
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--lift-lg);
 }
 
 .sync-error-header {
@@ -48,27 +30,6 @@
   font-weight: 600;
   color: var(--ink);
   letter-spacing: 0.015em;
-}
-
-.sync-error-close-btn {
-  background: transparent;
-  border: none;
-  color: var(--ink-4);
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--rad-sm);
-  transition:
-    color 0.18s,
-    background 0.18s;
-  flex-shrink: 0;
-}
-
-.sync-error-close-btn:hover {
-  color: var(--ink);
-  background: var(--panel-3);
 }
 
 .sync-error-body {

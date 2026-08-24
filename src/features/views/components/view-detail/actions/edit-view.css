@@ -1,25 +1,6 @@
-.edit-view-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(3, 6, 12, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-  backdrop-filter: blur(3px);
-}
-
-.edit-view-content {
-  background: var(--panel);
-  border: 1px solid var(--rule);
-  border-radius: var(--rad-lg);
-  width: 100%;
+/* Overlay, panel frame and close button live in shared/dialog.css. */
+.edit-view-panel {
   max-width: 48rem;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--lift-lg);
 }
 
 .edit-view-header {
@@ -42,27 +23,6 @@
 .edit-view-subtitle {
   font-size: 0.875rem;
   color: var(--ink-3);
-}
-
-.edit-view-close-btn {
-  background: transparent;
-  border: none;
-  color: var(--ink-4);
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--rad-sm);
-  transition:
-    color 0.18s,
-    background 0.18s;
-  flex-shrink: 0;
-}
-
-.edit-view-close-btn:hover {
-  color: var(--ink);
-  background: var(--panel-3);
 }
 
 .close-icon {
@@ -129,47 +89,9 @@
   letter-spacing: 0.02em;
 }
 
-.character-edit-class-badge.warrior {
-  background: #d97706;
-}
-.character-edit-class-badge.paladin {
-  background: #ec4899;
-}
-.character-edit-class-badge.hunter {
-  background: #65a30d;
-}
-.character-edit-class-badge.rogue {
-  background: #facc15;
-}
-.character-edit-class-badge.priest {
-  background: #f1f5f9;
-}
-.character-edit-class-badge.death-knight {
-  background: #b91c1c;
+/* Background comes from CLASS_COLORS in edit-view.tsx — one source of truth. */
+.character-edit-class-badge--on-dark {
   color: #fff;
-}
-.character-edit-class-badge.shaman {
-  background: #3b82f6;
-}
-.character-edit-class-badge.mage {
-  background: #22d3ee;
-}
-.character-edit-class-badge.warlock {
-  background: #9333ea;
-  color: #fff;
-}
-.character-edit-class-badge.monk {
-  background: #10b981;
-}
-.character-edit-class-badge.druid {
-  background: #f97316;
-}
-.character-edit-class-badge.demon-hunter {
-  background: #7c3aed;
-  color: #fff;
-}
-.character-edit-class-badge.evoker {
-  background: #14b8a6;
 }
 
 .character-edit-meta {
