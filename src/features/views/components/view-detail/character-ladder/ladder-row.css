@@ -75,10 +75,25 @@
   gap: 1rem;
   flex: 1;
   padding: 0.8125rem 1rem;
+}
+
+/* The expander is a <button>, so it has to be stripped back to a layout box. */
+.ladder-row-toggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
-.ladder-row-inner:focus-visible {
+.ladder-row-toggle:focus-visible {
   outline: 2px solid var(--beacon);
   outline-offset: -2px;
 }
@@ -212,16 +227,12 @@
 }
 
 .ladder-score {
-  text-align: right;
-  margin-right: 0.75rem;
-  flex-shrink: 0;
-}
-
-.ladder-score-value-row {
   display: flex;
   align-items: baseline;
   justify-content: flex-end;
   gap: 0.375rem;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
 }
 
 .score-improvement {
@@ -241,18 +252,16 @@
   letter-spacing: -0.02em;
 }
 
-.ladder-actions {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
 @media (max-width: 640px) {
   .ladder-row-inner {
     flex-wrap: nowrap;
     gap: 0.5rem;
     padding: 0.625rem 0.5rem;
     align-items: center;
+  }
+
+  .ladder-row-toggle {
+    gap: 0.5rem;
   }
 
   .ladder-rank {
@@ -318,14 +327,9 @@
 
   .ladder-score {
     margin-right: 0;
-    flex-shrink: 0;
   }
 
   .ladder-score-value {
     font-size: 1.0625rem;
-  }
-
-  .ladder-actions {
-    flex-shrink: 0;
   }
 }

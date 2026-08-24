@@ -97,14 +97,14 @@ describe('RealmSelect', () => {
       expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     });
 
-    it('does not select anything on Enter — the list is mouse driven', async () => {
+    it('selects the highlighted option on Enter', async () => {
       const onRealmChange = vi.fn();
       renderSelect({ onRealmChange });
 
       await userEvent.type(screen.getByLabelText('Realm'), 'sangu');
       await userEvent.keyboard('{Enter}');
 
-      expect(onRealmChange).not.toHaveBeenCalled();
+      expect(onRealmChange).toHaveBeenCalledWith('sanguino');
     });
 
     it('does not submit the surrounding form on Enter', async () => {
@@ -119,6 +119,113 @@ describe('RealmSelect', () => {
       await userEvent.type(screen.getByLabelText('Realm'), 'sangu');
       await userEvent.keyboard('{Enter}');
 
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('highlights the best match as soon as the list filters', async () => {
+      renderSelect();
+      await userEvent.type(screen.getByLabelText('Realm'), 'sangu');
+
+      expect(realmOption('Sanguino')).toHaveClass('realm-option--active');
+      expect(screen.getByLabelText('Realm')).toHaveAttribute(
+        'aria-activedescendant',
+        realmOption('Sanguino')!.id,
+      );
+    });
+
+    it('moves the highlight with the arrow keys', async () => {
+      const onRealmChange = vi.fn();
+      renderSelect({ onRealmChange });
+
+      await userEvent.type(screen.getByLabelText('Realm'), 'sa');
+      const [first, second] = realmOptions();
+      expect(first).toHaveClass('realm-option--active');
+
+      await userEvent.keyboard('{ArrowDown}');
+      expect(second).toHaveClass('realm-option--active');
+      expect(first).not.toHaveClass('realm-option--active');
+
+      await userEvent.keyboard('{ArrowUp}');
+      expect(first).toHaveClass('realm-option--active');
+
+      await userEvent.keyboard('{Enter}');
+      expect(onRealmChange).toHaveBeenCalledWith(first.textContent!.toLowerCase());
+    });
+
+    it('wraps the highlight around both ends of the list', async () => {
+      renderSelect();
+      await userEvent.type(screen.getByLabelText('Realm'), 'sangu');
+
+      const options = realmOptions();
+      await userEvent.keyboard('{ArrowUp}');
+      expect(options[options.length - 1]).toHaveClass('realm-option--active');
+
+      await userEvent.keyboard('{ArrowDown}');
+      expect(options[0]).toHaveClass('realm-option--active');
+    });
+
+    it('opens the list with ArrowDown without selecting anything', async () => {
+      const onRealmChange = vi.fn();
+      renderSelect({ onRealmChange });
+
+      await userEvent.click(screen.getByLabelText('Realm'));
+      await userEvent.keyboard('{Escape}');
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+
+      await userEvent.keyboard('{ArrowDown}');
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+      expect(onRealmChange).not.toHaveBeenCalled();
+    });
+
+    it('closes the list on Escape without selecting', async () => {
+      const onRealmChange = vi.fn();
+      renderSelect({ onRealmChange });
+
+      await userEvent.type(screen.getByLabelText('Realm'), 'sangu');
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+      await userEvent.keyboard('{Escape}');
+
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      expect(onRealmChange).not.toHaveBeenCalled();
+    });
+
+    it('keeps Escape from reaching the dialog while the list is open', async () => {
+      const onDialogEscape = vi.fn();
+      render(
+        <div onKeyDown={(e) => e.key === 'Escape' && onDialogEscape()}>
+          <RealmSelect region="eu" realm="" onRegionChange={vi.fn()} onRealmChange={vi.fn()} />
+        </div>,
+      );
+
+      await userEvent.type(screen.getByLabelText('Realm'), 'sangu');
+      await userEvent.keyboard('{Escape}');
+      expect(onDialogEscape).not.toHaveBeenCalled();
+
+      // List already closed — now Escape is the dialog's to handle.
+      await userEvent.keyboard('{Escape}');
+      expect(onDialogEscape).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not submit the surrounding form when Enter picks a realm', async () => {
+      const onSubmit = vi.fn((e: React.FormEvent) => e.preventDefault());
+      const onRealmChange = vi.fn();
+      render(
+        <form onSubmit={onSubmit}>
+          <RealmSelect
+            region="eu"
+            realm=""
+            onRegionChange={vi.fn()}
+            onRealmChange={onRealmChange}
+          />
+          <button type="submit">Create</button>
+        </form>,
+      );
+
+      await userEvent.type(screen.getByLabelText('Realm'), 'sangu');
+      await userEvent.keyboard('{Enter}');
+
+      expect(onRealmChange).toHaveBeenCalledWith('sanguino');
       expect(onSubmit).not.toHaveBeenCalled();
     });
 

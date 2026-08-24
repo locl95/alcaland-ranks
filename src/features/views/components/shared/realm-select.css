@@ -40,7 +40,9 @@
   text-overflow: ellipsis;
 }
 
-.realm-option:not(.realm-option--empty):hover {
+/* Hover and keyboard share one highlight: pointing at a row makes it the
+   active option, so there is never a second, competing highlight. */
+.realm-option--active {
   background: var(--beacon-soft);
   color: var(--beacon);
 }

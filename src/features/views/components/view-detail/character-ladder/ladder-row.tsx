@@ -33,89 +33,81 @@ export const LadderRow = memo(function LadderRow({
   const cachedCharacter = cachedIndex !== -1 ? cachedCharacters[cachedIndex] : undefined;
   const scoreGain =
     !isSyncing && cachedCharacter && cachedCharacter.score !== null
-      ? (character.score as number) - cachedCharacter.score
+      ? character.score! - cachedCharacter.score
       : 0;
 
   return (
     <div className="ladder-row" data-tier={isSyncing ? undefined : getScoreTier(character.score!)}>
-      <div
-        className="ladder-row-inner"
-        role="button"
-        tabIndex={0}
-        aria-expanded={isExpanded}
-        onClick={() => setIsExpanded((prev) => !prev)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setIsExpanded((prev) => !prev);
-          }
-        }}
-      >
-        <div className="ladder-rank">
-          <span className="rank-number num">{index + 1}</span>
-          {!isSyncing && (
-            <img
-              src={CLASS_IMAGES[getClassImageKey(character.class)]}
-              alt={character.class}
-              title={character.class}
-              className={`class-icon ${getClassSlug(character.class)}`}
-            />
-          )}
-        </div>
-
-        <div className="ladder-character-info">
-          <div className="ladder-character-name-row">
-            <p className="ladder-character-name">
-              {character.name.charAt(0).toUpperCase() + character.name.slice(1)}
-            </p>
-            {showPositionChange && (
-              <span
-                className={`ladder-position-change ${positionChange > 0 ? 'improved' : 'declined'}`}
-              >
-                {positionChange > 0 ? `↑ ${positionChange}` : `↓ ${Math.abs(positionChange)}`}
-              </span>
+      <div className="ladder-row-inner">
+        {/* A real button, not a div with role="button": the character menu is a
+            button too, and nesting one inside the other is invalid ARIA. */}
+        <button
+          type="button"
+          className="ladder-row-toggle"
+          aria-expanded={isExpanded}
+          onClick={() => setIsExpanded((prev) => !prev)}
+        >
+          <div className="ladder-rank">
+            <span className="rank-number num">{index + 1}</span>
+            {!isSyncing && (
+              <img
+                src={CLASS_IMAGES[getClassImageKey(character.class)]}
+                alt={character.class}
+                title={character.class}
+                className={`class-icon ${getClassSlug(character.class)}`}
+              />
             )}
           </div>
-          {!isSyncing && (
-            <div className="ladder-character-meta">
-              <span className="ladder-character-realm">{character.realm}</span>
-              <span className={`ladder-region-badge ${character.region}`}>
-                {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
+
+          <div className="ladder-character-info">
+            <div className="ladder-character-name-row">
+              <p className="ladder-character-name">
+                {character.name.charAt(0).toUpperCase() + character.name.slice(1)}
+              </p>
+              {showPositionChange && (
+                <span
+                  className={`ladder-position-change ${positionChange > 0 ? 'improved' : 'declined'}`}
+                >
+                  {positionChange > 0 ? `↑ ${positionChange}` : `↓ ${Math.abs(positionChange)}`}
+                </span>
+              )}
+            </div>
+            {!isSyncing && (
+              <div className="ladder-character-meta">
+                <span className="ladder-character-realm">{character.realm}</span>
+                <span className={`ladder-region-badge ${character.region}`}>
+                  {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {isSyncing ? (
+            <div className="ladder-syncing-indicator">
+              <span className="ladder-syncing-label">
+                {isBeingDeleted ? 'Deleting…' : 'Syncing…'}
               </span>
+              <Loader2 className="ladder-syncing-spinner" />
+            </div>
+          ) : (
+            <div className="ladder-score">
+              {scoreGain > 0 && (
+                <span className="score-improvement num">+{Math.round(scoreGain)}</span>
+              )}
+              <p className={`ladder-score-value num ${getScoreClass(character.score!)}`}>
+                {character.score!.toLocaleString()}
+              </p>
             </div>
           )}
-        </div>
+        </button>
 
-        {isSyncing ? (
-          <div className="ladder-syncing-indicator">
-            <span className="ladder-syncing-label">
-              {isBeingDeleted ? 'Deleting…' : 'Syncing…'}
-            </span>
-            <Loader2 className="ladder-syncing-spinner" />
-          </div>
-        ) : (
-          <>
-            <div className="ladder-score">
-              <div className="ladder-score-value-row">
-                {scoreGain > 0 && (
-                  <span className="score-improvement num">+{Math.round(scoreGain)}</span>
-                )}
-                <p className={`ladder-score-value num ${getScoreClass(character.score!)}`}>
-                  {character.score!.toLocaleString()}
-                </p>
-              </div>
-            </div>
-            <div className="ladder-actions">
-              <CharacterMenu character={character} />
-            </div>
-          </>
-        )}
+        {!isSyncing && <CharacterMenu character={character} />}
       </div>
 
       {isExpanded && character.mythicPlusRanks && (
         <LadderRowExpanded
           character={character}
-          cachedCharacter={cachedCharacters[cachedIndex]}
+          cachedCharacter={cachedCharacter}
           season={season}
         />
       )}

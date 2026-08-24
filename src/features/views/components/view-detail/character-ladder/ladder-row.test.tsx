@@ -101,4 +101,29 @@ describe('LadderRow', () => {
     await userEvent.click(screen.getByText('Arthas'));
     expect(screen.queryByTestId('ladder-row-expanded')).not.toBeInTheDocument();
   });
+
+  it('toggles with the keyboard and reports its state', async () => {
+    render(<LadderRow index={0} character={makeProfile()} cachedCharacters={[]} season={null} />);
+
+    const toggle = screen.getByRole('button', { expanded: false });
+    await userEvent.tab();
+    expect(toggle).toHaveFocus();
+
+    await userEvent.keyboard('{Enter}');
+    expect(screen.getByTestId('ladder-row-expanded')).toBeInTheDocument();
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    await userEvent.keyboard(' ');
+    expect(screen.queryByTestId('ladder-row-expanded')).not.toBeInTheDocument();
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('keeps the character menu outside the expander button', () => {
+    render(<LadderRow index={0} character={makeProfile()} cachedCharacters={[]} season={null} />);
+
+    const toggle = screen.getByRole('button', { expanded: false });
+    // Nesting the menu button inside the expander button is invalid ARIA and
+    // makes the row swallow its own child for screen readers.
+    expect(toggle).not.toContainElement(screen.getByTestId('character-menu'));
+  });
 });

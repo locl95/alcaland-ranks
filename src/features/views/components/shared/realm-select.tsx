@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { EU_REALMS, RealmOption } from '@/features/views/constants/euRealms.ts';
 import { NA_REALMS } from '@/features/views/constants/naRealms.ts';
 import './realm-select.css';
@@ -43,9 +43,16 @@ export function RealmSelect({
 }: Readonly<RealmSelectProps>) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [position, setPosition] = useState<ListPosition | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  // Several of these render side by side in the create dialog, so the ids that
+  // aria-controls and aria-activedescendant point at have to be per-instance.
+  const baseId = useId();
+  const listId = `${baseId}-listbox`;
+  const optionId = (index: number) => `${baseId}-option-${index}`;
 
   const realms = region === 'us' ? NA_REALMS : EU_REALMS;
   const selectedLabel = realms.find((r) => r.slug === realm)?.label ?? '';
@@ -54,6 +61,12 @@ export function RealmSelect({
   const close = () => {
     setIsOpen(false);
     setQuery('');
+    setActiveIndex(0);
+  };
+
+  const openList = () => {
+    setIsOpen(true);
+    setActiveIndex(0);
   };
 
   const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -85,6 +98,13 @@ export function RealmSelect({
     });
   }, []);
 
+  // Layout effect, not effect: the list is `position: fixed` with no placement
+  // until this runs, so measuring after paint shows it once at its static
+  // position before it snaps under the input.
+  useLayoutEffect(() => {
+    if (isOpen) updatePosition();
+  }, [isOpen, updatePosition]);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -93,7 +113,6 @@ export function RealmSelect({
     };
     document.addEventListener('mousedown', handlePointerDown);
 
-    updatePosition();
     window.addEventListener('scroll', updatePosition, true);
     window.addEventListener('resize', updatePosition);
 
@@ -103,6 +122,49 @@ export function RealmSelect({
       window.removeEventListener('resize', updatePosition);
     };
   }, [isOpen, updatePosition]);
+
+  // The list scrolls, so arrowing past its edge has to bring the row along.
+  useEffect(() => {
+    if (!isOpen) return;
+    listRef.current?.children[activeIndex]?.scrollIntoView({ block: 'nearest' });
+  }, [isOpen, activeIndex]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Enter must never reach the surrounding form: an open list means the user
+    // is picking a realm, not submitting the dialog.
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!isOpen) return;
+      e.stopPropagation();
+      const option = matches[activeIndex];
+      if (option) selectRealm(option.slug);
+      return;
+    }
+
+    // Same for Escape: it closes the list, and only closes the dialog when the
+    // list is already shut.
+    if (e.key === 'Escape') {
+      if (!isOpen) return;
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+      return;
+    }
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!isOpen) {
+        openList();
+        return;
+      }
+      if (matches.length === 0) return;
+      const step = e.key === 'ArrowDown' ? 1 : -1;
+      setActiveIndex((i) => (i + step + matches.length) % matches.length);
+      return;
+    }
+
+    if (e.key === 'Tab' && isOpen) close();
+  };
 
   return (
     <>
@@ -125,37 +187,41 @@ export function RealmSelect({
           aria-label="Realm"
           aria-expanded={isOpen}
           aria-autocomplete="list"
-          aria-controls="realm-listbox"
+          aria-controls={listId}
+          aria-activedescendant={isOpen && matches.length > 0 ? optionId(activeIndex) : undefined}
           autoComplete="off"
           placeholder="Realm"
           value={isOpen ? query : selectedLabel}
           onChange={(e) => {
             setQuery(e.target.value);
             setIsOpen(true);
+            // Typing re-filters, so the highlight goes back to the best match.
+            setActiveIndex(0);
           }}
-          onFocus={() => setIsOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') e.preventDefault();
-          }}
+          onFocus={openList}
+          onKeyDown={handleKeyDown}
         />
 
         {isOpen && (
           <ul
+            ref={listRef}
             className="realm-options"
-            id="realm-listbox"
+            id={listId}
             role="listbox"
-            style={{ maxHeight: MAX_LIST_HEIGHT, ...position }}
+            style={position ?? undefined}
           >
             {matches.length === 0 ? (
               <li className="realm-option realm-option--empty">No realms found</li>
             ) : (
-              matches.map((option) => (
+              matches.map((option, index) => (
                 <li
                   key={option.slug}
+                  id={optionId(index)}
                   role="option"
                   aria-selected={option.slug === realm}
-                  className="realm-option"
+                  className={`realm-option${index === activeIndex ? ' realm-option--active' : ''}`}
                   onClick={() => selectRealm(option.slug)}
+                  onMouseEnter={() => setActiveIndex(index)}
                 >
                   {option.label}
                 </li>
