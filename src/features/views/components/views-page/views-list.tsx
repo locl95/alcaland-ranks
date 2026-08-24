@@ -61,6 +61,7 @@ export function ViewsList({
             className={['view-row', !isLast && 'with-border', isDisabled && 'view-row-pending']
               .filter(Boolean)
               .join(' ')}
+            style={{ '--row-index': index } as React.CSSProperties}
             onClick={open}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {

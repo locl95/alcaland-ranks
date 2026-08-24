@@ -57,7 +57,7 @@ export function RosterRow({ entry, characterRegion }: Readonly<RosterRowProps>) 
         <span className="run-details-name">
           <span
             style={{
-              color: CLASS_COLORS[getClassSlug(entry.character.class.name)] ?? '#94a3b8',
+              color: CLASS_COLORS[getClassSlug(entry.character.class.name)] ?? 'var(--ink)',
             }}
           >
             {entry.character.name}

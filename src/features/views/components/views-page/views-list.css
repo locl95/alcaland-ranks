@@ -66,25 +66,9 @@
   transition: background 0.18s;
   position: relative;
   animation: rowFadeIn 0.3s ease-out backwards;
-}
-
-.view-row:nth-child(1) {
-  animation-delay: 0.03s;
-}
-.view-row:nth-child(2) {
-  animation-delay: 0.07s;
-}
-.view-row:nth-child(3) {
-  animation-delay: 0.11s;
-}
-.view-row:nth-child(4) {
-  animation-delay: 0.15s;
-}
-.view-row:nth-child(5) {
-  animation-delay: 0.19s;
-}
-.view-row:nth-child(n + 6) {
-  animation-delay: 0.22s;
+  /* Rows fade in one after another; --row-index comes from the render, and the
+     min() caps the wait so a long list does not crawl in. */
+  animation-delay: min(calc(var(--row-index, 0) * 40ms), 220ms);
 }
 
 @keyframes rowFadeIn {

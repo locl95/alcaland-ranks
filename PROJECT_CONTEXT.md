@@ -91,8 +91,11 @@ WoW item quality, and `getScoreTier` already maps M+ score onto it. It drives sc
 text, the ladder row spine, and the expanded panel accent. Colour here means something —
 don't use a ramp colour decoratively.
 
-**Cyan (`--beacon`) is interaction only**: focus rings, the primary action, the active
-tab. It was previously on twelve different things, which is why nothing stood out.
+**Cyan (`--beacon`) means "this responds to you"** — focus rings, hover and active
+states, the primary action, the active tab. It appears on ~20 rules because every hover
+state uses it; what it must never do is sit on static content. (The one deliberate
+exception is the loading spinner, where it reads as "the app is working".) It used to be
+scattered across decoration, which is why nothing stood out.
 
 Typography is three faces: `--font-display` (Saira Condensed) for headings and character
 names, `--font-data` (IBM Plex Mono, via the `.num` class) for every number that gets

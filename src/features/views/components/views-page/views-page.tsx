@@ -152,21 +152,19 @@ export function ViewsPage() {
           </div>
         </header>
 
-        <div className="directory-bar">
-          <div className="views-tab-toggle">
-            <button
-              className={`views-tab-btn${activeTab === 'featured' ? ' views-tab-btn--active' : ''}`}
-              onClick={() => setActiveTab('featured')}
-            >
-              Featured
-            </button>
-            <button
-              className={`views-tab-btn${activeTab === 'own' ? ' views-tab-btn--active' : ''}`}
-              onClick={handleOwnTabClick}
-            >
-              Own
-            </button>
-          </div>
+        <div className="views-tab-toggle">
+          <button
+            className={`views-tab-btn${activeTab === 'featured' ? ' views-tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('featured')}
+          >
+            Featured
+          </button>
+          <button
+            className={`views-tab-btn${activeTab === 'own' ? ' views-tab-btn--active' : ''}`}
+            onClick={handleOwnTabClick}
+          >
+            Own
+          </button>
         </div>
 
         {createError && (

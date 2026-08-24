@@ -34,7 +34,7 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
   const [duplicateName, setDuplicateName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const updateCharacter = (id: string, field: string, value: string) => {
+  const updateCharacter = (id: string, field: 'name' | 'realm' | 'region', value: string) => {
     setDuplicateName(null);
     setCharacters((prev) =>
       prev.map((c) => (c.id === id ? { ...c, [field]: value, status: 'draft' } : c)),
