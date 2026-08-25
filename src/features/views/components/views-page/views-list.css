@@ -142,6 +142,15 @@
   cursor: not-allowed;
 }
 
+/* The button only spans the content, so the row's padding was dead space. This
+   stretches its hit area over the whole row; .view-row-actions is lifted above
+   it so the delete control still gets its own clicks. */
+.view-row-open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
 /* The row's own focus cue is the spine plus the lifted background, so the
    default ring — which would stop short of the delete control — is dropped. */
 .view-row-open:focus-visible {
@@ -247,6 +256,8 @@
    on ladders you own, and without this the count column shifts between rows.
    2rem button + 0.25rem gap + 1.125rem chevron. */
 .view-row-actions {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
