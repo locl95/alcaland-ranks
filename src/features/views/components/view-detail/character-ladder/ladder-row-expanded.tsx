@@ -16,10 +16,12 @@ export function LadderRowExpanded({
   cachedCharacter,
   season,
 }: Readonly<LadderRowExpandedProps>) {
+  const isRanked = !!character.score;
+
   return (
     <div className="ladder-row-expanded">
       <div className="expanded-top">
-        {character.quantile != null && (
+        {isRanked && character.quantile != null && (
           <div className="quantile-banner">
             <span className="quantile-label">Top</span>
             <span className="quantile-value">{character.quantile.toFixed(2)}%</span>
@@ -36,9 +38,9 @@ export function LadderRowExpanded({
         characterClass={character.class}
       />
 
-      <RankingsTable character={character} cachedProfile={cachedCharacter} />
+      {isRanked && <RankingsTable character={character} cachedProfile={cachedCharacter} />}
 
-      <SpecRankingsTable character={character} cachedProfile={cachedCharacter} />
+      {isRanked && <SpecRankingsTable character={character} cachedProfile={cachedCharacter} />}
     </div>
   );
 }

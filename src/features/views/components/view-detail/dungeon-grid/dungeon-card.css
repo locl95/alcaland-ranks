@@ -45,7 +45,7 @@
 
 .dungeon-header-thumb-name {
   font-family: var(--font-data);
-  font-size: 0.625rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--ink-4);
   text-transform: uppercase;

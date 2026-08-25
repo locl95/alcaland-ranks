@@ -29,7 +29,7 @@ export interface WowEntityRequest {
   name: string;
   region: string;
   realm: string;
-  type: string; //"com.kos.entities.domain.WowEntityRequest"
+  type: string;
 }
 
 export interface ViewRequest {

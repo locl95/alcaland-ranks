@@ -8,7 +8,7 @@
   z-index: 1000;
   background: color-mix(in srgb, var(--void) 82%, transparent);
   backdrop-filter: blur(3px);
-  animation: dialogOverlayIn 0.18s ease-out;
+  animation: dialogOverlayIn var(--motion-base) ease-out;
 }
 
 /* Radix renders overlay and panel as siblings, so the panel centres itself
@@ -33,7 +33,7 @@
   border: 1px solid var(--rule);
   border-radius: var(--rad-lg);
   box-shadow: var(--lift-lg);
-  animation: dialogPanelIn 0.18s ease-out;
+  animation: dialogPanelIn var(--motion-base) ease-out;
 }
 
 .dialog-close-btn {
@@ -48,8 +48,8 @@
   border-radius: var(--rad-sm);
   flex-shrink: 0;
   transition:
-    color 0.18s,
-    background 0.18s;
+    color var(--motion-base),
+    background var(--motion-base);
 }
 
 .dialog-close-btn:hover {

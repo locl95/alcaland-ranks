@@ -61,9 +61,9 @@
   letter-spacing: 0.03em;
   cursor: pointer;
   transition:
-    background 0.18s,
-    border-color 0.18s,
-    color 0.18s;
+    background var(--motion-base),
+    border-color var(--motion-base),
+    color var(--motion-base);
   border: 1px solid;
   display: inline-flex;
   align-items: center;

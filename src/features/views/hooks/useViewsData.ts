@@ -51,8 +51,6 @@ export function useViewsData(isAuthenticated: boolean) {
     pollOperation(pendingView.operationId!)
       .then((result) => {
         if (result.status === 'COMPLETED' && result.resourceId) {
-          // Update simpleView.id to the real view ID so the ID-based dedup in the
-          // memo can remove the pending entry once the server refetch returns it.
           setPendingViews((prev) =>
             prev.map((v) =>
               v.operationId === pendingView.operationId
@@ -71,7 +69,6 @@ export function useViewsData(isAuthenticated: boolean) {
         }
       })
       .catch(() => {
-        // Network error after POST succeeded — view may exist on server.
         setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
         queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
       });

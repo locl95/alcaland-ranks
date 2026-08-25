@@ -39,8 +39,6 @@ export const LadderRow = memo(function LadderRow({
   return (
     <div className="ladder-row" data-tier={isSyncing ? undefined : getScoreTier(character.score!)}>
       <div className="ladder-row-inner">
-        {/* A real button, not a div with role="button": the character menu is a
-            button too, and nesting one inside the other is invalid ARIA. */}
         <button
           type="button"
           className="ladder-row-toggle"

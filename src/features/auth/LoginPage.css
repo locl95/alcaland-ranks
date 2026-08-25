@@ -59,8 +59,8 @@
   outline: none;
   font-size: 0.9375rem;
   transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast);
 }
 
 .login-input:focus {
@@ -87,9 +87,9 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   transition:
-    background 0.18s,
-    border-color 0.18s,
-    color 0.18s;
+    background var(--motion-base),
+    border-color var(--motion-base),
+    color var(--motion-base);
 }
 
 .login-btn:disabled {

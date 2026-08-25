@@ -8,7 +8,7 @@ import {
   formatDate,
 } from '@/features/views/api/raiderio.ts';
 import { KEYSTONE_DISPLAY } from '@/features/views/constants/keystone.ts';
-import { CLASS_COLORS } from '@/features/views/constants/class-colors.ts';
+import { CLASS_TEXT_COLORS } from '@/features/views/constants/class-colors.ts';
 
 import { getClassSlug } from '@/features/views/utils.ts';
 
@@ -23,7 +23,7 @@ export function RecentRuns({ recentRuns, bestRuns, characterClass }: Readonly<Re
   const [showAll, setShowAll] = useState(false);
   const runs = showAll ? recentRuns : recentRuns.slice(0, 5);
   const hasMore = recentRuns.length > runs.length;
-  const specColor = CLASS_COLORS[getClassSlug(characterClass)];
+  const specColor = CLASS_TEXT_COLORS[getClassSlug(characterClass)];
   const bestRunIds = new Set(bestRuns.map((br) => br.run.keystone_run_id));
 
   return (

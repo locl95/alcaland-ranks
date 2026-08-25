@@ -14,7 +14,7 @@
   flex-shrink: 0;
   box-shadow: 0 0 0 1px var(--rule);
   cursor: pointer;
-  transition: box-shadow 0.15s;
+  transition: box-shadow var(--motion-fast);
 }
 
 .dungeon-thumb:hover {

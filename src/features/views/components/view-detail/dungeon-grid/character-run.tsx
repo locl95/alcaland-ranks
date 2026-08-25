@@ -8,7 +8,7 @@ import {
 } from '@/features/views/api/raiderio.ts';
 import { formatTimeDelta, getClassSlug } from '@/features/views/utils.ts';
 import { KEYSTONE_DISPLAY } from '@/features/views/constants/keystone.ts';
-import { CLASS_COLORS } from '@/features/views/constants/class-colors.ts';
+import { CLASS_TEXT_COLORS } from '@/features/views/constants/class-colors.ts';
 import { SPEC_IMAGES, getSpecImageKey } from '@/features/views/constants/spec-images.ts';
 import { RunDetailsPanel } from './run-details-panel.tsx';
 
@@ -42,7 +42,7 @@ export function CharacterRun({
   const specImg = SPEC_IMAGES[getSpecImageKey(character.class, specName)];
   const scoreImprovement = bestRun ? getScoreImprovement(cachedProfiles, character, bestRun) : 0;
   const timeDelta =
-    run && run.par_time_ms != null ? formatTimeDelta(run.clear_time_ms, run.par_time_ms) : null;
+    run?.par_time_ms != null ? formatTimeDelta(run.clear_time_ms, run.par_time_ms) : null;
   const keystone = run
     ? (KEYSTONE_DISPLAY[run.num_keystone_upgrades] ?? KEYSTONE_DISPLAY[0])
     : null;
@@ -59,7 +59,7 @@ export function CharacterRun({
           <p
             className={`character-run-name ${isHighest ? 'highest' : 'normal'}`}
             style={{
-              color: CLASS_COLORS[getClassSlug(character.class)] ?? 'var(--ink)',
+              color: CLASS_TEXT_COLORS[getClassSlug(character.class)] ?? 'var(--ink)',
             }}
           >
             {character.name}

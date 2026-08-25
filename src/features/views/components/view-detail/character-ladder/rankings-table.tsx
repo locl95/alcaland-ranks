@@ -1,5 +1,6 @@
 import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
-import { getRankChange, formatRankChange } from '@/features/views/utils.ts';
+import { CLASS_TEXT_COLORS } from '@/features/views/constants/class-colors.ts';
+import { getClassSlug, getRankChange, formatRankChange } from '@/features/views/utils.ts';
 import './rankings-table.css';
 
 interface RankingsTableProps {
@@ -24,7 +25,14 @@ export function RankingsTable({ character, cachedProfile }: Readonly<RankingsTab
           <tbody>
             {(['overall', 'class'] as const).map((rankType) => (
               <tr key={rankType} className="rankings-tr">
-                <td className="rankings-td-label">
+                <td
+                  className="rankings-td-label"
+                  style={
+                    rankType === 'class'
+                      ? { color: CLASS_TEXT_COLORS[getClassSlug(character.class)] ?? 'var(--ink)' }
+                      : undefined
+                  }
+                >
                   {rankType === 'overall' ? 'Overall' : character.class}
                 </td>
                 {(['world', 'region', 'realm'] as const).map((key) => {

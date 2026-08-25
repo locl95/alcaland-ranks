@@ -25,8 +25,8 @@
     transparent 9rem
   );
   transition:
-    background-color 0.18s,
-    background-image 0.18s;
+    background-color var(--motion-base),
+    background-image var(--motion-base);
 }
 
 .ladder-row[data-tier='grey'] {

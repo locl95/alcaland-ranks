@@ -104,6 +104,12 @@
   /* Elevation */
   --lift: 0 10px 34px rgba(0, 0, 0, 0.45);
   --lift-lg: 0 24px 48px rgba(0, 0, 0, 0.6);
+
+  /* Motion — two speeds cover every state change in the app. The durations that
+     stay literal elsewhere are each doing a job of their own: spinner loops, the
+     row stagger, dialog entrances. Those are not part of this scale. */
+  --motion-fast: 0.15s;
+  --motion-base: 0.18s;
 }
 
 *,

@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Plus, Trash2, X } from 'lucide-react';
 import { hasOpenPopupInside } from '@/features/views/components/shared/dialog.ts';
@@ -6,14 +7,12 @@ import '@/features/views/components/shared/form-controls.css';
 import './edit-view.css';
 import '../character-ladder/ladder-row.css';
 import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
-import { getClassSlug } from '@/features/views/utils.ts';
+import { getClassSlug, getScoreClass } from '@/features/views/utils.ts';
 import { CLASS_COLORS } from '@/features/views/constants/class-colors.ts';
 import { RealmSelect } from '@/features/views/components/shared/realm-select.tsx';
 import { VerificationBadge } from '@/features/views/components/shared/verification-badge.tsx';
 import { useEditViewForm } from '@/features/views/hooks/useEditViewForm.ts';
 
-// The badge paints the class colour as its background, so these three need
-// light text on top. Every other class colour is bright enough for dark text.
 const DARK_CLASSES = new Set(['death-knight', 'warlock', 'demon-hunter']);
 
 interface EditViewProps {
@@ -39,14 +38,17 @@ export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps
     save,
   } = useEditViewForm(characters, onSave);
 
+  const panelRef = useRef<HTMLDivElement>(null);
+
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="dialog-overlay" data-testid="edit-view-overlay" />
         <Dialog.Content
+          ref={panelRef}
           className="dialog-panel edit-view-panel"
           onEscapeKeyDown={(e) => {
-            if (hasOpenPopupInside()) e.preventDefault();
+            if (hasOpenPopupInside(panelRef.current)) e.preventDefault();
           }}
         >
           <div className="edit-view-header">
@@ -86,25 +88,20 @@ export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps
                     </div>
 
                     <div className="character-edit-meta">
-                      {character.profile && (
-                        <>
-                          <span className="character-edit-spec">{character.profile.spec}</span>
-                          <span className="character-edit-separator">•</span>
-                        </>
-                      )}
+                      <span className="character-edit-spec">{character.profile?.spec}</span>
                       <span className="character-edit-realm">{character.realm}</span>
-                      <span className="character-edit-separator">•</span>
-                      <span className={`ladder-region-badge ${character.region}`}>
-                        {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
+                      <span className="character-edit-region">
+                        <span className={`ladder-region-badge ${character.region}`}>
+                          {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
+                        </span>
                       </span>
-                      {character.profile?.score != null && (
-                        <>
-                          <span className="character-edit-separator">•</span>
-                          <span className="character-edit-score">
-                            {character.profile.score.toLocaleString()} M+
+                      <span className="character-edit-score">
+                        {character.profile?.score != null && (
+                          <span className={`num ${getScoreClass(character.profile.score)}`}>
+                            {character.profile.score.toLocaleString()}
                           </span>
-                        </>
-                      )}
+                        )}
+                      </span>
                     </div>
                   </div>
 

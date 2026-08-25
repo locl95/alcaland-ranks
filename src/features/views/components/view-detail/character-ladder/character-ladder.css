@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--rule);
-  transition: background 0.18s;
+  transition: background var(--motion-base);
 }
 
 .ladder-header:hover {
@@ -40,7 +40,7 @@
   padding: 0.25rem;
   display: flex;
   align-items: center;
-  transition: color 0.18s;
+  transition: color var(--motion-base);
 }
 
 .ladder-header:hover .ladder-toggle-btn {

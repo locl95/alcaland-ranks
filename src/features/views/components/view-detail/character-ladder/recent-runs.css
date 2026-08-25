@@ -15,9 +15,9 @@
   padding: 0.375rem 0.75rem;
   cursor: pointer;
   transition:
-    color 0.18s,
-    background 0.18s,
-    border-color 0.18s;
+    color var(--motion-base),
+    background var(--motion-base),
+    border-color var(--motion-base);
   margin-bottom: 0.75rem;
 }
 
@@ -53,8 +53,8 @@
   margin-top: 0.125rem;
   border-radius: var(--rad-sm);
   transition:
-    color 0.15s,
-    background 0.15s;
+    color var(--motion-fast),
+    background var(--motion-fast);
 }
 
 .recent-runs-show-more:hover {
@@ -73,8 +73,8 @@
   border: 1px solid transparent;
   text-decoration: none;
   transition:
-    background 0.15s,
-    border-color 0.15s;
+    background var(--motion-fast),
+    border-color var(--motion-fast);
 }
 
 .recent-run-row:hover {

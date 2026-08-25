@@ -50,10 +50,10 @@ export const openExternalProfile = (
 export type ScoreTier = 'grey' | 'green' | 'blue' | 'purple' | 'orange';
 
 export const getScoreTier = (score: number): ScoreTier => {
-  if (score < 300) return 'grey';
-  if (score < 1100) return 'green';
-  if (score < 1800) return 'blue';
-  if (score < 3000) return 'purple';
+  if (score < 1600) return 'grey';
+  if (score < 2800) return 'green';
+  if (score < 3400) return 'blue';
+  if (score < 3999) return 'purple';
   return 'orange';
 };
 

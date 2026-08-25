@@ -9,8 +9,8 @@
   color: var(--ink);
   font-size: 0.875rem;
   transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast);
 }
 
 .form-input {
@@ -57,9 +57,9 @@
   border-radius: var(--rad-md);
   cursor: pointer;
   transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s;
+    background var(--motion-fast),
+    border-color var(--motion-fast),
+    color var(--motion-fast);
 }
 
 .btn-icon:disabled {

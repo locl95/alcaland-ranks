@@ -1,4 +1,4 @@
-import { ChevronRight, Plus, User, Users, Loader2, Trash2 } from 'lucide-react';
+import { ChevronRight, Plus, Star, User, Users, Loader2, Trash2 } from 'lucide-react';
 import './views-list.css';
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectUsername } from '@/app/authSlice.ts';
@@ -6,6 +6,7 @@ import { View } from '@/features/views/model/view.ts';
 
 interface ViewsListProps {
   views: View[];
+  activeTab: 'featured' | 'own';
   isLoadingViews: boolean;
   deletingViewId: string | null;
   onViewClick: (viewId: string) => void;
@@ -15,6 +16,7 @@ interface ViewsListProps {
 
 export function ViewsList({
   views,
+  activeTab,
   isLoadingViews,
   deletingViewId,
   onViewClick,
@@ -26,19 +28,38 @@ export function ViewsList({
 
   if (isLoadingViews && views.length === 0) return null;
 
-  return views.length === 0 ? (
-    <div className="views-empty-state">
-      <div className="views-empty-content">
-        <Users className="views-empty-icon" />
-        <h3 className="views-empty-title">No views yet</h3>
-        <p className="views-empty-text">Create your first ladder to start tracking characters</p>
-        <button onClick={onCreateView} className="create-view-btn">
-          <Plus className="view-row-icon" />
-          Create your first ladder
-        </button>
+  if (views.length === 0) {
+    return (
+      <div className="views-empty-state">
+        <div className="views-empty-content">
+          {activeTab === 'featured' ? (
+            <>
+              <Star className="views-empty-icon" />
+              <h3 className="views-empty-title">No featured ladders right now</h3>
+              <p className="views-empty-text">
+                Featured ladders are hand-picked by the site. Check back later, or open Own to build
+                your own.
+              </p>
+            </>
+          ) : (
+            <>
+              <Users className="views-empty-icon" />
+              <h3 className="views-empty-title">No ladders yet</h3>
+              <p className="views-empty-text">
+                Create your first ladder to start tracking characters
+              </p>
+              <button onClick={onCreateView} className="create-view-btn">
+                <Plus className="view-row-icon" />
+                Create your first ladder
+              </button>
+            </>
+          )}
+        </div>
       </div>
-    </div>
-  ) : (
+    );
+  }
+
+  return (
     <div className="views-list-container-box">
       <div className="views-list-head">
         <span className="eyebrow">Ladder</span>
@@ -59,8 +80,6 @@ export function ViewsList({
               .join(' ')}
             style={{ '--row-index': index } as React.CSSProperties}
           >
-            {/* A real button, not a div with role="button": the delete control is a
-                button too, and nesting one inside the other is invalid ARIA. */}
             <button
               type="button"
               className="view-row-open"

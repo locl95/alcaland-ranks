@@ -94,9 +94,9 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   transition:
-    background 0.18s,
-    border-color 0.18s,
-    color 0.18s;
+    background var(--motion-base),
+    border-color var(--motion-base),
+    color var(--motion-base);
 }
 
 .sync-error-dismiss-btn:hover {

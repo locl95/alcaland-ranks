@@ -24,16 +24,9 @@ function matchRealms(realms: RealmOption[], query: string): RealmOption[] {
   return [...prefix, ...contains];
 }
 
-const MAX_LIST_HEIGHT = 192;
 const GAP = 4;
 
-type ListPosition = {
-  left: number;
-  width: number;
-  maxHeight: number;
-  top?: number;
-  bottom?: number;
-};
+type ListPosition = { left: number; width: number; top?: number; bottom?: number };
 
 export function RealmSelect({
   region,
@@ -48,8 +41,6 @@ export function RealmSelect({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
-  // Several of these render side by side in the create dialog, so the ids that
-  // aria-controls and aria-activedescendant point at have to be per-instance.
   const baseId = useId();
   const listId = `${baseId}-listbox`;
   const optionId = (index: number) => `${baseId}-option-${index}`;
@@ -86,23 +77,30 @@ export function RealmSelect({
 
     const rect = input.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
-    const openUpwards = spaceBelow < MAX_LIST_HEIGHT && rect.top > spaceBelow;
+    const listHeight = listRef.current?.offsetHeight ?? 0;
+    const openUpwards = spaceBelow < listHeight && rect.top > spaceBelow;
 
     setPosition({
       left: rect.left,
       width: rect.width,
-      maxHeight: MAX_LIST_HEIGHT,
       ...(openUpwards
         ? { bottom: window.innerHeight - rect.top + GAP }
         : { top: rect.bottom + GAP }),
     });
   }, []);
 
-  // Layout effect, not effect: the list is `position: fixed` with no placement
-  // until this runs, so measuring after paint shows it once at its static
-  // position before it snaps under the input.
+  const frameRef = useRef<number | null>(null);
+  const scheduleUpdate = useCallback(() => {
+    if (frameRef.current !== null) return;
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = null;
+      updatePosition();
+    });
+  }, [updatePosition]);
+
   useLayoutEffect(() => {
     if (isOpen) updatePosition();
+    else setPosition(null);
   }, [isOpen, updatePosition]);
 
   useEffect(() => {
@@ -112,26 +110,23 @@ export function RealmSelect({
       if (!containerRef.current?.contains(e.target as Node)) close();
     };
     document.addEventListener('mousedown', handlePointerDown);
-
-    window.addEventListener('scroll', updatePosition, true);
-    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', scheduleUpdate, { capture: true, passive: true });
+    window.addEventListener('resize', scheduleUpdate);
 
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
-      window.removeEventListener('scroll', updatePosition, true);
-      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', scheduleUpdate, true);
+      window.removeEventListener('resize', scheduleUpdate);
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
     };
-  }, [isOpen, updatePosition]);
+  }, [isOpen, scheduleUpdate]);
 
-  // The list scrolls, so arrowing past its edge has to bring the row along.
   useEffect(() => {
     if (!isOpen) return;
     listRef.current?.children[activeIndex]?.scrollIntoView({ block: 'nearest' });
   }, [isOpen, activeIndex]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Enter must never reach the surrounding form: an open list means the user
-    // is picking a realm, not submitting the dialog.
     if (e.key === 'Enter') {
       e.preventDefault();
       if (!isOpen) return;
@@ -141,8 +136,6 @@ export function RealmSelect({
       return;
     }
 
-    // Same for Escape: it closes the list, and only closes the dialog when the
-    // list is already shut.
     if (e.key === 'Escape') {
       if (!isOpen) return;
       e.preventDefault();
@@ -195,7 +188,6 @@ export function RealmSelect({
           onChange={(e) => {
             setQuery(e.target.value);
             setIsOpen(true);
-            // Typing re-filters, so the highlight goes back to the best match.
             setActiveIndex(0);
           }}
           onFocus={openList}

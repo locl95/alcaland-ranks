@@ -131,8 +131,6 @@ export function ViewsPage() {
                     sideOffset={6}
                     collisionPadding={12}
                   >
-                    {/* The trigger collapses to an icon on mobile, so the menu
-                        is the only place the account name is legible. */}
                     <DropdownMenuLabel className="user-menu-identity">
                       <span className="eyebrow">Signed in as</span>
                       <span className="user-menu-identity-name">{username}</span>
@@ -182,6 +180,7 @@ export function ViewsPage() {
 
         <ViewsList
           views={views}
+          activeTab={activeTab}
           isLoadingViews={isLoadingViews}
           deletingViewId={deletingViewId}
           onViewClick={handleViewClick}

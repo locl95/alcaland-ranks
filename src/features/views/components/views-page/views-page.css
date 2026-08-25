@@ -76,9 +76,9 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   transition:
-    background 0.18s,
-    border-color 0.18s,
-    color 0.18s;
+    background var(--motion-base),
+    border-color var(--motion-base),
+    color var(--motion-base);
 }
 
 .create-view-btn:hover:not(:disabled) {
@@ -105,9 +105,9 @@
   font-size: 0.875rem;
   font-weight: 500;
   transition:
-    background 0.18s,
-    border-color 0.18s,
-    color 0.18s;
+    background var(--motion-base),
+    border-color var(--motion-base),
+    color var(--motion-base);
 }
 
 .user-menu-btn:hover {
@@ -129,7 +129,7 @@
   height: 0.875rem;
   color: var(--ink-4);
   flex-shrink: 0;
-  transition: transform 0.18s ease;
+  transition: transform var(--motion-base) ease;
 }
 
 .user-menu-btn[data-state='open'] {
@@ -203,7 +203,7 @@
   line-height: 1.25;
   cursor: pointer;
   outline: none;
-  transition: background 0.15s;
+  transition: background var(--motion-fast);
 }
 
 .user-menu-item--danger {
@@ -244,8 +244,8 @@
   letter-spacing: 0.03em;
   cursor: pointer;
   transition:
-    background 0.18s,
-    color 0.18s;
+    background var(--motion-base),
+    color var(--motion-base);
 }
 
 .views-tab-btn:hover {
@@ -285,7 +285,7 @@
   align-items: center;
   flex-shrink: 0;
   opacity: 0.75;
-  transition: opacity 0.15s;
+  transition: opacity var(--motion-fast);
 }
 
 .create-error-dismiss:hover {

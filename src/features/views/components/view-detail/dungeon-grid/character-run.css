@@ -33,7 +33,7 @@
 .character-run {
   padding: 0.5625rem 0.875rem;
   cursor: pointer;
-  transition: background 0.18s;
+  transition: background var(--motion-base);
 }
 
 .character-run.normal:hover {

@@ -1,9 +1,5 @@
-.char-menu-wrapper {
-  position: relative;
-  flex-shrink: 0;
-}
-
 .char-menu-btn {
+  flex-shrink: 0;
   background: transparent;
   border: none;
   color: var(--ink-4);
@@ -12,23 +8,37 @@
   display: flex;
   align-items: center;
   border-radius: var(--rad-sm);
-  transition: color 0.18s;
+  transition: color var(--motion-base);
 }
 
-.char-menu-btn:hover {
+.char-menu-btn:hover,
+.char-menu-btn[data-state='open'] {
   color: var(--beacon);
 }
 
-/* Fixed, not absolute: .ladder-card clips its children. */
+/* Portalled by Radix, which also owns placement — .ladder-card would otherwise
+   clip it. Kept in step with .user-menu-content in views-page.css. */
 .char-menu-dropdown {
-  position: fixed;
   background: var(--panel-2);
   border: 1px solid var(--rule);
   border-radius: var(--rad-md);
   box-shadow: var(--lift);
   z-index: 100;
   min-width: 9.5rem;
-  overflow: hidden;
+  padding: 0.25rem;
+  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+  animation: charMenuIn 0.14s ease-out;
+}
+
+@keyframes charMenuIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Kept in step with .user-menu-item in views-page.css. */
@@ -47,12 +57,14 @@
   line-height: 1.25;
   cursor: pointer;
   text-align: left;
+  border-radius: var(--rad-sm);
   transition:
-    background 0.15s,
-    color 0.15s;
+    background var(--motion-fast),
+    color var(--motion-fast);
 }
 
-.char-menu-item:hover {
+.char-menu-item:hover,
+.char-menu-item[data-highlighted] {
   background: var(--panel-3);
   color: var(--ink);
 }

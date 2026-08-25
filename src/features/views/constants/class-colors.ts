@@ -13,3 +13,10 @@ export const CLASS_COLORS: Record<string, string> = {
   'demon-hunter': '#7c3aed',
   evoker: '#14b8a6',
 };
+
+export const CLASS_TEXT_COLORS: Record<string, string> = {
+  ...CLASS_COLORS,
+  'death-knight': '#e55353',
+  'demon-hunter': '#9b69f1',
+  warlock: '#ab61ef',
+};

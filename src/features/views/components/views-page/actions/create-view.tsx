@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Plus, X } from 'lucide-react';
 import { VerificationBadge } from '@/features/views/components/shared/verification-badge.tsx';
@@ -28,15 +29,18 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
     handleSubmit,
   } = useCreateViewForm(onClose, onCreateView);
 
+  const panelRef = useRef<HTMLDivElement>(null);
+
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content
+          ref={panelRef}
           className="dialog-panel create-view-panel"
           aria-describedby={undefined}
           onEscapeKeyDown={(e) => {
-            if (hasOpenPopupInside()) e.preventDefault();
+            if (hasOpenPopupInside(panelRef.current)) e.preventDefault();
           }}
         >
           <div className="dialog-header">

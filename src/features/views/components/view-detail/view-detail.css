@@ -22,9 +22,9 @@
   border-radius: var(--rad-md);
   flex-shrink: 0;
   transition:
-    color 0.18s,
-    background 0.18s,
-    border-color 0.18s;
+    color var(--motion-base),
+    background var(--motion-base),
+    border-color var(--motion-base);
 }
 
 .header-back-button:hover {
@@ -79,9 +79,9 @@
   gap: 0.4375rem;
   border-radius: var(--rad-md);
   transition:
-    color 0.18s,
-    background 0.18s,
-    border-color 0.18s;
+    color var(--motion-base),
+    background var(--motion-base),
+    border-color var(--motion-base);
 }
 
 .header-sync-button:hover:not(:disabled),

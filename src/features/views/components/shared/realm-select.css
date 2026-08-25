@@ -12,6 +12,10 @@
 .realm-options {
   position: fixed;
   z-index: 50;
+  /* The cap lives here, not in the placement maths: it is a design constant,
+     and having it applied before the list is measured keeps the decision to
+     flip above the input honest. */
+  max-height: 12rem;
   overflow-y: auto;
   overflow-x: hidden;
   margin: 0;

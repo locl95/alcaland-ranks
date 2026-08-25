@@ -21,10 +21,26 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.rankings-table {
+/* Shared geometry for both ranking tables — they sit stacked in the expanded
+   row, so World, Region and Realm have to land in the same place.
+
+   Every numeric column is 19%, and the first column takes whatever is left:
+   43% here, 24% in the spec table, which has one more numeric column. The
+   three rank columns therefore occupy the same thirds of the row in both,
+   while the widths still spread across it rather than hugging the right edge.
+   The shared min-width keeps both the same width while .table-scroll scrolls. */
+.rankings-table,
+.spec-table {
   width: 100%;
+  min-width: 34rem;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.875rem;
+}
+
+.rankings-th:not(.rankings-th--label),
+.spec-th--num {
+  width: 19%;
 }
 
 .rankings-th {
@@ -41,7 +57,6 @@
 
 .rankings-th--label {
   text-align: left;
-  width: 6rem;
 }
 
 .rankings-tr:not(:last-child) {
