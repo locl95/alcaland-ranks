@@ -123,6 +123,13 @@
   text-transform: capitalize;
 }
 
+/* Wrapper keeps the badge at its own width — as a bare grid item it would be
+   blockified and stretch across the whole column. */
+.character-edit-region {
+  display: flex;
+  align-items: center;
+}
+
 /* Colour comes from the rarity ramp via getScoreClass, like every other score. */
 .character-edit-score {
   font-weight: 500;

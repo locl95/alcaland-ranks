@@ -75,6 +75,7 @@
   gap: 1rem;
   flex: 1;
   padding: 0.8125rem 1rem;
+  position: relative;
 }
 
 /* The expander is a <button>, so it has to be stripped back to a layout box. */
@@ -91,6 +92,15 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
+}
+
+/* Same as .view-row-open: the button covers only the content, so the row's
+   padding would not respond. Bounded to .ladder-row-inner, which keeps it off
+   the expanded panel below. */
+.ladder-row-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }
 
 .ladder-row-toggle:focus-visible {

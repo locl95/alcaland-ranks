@@ -128,7 +128,51 @@
   height: 1.0625rem;
 }
 
-.empty-state,
+.empty-state {
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  border-radius: var(--rad-lg);
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.empty-title {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+
+.empty-text {
+  color: var(--ink-3);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.empty-add-btn {
+  padding: 0.5rem 1.25rem;
+  background: var(--beacon-soft);
+  border: 1px solid var(--beacon-edge);
+  color: var(--beacon);
+  border-radius: var(--rad-md);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition:
+    color var(--motion-base),
+    background var(--motion-base),
+    border-color var(--motion-base);
+}
+
+.empty-add-btn:hover {
+  background: rgba(55, 201, 240, 0.18);
+  border-color: var(--beacon);
+  color: #b8ecfa;
+}
+
 @media (max-width: 640px) {
   .view-detail-header {
     gap: 0.625rem;
