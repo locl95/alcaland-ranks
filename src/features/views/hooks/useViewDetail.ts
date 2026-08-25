@@ -24,10 +24,6 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
   const username = useAppSelector(selectUsername);
   const { showError } = useToast();
 
-  // Pending chars drive the ladder's syncing state for both adds and deletes:
-  //   - Add: new chars have score: null → shown as "syncing" in the ladder.
-  //   - Delete: removed chars are kept in the list with score: null → shown as
-  //     "syncing" until the operation resolves, then drop out of the ladder.
   const [pendingCharacters, setPendingCharacters] = useState<RaiderioProfile[] | null>(null);
   const [syncError, setSyncError] = useState<RaiderioProfile[] | null>(null);
 
@@ -58,8 +54,6 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
     if (!pendingCharacters) return raiderioProfiles;
     const raiderioProfilesMap = new Map(raiderioProfiles.map((c) => [getCharacterName(c), c]));
     return pendingCharacters.map((c) => {
-      // Preserve score: null — it signals a pending add or a pending delete.
-      // Without this, the API version (with a real score) would overwrite the indicator.
       if (c.score === null) return c;
       return raiderioProfilesMap.get(getCharacterName(c)) ?? c;
     });
@@ -113,8 +107,6 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
       entities: characters.map((c) => ({
         name: c.name,
         region: c.region,
-        // Characters already on the ladder carry a realm display name while the
-        // picker produces a slug — the request must speak one language.
         realm: toRealmSlug(c.realm, c.region),
         type: 'com.kos.entities.domain.WowEntityRequest',
       })),

@@ -43,7 +43,6 @@ export function useSyncView(viewId: string | undefined): SyncViewResult {
     viewId ? localStorage.getItem(storageKey(viewId, 'lastSyncedAt')) : null,
   );
 
-  // Abort any in-flight poll on unmount
   useEffect(
     () => () => {
       abortRef.current?.abort();
@@ -51,7 +50,6 @@ export function useSyncView(viewId: string | undefined): SyncViewResult {
     [],
   );
 
-  // Re-render every second while cooldown is active so secondsLeft stays current
   const setTick = useState(0)[1];
   useEffect(() => {
     if (!retryAfter) return;
@@ -59,11 +57,9 @@ export function useSyncView(viewId: string | undefined): SyncViewResult {
     return () => clearInterval(id);
   }, [retryAfter, setTick]);
 
-  // Derived — no separate state needed
   const secondsLeft =
     retryAfter === null ? null : Math.max(0, Math.ceil((retryAfter.getTime() - Date.now()) / 1000));
 
-  // Expire cooldown when countdown reaches zero
   useEffect(() => {
     if (secondsLeft !== 0) return;
     setRetryAfter(null);

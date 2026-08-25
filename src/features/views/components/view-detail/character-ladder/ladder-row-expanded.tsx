@@ -16,9 +16,21 @@ export function LadderRowExpanded({
   cachedCharacter,
   season,
 }: Readonly<LadderRowExpandedProps>) {
+  const isRanked = !!character.score;
+
   return (
     <div className="ladder-row-expanded">
-      {season && <DungeonThumbnails season={season} bestRuns={character.mythicPlusBestRuns} />}
+      <div className="expanded-top">
+        {isRanked && character.quantile != null && (
+          <div className="quantile-banner">
+            <span className="quantile-label">Top</span>
+            <span className="quantile-value">{character.quantile.toFixed(2)}%</span>
+            <span className="quantile-label">of all players</span>
+          </div>
+        )}
+
+        {season && <DungeonThumbnails season={season} bestRuns={character.mythicPlusBestRuns} />}
+      </div>
 
       <RecentRuns
         recentRuns={character.mythicPlusRecentRuns ?? []}
@@ -26,17 +38,9 @@ export function LadderRowExpanded({
         characterClass={character.class}
       />
 
-      {character.quantile != null && (
-        <div className="quantile-banner">
-          <span className="quantile-label">Top</span>
-          <span className="quantile-value">{character.quantile.toFixed(2)}%</span>
-          <span className="quantile-label">of all players</span>
-        </div>
-      )}
+      {isRanked && <RankingsTable character={character} cachedProfile={cachedCharacter} />}
 
-      <RankingsTable character={character} cachedProfile={cachedCharacter} />
-
-      <SpecRankingsTable character={character} cachedProfile={cachedCharacter} />
+      {isRanked && <SpecRankingsTable character={character} cachedProfile={cachedCharacter} />}
     </div>
   );
 }

@@ -32,8 +32,6 @@ const fromProfile = (profile: RaiderioProfile): EditableCharacter => ({
   profile,
 });
 
-// The ladder renders saved and unsaved characters alike and reads score === null
-// as "syncing", so a character with no profile yet is padded out on the way back.
 const toProfile = ({ id, name, realm, region, profile }: EditableCharacter): RaiderioProfile =>
   profile ?? {
     id,
@@ -83,6 +81,7 @@ export function useEditViewForm(
 
   const deleteCharacter = (id: number) => {
     setEditingCharacters((prev) => prev.filter((c) => c.id !== id));
+    setStatuses(({ [id]: _removed, ...rest }) => rest);
   };
 
   const addCharacter = async () => {

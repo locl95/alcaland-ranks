@@ -1,51 +1,115 @@
-:root {
-  --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
-  --radius: 0.625rem;
+/* --------------------------------------------------------------------------
+   Alcaland Ranks — design tokens
+
+   The rarity ramp is the organising colour system. WoW players read
+   grey → green → blue → purple → orange as "how good is this" without
+   thinking, and `getScoreClass` already maps M+ score onto it. Colour here
+   carries meaning; it is not decoration.
+
+   Cyan (--beacon) is reserved for interaction only: focus, the primary
+   action, the active tab. Nothing else.
+   -------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Saira Condensed';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/saira-condensed-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Saira Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../../assets/fonts/saira-condensed-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Saira Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../assets/fonts/saira-condensed-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/plex-mono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../assets/fonts/plex-mono-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../../assets/fonts/plex-mono-600.woff2') format('woff2');
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+:root {
+  /* Surfaces — near-black with a blue undertone, so the rarity ramp pops.
+     --void is also inlined in index.html to paint before CSS loads; the two
+     must be changed together. */
+  --void: #070b14;
+  --void-lift: #0a1020;
+  --panel: #0d1421;
+  --panel-2: #131c2d;
+  --panel-3: #1a2436;
+  --rule: #1f2b40;
+  --rule-soft: rgba(31, 43, 64, 0.6);
+
+  /* Ink */
+  --ink: #e9edf5;
+  --ink-2: #93a1b8;
+  --ink-3: #5a6880;
+  --ink-4: #3b4659;
+
+  /* Interaction accent — used in three places, not twelve */
+  --beacon: #37c9f0;
+  --beacon-soft: rgba(55, 201, 240, 0.1);
+  --beacon-edge: rgba(55, 201, 240, 0.32);
+
+  /* Rarity ramp — mirrors WoW item quality, driven by getScoreClass */
+  --rarity-common: #9aa8bb;
+  --rarity-uncommon: #4ade80;
+  --rarity-rare: #5aa2f7;
+  --rarity-epic: #b06cf5;
+  --rarity-legendary: #ff8a3d;
+
+  /* Semantic */
+  --up: #4ade80;
+  --down: #f8717a;
+  --gold: #f5b73d;
+  --danger: #ef5a5a;
+  --danger-soft: rgba(239, 90, 90, 0.09);
+  --danger-edge: rgba(239, 90, 90, 0.3);
+
+  /* Type */
+  --font-display: 'Saira Condensed', ui-sans-serif, system-ui, sans-serif;
+  --font-data: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  /* Radii */
+  --rad-sm: 4px;
+  --rad-md: 8px;
+  --rad-lg: 12px;
+
+  /* Elevation */
+  --lift: 0 10px 34px rgba(0, 0, 0, 0.45);
+  --lift-lg: 0 24px 48px rgba(0, 0, 0, 0.6);
+
+  /* Motion — two speeds cover every state change in the app. The durations that
+     stay literal elsewhere are each doing a job of their own: spinner loops, the
+     row stagger, dialog entrances. Those are not part of this scale. */
+  --motion-fast: 0.15s;
+  --motion-base: 0.18s;
 }
 
 *,
@@ -54,58 +118,102 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  border-color: var(--border);
-  outline-color: color-mix(in oklch, var(--ring) 50%, transparent);
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, sans-serif;
+  border-color: var(--rule);
 }
 
 html {
-  font-size: var(--font-size);
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--void);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Display face carries the personality: headings, names, ranks. */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
 }
 
 h1 {
-  font-size: 1.5rem;
-  font-weight: var(--font-weight-medium);
-  line-height: 1.5;
+  font-size: 1.75rem;
 }
-
 h2 {
-  font-size: 1.25rem;
-  font-weight: var(--font-weight-medium);
-  line-height: 1.5;
+  font-size: 1.375rem;
 }
-
 h3 {
   font-size: 1.125rem;
-  font-weight: var(--font-weight-medium);
-  line-height: 1.5;
 }
-
 h4 {
   font-size: 1rem;
-  font-weight: var(--font-weight-medium);
-  line-height: 1.5;
 }
 
-label {
+button,
+input,
+select {
+  font-family: inherit;
   font-size: 1rem;
-  font-weight: var(--font-weight-medium);
-  line-height: 1.5;
 }
 
-button {
-  font-size: 1rem;
-  font-weight: var(--font-weight-medium);
-  line-height: 1.5;
+/* Every number in this app is a number you compare against another number,
+   so they all get tabular figures. */
+.num {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
 }
 
-input {
-  font-size: 1rem;
-  font-weight: var(--font-weight-normal);
-  line-height: 1.5;
+/* Small uppercase label used for column headers and section eyebrows. */
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* Rarity tier colours, applied by getScoreClass. */
+.score-grey {
+  color: var(--rarity-common);
+}
+.score-green {
+  color: var(--rarity-uncommon);
+}
+.score-blue {
+  color: var(--rarity-rare);
+}
+.score-purple {
+  color: var(--rarity-epic);
+}
+.score-orange {
+  color: var(--rarity-legendary);
+}
+
+/* Keyboard focus is always visible, and always the beacon. */
+:focus-visible {
+  outline: 2px solid var(--beacon);
+  outline-offset: 2px;
+  border-radius: var(--rad-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

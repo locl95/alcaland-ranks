@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { viewKeys } from '@/features/views/api/viewQueries.ts';
-import { Plus, User, LogOut, X } from 'lucide-react';
+import { Plus, User, LogOut, X, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@radix-ui/react-dropdown-menu';
 import { useAppSelector } from '@/app/hooks.ts';
@@ -14,6 +17,7 @@ import { selectIsAuthenticated, selectUsername } from '@/app/authSlice.ts';
 import { logout } from '@/features/auth/authApi.ts';
 import { useStaticData } from '@/features/views/hooks/useStaticData.ts';
 import { useViewsData } from '@/features/views/hooks/useViewsData.ts';
+import keystone from '@/assets/keystone.webp';
 import { ViewsList } from './views-list.tsx';
 import { CreateView } from './actions/create-view.tsx';
 import './views-page.css';
@@ -85,14 +89,23 @@ export function ViewsPage() {
   };
 
   return (
-    <div className="views-list-container">
-      <div className="views-list-content">
-        <div className="views-header">
-          <div className="views-header-text">
-            <h1>Mythic+ ladder tracker</h1>
+    <div className="page">
+      <div className="page-inner">
+        <header className="masthead">
+          <div className="masthead-brand">
+            <img src={keystone} alt="" aria-hidden={true} className="masthead-mark" />
+            <div className="masthead-lines">
+              <h1 className="masthead-title">Mythic+ ladder tracker</h1>
+              {season?.name && (
+                <p className="masthead-season">
+                  <span className="eyebrow">Season</span>
+                  <span className="masthead-season-name">{season.name}</span>
+                </p>
+              )}
+            </div>
           </div>
 
-          <div className="views-header-actions">
+          <div className="masthead-actions">
             <button
               onClick={handleCreateClick}
               className="create-view-btn"
@@ -106,45 +119,50 @@ export function ViewsPage() {
             {isAuthenticated && username && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="user-menu-btn">
+                  <button className="user-menu-btn" aria-label={`Account: ${username}`}>
                     <User className="user-menu-icon" />
-                    <span className="user-menu-name">{username}</span>
+                    <ChevronDown className="user-menu-chevron" aria-hidden={true} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="user-menu-content" align="end">
-                  <DropdownMenuItem
-                    className="user-menu-item user-menu-item--danger"
-                    onSelect={handleLogout}
+                <DropdownMenuPortal>
+                  <DropdownMenuContent
+                    className="user-menu-content"
+                    align="end"
+                    sideOffset={6}
+                    collisionPadding={12}
                   >
-                    <LogOut className="user-menu-item-icon" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
+                    <DropdownMenuLabel className="user-menu-identity">
+                      <span className="eyebrow">Signed in as</span>
+                      <span className="user-menu-identity-name">{username}</span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="user-menu-separator" />
+                    <DropdownMenuItem
+                      className="user-menu-item user-menu-item--danger"
+                      onSelect={handleLogout}
+                    >
+                      <LogOut className="user-menu-item-icon" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenuPortal>
               </DropdownMenu>
             )}
           </div>
-        </div>
+        </header>
 
-        <div className="views-season">
-          <span className="views-season-label">Current season</span>
-          <span className="views-season-value">{season?.name}</span>
-        </div>
-
-        <div className="views-tab-toggle-wrapper">
-          <div className="views-tab-toggle">
-            <button
-              className={`views-tab-btn${activeTab === 'featured' ? ' views-tab-btn--active' : ''}`}
-              onClick={() => setActiveTab('featured')}
-            >
-              Featured
-            </button>
-            <button
-              className={`views-tab-btn${activeTab === 'own' ? ' views-tab-btn--active' : ''}`}
-              onClick={handleOwnTabClick}
-            >
-              Own
-            </button>
-          </div>
+        <div className="views-tab-toggle">
+          <button
+            className={`views-tab-btn${activeTab === 'featured' ? ' views-tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('featured')}
+          >
+            Featured
+          </button>
+          <button
+            className={`views-tab-btn${activeTab === 'own' ? ' views-tab-btn--active' : ''}`}
+            onClick={handleOwnTabClick}
+          >
+            Own
+          </button>
         </div>
 
         {createError && (
@@ -162,6 +180,7 @@ export function ViewsPage() {
 
         <ViewsList
           views={views}
+          activeTab={activeTab}
           isLoadingViews={isLoadingViews}
           deletingViewId={deletingViewId}
           onViewClick={handleViewClick}

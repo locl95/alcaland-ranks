@@ -5,15 +5,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(2, 6, 23, 0.75);
+  background: rgba(7, 11, 20, 0.8);
   backdrop-filter: blur(2px);
 }
 
 .spinner {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 3px solid rgba(148, 163, 184, 0.2);
-  border-top-color: #fbbf24;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 2px solid var(--rule);
+  border-top-color: var(--beacon);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

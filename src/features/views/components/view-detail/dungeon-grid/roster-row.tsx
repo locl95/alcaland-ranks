@@ -2,7 +2,7 @@ import './roster-row.css';
 import { RunDetailsRosterEntry } from '@/features/views/api/raiderio.ts';
 import { SPEC_IMAGES, getSpecImageKey } from '@/features/views/constants/spec-images.ts';
 import { ROLE_IMAGES } from '@/features/views/constants/role-images.ts';
-import { CLASS_COLORS } from '@/features/views/constants/class-colors.ts';
+import { CLASS_TEXT_COLORS } from '@/features/views/constants/class-colors.ts';
 import { getClassSlug, getScoreClass, openExternalProfile } from '@/features/views/utils.ts';
 
 const ROLE_LABEL: Record<string, string> = {
@@ -57,7 +57,7 @@ export function RosterRow({ entry, characterRegion }: Readonly<RosterRowProps>) 
         <span className="run-details-name">
           <span
             style={{
-              color: CLASS_COLORS[getClassSlug(entry.character.class.name)] ?? '#94a3b8',
+              color: CLASS_TEXT_COLORS[getClassSlug(entry.character.class.name)] ?? 'var(--ink)',
             }}
           >
             {entry.character.name}

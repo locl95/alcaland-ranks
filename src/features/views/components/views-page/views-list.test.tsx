@@ -44,9 +44,13 @@ const makeStore = (username: string | null = 'testuser') =>
 
 const renderList = (
   views: View[],
-  options: { username?: string | null; isLoadingViews?: boolean } = {},
+  options: {
+    username?: string | null;
+    isLoadingViews?: boolean;
+    activeTab?: 'featured' | 'own';
+  } = {},
 ) => {
-  const { username = 'testuser', isLoadingViews = false } = options;
+  const { username = 'testuser', isLoadingViews = false, activeTab = 'own' } = options;
   const onViewClick = vi.fn();
   const onCreateView = vi.fn();
   const onDeleteView = vi.fn();
@@ -55,6 +59,7 @@ const renderList = (
     <Provider store={makeStore(username)}>
       <ViewsList
         views={views}
+        activeTab={activeTab}
         isLoadingViews={isLoadingViews}
         deletingViewId={null}
         onViewClick={onViewClick}
@@ -69,9 +74,19 @@ const renderList = (
 
 describe('ViewsList', () => {
   describe('empty state', () => {
-    it('shows the empty state when there are no views', () => {
+    it('invites you to create one when you have no ladders of your own', () => {
       renderList([]);
-      expect(screen.getByText('No views yet')).toBeInTheDocument();
+      expect(screen.getByText('No ladders yet')).toBeInTheDocument();
+      expect(screen.getByText('Create your first ladder')).toBeInTheDocument();
+    });
+
+    it('explains the featured tab instead of offering to create one', () => {
+      renderList([], { activeTab: 'featured' });
+
+      expect(screen.getByText('No featured ladders right now')).toBeInTheDocument();
+      // Featured ladders are curated, so creating one is not something the
+      // reader can do from here.
+      expect(screen.queryByText('Create your first ladder')).not.toBeInTheDocument();
     });
 
     it('calls onCreateView when clicking the create button in empty state', async () => {
@@ -95,7 +110,14 @@ describe('ViewsList', () => {
 
     it('displays character count', () => {
       renderList([makeView('v1', 'My Ladder')]);
-      expect(screen.getByText('2 characters')).toBeInTheDocument();
+      expect(screen.getByText('2')).toBeInTheDocument();
+      expect(screen.getByText('Characters')).toBeInTheDocument();
+    });
+
+    it('keeps the delete control outside the row button', () => {
+      renderList([makeView('v1', 'My Ladder')]);
+      const row = screen.getByRole('button', { name: /My Ladder/ });
+      expect(row.querySelector('button')).toBeNull();
     });
   });
 

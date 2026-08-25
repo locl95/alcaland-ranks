@@ -38,9 +38,7 @@ export async function bootstrapAuth(): Promise<void> {
     }
     const { accessToken } = (await response.json()) as { accessToken: string };
     store.dispatch(setAccessToken(accessToken));
-  } catch {
-    // Network error — keep the refresh token, auth will recover on next userRequest
-  }
+  } catch {}
 }
 
 export async function logout(): Promise<void> {

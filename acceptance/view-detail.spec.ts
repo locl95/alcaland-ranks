@@ -9,7 +9,7 @@ import {
 import { mockCharacter, mockSeason } from './mocks/raiderioMocks';
 
 import { API, VALID_VIEW_ID } from './constants';
-import { pickRealm } from './helpers';
+import { expectListAnchoredToInput, pickRealm, wheelBackground } from './helpers';
 import { ViewData } from '../src/features/views/api/raiderio';
 
 const viewData: ViewData = { data: [mockCharacter], viewName: 'My Ladder' };
@@ -28,6 +28,21 @@ test.describe('view detail', () => {
     await seedAuth(page);
     await mockViewDetailApis(page);
     await mockEntitiesExist(page);
+  });
+
+  test('a ladder row expands from the keyboard and tabs on to its menu', async ({ page }) => {
+    await page.goto(`/${VALID_VIEW_ID}`);
+    await page.locator('.ladder-row-toggle').first().focus();
+
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.ladder-row-expanded')).toBeVisible();
+
+    // The menu button is a sibling of the expander, not nested inside it, so
+    // Tab reaches it rather than it being swallowed by the row.
+    await page.keyboard.press('Tab');
+    await expect(page.locator('.char-menu-btn').first()).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('menu')).toBeVisible();
   });
 
   test('renders the character ladder and dungeon grid', async ({ page }) => {
@@ -142,11 +157,12 @@ test.describe('view detail', () => {
     await page.getByText('My Ladder').click();
     await page.getByRole('button', { name: 'Edit' }).click();
 
-    const dialog = page.locator('.edit-view-content');
+    const dialog = page.locator('.edit-view-panel');
     const before = await dialog.boundingBox();
 
     await page.getByLabel('Realm').click();
     await expect(page.getByRole('listbox')).toBeVisible();
+    await expectListAnchoredToInput(page, page.getByLabel('Realm'));
 
     const after = await dialog.boundingBox();
     expect(after?.height).toBe(before?.height);
@@ -178,6 +194,30 @@ test.describe('view detail', () => {
     await expect(page.getByRole('button', { name: 'Done' })).toBeDisabled();
   });
 
+  test('an open dialog freezes the page behind it', async ({ page }) => {
+    const crowd = Array.from({ length: 25 }, (_, i) => ({
+      ...mockCharacter,
+      id: i + 1,
+      name: `Char${i}`,
+      score: 3000 - i * 30,
+    }));
+    await mockViewDetailApis(page, { data: crowd, viewName: 'My Ladder' });
+    await mockFeaturedViews(page);
+    await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
+
+    await page.setViewportSize({ width: 1200, height: 500 });
+    await page.goto('/');
+    await page.getByText('My Ladder').click();
+    await expect(page.getByText('Char0').first()).toBeVisible();
+
+    // Without this the assertion below would pass on a page that never scrolled.
+    expect(await wheelBackground(page)).toBeGreaterThan(0);
+    await page.evaluate(() => window.scrollTo(0, 0));
+
+    await page.getByRole('button', { name: 'Edit' }).click();
+    expect(await wheelBackground(page)).toBe(0);
+  });
+
   test('edit: shows sync error dialog when an added character is not found after poll completes', async ({
     page,
   }) => {
@@ -205,6 +245,7 @@ test.describe('view detail', () => {
 
     await expect(page.getByText("Some characters couldn't be synced")).toBeVisible();
     await expect(page.getByText('Sylvanas')).toBeVisible();
+    await expect(page.getByRole('dialog')).toBeVisible();
   });
 
   // ---------------------------------------------------------------------------

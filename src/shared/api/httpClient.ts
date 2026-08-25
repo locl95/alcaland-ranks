@@ -10,10 +10,6 @@ import { ApiError } from '@/shared/api/ApiError';
 const BASE_URL = `${import.meta.env.VITE_API_HOST}/api`;
 const SERVICE_TOKEN = import.meta.env.VITE_SERVICE_TOKEN;
 
-// ---------------------------------------------------------------------------
-// Service token — read-only operations, no refresh needed
-// ---------------------------------------------------------------------------
-
 export async function serviceGet<T>(endpoint: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
@@ -44,10 +40,6 @@ export async function serviceRequest<T>(
   if (!response.ok) throw new ApiError(response.status, response.statusText);
   return response.json() as Promise<T>;
 }
-
-// ---------------------------------------------------------------------------
-// User token — write operations, with 401 → refresh retry
-// ---------------------------------------------------------------------------
 
 let isRefreshing = false;
 let refreshQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];

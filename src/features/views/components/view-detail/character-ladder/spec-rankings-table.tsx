@@ -1,5 +1,5 @@
 import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
-import { getRankChange, formatRankChange } from '@/features/views/utils.ts';
+import { getRankChange, formatRankChange, getScoreClass } from '@/features/views/utils.ts';
 import './spec-rankings-table.css';
 
 interface SpecRankingsTableProps {
@@ -34,7 +34,7 @@ export function SpecRankingsTable({ character, cachedProfile }: Readonly<SpecRan
               return (
                 <tr key={spec.name} className="spec-tr">
                   <td className="spec-td spec-td--name">{spec.name}</td>
-                  <td className="spec-td spec-td--score">
+                  <td className={`spec-td spec-td--score ${getScoreClass(spec.score)}`}>
                     {Math.round(spec.score).toLocaleString()}
                   </td>
                   {(['world', 'region', 'realm'] as const).map((key) => {

@@ -1,51 +1,64 @@
 .ladder-card {
-  border: 1px solid rgba(51, 65, 85, 0.45);
-  background: rgba(10, 22, 40, 0.4);
-  border-radius: 0.75rem;
-  margin-bottom: 1.5rem;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  border-radius: var(--rad-lg);
+  margin-bottom: 1.25rem;
   overflow: hidden;
-  backdrop-filter: blur(8px);
-  box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(148, 163, 184, 0.03);
 }
 
 .ladder-header {
-  padding: 1.25rem 1.5rem;
+  padding: 0.875rem 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: background 0.2s;
+  border-bottom: 1px solid var(--rule);
+  transition: background var(--motion-base);
 }
 
 .ladder-header:hover {
-  background: rgba(56, 189, 248, 0.04);
+  background: var(--panel-2);
 }
 
 .ladder-title {
-  color: #e2e8f0;
-  font-size: 1rem;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  letter-spacing: 0.01em;
+  gap: 0.625rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .ladder-toggle-btn {
   background: transparent;
   border: none;
-  color: #475569;
+  color: var(--ink-4);
   cursor: pointer;
   padding: 0.25rem;
   display: flex;
   align-items: center;
-  transition: color 0.2s;
+  transition: color var(--motion-base);
 }
 
-.ladder-toggle-btn:hover {
-  color: #94a3b8;
+.ladder-header:hover .ladder-toggle-btn {
+  color: var(--ink-2);
+}
+
+.ladder-cols {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+/* Lines up with .ladder-score: its right margin plus the character menu. */
+.ladder-cols-score {
+  padding-right: 3.125rem;
 }
 
 .ladder-content {
@@ -54,27 +67,35 @@
 }
 
 .keystone-icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   object-fit: contain;
 }
 
 .chevron-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 @media (max-width: 640px) {
   .ladder-header {
-    padding: 0.875rem 0.75rem;
+    padding: 0.75rem;
   }
 
-  .ladder-content {
-    padding: 0;
+  .ladder-title {
+    font-size: 1.0625rem;
   }
 
-  .chevron-icon {
-    width: 1rem;
-    height: 1rem;
+  .ladder-cols {
+    padding: 0.4375rem 0.5rem 0.4375rem 0.875rem;
+  }
+
+  .ladder-cols-score {
+    padding-right: 2rem;
+  }
+
+  .keystone-icon {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 }

@@ -1,173 +1,191 @@
+/* One shared grid for the column header and every run row, so SCORE / KEY /
+   TIME actually line up under their labels. The old layout stacked three
+   unlabelled numbers and expected you to know which was which. */
+.dungeon-cols,
+.character-run {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4.75rem 3rem 6.25rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dungeon-cols {
+  padding: 0.5rem 0.875rem;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.dungeon-cols > span:not(:first-child) {
+  text-align: right;
+}
+
 .character-run-wrapper {
   display: flex;
   flex-direction: column;
   position: relative;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.35);
+  border-bottom: 1px solid var(--rule-soft);
 }
 
 .character-run-wrapper:last-child {
   border-bottom: none;
 }
 
-.character-run-wrapper::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: #38bdf8;
-  transform: scaleY(0);
-  transition: transform 0.2s ease;
-}
-
-.character-run-wrapper:hover::before {
-  transform: scaleY(1);
-}
-
 .character-run {
-  padding: 0.75rem;
+  padding: 0.5625rem 0.875rem;
   cursor: pointer;
-  transition: background 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  transition: background var(--motion-base);
 }
 
 .character-run.normal:hover {
-  background: rgba(56, 189, 248, 0.04);
+  background: var(--panel-2);
 }
 
+/* Best run in the dungeon — the one row worth spotting instantly. */
 .character-run.highest {
-  background: rgba(120, 53, 15, 0.2);
+  background: rgba(245, 183, 61, 0.06);
+  box-shadow: inset 3px 0 0 var(--gold);
 }
 
 .character-run.highest:hover {
-  background: rgba(120, 53, 15, 0.3);
+  background: rgba(245, 183, 61, 0.11);
 }
 
 .character-run-left {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  flex: 1;
+  gap: 0.5rem;
   min-width: 0;
 }
 
 .crown-icon {
-  width: 1rem;
-  height: 1rem;
-  color: #fbbf24;
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--gold);
   flex-shrink: 0;
-}
-
-.character-run-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.character-run-name-row {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-width: 0;
 }
 
 .spec-icon {
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 0.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 3px;
   object-fit: cover;
   flex-shrink: 0;
-  box-shadow: 0 0 0 1px #475569;
+  box-shadow: 0 0 0 1px var(--rule);
 }
 
 .character-run-name {
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.875rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.character-run-name.normal {
-  color: #dde4ee;
-}
-
-.character-run-name.highest {
-  color: #fbbf24;
-}
-
-.character-run-stats {
-  text-align: right;
-  flex-shrink: 0;
-  margin-left: 0.75rem;
-}
-
-.character-run-score-row {
+.character-run-score-cell {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: flex-end;
-  gap: 0.375rem;
+  gap: 0.3125rem;
+  min-width: 0;
 }
 
 .character-run-score {
-  font-weight: bold;
-  font-size: 1.125rem;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
 }
 
 .character-run-score.normal {
-  color: #e2e8f0;
+  color: var(--ink);
 }
 
 .character-run-score.highest {
-  color: #fbbf24;
+  color: var(--gold);
 }
 
-.character-run-level {
-  font-size: 1rem;
+/* Keystone level. Keeps the WoW-native +/++/+++ prefix — players read it as
+   "how many chests" — but it now sits under a KEY label instead of floating
+   loose under the score. */
+.character-run-key {
   font-weight: 600;
-}
-
-.character-run-level.keystone-depleted {
-  color: #f87171;
-}
-.character-run-level.keystone-1 {
-  color: #4ade80;
-}
-.character-run-level.keystone-2 {
-  color: #60a5fa;
-}
-.character-run-level.keystone-3 {
-  color: #fb923c;
-}
-
-.character-run-class {
-  font-size: 0.75rem;
-  color: #64748b;
-}
-
-.character-run-no-data {
+  font-size: 0.9375rem;
   text-align: right;
-  flex-shrink: 0;
-  margin-left: 0.75rem;
-  font-size: 0.875rem;
-  color: #334155;
+}
+
+.character-run-key.keystone-depleted {
+  color: var(--down);
+}
+.character-run-key.keystone-1 {
+  color: var(--rarity-uncommon);
+}
+.character-run-key.keystone-2 {
+  color: var(--rarity-rare);
+}
+.character-run-key.keystone-3 {
+  color: var(--rarity-legendary);
+}
+
+.character-run-time {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.3125rem;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+  white-space: nowrap;
 }
 
 .time-delta-timed {
-  color: #4ade80;
+  color: var(--up);
+  font-size: 0.75rem;
 }
 
 .time-delta-depleted {
-  color: #f87171;
+  color: var(--down);
+  font-size: 0.75rem;
+}
+
+.character-run-no-data {
+  grid-column: 2 / -1;
+  text-align: right;
+  font-size: 0.8125rem;
+  color: var(--ink-4);
 }
 
 .score-improvement {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #4ade80;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--up);
   background: rgba(74, 222, 128, 0.1);
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  border: 1px solid rgba(74, 222, 128, 0.3);
+  padding: 0.0625rem 0.25rem;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .dungeon-cols,
+  .character-run {
+    grid-template-columns: minmax(0, 1fr) 3.75rem 2.5rem 5.25rem;
+    gap: 0.375rem;
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+
+  .character-run-name {
+    font-size: 0.8125rem;
+  }
+
+  .character-run-score {
+    font-size: 0.9375rem;
+  }
+
+  .character-run-time {
+    font-size: 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .time-delta-timed,
+  .time-delta-depleted {
+    font-size: 0.6875rem;
+  }
 }

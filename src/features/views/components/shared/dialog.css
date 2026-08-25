@@ -1,0 +1,79 @@
+/* Shared modal chrome. Behaviour — focus trap, focus restore, scroll lock,
+   Escape and outside-click — comes from Radix Dialog; this file is only the
+   look, so the three dialogs cannot drift apart again. */
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: color-mix(in srgb, var(--void) 82%, transparent);
+  backdrop-filter: blur(3px);
+  animation: dialogOverlayIn var(--motion-base) ease-out;
+}
+
+/* Radix renders overlay and panel as siblings, so the panel centres itself
+   rather than relying on the overlay being a flex parent.
+
+   Centred with inset + margin: auto, NOT translate(-50%, -50%). A transform
+   here would make this element the containing block for every `position: fixed`
+   descendant — which is how the realm list is positioned — sending those popups
+   to coordinates relative to the panel instead of the viewport. Keep the base
+   style transform-free. */
+.dialog-panel {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  z-index: 1000;
+  width: calc(100% - 2rem);
+  max-height: calc(100dvh - 2rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--rad-lg);
+  box-shadow: var(--lift-lg);
+  animation: dialogPanelIn var(--motion-base) ease-out;
+}
+
+.dialog-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-4);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rad-sm);
+  flex-shrink: 0;
+  transition:
+    color var(--motion-base),
+    background var(--motion-base);
+}
+
+.dialog-close-btn:hover {
+  color: var(--ink);
+  background: var(--panel-3);
+}
+
+@keyframes dialogOverlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fade only — no transform, not even mid-animation. A transform makes the panel
+   the containing block for the fixed-position realm list, and a user can focus
+   the realm field well inside the 180ms this runs for. */
+@keyframes dialogPanelIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

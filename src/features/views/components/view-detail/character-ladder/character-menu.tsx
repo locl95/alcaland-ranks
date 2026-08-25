@@ -1,66 +1,52 @@
-import { useEffect, useRef, useState } from 'react';
-import './character-menu.css';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuTrigger,
+} from '@radix-ui/react-dropdown-menu';
 import { ExternalLink } from 'lucide-react';
 import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
 import { openExternalProfile } from '@/features/views/utils.ts';
 import raiderio2 from '@/assets/raiderio.png';
 import summoned from '@/assets/summoned.webp';
+import './character-menu.css';
 
 interface CharacterMenuProps {
   character: RaiderioProfile;
 }
 
 export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
-    <div className="char-menu-wrapper" ref={menuRef}>
-      <button
-        className="char-menu-btn"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen(!isOpen);
-        }}
-      >
-        <ExternalLink className="chevron-icon" />
-      </button>
-      {isOpen && (
-        <div className="char-menu-dropdown">
-          <button
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="char-menu-btn" aria-label={`Open ${character.name} on another site`}>
+          <ExternalLink className="char-menu-btn-icon" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuPortal>
+        <DropdownMenuContent
+          className="char-menu-dropdown"
+          align="end"
+          sideOffset={6}
+          collisionPadding={12}
+        >
+          <DropdownMenuItem
             className="char-menu-item"
-            onClick={(e) => {
-              e.stopPropagation();
-              openExternalProfile(character, 'raiderio');
-              setIsOpen(false);
-            }}
+            onSelect={() => openExternalProfile(character, 'raiderio')}
           >
             <img src={raiderio2} alt="" aria-hidden={true} className="char-menu-icon" />
             Raider.io
-          </button>
-          <button
+          </DropdownMenuItem>
+          <DropdownMenuItem
             className="char-menu-item"
-            onClick={(e) => {
-              e.stopPropagation();
-              openExternalProfile(character, 'summoned');
-              setIsOpen(false);
-            }}
+            onSelect={() => openExternalProfile(character, 'summoned')}
           >
             <img src={summoned} alt="" aria-hidden={true} className="char-menu-icon" />
             Summoned.io
-          </button>
-        </div>
-      )}
-    </div>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
+    </DropdownMenu>
   );
 }

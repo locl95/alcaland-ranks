@@ -1,36 +1,26 @@
 .dungeon-card {
-  border: 1px solid rgba(51, 65, 85, 0.45);
-  background: rgba(10, 22, 40, 0.75);
-  border-radius: 0.75rem;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  border-radius: var(--rad-lg);
   overflow: hidden;
-  box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(148, 163, 184, 0.03);
 }
 
 .dungeon-header {
-  padding: 0.875rem 1.25rem;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.35);
+  padding: 0.75rem 0.875rem;
+  border-bottom: 1px solid var(--rule);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.dungeon-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #dde4ee;
-  letter-spacing: 0.01em;
+  gap: 0.75rem;
 }
 
 .dungeon-header-thumb {
   position: relative;
-  width: 34px;
-  height: 34px;
-  border-radius: 0.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--rad-sm);
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 0 0 1px #475569;
+  box-shadow: 0 0 0 1px var(--rule);
 }
 
 .dungeon-header-thumb-img {
@@ -40,22 +30,41 @@
   display: block;
 }
 
+.dungeon-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .dungeon-header-thumb-name {
-  position: absolute;
-  bottom: 0.2rem;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 0.5rem;
-  font-weight: 700;
-  color: #fbbf24;
+  font-family: var(--font-data);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink-4);
   text-transform: uppercase;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
-  letter-spacing: 0.05em;
-  line-height: 1;
+  letter-spacing: 0.08em;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .dungeon-content {
   display: flex;
   flex-direction: column;
+}
+
+@media (max-width: 640px) {
+  .dungeon-header {
+    padding: 0.625rem;
+  }
+
+  .dungeon-title {
+    font-size: 1rem;
+  }
 }

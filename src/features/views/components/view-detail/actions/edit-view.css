@@ -1,106 +1,63 @@
-.edit-view-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-  backdrop-filter: blur(2px);
-}
-
-.edit-view-content {
-  background: #0b1929;
-  border: 1px solid rgba(51, 65, 85, 0.55);
-  border-radius: 0.75rem;
-  width: 100%;
+/* Overlay, panel frame and close button live in shared/dialog.css. */
+.edit-view-panel {
   max-width: 48rem;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow:
-    0 24px 40px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(148, 163, 184, 0.04);
 }
 
 .edit-view-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.35);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
 }
 
 .edit-view-title {
-  font-size: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
   font-weight: 600;
-  color: #e2e8f0;
-  margin-bottom: 0.375rem;
-  letter-spacing: 0.01em;
+  color: var(--ink);
+  letter-spacing: 0.015em;
+  margin-bottom: 0.125rem;
 }
 
 .edit-view-subtitle {
   font-size: 0.875rem;
-  color: #64748b;
-}
-
-.edit-view-close-btn {
-  background: transparent;
-  border: none;
-  color: #475569;
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.25rem;
-  transition:
-    color 0.2s,
-    background 0.2s;
-  flex-shrink: 0;
-}
-
-.edit-view-close-btn:hover {
-  color: #e2e8f0;
-  background: rgba(51, 65, 85, 0.4);
+  color: var(--ink-3);
 }
 
 .close-icon {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.375rem;
+  height: 1.375rem;
 }
 
 .edit-view-body {
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
   overflow-y: auto;
 }
 
 .character-edit-items {
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 0.5rem;
 }
 
 .character-edit-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  background: rgba(15, 30, 55, 0.4);
-  border: 1px solid rgba(51, 65, 85, 0.35);
-  border-radius: 0.5rem;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--rad-md);
   transition:
-    background 0.2s,
-    border-color 0.2s;
+    background var(--motion-base),
+    border-color var(--motion-base);
 }
 
 .character-edit-row:hover {
-  background: rgba(56, 189, 248, 0.04);
-  border-color: rgba(51, 65, 85, 0.5);
+  background: var(--panel-3);
+  border-color: var(--ink-4);
 }
 
 .character-edit-info {
@@ -111,111 +68,89 @@
 .character-edit-name-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  gap: 0.625rem;
+  margin-bottom: 0.25rem;
 }
 
 .character-edit-name {
-  font-size: 1.0625rem;
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
   font-weight: 600;
-  color: #dde4ee;
+  color: var(--ink);
+  letter-spacing: 0.015em;
   text-transform: capitalize;
 }
 
 .character-edit-class-badge {
-  padding: 0.125rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  color: #ffffff;
-  font-weight: 500;
+  padding: 0.0625rem 0.4375rem;
+  border-radius: 3px;
+  font-size: 0.6875rem;
+  color: #08111c;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
-.character-edit-class-badge.warrior {
-  background: #d97706;
-}
-.character-edit-class-badge.paladin {
-  background: #ec4899;
-}
-.character-edit-class-badge.hunter {
-  background: #65a30d;
-}
-.character-edit-class-badge.rogue {
-  background: #facc15;
-}
-.character-edit-class-badge.priest {
-  background: #f1f5f9;
-  color: #1e293b;
-}
-.character-edit-class-badge.death-knight {
-  background: #b91c1c;
-}
-.character-edit-class-badge.shaman {
-  background: #3b82f6;
-}
-.character-edit-class-badge.mage {
-  background: #22d3ee;
-}
-.character-edit-class-badge.warlock {
-  background: #9333ea;
-}
-.character-edit-class-badge.monk {
-  background: #10b981;
-}
-.character-edit-class-badge.druid {
-  background: #f97316;
-}
-.character-edit-class-badge.demon-hunter {
-  background: #7c3aed;
-}
-.character-edit-class-badge.evoker {
-  background: #14b8a6;
+/* Background comes from CLASS_COLORS in edit-view.tsx — one source of truth. */
+.character-edit-class-badge--on-dark {
+  color: #fff;
 }
 
+/* Fixed tracks, not auto: every character is its own grid, so auto widths would
+   size per row and nothing would line up between them. The track list stops at
+   the score — this line is not meant to span the row. */
 .character-edit-meta {
-  display: flex;
+  display: grid;
+  grid-template-columns: 7.5rem 8rem 2.5rem 4.5rem;
+  justify-content: start;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.character-edit-spec,
+.character-edit-realm {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .character-edit-spec {
-  color: #94a3b8;
-}
-
-.character-edit-separator {
-  color: #334155;
+  color: var(--ink-2);
 }
 
 .character-edit-realm {
-  color: #64748b;
+  color: var(--ink-3);
   text-transform: capitalize;
 }
 
+/* Colour comes from the rarity ramp via getScoreClass, like every other score. */
 .character-edit-score {
-  color: #fbbf24;
   font-weight: 500;
 }
 
 .character-delete-btn {
-  padding: 0.4rem 0.875rem;
+  padding: 0.375rem 0.75rem;
   background: transparent;
-  border: 1px solid rgba(185, 28, 28, 0.4);
-  color: #f87171;
-  border-radius: 0.375rem;
+  border: 1px solid var(--danger-edge);
+  color: var(--danger);
+  border-radius: var(--rad-md);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.2s;
+  transition:
+    background var(--motion-base),
+    border-color var(--motion-base),
+    color var(--motion-base);
   flex-shrink: 0;
 }
 
 .character-delete-btn:hover {
-  background: rgba(185, 28, 28, 0.1);
-  border-color: rgba(239, 68, 68, 0.5);
-  color: #fca5a5;
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  color: #ff8b8b;
 }
 
 .delete-icon {
@@ -231,23 +166,27 @@
 }
 
 .edit-view-footer {
-  padding: 1.25rem 1.5rem;
-  border-top: 1px solid rgba(51, 65, 85, 0.35);
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--rule);
   display: flex;
   justify-content: flex-end;
 }
 
 .manage-done-btn {
-  padding: 0.625rem 2rem;
-  background: rgba(22, 163, 74, 0.1);
-  border: 1px solid rgba(22, 163, 74, 0.35);
-  color: #4ade80;
-  border-radius: 0.375rem;
+  padding: 0.5rem 1.75rem;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  color: var(--up);
+  border-radius: var(--rad-md);
   cursor: pointer;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all 0.2s;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition:
+    background var(--motion-base),
+    border-color var(--motion-base),
+    color var(--motion-base);
 }
 
 .manage-done-btn:disabled {
@@ -255,16 +194,8 @@
   cursor: not-allowed;
 }
 
-.manage-done-btn:disabled:hover {
-  background: rgba(22, 163, 74, 0.1);
-  border-color: rgba(22, 163, 74, 0.35);
-  color: #4ade80;
-  box-shadow: none;
-}
-
-.manage-done-btn:hover {
-  background: rgba(22, 163, 74, 0.18);
-  border-color: rgba(22, 163, 74, 0.5);
+.manage-done-btn:hover:not(:disabled) {
+  background: rgba(74, 222, 128, 0.18);
+  border-color: rgba(74, 222, 128, 0.55);
   color: #86efac;
-  box-shadow: 0 0 16px rgba(22, 163, 74, 0.1);
 }

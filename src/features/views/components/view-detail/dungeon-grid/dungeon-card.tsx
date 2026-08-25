@@ -28,11 +28,22 @@ export function DungeonCard({
   return (
     <div className="dungeon-card" id={`dungeon-card-${dungeon.short_name.toLowerCase()}`}>
       <div className="dungeon-header">
-        <div className="dungeon-title">{dungeon.name}</div>
         <div className="dungeon-header-thumb">
-          <img src={dungeon.icon_url} alt={dungeon.name} className="dungeon-header-thumb-img" />
-          <span className="dungeon-header-thumb-name">{dungeon.short_name}</span>
+          <img
+            src={dungeon.icon_url}
+            alt=""
+            aria-hidden={true}
+            className="dungeon-header-thumb-img"
+          />
         </div>
+        <h3 className="dungeon-title">{dungeon.name}</h3>
+        <span className="dungeon-header-thumb-name">{dungeon.short_name}</span>
+      </div>
+      <div className="dungeon-cols">
+        <span className="eyebrow">Character</span>
+        <span className="eyebrow">Score</span>
+        <span className="eyebrow">Key</span>
+        <span className="eyebrow">Time</span>
       </div>
       <div className="dungeon-content">
         {characterScores.map(({ character, bestRun }) => {

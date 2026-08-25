@@ -47,13 +47,17 @@ export const openExternalProfile = (
   );
 };
 
-export const getScoreClass = (score: number): string => {
-  if (score < 300) return 'score-grey';
-  if (score < 1100) return 'score-green';
-  if (score < 1800) return 'score-blue';
-  if (score < 3000) return 'score-purple';
-  return 'score-orange';
+export type ScoreTier = 'grey' | 'green' | 'blue' | 'purple' | 'orange';
+
+export const getScoreTier = (score: number): ScoreTier => {
+  if (score < 1600) return 'grey';
+  if (score < 2800) return 'green';
+  if (score < 3400) return 'blue';
+  if (score < 3999) return 'purple';
+  return 'orange';
 };
+
+export const getScoreClass = (score: number): string => `score-${getScoreTier(score)}`;
 
 export const getRankChange = (current: number, previous?: number): number | null => {
   if (previous === undefined) return null;

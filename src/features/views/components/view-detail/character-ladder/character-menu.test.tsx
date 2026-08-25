@@ -72,7 +72,10 @@ describe('CharacterMenu', () => {
     await userEvent.click(screen.getByRole('button'));
     expect(screen.getByText('Raider.io')).toBeInTheDocument();
 
-    await userEvent.click(document.body);
+    // The open menu is modal, so Radix marks the rest of the page inert with
+    // `pointer-events: none`. That is the behaviour under test, not an
+    // obstacle to it — userEvent's guard has to be waived to click through.
+    await userEvent.click(document.body, { pointerEventsCheck: 0 });
     expect(screen.queryByText('Raider.io')).not.toBeInTheDocument();
   });
 });
