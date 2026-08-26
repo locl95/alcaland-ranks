@@ -66,6 +66,11 @@
   flex-direction: column;
 }
 
+.ladder-card .entity-pager {
+  padding-left: 1.25rem;
+  padding-right: 0.75rem;
+}
+
 .keystone-icon {
   width: 1.75rem;
   height: 1.75rem;
@@ -92,6 +97,16 @@
 
   .ladder-cols-score {
     padding-right: 2rem;
+  }
+
+  .ladder-card .entity-pager {
+    padding-left: 0.875rem;
+    padding-right: 0.5rem;
+  }
+
+  .ladder-card .entity-pager {
+    padding-left: 1.25rem;
+    padding-right: 0.75rem;
   }
 
   .keystone-icon {

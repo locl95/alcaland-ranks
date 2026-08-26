@@ -15,6 +15,59 @@ import { ViewData } from '../src/features/views/api/raiderio';
 const viewData: ViewData = { data: [mockCharacter], viewName: 'My Ladder' };
 const emptyViewData: ViewData = { data: [], viewName: 'My Ladder' };
 
+const makeLadder = (
+  count: number,
+): {
+  viewName: string;
+  data: {
+    id: number;
+    name: string;
+    score: number;
+    mythicPlusBestRuns: {
+      run: {
+        keystone_run_id: number;
+        dungeon: string;
+        short_name: string;
+        mythic_level: number;
+        num_keystone_upgrades: number;
+        completed_at: string;
+        clear_time_ms: number;
+        par_time_ms: number;
+        score: number;
+        url: string;
+        affixes: never[];
+      };
+      details: never[];
+    }[];
+  }[];
+} => ({
+  viewName: 'My Ladder',
+  data: Array.from({ length: count }, (_, i) => ({
+    ...mockCharacter,
+    id: i + 1,
+    name: `Char${i + 1}`,
+    score: 3000 - i * 10,
+    mythicPlusBestRuns: [
+      {
+        run: {
+          keystone_run_id: i + 1,
+          dungeon: 'Siege of Boralus',
+          short_name: 'SIEGE',
+          mythic_level: 10,
+          num_keystone_upgrades: 1,
+          completed_at: '2026-01-01T00:00:00.000Z',
+          clear_time_ms: 1_800_000,
+          par_time_ms: 2_000_000,
+          score: 100 + i,
+          url: 'https://raider.io/run',
+          affixes: [],
+        },
+        details: [],
+      },
+    ],
+  })),
+});
+
 async function mockViewDetailApis(page: Parameters<typeof seedAuth>[0], data = viewData) {
   await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) => route.fulfill({ json: data }));
   await page.route(`${API}/views/${VALID_VIEW_ID}/cached-data`, (route) =>
@@ -51,6 +104,66 @@ test.describe('view detail', () => {
     await expect(page.getByText('Ladder', { exact: true })).toBeVisible();
     await expect(page.getByText('Arthas').first()).toBeVisible();
     await expect(page.getByText('Siege of Boralus')).toBeVisible();
+  });
+
+  test('the ladder and each dungeon card page independently', async ({ page }) => {
+    await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
+      route.fulfill({ json: makeLadder(15) }),
+    );
+    await page.goto(`/${VALID_VIEW_ID}`);
+
+    const ladder = page.locator('.ladder-card');
+    const dungeon = page.locator('.dungeon-card');
+
+    await expect(page.locator('.ladder-row')).toHaveCount(10);
+    await expect(ladder.getByText('1–10 of 15')).toBeVisible();
+
+    await expect(dungeon.locator('.character-run-name').first()).toHaveText('Char15');
+    await expect(dungeon.locator('.crown-icon')).toBeVisible();
+
+    await ladder.getByRole('button', { name: 'Next page' }).click();
+
+    await expect(ladder.getByText('11–15 of 15')).toBeVisible();
+    await expect(page.locator('.ladder-character-name')).toHaveText([
+      'Char11',
+      'Char12',
+      'Char13',
+      'Char14',
+      'Char15',
+    ]);
+    await expect(dungeon.getByText('1–10 of 15')).toBeVisible();
+    await expect(dungeon.locator('.character-run-name').first()).toHaveText('Char15');
+
+    await dungeon.getByRole('button', { name: 'Next page' }).click();
+
+    await expect(dungeon.getByText('11–15 of 15')).toBeVisible();
+    await expect(dungeon.locator('.character-run-name')).toHaveText([
+      'Char5',
+      'Char4',
+      'Char3',
+      'Char2',
+      'Char1',
+    ]);
+    await expect(ladder.getByText('11–15 of 15')).toBeVisible();
+  });
+
+  test('a dungeon card keeps its pager at the foot of the card', async ({ page }) => {
+    await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
+      route.fulfill({ json: makeLadder(15) }),
+    );
+    await page.goto(`/${VALID_VIEW_ID}`);
+
+    const card = page.locator('.dungeon-card').first();
+    await card.getByRole('button', { name: 'Next page' }).click();
+    await expect(card.getByText('11–15 of 15')).toBeVisible();
+
+    const cardBox = await card.boundingBox();
+    const pagerBox = await card.locator('.entity-pager').boundingBox();
+    expect(cardBox, 'dungeon card should be visible').not.toBeNull();
+    expect(pagerBox, 'pager should be visible').not.toBeNull();
+    const cardBottom = cardBox!.y + cardBox!.height;
+    const pagerBottom = pagerBox!.y + pagerBox!.height;
+    expect(Math.abs(cardBottom - pagerBottom)).toBeLessThan(2);
   });
 
   test('edit: deleting all characters hides the ladder', async ({ page }) => {

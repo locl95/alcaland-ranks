@@ -32,28 +32,25 @@ const makeProfile = (id: number, name: string, score: number): RaiderioProfile =
   },
 });
 
+const makeLadder = (count: number) =>
+  Array.from({ length: count }, (_, i) => makeProfile(i + 1, `Char${i + 1}`, 3000 - i * 10));
+
+const renderLadder = (characters: RaiderioProfile[], cachedCharacters: RaiderioProfile[] = []) =>
+  render(
+    <CharacterLadder characters={characters} cachedCharacters={cachedCharacters} season={null} />,
+  );
+
 describe('CharacterLadder', () => {
   it('sorts characters by score descending', () => {
-    render(
-      <CharacterLadder
-        characters={[makeProfile(2, 'Low', 1000), makeProfile(1, 'High', 3000)]}
-        cachedCharacters={[]}
-        season={null}
-      />,
-    );
+    renderLadder([makeProfile(2, 'Low', 1000), makeProfile(1, 'High', 3000)]);
+
     // The mock renders "#{index+1} {name}" — index 0 means rank #1 position
     expect(screen.getByTestId('ladder-row-1').textContent).toBe('#1 High');
     expect(screen.getByTestId('ladder-row-2').textContent).toBe('#2 Low');
   });
 
   it('collapses and expands on header click', async () => {
-    render(
-      <CharacterLadder
-        characters={[makeProfile(1, 'Arthas', 3000)]}
-        cachedCharacters={[]}
-        season={null}
-      />,
-    );
+    renderLadder([makeProfile(1, 'Arthas', 3000)]);
     expect(screen.getByTestId('ladder-row-1')).toBeInTheDocument();
 
     await userEvent.click(screen.getByText('Ladder'));
@@ -61,5 +58,41 @@ describe('CharacterLadder', () => {
 
     await userEvent.click(screen.getByText('Ladder'));
     expect(screen.getByTestId('ladder-row-1')).toBeInTheDocument();
+  });
+});
+
+describe('CharacterLadder — paging', () => {
+  it('shows no pager while everyone fits on one page', () => {
+    renderLadder(makeLadder(10));
+
+    expect(screen.getAllByTestId(/^ladder-row-/)).toHaveLength(10);
+    expect(screen.queryByRole('navigation', { name: /ladder pages/i })).not.toBeInTheDocument();
+  });
+
+  it('pages the ladder, numbering rows from the page offset', async () => {
+    renderLadder(makeLadder(15));
+
+    expect(screen.getAllByTestId(/^ladder-row-/)).toHaveLength(10);
+    expect(screen.getByText('1–10 of 15')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+
+    expect(screen.getByText('11–15 of 15')).toBeInTheDocument();
+    expect(screen.getAllByTestId(/^ladder-row-/).map((row) => row.textContent)).toEqual([
+      '#11 Char11',
+      '#12 Char12',
+      '#13 Char13',
+      '#14 Char14',
+      '#15 Char15',
+    ]);
+  });
+
+  it('keeps the range visible when the ladder is collapsed', async () => {
+    renderLadder(makeLadder(15));
+
+    await userEvent.click(screen.getByText('Ladder'));
+
+    expect(screen.queryByTestId('ladder-row-1')).not.toBeInTheDocument();
+    expect(screen.getByText('1–10 of 15')).toBeInTheDocument();
   });
 });

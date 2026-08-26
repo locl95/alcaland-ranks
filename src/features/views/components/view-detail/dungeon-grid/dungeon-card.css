@@ -3,6 +3,8 @@
   background: var(--panel);
   border-radius: var(--rad-lg);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .dungeon-header {
@@ -57,6 +59,7 @@
 .dungeon-content {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 @media (max-width: 640px) {
