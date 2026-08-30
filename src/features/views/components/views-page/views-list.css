@@ -68,6 +68,11 @@
   padding-right: calc(var(--row-actions-w) + var(--row-gap));
 }
 
+.views-list-container-box .pager {
+  padding-left: var(--row-pad-x);
+  padding-right: 0.75rem;
+}
+
 .view-row {
   display: flex;
   align-items: center;

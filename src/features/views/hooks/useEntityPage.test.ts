@@ -8,11 +8,11 @@ describe('useEntityPage', () => {
   it('keeps everything on one page when there is no more than a full page', () => {
     const { result } = renderHook(() => useEntityPage(makeItems(ENTITY_PAGE_SIZE)));
 
-    expect(result.current.pageCount).toBe(1);
-    expect(result.current.page).toBe(1);
-    expect(result.current.startIndex).toBe(0);
+    expect(result.current.pagination.pageCount).toBe(1);
+    expect(result.current.pagination.page).toBe(1);
+    expect(result.current.pagination.startIndex).toBe(0);
     expect(result.current.pageItems).toHaveLength(ENTITY_PAGE_SIZE);
-    expect(result.current.total).toBe(ENTITY_PAGE_SIZE);
+    expect(result.current.pagination.total).toBe(ENTITY_PAGE_SIZE);
   });
 
   it('preserves the order it is given', () => {
@@ -24,35 +24,52 @@ describe('useEntityPage', () => {
   it('splits 15 items into two pages and offsets the second', () => {
     const { result } = renderHook(() => useEntityPage(makeItems(15)));
 
-    expect(result.current.pageCount).toBe(2);
+    expect(result.current.pagination.pageCount).toBe(2);
     expect(result.current.pageItems).toEqual(makeItems(15).slice(0, 10));
 
-    act(() => result.current.goNext());
+    act(() => result.current.pagination.goNext());
 
-    expect(result.current.page).toBe(2);
-    expect(result.current.startIndex).toBe(10);
+    expect(result.current.pagination.page).toBe(2);
+    expect(result.current.pagination.startIndex).toBe(10);
     expect(result.current.pageItems).toEqual(makeItems(15).slice(10));
   });
 
   it('goes back to the previous page', () => {
     const { result } = renderHook(() => useEntityPage(makeItems(15)));
 
-    act(() => result.current.goNext());
-    act(() => result.current.goPrev());
+    act(() => result.current.pagination.goNext());
+    act(() => result.current.pagination.goPrev());
 
-    expect(result.current.page).toBe(1);
-    expect(result.current.startIndex).toBe(0);
+    expect(result.current.pagination.page).toBe(1);
+    expect(result.current.pagination.startIndex).toBe(0);
   });
 
   it('does not move past either end', () => {
     const { result } = renderHook(() => useEntityPage(makeItems(15)));
 
-    act(() => result.current.goPrev());
-    expect(result.current.page).toBe(1);
+    act(() => result.current.pagination.goPrev());
+    expect(result.current.pagination.page).toBe(1);
 
-    act(() => result.current.goNext());
-    act(() => result.current.goNext());
-    expect(result.current.page).toBe(2);
+    act(() => result.current.pagination.goNext());
+    act(() => result.current.pagination.goNext());
+    expect(result.current.pagination.page).toBe(2);
+  });
+
+  it('jumps straight to the last page and back to the first', () => {
+    const { result } = renderHook(() => useEntityPage(makeItems(35)));
+
+    expect(result.current.pagination.pageCount).toBe(4);
+
+    act(() => result.current.pagination.goLast());
+
+    expect(result.current.pagination.page).toBe(4);
+    expect(result.current.pagination.startIndex).toBe(30);
+    expect(result.current.pageItems).toEqual(makeItems(35).slice(30));
+
+    act(() => result.current.pagination.goFirst());
+
+    expect(result.current.pagination.page).toBe(1);
+    expect(result.current.pagination.startIndex).toBe(0);
   });
 
   it('clamps back to the last page when the list shrinks under the current page', () => {
@@ -60,25 +77,27 @@ describe('useEntityPage', () => {
       initialProps: { items: makeItems(15) },
     });
 
-    act(() => result.current.goNext());
-    expect(result.current.page).toBe(2);
+    act(() => result.current.pagination.goNext());
+    expect(result.current.pagination.page).toBe(2);
 
     rerender({ items: makeItems(8) });
 
-    expect(result.current.page).toBe(1);
-    expect(result.current.pageCount).toBe(1);
-    expect(result.current.startIndex).toBe(0);
+    expect(result.current.pagination.page).toBe(1);
+    expect(result.current.pagination.pageCount).toBe(1);
+    expect(result.current.pagination.startIndex).toBe(0);
     expect(result.current.pageItems).toHaveLength(8);
   });
 
   it('keeps its page controls stable across renders, so memoised lists do not re-render', () => {
     const items = makeItems(15);
     const { result, rerender } = renderHook(() => useEntityPage(items));
-    const { goPrev, goNext } = result.current;
+    const { goFirst, goPrev, goNext, goLast } = result.current.pagination;
 
     rerender();
 
-    expect(result.current.goPrev).toBe(goPrev);
-    expect(result.current.goNext).toBe(goNext);
+    expect(result.current.pagination.goFirst).toBe(goFirst);
+    expect(result.current.pagination.goPrev).toBe(goPrev);
+    expect(result.current.pagination.goNext).toBe(goNext);
+    expect(result.current.pagination.goLast).toBe(goLast);
   });
 });

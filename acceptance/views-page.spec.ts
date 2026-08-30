@@ -229,7 +229,7 @@ test.describe('create view', () => {
     let created = false;
 
     // override the beforeEach mock — last registered route wins in Playwright
-    await page.route(`${API}/views?game=wow`, (route) =>
+    await page.route(`${API}/views?game=wow&page=*`, (route) =>
       route.fulfill({
         json: { records: created ? [makeSimpleView(VALID_VIEW_ID, 'My New Ladder')] : [] },
       }),
@@ -260,6 +260,98 @@ test.describe('create view', () => {
   });
 });
 
+test.describe('paging the ladder list', () => {
+  const manyViews = Array.from({ length: 25 }, (_, i) =>
+    makeSimpleView(`v${i + 1}`, `Ladder ${i + 1}`),
+  );
+
+  test.beforeEach(async ({ page }) => {
+    await seedAuth(page);
+    await mockStaticData(page);
+    await mockFeaturedViews(page);
+    await mockOwnViews(page, manyViews);
+  });
+
+  test('walks through the pages the server returns', async ({ page }) => {
+    const requestedPages: string[] = [];
+    page.on('request', (request) => {
+      const url = new URL(request.url());
+      const isOwnList = !url.searchParams.has('featured');
+      if (url.pathname.endsWith('/views') && url.searchParams.has('page') && isOwnList) {
+        requestedPages.push(url.searchParams.get('page')!);
+      }
+    });
+
+    await page.goto('/');
+
+    await expect(page.locator('.view-row')).toHaveCount(10);
+    await expect(page.getByText('1–10 of 25')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Next page' }).click();
+
+    await expect(page.getByText('11–20 of 25')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ladder 11', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ladder 1', exact: true })).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Next page' }).click();
+
+    await expect(page.getByText('21–25 of 25')).toBeVisible();
+    await expect(page.locator('.view-row')).toHaveCount(5);
+    await expect(page.getByRole('button', { name: 'Next page' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+
+    await page.getByRole('button', { name: 'Previous page' }).click();
+    await expect(page.getByText('11–20 of 25')).toBeVisible();
+
+    expect(requestedPages).toEqual(['1', '2', '3']);
+  });
+
+  test('jumps to the last page and back to the first', async ({ page }) => {
+    await page.goto('/');
+
+    await expect(page.getByText('1–10 of 25')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Last page' }).click();
+
+    await expect(page.getByText('21–25 of 25')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ladder 21', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Last page' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+
+    await page.getByRole('button', { name: 'First page' }).click();
+
+    await expect(page.getByText('1–10 of 25')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ladder 1', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'First page' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
+
+  test('asks the server for a page at a time, with the metadata it needs', async ({ page }) => {
+    const [request] = await Promise.all([
+      page.waitForRequest((req) => {
+        const url = new URL(req.url());
+        return (
+          url.pathname.endsWith('/views') &&
+          req.method() === 'GET' &&
+          !url.searchParams.has('featured')
+        );
+      }),
+      page.goto('/'),
+    ]);
+
+    const params = new URL(request.url()).searchParams;
+    expect(params.get('limit')).toBe('10');
+    expect(params.get('page')).toBe('1');
+    expect(params.get('include')).toBe('metadata');
+  });
+});
+
 test.describe('delete view', () => {
   test('removes the view from the list immediately on delete', async ({ page }) => {
     await seedAuth(page);
@@ -267,7 +359,7 @@ test.describe('delete view', () => {
     await mockFeaturedViews(page);
 
     let deleted = false;
-    await page.route(`${API}/views?game=wow`, (route) =>
+    await page.route(`${API}/views?game=wow&page=*`, (route) =>
       route.fulfill({
         json: { records: deleted ? [] : [makeSimpleView(VALID_VIEW_ID, 'My Ladder')] },
       }),

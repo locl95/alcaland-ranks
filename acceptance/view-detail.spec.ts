@@ -15,32 +15,7 @@ import { ViewData } from '../src/features/views/api/raiderio';
 const viewData: ViewData = { data: [mockCharacter], viewName: 'My Ladder' };
 const emptyViewData: ViewData = { data: [], viewName: 'My Ladder' };
 
-const makeLadder = (
-  count: number,
-): {
-  viewName: string;
-  data: {
-    id: number;
-    name: string;
-    score: number;
-    mythicPlusBestRuns: {
-      run: {
-        keystone_run_id: number;
-        dungeon: string;
-        short_name: string;
-        mythic_level: number;
-        num_keystone_upgrades: number;
-        completed_at: string;
-        clear_time_ms: number;
-        par_time_ms: number;
-        score: number;
-        url: string;
-        affixes: never[];
-      };
-      details: never[];
-    }[];
-  }[];
-} => ({
+const makeLadder = (count: number): ViewData => ({
   viewName: 'My Ladder',
   data: Array.from({ length: count }, (_, i) => ({
     ...mockCharacter,
@@ -158,7 +133,7 @@ test.describe('view detail', () => {
     await expect(card.getByText('11–15 of 15')).toBeVisible();
 
     const cardBox = await card.boundingBox();
-    const pagerBox = await card.locator('.entity-pager').boundingBox();
+    const pagerBox = await card.locator('.pager').boundingBox();
     expect(cardBox, 'dungeon card should be visible').not.toBeNull();
     expect(pagerBox, 'pager should be visible').not.toBeNull();
     const cardBottom = cardBox!.y + cardBox!.height;

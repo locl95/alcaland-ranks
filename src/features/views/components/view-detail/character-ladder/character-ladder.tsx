@@ -5,7 +5,7 @@ import { memo, useMemo, useState } from 'react';
 import { RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
 import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
 import { LadderRow } from './ladder-row.tsx';
-import { EntityPager } from '../entity-pager.tsx';
+import { Pager } from '@/features/views/components/shared/pager.tsx';
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];
@@ -28,8 +28,7 @@ export const CharacterLadder = memo(function CharacterLadder({
     [cachedCharacters],
   );
 
-  const { pageItems, startIndex, page, pageCount, total, goPrev, goNext } =
-    useEntityPage(sortedCharacters);
+  const { pageItems, startIndex, pagination } = useEntityPage(sortedCharacters);
 
   return (
     <div className="ladder-card">
@@ -64,18 +63,9 @@ export const CharacterLadder = memo(function CharacterLadder({
               />
             ))}
           </div>
+          <Pager label="Ladder pages" pagination={pagination} />
         </>
       )}
-
-      <EntityPager
-        page={page}
-        pageCount={pageCount}
-        startIndex={startIndex}
-        count={pageItems.length}
-        total={total}
-        onPrev={goPrev}
-        onNext={goNext}
-      />
     </div>
   );
 });

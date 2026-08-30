@@ -66,7 +66,7 @@ describe('CharacterLadder — paging', () => {
     renderLadder(makeLadder(10));
 
     expect(screen.getAllByTestId(/^ladder-row-/)).toHaveLength(10);
-    expect(screen.queryByRole('navigation', { name: /ladder pages/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: /pages$/i })).not.toBeInTheDocument();
   });
 
   it('pages the ladder, numbering rows from the page offset', async () => {
@@ -87,12 +87,14 @@ describe('CharacterLadder — paging', () => {
     ]);
   });
 
-  it('keeps the range visible when the ladder is collapsed', async () => {
+  it('collapses the pager along with the rows it pages', async () => {
     renderLadder(makeLadder(15));
+    expect(screen.getByRole('navigation', { name: 'Ladder pages' })).toBeInTheDocument();
 
     await userEvent.click(screen.getByText('Ladder'));
 
     expect(screen.queryByTestId('ladder-row-1')).not.toBeInTheDocument();
-    expect(screen.getByText('1–10 of 15')).toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: 'Ladder pages' })).not.toBeInTheDocument();
+    expect(screen.queryByText('1–10 of 15')).not.toBeInTheDocument();
   });
 });

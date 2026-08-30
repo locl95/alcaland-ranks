@@ -7,6 +7,7 @@ import authReducer from '@/app/authSlice.ts';
 import { ViewsList } from './views-list.tsx';
 import { View } from '@/features/views/model/view.ts';
 import { SimpleView } from '@/features/views/api/view-types.ts';
+import { Pagination } from '@/features/views/components/shared/pager.tsx';
 
 const makeSimpleView = (id: string, name: string, owner = 'testuser'): SimpleView => ({
   id,
@@ -42,15 +43,34 @@ const makeStore = (username: string | null = 'testuser') =>
     },
   });
 
+const makePagination = (overrides: Partial<Pagination> = {}): Pagination => ({
+  page: 1,
+  pageCount: 1,
+  startIndex: 0,
+  count: 1,
+  total: 1,
+  goFirst: vi.fn(),
+  goPrev: vi.fn(),
+  goNext: vi.fn(),
+  goLast: vi.fn(),
+  ...overrides,
+});
+
 const renderList = (
   views: View[],
   options: {
     username?: string | null;
     isLoadingViews?: boolean;
     activeTab?: 'featured' | 'own';
+    pagination?: Pagination;
   } = {},
 ) => {
-  const { username = 'testuser', isLoadingViews = false, activeTab = 'own' } = options;
+  const {
+    username = 'testuser',
+    isLoadingViews = false,
+    activeTab = 'own',
+    pagination = makePagination(),
+  } = options;
   const onViewClick = vi.fn();
   const onCreateView = vi.fn();
   const onDeleteView = vi.fn();
@@ -65,11 +85,12 @@ const renderList = (
         onViewClick={onViewClick}
         onCreateView={onCreateView}
         onDeleteView={onDeleteView}
+        pagination={pagination}
       />
     </Provider>,
   );
 
-  return { ...result, onViewClick, onCreateView, onDeleteView };
+  return { ...result, onViewClick, onCreateView, onDeleteView, pagination };
 };
 
 describe('ViewsList', () => {
@@ -161,6 +182,42 @@ describe('ViewsList', () => {
         makeView('v2', 'My Ladder', 'synced', 'testuser'),
       ]);
       expect(screen.getByTitle('Cannot delete while syncing')).toBeDisabled();
+    });
+  });
+
+  describe('paging', () => {
+    it('shows no pager when the server returned everything on one page', () => {
+      renderList([makeView('v1', 'My Ladder')], {
+        pagination: makePagination({ total: 1, pageCount: 1 }),
+      });
+
+      expect(screen.queryByRole('navigation', { name: /pages$/i })).not.toBeInTheDocument();
+    });
+
+    it('states which ladders are on screen', () => {
+      renderList([makeView('v1', 'My Ladder')], {
+        pagination: makePagination({ page: 2, pageCount: 5, startIndex: 10, count: 1, total: 45 }),
+      });
+
+      expect(screen.getByText('11–11 of 45')).toBeInTheDocument();
+    });
+
+    it('counts only what the server sent, not ladders still being created', () => {
+      renderList([makeView('v1', 'My Ladder'), makeView('v2', 'Brand New Ladder', 'pending')], {
+        pagination: makePagination({ page: 1, pageCount: 5, count: 1, total: 45 }),
+      });
+
+      expect(screen.getByText('1–1 of 45')).toBeInTheDocument();
+    });
+
+    it('asks for the next page', async () => {
+      const { pagination } = renderList([makeView('v1', 'My Ladder')], {
+        pagination: makePagination({ page: 1, pageCount: 5, total: 45 }),
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+
+      expect(pagination.goNext).toHaveBeenCalledOnce();
     });
   });
 });

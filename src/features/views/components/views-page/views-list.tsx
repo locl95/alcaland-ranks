@@ -3,6 +3,7 @@ import './views-list.css';
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectUsername } from '@/app/authSlice.ts';
 import { View } from '@/features/views/model/view.ts';
+import { Pager, Pagination } from '@/features/views/components/shared/pager.tsx';
 
 interface ViewsListProps {
   views: View[];
@@ -12,6 +13,7 @@ interface ViewsListProps {
   onViewClick: (viewId: string) => void;
   onCreateView: () => void;
   onDeleteView: (viewId: string) => void;
+  pagination: Pagination;
 }
 
 export function ViewsList({
@@ -22,6 +24,7 @@ export function ViewsList({
   onViewClick,
   onCreateView,
   onDeleteView,
+  pagination,
 }: Readonly<ViewsListProps>) {
   const username = useAppSelector(selectUsername);
   const pendingViews = views.some((v) => v.status === 'pending');
@@ -130,6 +133,7 @@ export function ViewsList({
           </div>
         );
       })}
+      <Pager label="Ladder list pages" pagination={pagination} />
     </div>
   );
 }

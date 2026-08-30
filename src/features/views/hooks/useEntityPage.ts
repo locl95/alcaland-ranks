@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { Pagination } from '@/features/views/components/shared/pager.tsx';
 
 export const ENTITY_PAGE_SIZE = 10;
 
@@ -15,6 +16,9 @@ export function useEntityPage<T>(items: T[]) {
     [items, startIndex],
   );
 
+  const goFirst = useCallback(() => setRequestedPage(1), []);
+  const goLast = useCallback(() => setRequestedPage(pageCount), [pageCount]);
+
   const goPrev = useCallback(
     () => setRequestedPage((p) => Math.max(1, Math.min(p, pageCount) - 1)),
     [pageCount],
@@ -24,5 +28,17 @@ export function useEntityPage<T>(items: T[]) {
     [pageCount],
   );
 
-  return { pageItems, startIndex, page, pageCount, total, goPrev, goNext };
+  const pagination: Pagination = {
+    page,
+    pageCount,
+    startIndex,
+    count: pageItems.length,
+    total,
+    goFirst,
+    goPrev,
+    goNext,
+    goLast,
+  };
+
+  return { pageItems, startIndex, pagination };
 }

@@ -42,7 +42,7 @@ describe('DungeonCard', () => {
     renderCard(makeScores(10));
 
     expect(screen.getAllByTestId(/^run-/)).toHaveLength(10);
-    expect(screen.queryByRole('navigation', { name: /ladder pages/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: /pages$/i })).not.toBeInTheDocument();
   });
 
   it('pages this dungeon on its own', async () => {
