@@ -177,7 +177,7 @@ describe('EditView', () => {
     expect(await screen.findByTitle('Character found')).toBeInTheDocument();
   });
 
-  it('marks a character that does not exist and blocks saving', async () => {
+  it('never adds a character that does not exist, and keeps the name to be corrected', async () => {
     mockCheckEntitiesExist.mockResolvedValue(notFound('Fake'));
     const onSave = vi.fn();
     render(<EditView characters={[]} onClose={vi.fn()} onSave={onSave} />);
@@ -186,16 +186,30 @@ describe('EditView', () => {
     await userEvent.selectOptions(screen.getByTestId('realm-select'), 'tarren-mill');
     await userEvent.click(screen.getByTitle('Add'));
 
-    expect(await screen.findByTitle('Character not found')).toBeInTheDocument();
-    expect(screen.getByText(/Fake was not found/)).toBeInTheDocument();
+    expect(await screen.findByText(/Fake was not found/)).toBeInTheDocument();
+    // No row was created, so there is nothing to delete and no badge to show.
+    expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull();
+    expect(screen.queryByTitle('Character not found')).toBeNull();
+    expect(screen.getByPlaceholderText('Name')).toHaveValue('Fake');
     expect(screen.getByText('Done')).toBeDisabled();
-
-    await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
-    expect(screen.getByText('Done')).toBeEnabled();
-    expect(onSave).not.toHaveBeenCalled();
   });
 
-  it('clears the input on add so another character can be typed while checking', async () => {
+  it('clears the rejection once the name is edited', async () => {
+    mockCheckEntitiesExist.mockResolvedValue(notFound('Fake'));
+    render(<EditView characters={[]} onClose={vi.fn()} onSave={vi.fn()} />);
+
+    await userEvent.type(screen.getByPlaceholderText('Name'), 'Fake');
+    await userEvent.selectOptions(screen.getByTestId('realm-select'), 'tarren-mill');
+    await userEvent.click(screen.getByTitle('Add'));
+    expect(await screen.findByText(/Fake was not found/)).toBeInTheDocument();
+
+    await userEvent.clear(screen.getByPlaceholderText('Name'));
+
+    expect(screen.queryByText(/Fake was not found/)).toBeNull();
+    expect(screen.getByText('Done')).toBeEnabled();
+  });
+
+  it('holds the add row while the check is in flight, then commits it', async () => {
     let resolveCheck: (value: unknown) => void = () => {};
     mockCheckEntitiesExist.mockReturnValue(
       new Promise((resolve) => {
@@ -208,16 +222,20 @@ describe('EditView', () => {
     await userEvent.selectOptions(screen.getByTestId('realm-select'), 'tarren-mill');
     await userEvent.click(screen.getByTitle('Add'));
 
+    // The row being checked is the add row itself, so it holds its value and locks: the
+    // character is not in the list yet and may still turn out not to exist.
     expect(screen.getByTitle('Checking character')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Name')).toHaveValue('');
+    expect(screen.getByPlaceholderText('Name')).toHaveValue('Arthas');
+    expect(screen.getByPlaceholderText('Name')).toBeDisabled();
+    expect(screen.queryByTitle('Add')).toBeNull();
     expect(screen.getByText('Done')).toBeDisabled();
 
-    await userEvent.type(screen.getByPlaceholderText('Name'), 'Sylvanas');
-    await userEvent.selectOptions(screen.getByTestId('realm-select'), 'silvermoon');
-    expect(screen.getByTitle('Add')).toBeEnabled();
-
     await act(async () => resolveCheck({ exist: [], nonExisting: [], unchecked: [] }));
+
     expect(screen.getByTitle('Character found')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Name')).toHaveValue('');
+    expect(screen.getByPlaceholderText('Name')).toBeEnabled();
+    expect(screen.getByText('Done')).toBeEnabled();
   });
 
   it('blocks saving while a name is typed but not added', async () => {
@@ -332,5 +350,146 @@ describe('EditView', () => {
     await userEvent.click(screen.getByTitle('Add'));
 
     expect(screen.getByText('Arthas is already in this ladder.')).toBeInTheDocument();
+  });
+
+  describe('pagination', () => {
+    const manyProfiles = (count: number) =>
+      Array.from({ length: count }, (_, i) => makeProfile(i + 1, `Char${i + 1}`, 2000 - i));
+
+    const addCharacter = async (name: string) => {
+      await userEvent.type(screen.getByPlaceholderText('Name'), name);
+      await userEvent.selectOptions(screen.getByTestId('realm-select'), 'tarren-mill');
+      await userEvent.click(screen.getByTitle('Add'));
+    };
+
+    it('renders no pager while everything fits on one page', () => {
+      render(<EditView characters={manyProfiles(10)} onClose={vi.fn()} onSave={vi.fn()} />);
+      expect(screen.queryByRole('navigation', { name: 'Character list pages' })).toBeNull();
+    });
+
+    it('shows only the first page once the list overflows', () => {
+      render(<EditView characters={manyProfiles(12)} onClose={vi.fn()} onSave={vi.fn()} />);
+
+      expect(screen.getByText('Char1')).toBeInTheDocument();
+      expect(screen.getByText('Char10')).toBeInTheDocument();
+      expect(screen.queryByText('Char11')).toBeNull();
+      expect(screen.getByRole('navigation', { name: 'Character list pages' })).toBeInTheDocument();
+    });
+
+    it('reveals the rest of the list on the next page', async () => {
+      render(<EditView characters={manyProfiles(12)} onClose={vi.fn()} onSave={vi.fn()} />);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+
+      expect(screen.getByText('Char11')).toBeInTheDocument();
+      expect(screen.queryByText('Char1')).toBeNull();
+    });
+
+    // Appending would drop the new row onto the last page, out of sight along with its
+    // verification badge; it is prepended and the dialog returns to page one instead.
+    it('shows a character added from a later page', async () => {
+      render(<EditView characters={manyProfiles(12)} onClose={vi.fn()} onSave={vi.fn()} />);
+      await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(screen.queryByText('Char1')).toBeNull();
+
+      await addCharacter('Newcomer');
+
+      expect(screen.getByText('Newcomer')).toBeInTheDocument();
+      expect(screen.getByText('Char1')).toBeInTheDocument();
+    });
+
+    it('keeps every character in the payload, not just the visible page', async () => {
+      const onSave = vi.fn();
+      render(<EditView characters={manyProfiles(12)} onClose={vi.fn()} onSave={onSave} />);
+
+      await userEvent.click(screen.getByText('Done'));
+
+      expect(onSave.mock.calls[0][0]).toHaveLength(12);
+    });
+
+    it('falls back to the previous page when the last one is emptied', async () => {
+      render(<EditView characters={manyProfiles(11)} onClose={vi.fn()} onSave={vi.fn()} />);
+      await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(screen.getByText('Char11')).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+      expect(screen.getByText('Char1')).toBeInTheDocument();
+      expect(screen.queryByRole('navigation', { name: 'Character list pages' })).toBeNull();
+    });
+
+    // A rejected character is never added, so it cannot hide on a page you are not looking
+    // at: the pager stays put and the payload is unchanged.
+    it('adds no row anywhere when the character is rejected', async () => {
+      mockCheckEntitiesExist.mockResolvedValue(notFound('Fake'));
+      const onSave = vi.fn();
+      render(<EditView characters={manyProfiles(12)} onClose={vi.fn()} onSave={onSave} />);
+
+      await addCharacter('Fake');
+      await screen.findByText(/Fake was not found/);
+
+      expect(screen.queryByText('Fake')).toBeNull();
+      await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(screen.queryByText('Fake')).toBeNull();
+
+      await userEvent.clear(screen.getByPlaceholderText('Name'));
+      await userEvent.click(screen.getByText('Done'));
+      expect(onSave.mock.calls[0][0]).toHaveLength(12);
+    });
+  });
+
+  describe('ordering', () => {
+    const renderedNames = () =>
+      Array.from(document.querySelectorAll('.character-edit-name')).map((el) => el.textContent);
+
+    it('lists characters by score, highest first', () => {
+      render(
+        <EditView
+          characters={[
+            makeProfile(1, 'Mid', 2000),
+            makeProfile(2, 'Top', 3200),
+            makeProfile(3, 'Low', 900),
+          ]}
+          onClose={vi.fn()}
+          onSave={vi.fn()}
+        />,
+      );
+
+      expect(renderedNames()).toEqual(['Top', 'Mid', 'Low']);
+    });
+
+    // A character added here has no profile and therefore no score. The ladder sorts the
+    // unscored last; this dialog puts them first so the row you just created stays visible.
+    it('puts a newly added character above the scored ones', async () => {
+      render(
+        <EditView
+          characters={[makeProfile(1, 'Top', 3200), makeProfile(2, 'Low', 900)]}
+          onClose={vi.fn()}
+          onSave={vi.fn()}
+        />,
+      );
+
+      await userEvent.type(screen.getByPlaceholderText('Name'), 'Newcomer');
+      await userEvent.selectOptions(screen.getByTestId('realm-select'), 'tarren-mill');
+      await userEvent.click(screen.getByTitle('Add'));
+      await screen.findByTitle('Character found');
+
+      expect(renderedNames()).toEqual(['Newcomer', 'Top', 'Low']);
+    });
+
+    it('keeps the most recent addition at the very top', async () => {
+      render(
+        <EditView characters={[makeProfile(1, 'Top', 3200)]} onClose={vi.fn()} onSave={vi.fn()} />,
+      );
+
+      for (const name of ['First', 'Second']) {
+        await userEvent.type(screen.getByPlaceholderText('Name'), name);
+        await userEvent.selectOptions(screen.getByTestId('realm-select'), 'tarren-mill');
+        await userEvent.click(screen.getByTitle('Add'));
+        await screen.findByText(name);
+      }
+
+      expect(renderedNames()).toEqual(['Second', 'First', 'Top']);
+    });
   });
 });

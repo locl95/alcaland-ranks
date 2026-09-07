@@ -206,3 +206,13 @@
   border-color: rgba(74, 222, 128, 0.55);
   color: #86efac;
 }
+
+/* The shared pager is built to sit flush inside a bordered container. Here it sits inside
+   the already-padded body, so it drops its own inset and keeps only the rule. No negative
+   margin: .edit-view-body scrolls, and that would buy a horizontal scrollbar with it. */
+.edit-view-body .pager {
+  padding-left: 0;
+  padding-right: 0;
+  margin-top: 0.75rem;
+  background: transparent;
+}

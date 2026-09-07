@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Plus, Trash2, X } from 'lucide-react';
 import { hasOpenPopupInside } from '@/features/views/components/shared/dialog.ts';
@@ -12,6 +12,8 @@ import { CLASS_COLORS } from '@/features/views/constants/class-colors.ts';
 import { RealmSelect } from '@/features/views/components/shared/realm-select.tsx';
 import { VerificationBadge } from '@/features/views/components/shared/verification-badge.tsx';
 import { useEditViewForm } from '@/features/views/hooks/useEditViewForm.ts';
+import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
+import { Pager } from '@/features/views/components/shared/pager.tsx';
 
 const DARK_CLASSES = new Set(['death-knight', 'warlock', 'demon-hunter']);
 
@@ -32,11 +34,35 @@ export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps
     setRealm,
     setRegion,
     errorMessage,
+    isChecking,
     canSave,
     addCharacter,
     deleteCharacter,
     save,
   } = useEditViewForm(characters, onSave);
+
+  // Score order, like the ladder — with one deliberate difference: characters added in
+  // this dialog have no profile yet, and go on top rather than last. They are what you are
+  // working on, and burying them on the final page is what the page reset avoids.
+  const sortedCharacters = useMemo(
+    () =>
+      [...editingCharacters].sort((a, b) => {
+        const scoreA = a.profile?.score;
+        const scoreB = b.profile?.score;
+        if (scoreA == null && scoreB == null) return 0;
+        if (scoreA == null) return -1;
+        if (scoreB == null) return 1;
+        return scoreB - scoreA;
+      }),
+    [editingCharacters],
+  );
+
+  const { pageItems, pagination } = useEntityPage(sortedCharacters);
+
+  const handleAdd = () => {
+    addCharacter();
+    pagination.goFirst();
+  };
 
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +91,7 @@ export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps
 
           <div className="edit-view-body">
             <div className="character-edit-items">
-              {editingCharacters.map((character) => (
+              {pageItems.map((character) => (
                 <div key={character.id} className="character-edit-row">
                   <div className="character-edit-info">
                     <div className="character-edit-name-row">
@@ -118,13 +144,16 @@ export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps
               ))}
             </div>
 
+            <Pager label="Character list pages" pagination={pagination} />
+
             <div className="character-add-row">
               <input
                 className="form-input"
                 placeholder="Name"
                 value={newName}
                 onChange={(e) => setName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addCharacter()}
+                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+                disabled={isChecking}
               />
 
               <RealmSelect
@@ -134,15 +163,20 @@ export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps
                 onRealmChange={setRealm}
               />
 
-              <button
-                type="button"
-                className="btn-icon btn-icon-primary"
-                onClick={addCharacter}
-                disabled={!newName.trim() || !newRealm}
-                title="Add"
-              >
-                <Plus size={16} />
-              </button>
+              {/* The check runs on this row now, not on a row already in the list. */}
+              {isChecking ? (
+                <VerificationBadge status="checking" />
+              ) : (
+                <button
+                  type="button"
+                  className="btn-icon btn-icon-primary"
+                  onClick={handleAdd}
+                  disabled={!newName.trim() || !newRealm}
+                  title="Add"
+                >
+                  <Plus size={16} />
+                </button>
+              )}
             </div>
 
             {errorMessage && <p className="form-error">{errorMessage}</p>}
