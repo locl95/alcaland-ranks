@@ -19,13 +19,15 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
   const {
     name,
     setName,
-    characters,
+    mode,
+    selectMode,
+    rows,
     canSubmit,
     errorMessage,
     isSubmitting,
-    updateCharacter,
-    addCharacter,
-    removeCharacter,
+    updateRow,
+    verifyRow,
+    removeRow,
     handleSubmit,
   } = useCreateViewForm(onClose, onCreateView);
 
@@ -61,43 +63,61 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
                   placeholder="e.g., Main Push Team"
                 />
               </div>
-              <label className="form-label">Characters</label>
+              <div className="create-mode-toggle" role="group" aria-label="Ladder contents">
+                <button
+                  type="button"
+                  className={`create-mode-btn${mode === 'characters' ? ' create-mode-btn--active' : ''}`}
+                  aria-pressed={mode === 'characters'}
+                  onClick={() => selectMode('characters')}
+                >
+                  Characters
+                </button>
+                <button
+                  type="button"
+                  className={`create-mode-btn${mode === 'guild' ? ' create-mode-btn--active' : ''}`}
+                  aria-pressed={mode === 'guild'}
+                  onClick={() => selectMode('guild')}
+                >
+                  Guild
+                </button>
+              </div>
 
-              {characters.map((char, index) => (
-                <div key={char.id} className="character-row">
+              {rows.map((row, index) => (
+                <div key={row.id} className="entity-row">
                   <input
                     className="form-input"
-                    placeholder="Name"
-                    value={char.name}
-                    onChange={(e) => updateCharacter(char.id, 'name', e.target.value)}
+                    placeholder={mode === 'guild' ? 'Guild name' : 'Name'}
+                    value={row.name}
+                    onChange={(e) => updateRow(row.id, 'name', e.target.value)}
                   />
 
                   <RealmSelect
-                    region={char.region}
-                    realm={char.realm}
-                    onRegionChange={(v) => updateCharacter(char.id, 'region', v)}
-                    onRealmChange={(v) => updateCharacter(char.id, 'realm', v)}
+                    region={row.region}
+                    realm={row.realm}
+                    onRegionChange={(v) => updateRow(row.id, 'region', v)}
+                    onRealmChange={(v) => updateRow(row.id, 'realm', v)}
                   />
 
-                  {char.status === 'draft' && (
+                  {row.status === 'draft' ? (
                     <button
                       type="button"
                       className="btn-icon btn-icon-primary"
-                      onClick={() => addCharacter(char.id)}
-                      disabled={!char.name || !char.realm}
+                      onClick={() => verifyRow(row.id)}
+                      disabled={!row.name || !row.realm}
                       title="Add"
                     >
                       <Plus size={16} />
                     </button>
+                  ) : (
+                    <VerificationBadge status={row.status} />
                   )}
 
-                  {char.status !== 'draft' && <VerificationBadge status={char.status} />}
-
-                  {index < characters.length - 1 && (
+                  {/* Never renders in guild mode: the single row is always the last one. */}
+                  {index < rows.length - 1 && (
                     <button
                       type="button"
                       className="btn-icon btn-icon-outline"
-                      onClick={() => removeCharacter(char.id)}
+                      onClick={() => removeRow(row.id)}
                       title="Remove"
                     >
                       <X size={16} />
@@ -105,6 +125,10 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
                   )}
                 </div>
               ))}
+
+              {mode === 'guild' && (
+                <p className="form-hint">The whole roster is pulled in for you.</p>
+              )}
 
               {errorMessage && <p className="form-error">{errorMessage}</p>}
             </div>
@@ -114,7 +138,13 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
                 type="submit"
                 className="btn btn-primary"
                 disabled={!canSubmit}
-                title={canSubmit ? undefined : 'Name the ladder and add at least one character'}
+                title={
+                  canSubmit
+                    ? undefined
+                    : mode === 'guild'
+                      ? 'Name the ladder and add a guild'
+                      : 'Name the ladder and add at least one character'
+                }
               >
                 {isSubmitting ? 'Creating...' : 'Create'}
               </button>
