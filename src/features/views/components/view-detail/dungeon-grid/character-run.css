@@ -189,3 +189,45 @@
     font-size: 0.6875rem;
   }
 }
+
+/* A second, narrower breakpoint than the 640px the rest of the app uses — deliberately.
+   The block above still spends 9.5rem on fixed number columns, which only starves the
+   name once the card itself is phone-width: 72px of name at 360px, 32px at 320px. On a
+   500px screen those same columns leave the name 244px, so shrinking there would just
+   make the type small for no reason. */
+@media (max-width: 400px) {
+  .dungeon-cols,
+  .character-run {
+    grid-template-columns: minmax(0, 1fr) 3rem 2.25rem 4.5rem;
+  }
+
+  .character-run-left {
+    gap: 0.375rem;
+  }
+
+  .spec-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .character-run-name {
+    font-size: 0.75rem;
+  }
+
+  .character-run-score {
+    font-size: 0.875rem;
+  }
+
+  .character-run-key {
+    font-size: 0.8125rem;
+  }
+
+  .character-run-time {
+    font-size: 0.6875rem;
+  }
+
+  .time-delta-timed,
+  .time-delta-depleted {
+    font-size: 0.625rem;
+  }
+}

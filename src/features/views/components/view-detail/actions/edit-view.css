@@ -216,3 +216,83 @@
   margin-top: 0.75rem;
   background: transparent;
 }
+
+/* On a phone a row keeps only what you need to decide whether to delete it: the name,
+   the class, and the button. The meta line is four fixed tracks — 21.5rem of them — so
+   it cannot narrow, and at 360px it pushed the score clean out of the row. */
+@media (max-width: 640px) {
+  .edit-view-header,
+  .edit-view-body,
+  .edit-view-footer {
+    padding: 0.875rem 1rem;
+  }
+
+  .edit-view-title {
+    font-size: 1.25rem;
+  }
+
+  .edit-view-subtitle {
+    font-size: 0.8125rem;
+  }
+
+  .character-edit-row {
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem;
+  }
+
+  .character-edit-meta {
+    display: none;
+  }
+
+  /* The margin only separated the name from the meta line, which is gone. Wrapping
+     keeps a long name whole — the class badge drops beneath it instead of squeezing it. */
+  .character-edit-name-row {
+    flex-wrap: wrap;
+    gap: 0.375rem 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .character-edit-name {
+    font-size: 1rem;
+  }
+
+  .character-delete-btn {
+    padding: 0.375rem 0.5rem;
+  }
+
+  .manage-done-btn {
+    font-size: 1rem;
+    padding: 0.5rem 1.25rem;
+  }
+
+  /* Same two-line split as the create dialog's row, minus the remove button this one
+     never had: at 360px the realm field was 58px wide, and so was the list it opens. */
+  .character-add-row {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      'name   name  action'
+      'region realm realm';
+    align-items: center;
+  }
+
+  /* Direct child: the realm's own input is a .form-input too, but it is nested inside
+     .realm-combobox and gets placed by that wrapper. */
+  .character-add-row > .form-input {
+    grid-area: name;
+  }
+
+  .character-add-row > .form-select-region {
+    grid-area: region;
+    width: 100%;
+  }
+
+  .character-add-row > .realm-combobox {
+    grid-area: realm;
+  }
+
+  .character-add-row > .btn-icon-primary,
+  .character-add-row > .verification-badge {
+    grid-area: action;
+  }
+}

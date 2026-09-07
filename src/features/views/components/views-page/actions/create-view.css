@@ -142,3 +142,52 @@
   color: var(--ink-3);
   font-size: 0.8125rem;
 }
+
+/* Name + region + realm + add does not fit one line on a phone: at 360px the realm field
+   came out 58px wide — two letters of "Chamber of Aspects" — and the list it opens takes
+   the input's width, so it was unreadable too. The row splits in two instead, name and
+   its buttons above, region and realm sharing the line below, which puts the realm back
+   at ~190px. Lives here rather than in form-controls.css because this file is imported
+   after it, and an equally specific `display: flex` there would win. */
+@media (max-width: 640px) {
+  .create-view-panel {
+    padding: 1.125rem;
+  }
+
+  .dialog-title {
+    font-size: 1.25rem;
+  }
+
+  .entity-row {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'name   name  action remove'
+      'region realm realm  realm';
+    align-items: center;
+  }
+
+  /* Direct child: the realm's own input is a .form-input too, but it is nested inside
+     .realm-combobox and gets placed by that wrapper. */
+  .entity-row > .form-input {
+    grid-area: name;
+  }
+
+  .entity-row > .form-select-region {
+    grid-area: region;
+    width: 100%;
+  }
+
+  .entity-row > .realm-combobox {
+    grid-area: realm;
+  }
+
+  .entity-row > .btn-icon-primary,
+  .entity-row > .verification-badge {
+    grid-area: action;
+  }
+
+  .entity-row > .btn-icon-outline {
+    grid-area: remove;
+  }
+}
