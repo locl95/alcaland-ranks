@@ -72,8 +72,8 @@ const makeWrapper = () => {
 describe('useViewsData', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockServiceGet.mockResolvedValue({ records: [] });
-    mockUserRequest.mockResolvedValue({ records: [] });
+    mockServiceGet.mockResolvedValue({ records: [], metadata: { totalCount: 0 } });
+    mockUserRequest.mockResolvedValue({ records: [], metadata: { totalCount: 0 } });
     mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'COMPLETED' });
   });
 
@@ -82,12 +82,17 @@ describe('useViewsData', () => {
       const { wrapper } = makeWrapper();
       renderHook(() => useViewsData(false), { wrapper });
       await waitFor(() =>
-        expect(mockServiceGet).toHaveBeenCalledWith('/views?game=wow&featured=true'),
+        expect(mockServiceGet).toHaveBeenCalledWith(
+          '/views?game=wow&featured=true&page=1&limit=10&include=metadata',
+        ),
       );
     });
 
     it('returns the featured views from the API', async () => {
-      mockServiceGet.mockResolvedValue({ records: [makeSimpleView('v1', 'Featured')] });
+      mockServiceGet.mockResolvedValue({
+        records: [makeSimpleView('v1', 'Featured')],
+        metadata: { totalCount: 1 },
+      });
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(false), { wrapper });
       await waitFor(() => expect(result.current.featuredViews).toHaveLength(1));
@@ -106,11 +111,19 @@ describe('useViewsData', () => {
     it('fetches own views using userRequest when authenticated', async () => {
       const { wrapper } = makeWrapper();
       renderHook(() => useViewsData(true), { wrapper });
-      await waitFor(() => expect(mockUserRequest).toHaveBeenCalledWith('GET', '/views?game=wow'));
+      await waitFor(() =>
+        expect(mockUserRequest).toHaveBeenCalledWith(
+          'GET',
+          '/views?game=wow&page=1&limit=10&include=metadata',
+        ),
+      );
     });
 
     it('returns the own views from the API', async () => {
-      mockUserRequest.mockResolvedValue({ records: [makeSimpleView('v1', 'My View')] });
+      mockUserRequest.mockResolvedValue({
+        records: [makeSimpleView('v1', 'My View')],
+        metadata: { totalCount: 1 },
+      });
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(true), { wrapper });
       await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
@@ -139,8 +152,11 @@ describe('useViewsData', () => {
         resourceId: 'real-view-id',
       });
       mockUserRequest
-        .mockResolvedValueOnce({ records: [] })
-        .mockResolvedValue({ records: [makeSimpleView('real-view-id', 'New View')] });
+        .mockResolvedValueOnce({ records: [], metadata: { totalCount: 0 } })
+        .mockResolvedValue({
+          records: [makeSimpleView('real-view-id', 'New View')],
+          metadata: { totalCount: 1 },
+        });
 
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(true), { wrapper });
@@ -317,5 +333,160 @@ describe('useViewsData', () => {
 
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: viewKeys.ownList() });
     });
+  });
+});
+
+describe('useViewsData — paging', () => {
+  const pageOfViews = (page: number, totalCount: number) => ({
+    records: [makeSimpleView(`v${page}`, `View page ${page}`)],
+    metadata: { totalCount },
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockServiceGet.mockResolvedValue({ records: [], metadata: { totalCount: 0 } });
+    mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'COMPLETED' });
+  });
+
+  it('reports how many pages the server says there are', async () => {
+    mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useViewsData(true), { wrapper });
+
+    await waitFor(() => expect(result.current.ownPagination.total).toBe(45));
+    expect(result.current.ownPagination.pageCount).toBe(5);
+    expect(result.current.ownPagination.page).toBe(1);
+    expect(result.current.ownPagination.startIndex).toBe(0);
+  });
+
+  it('asks the server for the next page', async () => {
+    mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
+
+    mockUserRequest.mockResolvedValue(pageOfViews(2, 45));
+    act(() => result.current.ownPagination.goNext());
+
+    await waitFor(() =>
+      expect(mockUserRequest).toHaveBeenCalledWith(
+        'GET',
+        '/views?game=wow&page=2&limit=10&include=metadata',
+      ),
+    );
+    expect(result.current.ownPagination.page).toBe(2);
+    expect(result.current.ownPagination.startIndex).toBe(10);
+  });
+
+  it('steps back when the page it is on no longer exists', async () => {
+    mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    await waitFor(() => expect(result.current.ownPagination.pageCount).toBe(5));
+
+    mockUserRequest.mockResolvedValue(pageOfViews(2, 45));
+    act(() => result.current.ownPagination.goNext());
+    await waitFor(() => expect(result.current.ownPagination.page).toBe(2));
+
+    mockUserRequest.mockResolvedValue({ records: [], metadata: { totalCount: 12 } });
+    act(() => result.current.ownPagination.goNext());
+
+    await waitFor(() =>
+      expect(mockUserRequest).toHaveBeenCalledWith(
+        'GET',
+        '/views?game=wow&page=3&limit=10&include=metadata',
+      ),
+    );
+    await waitFor(() => expect(result.current.ownPagination.page).toBe(2));
+  });
+
+  it('keeps later pages reachable when the server omits the total', async () => {
+    // The backend is asked for include=metadata; if it answers without it we must not
+    // silently strand every row past the first page.
+    mockUserRequest.mockResolvedValue({
+      records: Array.from({ length: 10 }, (_, i) => makeSimpleView(`v${i + 1}`, `View ${i + 1}`)),
+    });
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useViewsData(true), { wrapper });
+
+    await waitFor(() => expect(result.current.ownViews).toHaveLength(10));
+    expect(result.current.ownPagination.pageCount).toBe(2);
+
+    mockUserRequest.mockResolvedValue({
+      records: [makeSimpleView('v11', 'View 11')],
+    });
+    act(() => result.current.ownPagination.goNext());
+
+    await waitFor(() =>
+      expect(mockUserRequest).toHaveBeenCalledWith(
+        'GET',
+        '/views?game=wow&page=2&limit=10&include=metadata',
+      ),
+    );
+    await waitFor(() => expect(result.current.ownPagination.total).toBe(11));
+    expect(result.current.ownPagination.pageCount).toBe(2);
+  });
+
+  it('stays on one page when a short page arrives without a total', async () => {
+    mockUserRequest.mockResolvedValue({
+      records: [makeSimpleView('v1', 'View 1')],
+    });
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useViewsData(true), { wrapper });
+
+    await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
+
+    expect(result.current.ownPagination.pageCount).toBe(1);
+    expect(result.current.ownPagination.total).toBe(1);
+  });
+
+  it('asks the server for the last page, then the first', async () => {
+    mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    await waitFor(() => expect(result.current.ownPagination.pageCount).toBe(5));
+
+    act(() => result.current.ownPagination.goLast());
+
+    await waitFor(() =>
+      expect(mockUserRequest).toHaveBeenCalledWith(
+        'GET',
+        '/views?game=wow&page=5&limit=10&include=metadata',
+      ),
+    );
+    expect(result.current.ownPagination.page).toBe(5);
+    expect(result.current.ownPagination.startIndex).toBe(40);
+
+    act(() => result.current.ownPagination.goFirst());
+
+    await waitFor(() => expect(result.current.ownPagination.page).toBe(1));
+    expect(result.current.ownPagination.startIndex).toBe(0);
+  });
+
+  it('counts the server page, not the pending views merged into it', async () => {
+    mockPollOperation.mockReturnValue(new Promise(() => {}));
+    mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useViewsData(true), { wrapper });
+
+    await waitFor(() => expect(result.current.ownPagination.count).toBe(1));
+
+    act(() => result.current.createView(makeView('op-123', 'Pending View', 'pending')));
+
+    await waitFor(() => expect(result.current.ownViews).toHaveLength(2));
+    expect(result.current.ownPagination.count).toBe(1);
+  });
+
+  it('pages the featured list separately from the own list', async () => {
+    mockServiceGet.mockResolvedValue(pageOfViews(1, 45));
+    mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    await waitFor(() => expect(result.current.featuredPagination.pageCount).toBe(5));
+
+    act(() => result.current.featuredPagination.goNext());
+
+    await waitFor(() => expect(result.current.featuredPagination.page).toBe(2));
+    expect(result.current.ownPagination.page).toBe(1);
   });
 });

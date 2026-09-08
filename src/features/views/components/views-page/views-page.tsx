@@ -45,8 +45,10 @@ export function ViewsPage() {
   const {
     featuredViews,
     isLoadingFeatured,
+    featuredPagination,
     ownViews,
     isLoadingOwn,
+    ownPagination,
     createView,
     deleteView,
     deletingViewId,
@@ -56,6 +58,7 @@ export function ViewsPage() {
 
   const views = activeTab === 'featured' ? featuredViews : ownViews;
   const isLoadingViews = activeTab === 'featured' ? isLoadingFeatured : isLoadingOwn;
+  const pagination = activeTab === 'featured' ? featuredPagination : ownPagination;
   const isSyncing = views.some((v) => v.status === 'pending');
 
   const requireAuth = (action: () => void) => {
@@ -186,6 +189,7 @@ export function ViewsPage() {
           onViewClick={handleViewClick}
           onCreateView={handleCreateClick}
           onDeleteView={handleDeleteView}
+          pagination={pagination}
         />
       </div>
 

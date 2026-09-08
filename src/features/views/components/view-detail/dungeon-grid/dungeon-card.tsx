@@ -5,7 +5,9 @@ import {
   RaiderioProfile,
   Season,
 } from '@/features/views/api/raiderio.ts';
+import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
 import { CharacterRun } from './character-run.tsx';
+import { Pager } from '@/features/views/components/shared/pager.tsx';
 
 export interface CharacterDungeonScore {
   character: RaiderioProfile;
@@ -25,6 +27,8 @@ export function DungeonCard({
   winningRun,
   cachedProfiles,
 }: Readonly<DungeonCardProps>) {
+  const { pageItems, pagination } = useEntityPage(characterScores);
+
   return (
     <div className="dungeon-card" id={`dungeon-card-${dungeon.short_name.toLowerCase()}`}>
       <div className="dungeon-header">
@@ -46,7 +50,7 @@ export function DungeonCard({
         <span className="eyebrow">Time</span>
       </div>
       <div className="dungeon-content">
-        {characterScores.map(({ character, bestRun }) => {
+        {pageItems.map(({ character, bestRun }) => {
           const run = bestRun?.run;
           const isHighest =
             !!winningRun &&
@@ -64,6 +68,7 @@ export function DungeonCard({
           );
         })}
       </div>
+      <Pager label={`${dungeon.name} pages`} pagination={pagination} />
     </div>
   );
 }

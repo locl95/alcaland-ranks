@@ -3,7 +3,9 @@ import keystone from '@/assets/keystone.webp';
 import './character-ladder.css';
 import { memo, useMemo, useState } from 'react';
 import { RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
+import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
 import { LadderRow } from './ladder-row.tsx';
+import { Pager } from '@/features/views/components/shared/pager.tsx';
 
 interface CharacterLadderProps {
   characters: RaiderioProfile[];
@@ -25,6 +27,8 @@ export const CharacterLadder = memo(function CharacterLadder({
     () => [...cachedCharacters].sort((a, b) => (b.score ?? -1) - (a.score ?? -1)),
     [cachedCharacters],
   );
+
+  const { pageItems, startIndex, pagination } = useEntityPage(sortedCharacters);
 
   return (
     <div className="ladder-card">
@@ -49,16 +53,17 @@ export const CharacterLadder = memo(function CharacterLadder({
             <span className="eyebrow ladder-cols-score">M+ score</span>
           </div>
           <div className="ladder-content">
-            {sortedCharacters.map((character, index) => (
+            {pageItems.map((character, index) => (
               <LadderRow
                 key={character.id}
-                index={index}
+                index={startIndex + index}
                 character={character}
                 cachedCharacters={sortedCachedCharacters}
                 season={season}
               />
             ))}
           </div>
+          <Pager label="Ladder pages" pagination={pagination} />
         </>
       )}
     </div>

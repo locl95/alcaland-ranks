@@ -15,6 +15,57 @@ import { ViewData } from '../src/features/views/api/raiderio';
 const viewData: ViewData = { data: [mockCharacter], viewName: 'My Ladder' };
 const emptyViewData: ViewData = { data: [], viewName: 'My Ladder' };
 
+const makeLadder = (count: number): {
+    viewName: string;
+    data: {
+        id: number;
+        name: string;
+        score: number;
+        mythicPlusBestRuns: {
+            run: {
+                keystone_run_id: number;
+                dungeon: string;
+                short_name: string;
+                mythic_level: number;
+                num_keystone_upgrades: number;
+                completed_at: string;
+                clear_time_ms: number;
+                par_time_ms: number;
+                score: number;
+                url: string;
+                affixes: never[]
+            };
+            details: never[]
+        }[]
+    }[]
+} => ({
+  viewName: 'My Ladder',
+  data: Array.from({ length: count }, (_, i) => ({
+    ...mockCharacter,
+    id: i + 1,
+    name: `Char${i + 1}`,
+    score: 3000 - i * 10,
+    mythicPlusBestRuns: [
+      {
+        run: {
+          keystone_run_id: i + 1,
+          dungeon: 'Siege of Boralus',
+          short_name: 'SIEGE',
+          mythic_level: 10,
+          num_keystone_upgrades: 1,
+          completed_at: '2026-01-01T00:00:00.000Z',
+          clear_time_ms: 1_800_000,
+          par_time_ms: 2_000_000,
+          score: 100 + i,
+          url: 'https://raider.io/run',
+          affixes: [],
+        },
+        details: [],
+      },
+    ],
+  })),
+});
+
 async function mockViewDetailApis(page: Parameters<typeof seedAuth>[0], data = viewData) {
   await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) => route.fulfill({ json: data }));
   await page.route(`${API}/views/${VALID_VIEW_ID}/cached-data`, (route) =>
@@ -51,6 +102,47 @@ test.describe('view detail', () => {
     await expect(page.getByText('Ladder', { exact: true })).toBeVisible();
     await expect(page.getByText('Arthas').first()).toBeVisible();
     await expect(page.getByText('Siege of Boralus')).toBeVisible();
+  });
+
+  test('the ladder and each dungeon card page independently', async ({ page }) => {
+    await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
+      route.fulfill({ json: makeLadder(15) }),
+    );
+    await page.goto(`/${VALID_VIEW_ID}`);
+
+    const ladder = page.locator('.ladder-card');
+    const dungeon = page.locator('.dungeon-card');
+
+    await expect(page.locator('.ladder-row')).toHaveCount(10);
+    await expect(ladder.getByText('1–10 of 15')).toBeVisible();
+
+    await expect(dungeon.locator('.character-run-name').first()).toHaveText('Char15');
+    await expect(dungeon.locator('.crown-icon')).toBeVisible();
+
+    await ladder.getByRole('button', { name: 'Next page' }).click();
+
+    await expect(ladder.getByText('11–15 of 15')).toBeVisible();
+    await expect(page.locator('.ladder-character-name')).toHaveText([
+      'Char11',
+      'Char12',
+      'Char13',
+      'Char14',
+      'Char15',
+    ]);
+    await expect(dungeon.getByText('1–10 of 15')).toBeVisible();
+    await expect(dungeon.locator('.character-run-name').first()).toHaveText('Char15');
+
+    await dungeon.getByRole('button', { name: 'Next page' }).click();
+
+    await expect(dungeon.getByText('11–15 of 15')).toBeVisible();
+    await expect(dungeon.locator('.character-run-name')).toHaveText([
+      'Char5',
+      'Char4',
+      'Char3',
+      'Char2',
+      'Char1',
+    ]);
+    await expect(ladder.getByText('11–15 of 15')).toBeVisible();
   });
 
   test('edit: deleting all characters hides the ladder', async ({ page }) => {
@@ -116,7 +208,7 @@ test.describe('view detail', () => {
     await expect(page.getByText('Syncing…')).toBeVisible();
   });
 
-  test('edit: flags a character that does not exist and blocks saving', async ({ page }) => {
+  test('edit: never adds a character that does not exist, and blocks saving', async ({ page }) => {
     await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
     await page.route(`${API}/entities/exists`, (route) =>
@@ -137,13 +229,14 @@ test.describe('view detail', () => {
     await pickRealm(page, 'Silvermoon');
     await page.getByRole('button', { name: 'Add', exact: true }).click();
 
-    await expect(page.getByTitle('Character not found')).toBeVisible();
     await expect(
       page.getByText('Fake was not found. Check the name, realm and region.'),
     ).toBeVisible();
+
+    await expect(page.locator('.character-edit-row')).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Done' })).toBeDisabled();
 
-    await page.getByRole('button', { name: 'Delete' }).last().click();
+    await page.getByPlaceholder('Name').fill('');
     await expect(page.getByRole('button', { name: 'Done' })).toBeEnabled();
   });
 

@@ -63,19 +63,26 @@ export function useEditViewForm(
   const [newRegion, setNewRegion] = useState('eu');
   const [statuses, setStatuses] = useState<StatusById>({});
   const [duplicateName, setDuplicateName] = useState<string | null>(null);
+  const [notFoundName, setNotFoundName] = useState<string | null>(null);
+  const [isChecking, setIsChecking] = useState(false);
+
+  const clearFeedback = () => {
+    setDuplicateName(null);
+    setNotFoundName(null);
+  };
 
   const setName = (value: string) => {
-    setDuplicateName(null);
+    clearFeedback();
     setNewName(value);
   };
 
   const setRealm = (value: string) => {
-    setDuplicateName(null);
+    clearFeedback();
     setNewRealm(value);
   };
 
   const setRegion = (value: string) => {
-    setDuplicateName(null);
+    clearFeedback();
     setNewRegion(value);
   };
 
@@ -86,36 +93,35 @@ export function useEditViewForm(
 
   const addCharacter = async () => {
     const name = newName.trim();
-    if (!name || !newRealm) return;
+    if (!name || !newRealm || isChecking) return;
 
-    const character: EditableCharacter = {
-      id: nextTempId(),
-      name,
-      realm: newRealm,
-      region: newRegion,
-      profile: null,
-    };
-
-    const key = characterKey(character);
+    const entity = { name, region: newRegion, realm: newRealm };
+    const key = characterKey(entity);
     if (editingCharacters.some((c) => characterKey(c) === key)) {
       setDuplicateName(name);
       return;
     }
 
-    setEditingCharacters((prev) => [...prev, character]);
-    setStatuses((prev) => ({ ...prev, [character.id]: 'checking' }));
-    setDuplicateName(null);
+    clearFeedback();
+    setIsChecking(true);
+    const result = await verifyEntity(entity);
+    setIsChecking(false);
+
+    if (result === 'invalid') {
+      setNotFoundName(name);
+      return;
+    }
+
+    const character: EditableCharacter = { id: nextTempId(), ...entity, profile: null };
+
+    setEditingCharacters((prev) => [character, ...prev]);
+    setStatuses((prev) => ({ ...prev, [character.id]: result }));
     setNewName('');
     setNewRealm('');
     setNewRegion('eu');
-
-    const result = await verifyEntity(character);
-    setStatuses((prev) => ({ ...prev, [character.id]: result }));
   };
 
-  const visibleStatuses = editingCharacters.map((c) => statuses[c.id]);
-  const notFound = editingCharacters.filter((c) => statuses[c.id] === 'invalid');
-  const canSave = !newName.trim() && !visibleStatuses.includes('checking') && notFound.length === 0;
+  const canSave = !newName.trim() && !isChecking;
 
   return {
     editingCharacters,
@@ -127,7 +133,9 @@ export function useEditViewForm(
     setRealm,
     setRegion,
     errorMessage:
-      formatDuplicateMessage(duplicateName) ?? formatNotFoundMessage(notFound.map((c) => c.name)),
+      formatDuplicateMessage(duplicateName) ??
+      formatNotFoundMessage(notFoundName ? [notFoundName] : []),
+    isChecking,
     canSave,
     addCharacter,
     deleteCharacter,

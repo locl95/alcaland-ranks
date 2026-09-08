@@ -24,6 +24,10 @@ export async function checkEntitiesExist(entities: EntityRef[]): Promise<Entitie
   });
 }
 
+export interface GuildExistsResponse {
+  guild: { name: string; realm: string; region: string; blizzardId: number } | null;
+}
+
 export type VerifyResult = 'valid' | 'invalid' | 'unverified';
 
 export const entityKey = ({ name, realm, region }: EntityRef): string =>
@@ -36,6 +40,19 @@ export async function verifyEntity(entity: EntityRef): Promise<VerifyResult> {
     if (nonExisting.some((n) => entityKey(n) === key)) return 'invalid';
     if (unchecked.some((u) => entityKey(u) === key)) return 'unverified';
     return 'valid';
+  } catch {
+    return 'unverified';
+  }
+}
+
+export async function verifyGuild({ name, region, realm }: EntityRef): Promise<VerifyResult> {
+  try {
+    const { guild } = await serviceRequest<GuildExistsResponse>('POST', '/entities/exists/guild', {
+      name: name.trim(),
+      region,
+      realm,
+    });
+    return guild ? 'valid' : 'invalid';
   } catch {
     return 'unverified';
   }
