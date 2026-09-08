@@ -7,8 +7,6 @@ import { View } from '@/features/views/model/view.ts';
 export const VIEWS_PAGE_SIZE = 10;
 
 export const viewKeys = {
-  // The *Page keys are what actually get fetched; ownList is the prefix they share, used
-  // only to invalidate every page of the own list at once.
   listPage: (page: number) => ['views', 'featured', page] as const,
   ownList: () => ['views', 'own'] as const,
   ownListPage: (page: number) => ['views', 'own', page] as const,

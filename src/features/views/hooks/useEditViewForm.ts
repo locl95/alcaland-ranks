@@ -107,9 +107,6 @@ export function useEditViewForm(
     const result = await verifyEntity(entity);
     setIsChecking(false);
 
-    // A rejected character never enters the list. Unlike the create form, a row here
-    // cannot be edited once added — only deleted — so keeping it would be pure friction.
-    // The typed values stay put instead, ready to be corrected in place.
     if (result === 'invalid') {
       setNotFoundName(name);
       return;
@@ -117,8 +114,6 @@ export function useEditViewForm(
 
     const character: EditableCharacter = { id: nextTempId(), ...entity, profile: null };
 
-    // Prepended, not appended: the list is paginated, and the dialog resets to page one
-    // on add so the new row — and its verification badge — is always the one you see.
     setEditingCharacters((prev) => [character, ...prev]);
     setStatuses((prev) => ({ ...prev, [character.id]: result }));
     setNewName('');
@@ -126,8 +121,6 @@ export function useEditViewForm(
     setNewRegion('eu');
   };
 
-  // No row in the list can be invalid or checking any more, so saving only waits on the
-  // add row: a name still typed in it, or a check still in flight.
   const canSave = !newName.trim() && !isChecking;
 
   return {

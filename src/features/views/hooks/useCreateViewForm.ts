@@ -17,8 +17,6 @@ export interface EntityRow {
   status: RowStatus;
 }
 
-// A guild view carries exactly one entity — a pointer to the guild, not a member. The
-// backend resolves the roster behind the operation, which is why it can take a while.
 const GUILD_EXTRA_ARGUMENTS = {
   type: 'com.kos.views.WowExtraArguments',
   guild: 'RESOLVE',
@@ -40,15 +38,11 @@ const emptyRow = (): EntityRow => ({
 export function useCreateViewForm(onClose: () => void, onCreateView: (view: View) => void) {
   const [name, setName] = useState('');
   const [mode, setMode] = useState<CreateMode>('characters');
-  // A guild ladder is a one-row ladder: the row points at the guild rather than at a
-  // character, so both modes share this state and differ only in how a row is verified.
   const [rows, setRows] = useState<EntityRow[]>(() => [emptyRow()]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [duplicateName, setDuplicateName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Switching mode drops whatever rows were filled in: the two modes send different
-  // payloads, so half-finished input from the other one can only mislead.
   const selectMode = (next: CreateMode) => {
     if (next === mode) return;
     setMode(next);
@@ -77,7 +71,6 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
     }
     setDuplicateName(null);
 
-    // Only a character ladder grows a row: a guild ladder is capped at its single guild.
     const isLastRow = mode === 'characters' && rows[rows.length - 1].id === id;
     setRows((prev) => {
       const updated = prev.map((r) => (r.id === id ? { ...r, status: 'checking' as const } : r));

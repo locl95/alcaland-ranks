@@ -497,8 +497,6 @@ describe('useCreateViewForm', () => {
     });
   });
   describe('guild mode', () => {
-    // The single guild row goes through the same verify flow as a character row; only the
-    // endpoint behind it differs.
     const addGuild = async (
       result: { current: ReturnType<typeof useCreateViewForm> },
       name = 'Frikis y un Calvo',

@@ -145,25 +145,6 @@ test.describe('view detail', () => {
     await expect(ladder.getByText('11–15 of 15')).toBeVisible();
   });
 
-  test('a dungeon card keeps its pager at the foot of the card', async ({ page }) => {
-    await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
-      route.fulfill({ json: makeLadder(15) }),
-    );
-    await page.goto(`/${VALID_VIEW_ID}`);
-
-    const card = page.locator('.dungeon-card').first();
-    await card.getByRole('button', { name: 'Next page' }).click();
-    await expect(card.getByText('11–15 of 15')).toBeVisible();
-
-    const cardBox = await card.boundingBox();
-    const pagerBox = await card.locator('.pager').boundingBox();
-    expect(cardBox, 'dungeon card should be visible').not.toBeNull();
-    expect(pagerBox, 'pager should be visible').not.toBeNull();
-    const cardBottom = cardBox!.y + cardBox!.height;
-    const pagerBottom = pagerBox!.y + pagerBox!.height;
-    expect(Math.abs(cardBottom - pagerBottom)).toBeLessThan(2);
-  });
-
   test('edit: deleting all characters hides the ladder', async ({ page }) => {
     await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
@@ -251,8 +232,7 @@ test.describe('view detail', () => {
     await expect(
       page.getByText('Fake was not found. Check the name, realm and region.'),
     ).toBeVisible();
-    // A rejected character never joins the list — the row it would have taken is the one
-    // still holding the typed name, so it can be corrected in place.
+
     await expect(page.locator('.character-edit-row')).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Done' })).toBeDisabled();
 

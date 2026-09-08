@@ -187,7 +187,6 @@ describe('EditView', () => {
     await userEvent.click(screen.getByTitle('Add'));
 
     expect(await screen.findByText(/Fake was not found/)).toBeInTheDocument();
-    // No row was created, so there is nothing to delete and no badge to show.
     expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull();
     expect(screen.queryByTitle('Character not found')).toBeNull();
     expect(screen.getByPlaceholderText('Name')).toHaveValue('Fake');
@@ -222,8 +221,6 @@ describe('EditView', () => {
     await userEvent.selectOptions(screen.getByTestId('realm-select'), 'tarren-mill');
     await userEvent.click(screen.getByTitle('Add'));
 
-    // The row being checked is the add row itself, so it holds its value and locks: the
-    // character is not in the list yet and may still turn out not to exist.
     expect(screen.getByTitle('Checking character')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Name')).toHaveValue('Arthas');
     expect(screen.getByPlaceholderText('Name')).toBeDisabled();
@@ -333,7 +330,6 @@ describe('EditView', () => {
     await userEvent.click(screen.getByTitle('Add'));
     expect(screen.getByText('Sylvanas')).toBeInTheDocument();
 
-    // The parent mounts the dialog only while open, so reopening is a fresh mount.
     unmount();
     render(<EditView characters={[makeProfile(2, 'Jaina')]} {...props} />);
 
@@ -385,8 +381,6 @@ describe('EditView', () => {
       expect(screen.queryByText('Char1')).toBeNull();
     });
 
-    // Appending would drop the new row onto the last page, out of sight along with its
-    // verification badge; it is prepended and the dialog returns to page one instead.
     it('shows a character added from a later page', async () => {
       render(<EditView characters={manyProfiles(12)} onClose={vi.fn()} onSave={vi.fn()} />);
       await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
@@ -418,8 +412,6 @@ describe('EditView', () => {
       expect(screen.queryByRole('navigation', { name: 'Character list pages' })).toBeNull();
     });
 
-    // A rejected character is never added, so it cannot hide on a page you are not looking
-    // at: the pager stays put and the payload is unchanged.
     it('adds no row anywhere when the character is rejected', async () => {
       mockCheckEntitiesExist.mockResolvedValue(notFound('Fake'));
       const onSave = vi.fn();
@@ -458,8 +450,6 @@ describe('EditView', () => {
       expect(renderedNames()).toEqual(['Top', 'Mid', 'Low']);
     });
 
-    // A character added here has no profile and therefore no score. The ladder sorts the
-    // unscored last; this dialog puts them first so the row you just created stays visible.
     it('puts a newly added character above the scored ones', async () => {
       render(
         <EditView

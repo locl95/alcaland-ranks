@@ -112,7 +112,6 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
                     <VerificationBadge status={row.status} />
                   )}
 
-                  {/* Never renders in guild mode: the single row is always the last one. */}
                   {index < rows.length - 1 && (
                     <button
                       type="button"

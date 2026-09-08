@@ -45,8 +45,6 @@ export async function verifyEntity(entity: EntityRef): Promise<VerifyResult> {
   }
 }
 
-// Always answers 200: a guild that does not exist comes back as `guild: null`, not as an
-// error status. Only WOW retail — the game is fixed backend-side and not part of the body.
 export async function verifyGuild({ name, region, realm }: EntityRef): Promise<VerifyResult> {
   try {
     const { guild } = await serviceRequest<GuildExistsResponse>('POST', '/entities/exists/guild', {

@@ -41,9 +41,6 @@ export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps
     save,
   } = useEditViewForm(characters, onSave);
 
-  // Score order, like the ladder — with one deliberate difference: characters added in
-  // this dialog have no profile yet, and go on top rather than last. They are what you are
-  // working on, and burying them on the final page is what the page reset avoids.
   const sortedCharacters = useMemo(
     () =>
       [...editingCharacters].sort((a, b) => {

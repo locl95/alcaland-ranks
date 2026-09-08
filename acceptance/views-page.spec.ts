@@ -228,7 +228,6 @@ test.describe('create view', () => {
   }) => {
     let created = false;
 
-    // override the beforeEach mock — last registered route wins in Playwright
     await page.route(`${API}/views?game=wow&page=*`, (route) =>
       route.fulfill({
         json: { records: created ? [makeSimpleView(VALID_VIEW_ID, 'My New Ladder')] : [] },
@@ -252,8 +251,6 @@ test.describe('create view', () => {
 
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
-    // refetch reconciles the pending view with the backend response —
-    // syncing indicator never persists and the real view appears with delete available
     await expect(page.getByRole('heading', { name: 'My New Ladder' })).toBeVisible();
     await expect(page.getByText('Synchronizing with server...')).not.toBeVisible();
     await expect(page.getByTitle('Delete view')).toBeVisible();

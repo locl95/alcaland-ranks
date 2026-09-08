@@ -68,7 +68,6 @@ describe('Pager', () => {
       'false',
     );
     expect(screen.getByRole('button', { name: /next/i })).toHaveAttribute('aria-disabled', 'true');
-    // Still focusable at the end of the run, so a keyboard user does not lose their place.
     screen.getByRole('button', { name: /next/i }).focus();
     expect(screen.getByRole('button', { name: /next/i })).toHaveFocus();
   });

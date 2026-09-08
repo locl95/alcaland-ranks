@@ -44,7 +44,6 @@ describe('CharacterLadder', () => {
   it('sorts characters by score descending', () => {
     renderLadder([makeProfile(2, 'Low', 1000), makeProfile(1, 'High', 3000)]);
 
-    // The mock renders "#{index+1} {name}" — index 0 means rank #1 position
     expect(screen.getByTestId('ladder-row-1').textContent).toBe('#1 High');
     expect(screen.getByTestId('ladder-row-2').textContent).toBe('#2 Low');
   });
