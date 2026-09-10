@@ -43,7 +43,7 @@ const makeEntry = (name: string, role: string): RunDetailsRosterEntry => ({
 const makeDetails = (roster: RunDetailsRosterEntry[], deathCount = 0): RunDetails => ({
   roster,
   logged_details: {
-    deaths: Array(deathCount).fill({ character_id: 1, approximate_died_at: 0 }),
+    deaths: Array(deathCount).fill({ approximate_died_at: 0 }),
   },
 });
 
