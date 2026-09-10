@@ -119,9 +119,7 @@ export interface RunDetailsRosterEntry {
 }
 
 export interface RunDetailsDeath {
-  character_id: number;
   approximate_died_at: number;
-  logged_encounter_id?: number;
 }
 
 export interface RunDetails {
