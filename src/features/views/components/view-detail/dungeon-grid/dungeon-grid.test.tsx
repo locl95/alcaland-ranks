@@ -12,11 +12,11 @@ vi.mock('./character-run.tsx', () => ({
 const DUNGEON = 'ARAK';
 
 const season = {
-  dungeons: [{ name: 'Ara-Kara', short_name: DUNGEON, challenge_mode_id: 1, icon_url: 'i.png' }],
+  dungeons: [{ name: 'Ara-Kara', shortName: DUNGEON, dungeonId: 1, icon: 'i.png' }],
 } as Season;
 
 const makeBestRun = (score: number, clearTimeMs: number): MythicPlusBestRun =>
-  ({ run: { short_name: DUNGEON, score, clear_time_ms: clearTimeMs } }) as MythicPlusBestRun;
+  ({ run: { shortName: DUNGEON, score, clearTimeMs: clearTimeMs } }) as MythicPlusBestRun;
 
 const makeProfile = (id: number, name: string, bestRun?: MythicPlusBestRun): WowProfile =>
   ({ id, name, mythicPlusBestRuns: bestRun ? [bestRun] : [] }) as WowProfile;

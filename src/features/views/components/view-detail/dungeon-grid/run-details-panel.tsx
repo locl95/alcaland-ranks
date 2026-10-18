@@ -20,7 +20,7 @@ export function RunDetailsPanel({ run, details, characterRegion }: Readonly<RunD
     );
   }
 
-  const deathCount = details.logged_details?.deaths?.length ?? 0;
+  const deathCount = details.loggedDetails?.deaths?.length ?? 0;
   const sortedRoster = [...details.roster].sort(
     (a, b) => (ROLE_ORDER[a.role] ?? 99) - (ROLE_ORDER[b.role] ?? 99),
   );
@@ -42,7 +42,7 @@ export function RunDetailsPanel({ run, details, characterRegion }: Readonly<RunD
         ))}
       </div>
       <div className="run-details-footer">
-        <span className="run-details-date">{formatDate(run.completed_at)}</span>
+        <span className="run-details-date">{formatDate(run.dateCompleted)}</span>
       </div>
     </div>
   );

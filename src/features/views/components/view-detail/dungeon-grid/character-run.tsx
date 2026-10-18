@@ -15,7 +15,7 @@ function getScoreImprovement(
 ): number {
   const cachedBestRun = cached
     .find((c) => c.id === character.id)
-    ?.mythicPlusBestRuns.find((br) => br.run.short_name === bestRun.run.short_name);
+    ?.mythicPlusBestRuns.find((br) => br.run.shortName === bestRun.run.shortName);
   return cachedBestRun ? bestRun.run.score - cachedBestRun.run.score : 0;
 }
 
@@ -38,10 +38,8 @@ export function CharacterRun({
   const specImg = SPEC_IMAGES[getSpecImageKey(character.class, specName)];
   const scoreImprovement = bestRun ? getScoreImprovement(cachedProfiles, character, bestRun) : 0;
   const timeDelta =
-    run?.par_time_ms != null ? formatTimeDelta(run.clear_time_ms, run.par_time_ms) : null;
-  const keystone = run
-    ? (KEYSTONE_DISPLAY[run.num_keystone_upgrades] ?? KEYSTONE_DISPLAY[0])
-    : null;
+    run?.dungeonTimeMs != null ? formatTimeDelta(run.clearTimeMs, run.dungeonTimeMs) : null;
+  const keystone = run ? (KEYSTONE_DISPLAY[run.upgrades] ?? KEYSTONE_DISPLAY[0]) : null;
 
   return (
     <div className="character-run-wrapper">
@@ -75,11 +73,11 @@ export function CharacterRun({
 
             <span className={`character-run-key num ${keystone.className}`}>
               {keystone.prefix}
-              {run.mythic_level}
+              {run.keyLevel}
             </span>
 
             <span className="character-run-time num">
-              {formatClearTime(run.clear_time_ms)}
+              {formatClearTime(run.clearTimeMs)}
               {timeDelta && (
                 <span className={timeDelta.timed ? 'time-delta-timed' : 'time-delta-depleted'}>
                   {timeDelta.text}

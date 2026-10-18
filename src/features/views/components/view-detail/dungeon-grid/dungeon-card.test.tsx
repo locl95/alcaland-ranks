@@ -12,14 +12,14 @@ vi.mock('./character-run.tsx', () => ({
 
 const dungeon: Season['dungeons'][number] = {
   name: 'Ara-Kara',
-  short_name: 'ARAK',
-  challenge_mode_id: 1,
-  icon_url: 'i.png',
+  shortName: 'ARAK',
+  dungeonId: 1,
+  icon: 'i.png',
 };
 
 const makeScore = (id: number, score: number) => ({
   character: { id, name: `Char${id}` } as WowProfile,
-  bestRun: { run: { short_name: 'ARAK', score, clear_time_ms: 1000 } } as MythicPlusBestRun,
+  bestRun: { run: { shortName: 'ARAK', score, clearTimeMs: 1000 } } as MythicPlusBestRun,
 });
 
 const makeScores = (count: number) =>

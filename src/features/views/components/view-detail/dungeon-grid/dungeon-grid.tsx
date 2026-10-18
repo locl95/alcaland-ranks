@@ -16,14 +16,12 @@ function getCharacterScoresForDungeon(
   return profiles
     .map((character) => ({
       character,
-      bestRun: character.mythicPlusBestRuns.find((br) => br.run.short_name === dungeonId),
+      bestRun: character.mythicPlusBestRuns.find((br) => br.run.shortName === dungeonId),
     }))
     .sort((a, b) => {
       const scoreDiff = (b.bestRun?.run.score ?? 0) - (a.bestRun?.run.score ?? 0);
       if (scoreDiff !== 0) return scoreDiff;
-      return (
-        (a.bestRun?.run.clear_time_ms ?? Infinity) - (b.bestRun?.run.clear_time_ms ?? Infinity)
-      );
+      return (a.bestRun?.run.clearTimeMs ?? Infinity) - (b.bestRun?.run.clearTimeMs ?? Infinity);
     });
 }
 
@@ -39,7 +37,7 @@ export const DungeonGrid = memo(function DungeonGrid({
   const dungeonData = useMemo(
     () =>
       season.dungeons.map((dungeon) => {
-        const characterScores = getCharacterScoresForDungeon(profiles, dungeon.short_name);
+        const characterScores = getCharacterScoresForDungeon(profiles, dungeon.shortName);
         return { dungeon, characterScores, winningRun: getWinningRun(characterScores) };
       }),
     [profiles, season.dungeons],
@@ -49,7 +47,7 @@ export const DungeonGrid = memo(function DungeonGrid({
     <div className="dungeon-grid">
       {dungeonData.map(({ dungeon, characterScores, winningRun }) => (
         <DungeonCard
-          key={dungeon.challenge_mode_id}
+          key={dungeon.dungeonId}
           dungeon={dungeon}
           characterScores={characterScores}
           winningRun={winningRun}

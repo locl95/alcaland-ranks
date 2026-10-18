@@ -20,14 +20,14 @@ interface MythicPlusRanks {
 }
 
 export interface MythicPlusRun {
-  keystone_run_id: number;
+  runId: number;
   dungeon: string;
-  short_name: string;
-  mythic_level: number;
-  num_keystone_upgrades: number;
-  completed_at: string;
-  clear_time_ms: number;
-  par_time_ms: number;
+  shortName: string;
+  keyLevel: number;
+  upgrades: number;
+  dateCompleted: string;
+  clearTimeMs: number;
+  dungeonTimeMs: number;
   score: number;
   url: string;
   affixes: Affix[];
@@ -67,16 +67,16 @@ export interface ViewData {
 
 export interface Dungeon {
   name: string;
-  short_name: string;
-  challenge_mode_id: number;
-  icon_url: string;
+  shortName: string;
+  dungeonId: number;
+  icon: string;
 }
 
 export interface Season {
-  is_main_season: boolean;
+  isCurrentSeason: boolean;
   slug: string;
   name: string;
-  blizzard_season_id: number;
+  blizzardSeasonId: number;
   dungeons: Dungeon[];
 }
 
@@ -96,7 +96,7 @@ export interface RunDetailsCharacterRealm {
 
 export interface RunDetailsCharacterRegion {
   name: string;
-  short_name: string;
+  shortName: string;
   slug: string;
 }
 
@@ -119,12 +119,12 @@ export interface RunDetailsRosterEntry {
 }
 
 export interface RunDetailsDeath {
-  approximate_died_at: number;
+  approximateDiedAt: number;
 }
 
 export interface RunDetails {
   roster: RunDetailsRosterEntry[];
-  logged_details?: {
+  loggedDetails?: {
     deaths?: RunDetailsDeath[];
   };
 }

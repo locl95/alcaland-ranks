@@ -33,14 +33,14 @@ const makeProfile = (name = 'Arthas', id = 1): WowProfile => ({
 
 const makeBestRun = (score = 200, level = 20): MythicPlusBestRun => ({
   run: {
-    keystone_run_id: 1,
+    runId: 1,
     dungeon: 'Siege of Orgrimmar',
-    short_name: 'SIEGE',
-    mythic_level: level,
-    num_keystone_upgrades: 3,
-    completed_at: '2024-01-01T00:00:00Z',
-    clear_time_ms: 1800000,
-    par_time_ms: 1800000,
+    shortName: 'SIEGE',
+    keyLevel: level,
+    upgrades: 3,
+    dateCompleted: '2024-01-01T00:00:00Z',
+    clearTimeMs: 1800000,
+    dungeonTimeMs: 1800000,
     score,
     url: '',
     affixes: [],
@@ -133,14 +133,14 @@ describe('CharacterRun', () => {
       ...profile,
       mythicPlusBestRuns: [
         {
-          run: { short_name: 'SIEGE', score: 180 },
+          run: { shortName: 'SIEGE', score: 180 },
           details: [],
         } as unknown as MythicPlusBestRun,
       ],
     };
     profile.mythicPlusBestRuns = [
       {
-        run: { short_name: 'SIEGE', score: 200 },
+        run: { shortName: 'SIEGE', score: 200 },
         details: [],
       } as unknown as MythicPlusBestRun,
     ];
