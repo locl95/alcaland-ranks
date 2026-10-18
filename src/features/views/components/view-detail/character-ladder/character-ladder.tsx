@@ -2,14 +2,14 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import keystone from '@/assets/keystone.webp';
 import './character-ladder.css';
 import { memo, useMemo, useState } from 'react';
-import { RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
+import { WowProfile, Season } from '@/features/views/api/wow-types.ts';
 import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
 import { LadderRow } from './ladder-row.tsx';
 import { Pager } from '@/features/views/components/shared/pager.tsx';
 
 interface CharacterLadderProps {
-  characters: RaiderioProfile[];
-  cachedCharacters: RaiderioProfile[];
+  characters: WowProfile[];
+  cachedCharacters: WowProfile[];
   season: Season | null;
 }
 

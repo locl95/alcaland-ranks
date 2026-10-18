@@ -2,15 +2,15 @@ import './dungeon-card.css';
 import {
   MythicPlusBestRun,
   MythicPlusRun,
-  RaiderioProfile,
+  WowProfile,
   Season,
-} from '@/features/views/api/raiderio.ts';
+} from '@/features/views/api/wow-types.ts';
 import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
 import { CharacterRun } from './character-run.tsx';
 import { Pager } from '@/features/views/components/shared/pager.tsx';
 
 export interface CharacterDungeonScore {
-  character: RaiderioProfile;
+  character: WowProfile;
   bestRun: MythicPlusBestRun | undefined;
 }
 
@@ -18,7 +18,7 @@ interface DungeonCardProps {
   dungeon: Season['dungeons'][number];
   characterScores: CharacterDungeonScore[];
   winningRun: MythicPlusRun | undefined;
-  cachedProfiles: RaiderioProfile[];
+  cachedProfiles: WowProfile[];
 }
 
 export function DungeonCard({
@@ -30,18 +30,13 @@ export function DungeonCard({
   const { pageItems, pagination } = useEntityPage(characterScores);
 
   return (
-    <div className="dungeon-card" id={`dungeon-card-${dungeon.short_name.toLowerCase()}`}>
+    <div className="dungeon-card" id={`dungeon-card-${dungeon.shortName.toLowerCase()}`}>
       <div className="dungeon-header">
         <div className="dungeon-header-thumb">
-          <img
-            src={dungeon.icon_url}
-            alt=""
-            aria-hidden={true}
-            className="dungeon-header-thumb-img"
-          />
+          <img src={dungeon.icon} alt="" aria-hidden={true} className="dungeon-header-thumb-img" />
         </div>
         <h3 className="dungeon-title">{dungeon.name}</h3>
-        <span className="dungeon-header-thumb-name">{dungeon.short_name}</span>
+        <span className="dungeon-header-thumb-name">{dungeon.shortName}</span>
       </div>
       <div className="dungeon-cols">
         <span className="eyebrow">Character</span>
@@ -55,7 +50,7 @@ export function DungeonCard({
           const isHighest =
             !!winningRun &&
             run?.score === winningRun.score &&
-            run?.clear_time_ms === winningRun.clear_time_ms;
+            run?.clearTimeMs === winningRun.clearTimeMs;
 
           return (
             <CharacterRun

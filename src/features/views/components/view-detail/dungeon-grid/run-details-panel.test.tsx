@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { RunDetailsPanel } from './run-details-panel.tsx';
-import { MythicPlusRun, RunDetails, RunDetailsRosterEntry } from '@/features/views/api/raiderio.ts';
+import {
+  MythicPlusRun,
+  RunDetails,
+  RunDetailsRosterEntry,
+} from '@/features/views/api/wow-types.ts';
 
 vi.mock('./roster-row.tsx', () => ({
   RosterRow: ({ entry }: { entry: RunDetailsRosterEntry }) => (
@@ -9,20 +13,20 @@ vi.mock('./roster-row.tsx', () => ({
   ),
 }));
 
-vi.mock('@/features/views/api/raiderio.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/views/api/raiderio.ts')>();
+vi.mock('@/features/views/api/wow-types.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/views/api/wow-types.ts')>();
   return { ...actual, formatDate: () => '15-03-2024' };
 });
 
 const makeRun = (): MythicPlusRun => ({
-  keystone_run_id: 1,
+  runId: 1,
   dungeon: 'Siege of Boralus',
-  short_name: 'SIEGE',
-  mythic_level: 20,
-  num_keystone_upgrades: 3,
-  completed_at: '2024-03-15T20:00:00Z',
-  clear_time_ms: 1800000,
-  par_time_ms: 2200000,
+  shortName: 'SIEGE',
+  keyLevel: 20,
+  upgrades: 3,
+  dateCompleted: '2024-03-15T20:00:00Z',
+  clearTimeMs: 1800000,
+  dungeonTimeMs: 2200000,
   score: 300,
   url: 'https://raider.io/test',
   affixes: [],
@@ -34,7 +38,7 @@ const makeEntry = (name: string, role: string): RunDetailsRosterEntry => ({
     class: { name: 'Warrior' },
     spec: { name: 'Arms' },
     realm: { id: 1, name: 'Tarren Mill', slug: 'tarren-mill' },
-    region: { name: 'Europe', short_name: 'EU', slug: 'eu' },
+    region: { name: 'Europe', shortName: 'EU', slug: 'eu' },
   },
   role,
   ranks: { score: 2000 },
@@ -42,8 +46,8 @@ const makeEntry = (name: string, role: string): RunDetailsRosterEntry => ({
 
 const makeDetails = (roster: RunDetailsRosterEntry[], deathCount = 0): RunDetails => ({
   roster,
-  logged_details: {
-    deaths: Array(deathCount).fill({ approximate_died_at: 0 }),
+  loggedDetails: {
+    deaths: Array(deathCount).fill({ approximateDiedAt: 0 }),
   },
 });
 
@@ -53,7 +57,7 @@ describe('RunDetailsPanel', () => {
     expect(screen.getByText('Run details are currently unavailable.')).toBeInTheDocument();
   });
 
-  it('shows death count from logged_details', () => {
+  it('shows death count from loggedDetails', () => {
     render(
       <RunDetailsPanel
         run={makeRun()}
@@ -64,11 +68,11 @@ describe('RunDetailsPanel', () => {
     expect(screen.getByText(/x 3/, { selector: '.run-details-deaths' })).toBeInTheDocument();
   });
 
-  it('shows zero deaths when logged_details has no deaths', () => {
+  it('shows zero deaths when loggedDetails has no deaths', () => {
     render(
       <RunDetailsPanel
         run={makeRun()}
-        details={{ roster: [makeEntry('Arthas', 'dps')], logged_details: {} }}
+        details={{ roster: [makeEntry('Arthas', 'dps')], loggedDetails: {} }}
         characterRegion="eu"
       />,
     );

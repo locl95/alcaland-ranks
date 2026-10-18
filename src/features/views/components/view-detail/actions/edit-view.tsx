@@ -6,7 +6,7 @@ import '@/features/views/components/shared/dialog.css';
 import '@/features/views/components/shared/form-controls.css';
 import './edit-view.css';
 import '../character-ladder/ladder-row.css';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 import { getClassSlug, getScoreClass } from '@/features/views/utils.ts';
 import { CLASS_COLORS } from '@/features/views/constants/class-colors.ts';
 import { RealmSelect } from '@/features/views/components/shared/realm-select.tsx';
@@ -18,9 +18,9 @@ import { Pager } from '@/features/views/components/shared/pager.tsx';
 const DARK_CLASSES = new Set(['death-knight', 'warlock', 'demon-hunter']);
 
 interface EditViewProps {
-  characters: RaiderioProfile[];
+  characters: WowProfile[];
   onClose: () => void;
-  onSave: (characters: RaiderioProfile[]) => void;
+  onSave: (characters: WowProfile[]) => void;
 }
 
 export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps>) {

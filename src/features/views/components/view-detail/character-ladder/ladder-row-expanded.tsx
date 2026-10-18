@@ -1,4 +1,4 @@
-import { RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
+import { WowProfile, Season } from '@/features/views/api/wow-types.ts';
 import './ladder-row-expanded.css';
 import { DungeonThumbnails } from './dungeon-thumbnails.tsx';
 import { RecentRuns } from './recent-runs.tsx';
@@ -6,8 +6,8 @@ import { RankingsTable } from './rankings-table.tsx';
 import { SpecRankingsTable } from './spec-rankings-table.tsx';
 
 interface LadderRowExpandedProps {
-  character: RaiderioProfile;
-  cachedCharacter: RaiderioProfile | undefined;
+  character: WowProfile;
+  cachedCharacter: WowProfile | undefined;
   season: Season | null;
 }
 

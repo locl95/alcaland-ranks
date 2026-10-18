@@ -1,6 +1,6 @@
-import { RaiderioProfile, Season } from '@/features/views/api/raiderio';
+import { WowProfile, Season } from '@/features/views/api/wow-types';
 
-export const mockCharacter: RaiderioProfile = {
+export const mockCharacter: WowProfile = {
   id: 1,
   name: 'Arthas',
   realm: 'Tarren Mill',
@@ -19,16 +19,16 @@ export const mockCharacter: RaiderioProfile = {
 };
 
 export const mockSeason: Season = {
-  is_main_season: true,
+  isCurrentSeason: true,
   slug: 'midnight-season-1',
   name: 'Midnight Season 1',
-  blizzard_season_id: 1,
+  blizzardSeasonId: 1,
   dungeons: [
     {
       name: 'Siege of Boralus',
-      short_name: 'SIEGE',
-      challenge_mode_id: 1,
-      icon_url: 'https://cdn.raiderio.net/images/dungeons/siege-of-boralus.jpg',
+      shortName: 'SIEGE',
+      dungeonId: 1,
+      icon: 'https://cdn.raiderio.net/images/dungeons/siege-of-boralus.jpg',
     },
   ],
 };

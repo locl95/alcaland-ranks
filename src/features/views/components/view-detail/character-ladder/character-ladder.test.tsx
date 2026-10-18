@@ -2,10 +2,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { CharacterLadder } from './character-ladder.tsx';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 
 vi.mock('./ladder-row.tsx', () => ({
-  LadderRow: ({ character, index }: { character: RaiderioProfile; index: number }) => (
+  LadderRow: ({ character, index }: { character: WowProfile; index: number }) => (
     <div data-testid={`ladder-row-${character.id}`}>
       #{index + 1} {character.name}
     </div>
@@ -14,7 +14,7 @@ vi.mock('./ladder-row.tsx', () => ({
 
 vi.mock('@/assets/keystone.webp', () => ({ default: 'keystone.webp' }));
 
-const makeProfile = (id: number, name: string, score: number): RaiderioProfile => ({
+const makeProfile = (id: number, name: string, score: number): WowProfile => ({
   id,
   name,
   realm: 'Tarren Mill',
@@ -35,7 +35,7 @@ const makeProfile = (id: number, name: string, score: number): RaiderioProfile =
 const makeLadder = (count: number) =>
   Array.from({ length: count }, (_, i) => makeProfile(i + 1, `Char${i + 1}`, 3000 - i * 10));
 
-const renderLadder = (characters: RaiderioProfile[], cachedCharacters: RaiderioProfile[] = []) =>
+const renderLadder = (characters: WowProfile[], cachedCharacters: WowProfile[] = []) =>
   render(
     <CharacterLadder characters={characters} cachedCharacters={cachedCharacters} season={null} />,
   );

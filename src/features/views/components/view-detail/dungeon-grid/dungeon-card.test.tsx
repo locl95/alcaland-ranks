@@ -2,24 +2,24 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { DungeonCard } from './dungeon-card.tsx';
-import { MythicPlusBestRun, RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
+import { MythicPlusBestRun, WowProfile, Season } from '@/features/views/api/wow-types.ts';
 
 vi.mock('./character-run.tsx', () => ({
-  CharacterRun: ({ character, isHighest }: { character: RaiderioProfile; isHighest: boolean }) => (
+  CharacterRun: ({ character, isHighest }: { character: WowProfile; isHighest: boolean }) => (
     <div data-testid={`run-${character.id}`}>{`${character.name}${isHighest ? ' *' : ''}`}</div>
   ),
 }));
 
 const dungeon: Season['dungeons'][number] = {
   name: 'Ara-Kara',
-  short_name: 'ARAK',
-  challenge_mode_id: 1,
-  icon_url: 'i.png',
+  shortName: 'ARAK',
+  dungeonId: 1,
+  icon: 'i.png',
 };
 
 const makeScore = (id: number, score: number) => ({
-  character: { id, name: `Char${id}` } as RaiderioProfile,
-  bestRun: { run: { short_name: 'ARAK', score, clear_time_ms: 1000 } } as MythicPlusBestRun,
+  character: { id, name: `Char${id}` } as WowProfile,
+  bestRun: { run: { shortName: 'ARAK', score, clearTimeMs: 1000 } } as MythicPlusBestRun,
 });
 
 const makeScores = (count: number) =>

@@ -6,11 +6,11 @@ import {
   mockFeaturedViews,
   mockOwnViews,
 } from './mocks/viewMocks';
-import { mockCharacter, mockSeason } from './mocks/raiderioMocks';
+import { mockCharacter, mockSeason } from './mocks/wowMocks';
 
 import { API, VALID_VIEW_ID } from './constants';
 import { expectListAnchoredToInput, pickRealm, wheelBackground } from './helpers';
-import { ViewData } from '../src/features/views/api/raiderio';
+import { ViewData } from '../src/features/views/api/wow-types';
 
 const viewData: ViewData = { data: [mockCharacter], viewName: 'My Ladder' };
 const emptyViewData: ViewData = { data: [], viewName: 'My Ladder' };
@@ -23,14 +23,14 @@ const makeLadder = (count: number): {
         score: number;
         mythicPlusBestRuns: {
             run: {
-                keystone_run_id: number;
+                runId: number;
                 dungeon: string;
-                short_name: string;
-                mythic_level: number;
-                num_keystone_upgrades: number;
-                completed_at: string;
-                clear_time_ms: number;
-                par_time_ms: number;
+                shortName: string;
+                keyLevel: number;
+                upgrades: number;
+                dateCompleted: string;
+                clearTimeMs: number;
+                dungeonTimeMs: number;
                 score: number;
                 url: string;
                 affixes: never[]
@@ -48,14 +48,14 @@ const makeLadder = (count: number): {
     mythicPlusBestRuns: [
       {
         run: {
-          keystone_run_id: i + 1,
+          runId: i + 1,
           dungeon: 'Siege of Boralus',
-          short_name: 'SIEGE',
-          mythic_level: 10,
-          num_keystone_upgrades: 1,
-          completed_at: '2026-01-01T00:00:00.000Z',
-          clear_time_ms: 1_800_000,
-          par_time_ms: 2_000_000,
+          shortName: 'SIEGE',
+          keyLevel: 10,
+          upgrades: 1,
+          dateCompleted: '2026-01-01T00:00:00.000Z',
+          clearTimeMs: 1_800_000,
+          dungeonTimeMs: 2_000_000,
           score: 100 + i,
           url: 'https://raider.io/run',
           affixes: [],

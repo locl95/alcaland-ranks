@@ -6,7 +6,7 @@ import {
   MythicPlusRecentRun,
   formatClearTime,
   formatDate,
-} from '@/features/views/api/raiderio.ts';
+} from '@/features/views/api/wow-types.ts';
 import { KEYSTONE_DISPLAY } from '@/features/views/constants/keystone.ts';
 import { CLASS_TEXT_COLORS } from '@/features/views/constants/class-colors.ts';
 
@@ -24,7 +24,7 @@ export function RecentRuns({ recentRuns, bestRuns, characterClass }: Readonly<Re
   const runs = showAll ? recentRuns : recentRuns.slice(0, 5);
   const hasMore = recentRuns.length > runs.length;
   const specColor = CLASS_TEXT_COLORS[getClassSlug(characterClass)];
-  const bestRunIds = new Set(bestRuns.map((br) => br.run.keystone_run_id));
+  const bestRunIds = new Set(bestRuns.map((br) => br.run.runId));
 
   return (
     <div className="recent-runs-section">
@@ -39,13 +39,13 @@ export function RecentRuns({ recentRuns, bestRuns, characterClass }: Readonly<Re
           ) : (
             runs.map((run) => (
               <a
-                key={run.keystone_run_id}
+                key={run.runId}
                 href={run.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="recent-run-row"
               >
-                <span className="recent-run-name">{run.short_name}</span>
+                <span className="recent-run-name">{run.shortName}</span>
                 <span
                   className="recent-run-spec"
                   style={specColor ? { color: specColor } : undefined}
@@ -54,24 +54,20 @@ export function RecentRuns({ recentRuns, bestRuns, characterClass }: Readonly<Re
                 </span>
                 {(() => {
                   const { prefix, className } =
-                    KEYSTONE_DISPLAY[run.num_keystone_upgrades] ?? KEYSTONE_DISPLAY[0];
+                    KEYSTONE_DISPLAY[run.upgrades] ?? KEYSTONE_DISPLAY[0];
                   return (
                     <span className={`recent-run-level ${className}`}>
                       {prefix}
-                      {run.mythic_level}
+                      {run.keyLevel}
                     </span>
                   );
                 })()}
-                <span className="recent-run-time">{formatClearTime(run.clear_time_ms)}</span>
-                <span
-                  className={`recent-run-status ${run.num_keystone_upgrades > 0 ? 'timed' : 'depleted'}`}
-                >
-                  {run.num_keystone_upgrades > 0 ? 'Timed' : 'Depleted'}
-                  {bestRunIds.has(run.keystone_run_id) && (
-                    <Crown size={11} className="recent-run-crown" />
-                  )}
+                <span className="recent-run-time">{formatClearTime(run.clearTimeMs)}</span>
+                <span className={`recent-run-status ${run.upgrades > 0 ? 'timed' : 'depleted'}`}>
+                  {run.upgrades > 0 ? 'Timed' : 'Depleted'}
+                  {bestRunIds.has(run.runId) && <Crown size={11} className="recent-run-crown" />}
                 </span>
-                <span className="recent-run-date">{formatDate(run.completed_at)}</span>
+                <span className="recent-run-date">{formatDate(run.dateCompleted)}</span>
               </a>
             ))
           )}

@@ -6,14 +6,14 @@ import {
   DropdownMenuTrigger,
 } from '@radix-ui/react-dropdown-menu';
 import { ExternalLink } from 'lucide-react';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 import { openExternalProfile } from '@/features/views/utils.ts';
 import raiderio2 from '@/assets/raiderio.png';
 import summoned from '@/assets/summoned.webp';
 import './character-menu.css';
 
 interface CharacterMenuProps {
-  character: RaiderioProfile;
+  character: WowProfile;
 }
 
 export function CharacterMenu({ character }: Readonly<CharacterMenuProps>) {

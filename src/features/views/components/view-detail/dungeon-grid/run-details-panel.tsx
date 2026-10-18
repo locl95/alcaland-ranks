@@ -1,6 +1,6 @@
 import './run-details-panel.css';
 import { Skull } from 'lucide-react';
-import { MythicPlusRun, RunDetails, formatDate } from '@/features/views/api/raiderio.ts';
+import { MythicPlusRun, RunDetails, formatDate } from '@/features/views/api/wow-types.ts';
 import { RosterRow } from './roster-row.tsx';
 
 const ROLE_ORDER: Record<string, number> = { tank: 0, healer: 1, dps: 2 };
@@ -20,7 +20,7 @@ export function RunDetailsPanel({ run, details, characterRegion }: Readonly<RunD
     );
   }
 
-  const deathCount = details.logged_details?.deaths?.length ?? 0;
+  const deathCount = details.loggedDetails?.deaths?.length ?? 0;
   const sortedRoster = [...details.roster].sort(
     (a, b) => (ROLE_ORDER[a.role] ?? 99) - (ROLE_ORDER[b.role] ?? 99),
   );
@@ -42,7 +42,7 @@ export function RunDetailsPanel({ run, details, characterRegion }: Readonly<RunD
         ))}
       </div>
       <div className="run-details-footer">
-        <span className="run-details-date">{formatDate(run.completed_at)}</span>
+        <span className="run-details-date">{formatDate(run.dateCompleted)}</span>
       </div>
     </div>
   );

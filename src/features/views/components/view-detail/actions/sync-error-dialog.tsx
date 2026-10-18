@@ -1,11 +1,11 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { AlertTriangle, X } from 'lucide-react';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 import '@/features/views/components/shared/dialog.css';
 import './sync-error-dialog.css';
 
 interface SyncErrorDialogProps {
-  failedCharacters: RaiderioProfile[];
+  failedCharacters: WowProfile[];
   onClose: () => void;
 }
 

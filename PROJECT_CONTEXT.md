@@ -40,7 +40,7 @@ Everything is served by **`serresiete-backend`** (separate repo, `http://localho
 in dev via `VITE_API_HOST`). The frontend makes **no API calls to raider.io** or any
 other external service — all data is proxied.
 
-The one exception is images: `Dungeon.icon_url` from the season payload is rendered
+The one exception is images: `Dungeon.icon` from the season payload is rendered
 straight into an `<img src>`, so the browser does load raider.io's CDN directly. This is
 deliberate — see "Dungeon icons" below.
 
@@ -263,9 +263,9 @@ this.
 
 ## Mythic+ jargon appearing in types
 
-- **keystone / `mythic_level`** — dungeon difficulty; higher = more score
-- **`par_time_ms`** — the dungeon's time limit; beating it is "timing the key"
-- **`num_keystone_upgrades`** — 0–3, rendered `+`/`++`/`+++`; 0 means depleted
+- **keystone / `keyLevel`** — dungeon difficulty; higher = more score
+- **`dungeonTimeMs`** — the dungeon's time limit; beating it is "timing the key"
+- **`upgrades`** — 0–3, rendered `+`/`++`/`+++`; 0 means depleted
 - **score** — raider.io Mythic+ rating, colored in tiers by `getScoreClass` mirroring
   WoW item-rarity colors
 - **affixes** — weekly rotating run modifiers
@@ -281,7 +281,7 @@ This looks like an inconsistency and is not. Do not unify them.
 | Type | `id: string` | `id: number` |
 | Source | `crypto.randomUUID()` | `profile.id`, or `nextTempId()` |
 
-`EditableCharacter.id` has to round-trip through `RaiderioProfile.id`, which is the **real
+`EditableCharacter.id` has to round-trip through `WowProfile.id`, which is the **real
 backend entity id**, so it must be a number. A character added in the edit dialog has no
 backend id yet, so it borrows a **negative** one: the backend only ever issues positives,
 which makes a collision impossible while both share a list.
@@ -310,14 +310,14 @@ Icons were once 8 `.webp` files in `src/assets/dungeons/` plus a hardcoded
 `short_name → image` map. That required hand-adding files and editing the map every
 season (~4-5 months), and forgetting broke the dungeon grid.
 
-Now `Dungeon.icon_url` is rendered directly. The accepted tradeoff: the browser hotlinks
+Now `Dungeon.icon` is rendered directly. The accepted tradeoff: the browser hotlinks
 raider.io's CDN. Reasonable here because the app already depends entirely on raider.io
 for its data — if that CDN is down there are no scores to show anyway.
 
 Two constraints this creates:
 - The backend must return a **stable** URL — no signed tokens or cache-busting params,
   or browser caching breaks and images refetch.
-- `icon_url` is typed non-nullable and neither call site guards it, so a 404 renders a
+- `icon` is typed non-nullable and neither call site guards it, so a 404 renders a
   broken-image glyph. There is no `onError` fallback yet.
 
 ## Testing notes

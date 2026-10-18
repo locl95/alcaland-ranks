@@ -8,7 +8,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '@/app/authSlice.ts';
 import { useViewDetail } from './useViewDetail.ts';
 import { viewKeys } from '@/features/views/api/viewQueries.ts';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -38,7 +38,7 @@ const VALID_ID = '12345678-1234-1234-1234-123456789012';
 const INVALID_ID = 'not-a-uuid';
 const OWNER = 'viewowner';
 
-const makeProfile = (name: string, id = Date.now() + Math.random()): RaiderioProfile => ({
+const makeProfile = (name: string, id = Date.now() + Math.random()): WowProfile => ({
   id,
   name,
   realm: 'Tarren Mill',
@@ -57,7 +57,7 @@ const makeProfile = (name: string, id = Date.now() + Math.random()): RaiderioPro
 });
 
 // A character that was just added in the edit dialog and has never been synced.
-const makeNewProfile = (name: string): RaiderioProfile => ({
+const makeNewProfile = (name: string): WowProfile => ({
   ...makeProfile(name),
   score: null,
   class: '',
@@ -92,7 +92,7 @@ const makeWrapper = (username: string | null = null) => {
   return { wrapper, queryClient };
 };
 
-const seedCache = (queryClient: QueryClient, profiles: RaiderioProfile[] = []) => {
+const seedCache = (queryClient: QueryClient, profiles: WowProfile[] = []) => {
   queryClient.setQueryData(viewKeys.data(VALID_ID), { data: profiles, viewName: 'Test View' });
   queryClient.setQueryData(viewKeys.cachedData(VALID_ID), { data: [], viewName: 'Test View' });
   queryClient.setQueryData(viewKeys.static(), null);

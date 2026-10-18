@@ -1,7 +1,7 @@
 import { serviceGet, userRequest } from '@/shared/api/httpClient.ts';
 import { poll } from '@/shared/utils/poll.ts';
 import { GetViewsResponse, OperationResult } from '@/features/views/api/view-types.ts';
-import { Season, ViewData } from '@/features/views/api/raiderio.ts';
+import { Season, ViewData } from '@/features/views/api/wow-types.ts';
 import { View } from '@/features/views/model/view.ts';
 
 export const VIEWS_PAGE_SIZE = 10;

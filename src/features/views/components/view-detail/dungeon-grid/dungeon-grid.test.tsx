@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { DungeonGrid } from './dungeon-grid.tsx';
-import { MythicPlusBestRun, RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
+import { MythicPlusBestRun, WowProfile, Season } from '@/features/views/api/wow-types.ts';
 
 vi.mock('./character-run.tsx', () => ({
-  CharacterRun: ({ character, isHighest }: { character: RaiderioProfile; isHighest: boolean }) => (
+  CharacterRun: ({ character, isHighest }: { character: WowProfile; isHighest: boolean }) => (
     <div data-testid={`run-${character.id}`}>{`${character.name}${isHighest ? ' *' : ''}`}</div>
   ),
 }));
@@ -12,19 +12,19 @@ vi.mock('./character-run.tsx', () => ({
 const DUNGEON = 'ARAK';
 
 const season = {
-  dungeons: [{ name: 'Ara-Kara', short_name: DUNGEON, challenge_mode_id: 1, icon_url: 'i.png' }],
+  dungeons: [{ name: 'Ara-Kara', shortName: DUNGEON, dungeonId: 1, icon: 'i.png' }],
 } as Season;
 
 const makeBestRun = (score: number, clearTimeMs: number): MythicPlusBestRun =>
-  ({ run: { short_name: DUNGEON, score, clear_time_ms: clearTimeMs } }) as MythicPlusBestRun;
+  ({ run: { shortName: DUNGEON, score, clearTimeMs: clearTimeMs } }) as MythicPlusBestRun;
 
-const makeProfile = (id: number, name: string, bestRun?: MythicPlusBestRun): RaiderioProfile =>
-  ({ id, name, mythicPlusBestRuns: bestRun ? [bestRun] : [] }) as RaiderioProfile;
+const makeProfile = (id: number, name: string, bestRun?: MythicPlusBestRun): WowProfile =>
+  ({ id, name, mythicPlusBestRuns: bestRun ? [bestRun] : [] }) as WowProfile;
 
 const rowText = () => screen.getAllByTestId(/^run-/).map((row) => row.textContent);
 
-const renderGrid = (profiles: RaiderioProfile[]) =>
-  render(<DungeonGrid raiderioProfiles={profiles} raiderioCachedProfiles={[]} season={season} />);
+const renderGrid = (profiles: WowProfile[]) =>
+  render(<DungeonGrid profiles={profiles} cachedProfiles={[]} season={season} />);
 
 describe('DungeonGrid', () => {
   it('sorts each dungeon by its own score, then by clear time', () => {

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { LadderRow } from './ladder-row.tsx';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 
 vi.mock('./character-menu.tsx', () => ({
   CharacterMenu: () => <div data-testid="character-menu" />,
@@ -17,7 +17,7 @@ vi.mock('@/features/views/constants/class-images.ts', () => ({
   getClassImageKey: () => 'warrior',
 }));
 
-const makeProfile = (overrides: Partial<RaiderioProfile> = {}): RaiderioProfile => ({
+const makeProfile = (overrides: Partial<WowProfile> = {}): WowProfile => ({
   id: 1,
   name: 'Arthas',
   realm: 'Tarren Mill',

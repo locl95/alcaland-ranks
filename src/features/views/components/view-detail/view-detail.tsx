@@ -117,11 +117,7 @@ export function ViewDetail() {
               season={season}
             />
             {season && (
-              <DungeonGrid
-                raiderioProfiles={profiles}
-                raiderioCachedProfiles={cachedProfiles}
-                season={season}
-              />
+              <DungeonGrid profiles={profiles} cachedProfiles={cachedProfiles} season={season} />
             )}
           </>
         )}
