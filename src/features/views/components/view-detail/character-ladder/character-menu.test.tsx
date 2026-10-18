@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CharacterMenu } from './character-menu.tsx';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 
 vi.mock('@/features/views/utils.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/views/utils.ts')>();
@@ -14,7 +14,7 @@ vi.mock('@/assets/summoned.webp', () => ({ default: 'summoned.webp' }));
 
 import { openExternalProfile } from '@/features/views/utils.ts';
 
-const makeProfile = (): RaiderioProfile => ({
+const makeProfile = (): WowProfile => ({
   id: 1,
   name: 'Arthas',
   realm: 'Tarren Mill',

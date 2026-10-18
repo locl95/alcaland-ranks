@@ -6,11 +6,11 @@ import {
   mockFeaturedViews,
   mockOwnViews,
 } from './mocks/viewMocks';
-import { mockCharacter, mockSeason } from './mocks/raiderioMocks';
+import { mockCharacter, mockSeason } from './mocks/wowMocks';
 
 import { API, VALID_VIEW_ID } from './constants';
 import { expectListAnchoredToInput, pickRealm, wheelBackground } from './helpers';
-import { ViewData } from '../src/features/views/api/raiderio';
+import { ViewData } from '../src/features/views/api/wow-types';
 
 const viewData: ViewData = { data: [mockCharacter], viewName: 'My Ladder' };
 const emptyViewData: ViewData = { data: [], viewName: 'My Ladder' };

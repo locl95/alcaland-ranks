@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { LadderRowExpanded } from './ladder-row-expanded.tsx';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 
 // The API sends 0 for every standing a character has not earned, so a profile
 // with no score arrives full of zeroes rather than nulls.
-const makeProfile = (score: number | null, quantile: number, rank: number): RaiderioProfile => ({
+const makeProfile = (score: number | null, quantile: number, rank: number): WowProfile => ({
   id: 1,
   name: 'Arthas',
   realm: 'Tarren Mill',
@@ -23,7 +23,7 @@ const makeProfile = (score: number | null, quantile: number, rank: number): Raid
   },
 });
 
-const renderExpanded = (character: RaiderioProfile) =>
+const renderExpanded = (character: WowProfile) =>
   render(<LadderRowExpanded character={character} cachedCharacter={undefined} season={null} />);
 
 describe('LadderRowExpanded', () => {

@@ -6,7 +6,7 @@ import {
   MythicPlusRecentRun,
   formatClearTime,
   formatDate,
-} from '@/features/views/api/raiderio.ts';
+} from '@/features/views/api/wow-types.ts';
 import { KEYSTONE_DISPLAY } from '@/features/views/constants/keystone.ts';
 import { CLASS_TEXT_COLORS } from '@/features/views/constants/class-colors.ts';
 

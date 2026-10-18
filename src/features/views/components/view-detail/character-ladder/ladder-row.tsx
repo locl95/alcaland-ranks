@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import './ladder-row.css';
 import { memo, useState } from 'react';
-import { RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
+import { WowProfile, Season } from '@/features/views/api/wow-types.ts';
 import { CharacterMenu } from './character-menu.tsx';
 import { LadderRowExpanded } from './ladder-row-expanded.tsx';
 
@@ -10,8 +10,8 @@ import { CLASS_IMAGES, getClassImageKey } from '@/features/views/constants/class
 
 interface LadderRowProps {
   index: number;
-  character: RaiderioProfile;
-  cachedCharacters: RaiderioProfile[];
+  character: WowProfile;
+  cachedCharacters: WowProfile[];
   season: Season | null;
 }
 

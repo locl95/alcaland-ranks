@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 import { entityKey, verifyEntity } from '@/features/views/api/entityApi.ts';
 import { CheckStatus } from '@/features/views/components/shared/verification-badge.tsx';
 import {
@@ -13,7 +13,7 @@ export interface EditableCharacter {
   name: string;
   realm: string;
   region: string;
-  profile: RaiderioProfile | null;
+  profile: WowProfile | null;
 }
 
 type StatusById = Record<number, CheckStatus>;
@@ -24,7 +24,7 @@ const nextTempId = () => --lastTempId;
 const characterKey = (c: { name: string; realm: string; region: string }) =>
   entityKey({ name: c.name, region: c.region, realm: toRealmSlug(c.realm, c.region) });
 
-const fromProfile = (profile: RaiderioProfile): EditableCharacter => ({
+const fromProfile = (profile: WowProfile): EditableCharacter => ({
   id: profile.id,
   name: profile.name,
   realm: profile.realm,
@@ -32,7 +32,7 @@ const fromProfile = (profile: RaiderioProfile): EditableCharacter => ({
   profile,
 });
 
-const toProfile = ({ id, name, realm, region, profile }: EditableCharacter): RaiderioProfile =>
+const toProfile = ({ id, name, realm, region, profile }: EditableCharacter): WowProfile =>
   profile ?? {
     id,
     name,
@@ -51,10 +51,7 @@ const toProfile = ({ id, name, realm, region, profile }: EditableCharacter): Rai
     mythicPlusRecentRuns: [],
   };
 
-export function useEditViewForm(
-  characters: RaiderioProfile[],
-  onSave: (c: RaiderioProfile[]) => void,
-) {
+export function useEditViewForm(characters: WowProfile[], onSave: (c: WowProfile[]) => void) {
   const [editingCharacters, setEditingCharacters] = useState<EditableCharacter[]>(() =>
     characters.filter((c) => c.score !== null).map(fromProfile),
   );

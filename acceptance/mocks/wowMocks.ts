@@ -1,6 +1,6 @@
-import { RaiderioProfile, Season } from '@/features/views/api/raiderio';
+import { WowProfile, Season } from '@/features/views/api/wow-types';
 
-export const mockCharacter: RaiderioProfile = {
+export const mockCharacter: WowProfile = {
   id: 1,
   name: 'Arthas',
   realm: 'Tarren Mill',

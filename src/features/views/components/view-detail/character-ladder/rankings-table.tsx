@@ -1,11 +1,11 @@
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 import { CLASS_TEXT_COLORS } from '@/features/views/constants/class-colors.ts';
 import { getClassSlug, getRankChange, formatRankChange } from '@/features/views/utils.ts';
 import './rankings-table.css';
 
 interface RankingsTableProps {
-  character: RaiderioProfile;
-  cachedProfile: RaiderioProfile | undefined;
+  character: WowProfile;
+  cachedProfile: WowProfile | undefined;
 }
 
 export function RankingsTable({ character, cachedProfile }: Readonly<RankingsTableProps>) {

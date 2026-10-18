@@ -1,4 +1,4 @@
-import { MythicPlusBestRun, Season } from '@/features/views/api/raiderio.ts';
+import { MythicPlusBestRun, Season } from '@/features/views/api/wow-types.ts';
 import './dungeon-thumbnails.css';
 
 interface DungeonThumbnailsProps {

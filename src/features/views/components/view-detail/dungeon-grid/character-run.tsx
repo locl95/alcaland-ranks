@@ -1,11 +1,7 @@
 import './character-run.css';
 import { useState } from 'react';
 import { Crown } from 'lucide-react';
-import {
-  MythicPlusBestRun,
-  RaiderioProfile,
-  formatClearTime,
-} from '@/features/views/api/raiderio.ts';
+import { MythicPlusBestRun, WowProfile, formatClearTime } from '@/features/views/api/wow-types.ts';
 import { formatTimeDelta, getClassSlug } from '@/features/views/utils.ts';
 import { KEYSTONE_DISPLAY } from '@/features/views/constants/keystone.ts';
 import { CLASS_TEXT_COLORS } from '@/features/views/constants/class-colors.ts';
@@ -13,8 +9,8 @@ import { SPEC_IMAGES, getSpecImageKey } from '@/features/views/constants/spec-im
 import { RunDetailsPanel } from './run-details-panel.tsx';
 
 function getScoreImprovement(
-  cached: RaiderioProfile[],
-  character: RaiderioProfile,
+  cached: WowProfile[],
+  character: WowProfile,
   bestRun: MythicPlusBestRun,
 ): number {
   const cachedBestRun = cached
@@ -24,10 +20,10 @@ function getScoreImprovement(
 }
 
 interface CharacterRunProps {
-  character: RaiderioProfile;
+  character: WowProfile;
   bestRun: MythicPlusBestRun | undefined;
   isHighest: boolean;
-  cachedProfiles: RaiderioProfile[];
+  cachedProfiles: WowProfile[];
 }
 
 export function CharacterRun({

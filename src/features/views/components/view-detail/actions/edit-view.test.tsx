@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { EditView } from './edit-view.tsx';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 
 const mockCheckEntitiesExist = vi.fn();
 
@@ -51,7 +51,7 @@ vi.mock('@/features/views/components/shared/realm-select.tsx', () => ({
   ),
 }));
 
-const makeProfile = (id: number, name: string, score: number | null = 2000): RaiderioProfile => ({
+const makeProfile = (id: number, name: string, score: number | null = 2000): WowProfile => ({
   id,
   name,
   realm: 'Tarren Mill',

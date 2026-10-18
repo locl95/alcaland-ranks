@@ -1,6 +1,6 @@
 import './run-details-panel.css';
 import { Skull } from 'lucide-react';
-import { MythicPlusRun, RunDetails, formatDate } from '@/features/views/api/raiderio.ts';
+import { MythicPlusRun, RunDetails, formatDate } from '@/features/views/api/wow-types.ts';
 import { RosterRow } from './roster-row.tsx';
 
 const ROLE_ORDER: Record<string, number> = { tank: 0, healer: 1, dps: 2 };

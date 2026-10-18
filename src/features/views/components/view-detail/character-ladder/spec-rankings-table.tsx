@@ -1,10 +1,10 @@
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 import { getRankChange, formatRankChange, getScoreClass } from '@/features/views/utils.ts';
 import './spec-rankings-table.css';
 
 interface SpecRankingsTableProps {
-  character: RaiderioProfile;
-  cachedProfile: RaiderioProfile | undefined;
+  character: WowProfile;
+  cachedProfile: WowProfile | undefined;
 }
 
 export function SpecRankingsTable({ character, cachedProfile }: Readonly<SpecRankingsTableProps>) {

@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { SyncErrorDialog } from './sync-error-dialog.tsx';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 
-const makeProfile = (name: string): RaiderioProfile => ({
+const makeProfile = (name: string): WowProfile => ({
   id: Math.random(),
   name,
   realm: 'Tarren Mill',

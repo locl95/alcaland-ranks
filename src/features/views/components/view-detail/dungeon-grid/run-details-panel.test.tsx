@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { RunDetailsPanel } from './run-details-panel.tsx';
-import { MythicPlusRun, RunDetails, RunDetailsRosterEntry } from '@/features/views/api/raiderio.ts';
+import {
+  MythicPlusRun,
+  RunDetails,
+  RunDetailsRosterEntry,
+} from '@/features/views/api/wow-types.ts';
 
 vi.mock('./roster-row.tsx', () => ({
   RosterRow: ({ entry }: { entry: RunDetailsRosterEntry }) => (
@@ -9,8 +13,8 @@ vi.mock('./roster-row.tsx', () => ({
   ),
 }));
 
-vi.mock('@/features/views/api/raiderio.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/views/api/raiderio.ts')>();
+vi.mock('@/features/views/api/wow-types.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/views/api/wow-types.ts')>();
   return { ...actual, formatDate: () => '15-03-2024' };
 });
 

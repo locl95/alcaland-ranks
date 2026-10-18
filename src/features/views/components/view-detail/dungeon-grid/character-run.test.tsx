@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { CharacterRun } from './character-run.tsx';
-import { MythicPlusBestRun, RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { MythicPlusBestRun, WowProfile } from '@/features/views/api/wow-types.ts';
 
 vi.mock('./run-details-panel.tsx', () => ({
   RunDetailsPanel: () => <div data-testid="run-details-panel" />,
@@ -13,7 +13,7 @@ vi.mock('@/features/views/constants/spec-images.ts', () => ({
   getSpecImageKey: () => 'warrior_arms',
 }));
 
-const makeProfile = (name = 'Arthas', id = 1): RaiderioProfile => ({
+const makeProfile = (name = 'Arthas', id = 1): WowProfile => ({
   id,
   name,
   realm: 'Tarren Mill',

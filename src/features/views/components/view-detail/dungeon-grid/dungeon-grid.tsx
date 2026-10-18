@@ -1,16 +1,16 @@
 import './dungeon-grid.css';
 import { memo, useMemo } from 'react';
-import { MythicPlusRun, RaiderioProfile, Season } from '@/features/views/api/raiderio.ts';
+import { MythicPlusRun, WowProfile, Season } from '@/features/views/api/wow-types.ts';
 import { CharacterDungeonScore, DungeonCard } from './dungeon-card.tsx';
 
 interface DungeonGridProps {
-  raiderioProfiles: RaiderioProfile[];
-  raiderioCachedProfiles: RaiderioProfile[];
+  profiles: WowProfile[];
+  cachedProfiles: WowProfile[];
   season: Season;
 }
 
 function getCharacterScoresForDungeon(
-  profiles: RaiderioProfile[],
+  profiles: WowProfile[],
   dungeonId: string,
 ): CharacterDungeonScore[] {
   return profiles
@@ -32,17 +32,17 @@ function getWinningRun(scores: CharacterDungeonScore[]): MythicPlusRun | undefin
 }
 
 export const DungeonGrid = memo(function DungeonGrid({
-  raiderioProfiles,
-  raiderioCachedProfiles,
+  profiles,
+  cachedProfiles,
   season,
 }: Readonly<DungeonGridProps>) {
   const dungeonData = useMemo(
     () =>
       season.dungeons.map((dungeon) => {
-        const characterScores = getCharacterScoresForDungeon(raiderioProfiles, dungeon.short_name);
+        const characterScores = getCharacterScoresForDungeon(profiles, dungeon.short_name);
         return { dungeon, characterScores, winningRun: getWinningRun(characterScores) };
       }),
-    [raiderioProfiles, season.dungeons],
+    [profiles, season.dungeons],
   );
 
   return (
@@ -53,7 +53,7 @@ export const DungeonGrid = memo(function DungeonGrid({
           dungeon={dungeon}
           characterScores={characterScores}
           winningRun={winningRun}
-          cachedProfiles={raiderioCachedProfiles}
+          cachedProfiles={cachedProfiles}
         />
       ))}
     </div>

@@ -2,15 +2,15 @@ import './dungeon-card.css';
 import {
   MythicPlusBestRun,
   MythicPlusRun,
-  RaiderioProfile,
+  WowProfile,
   Season,
-} from '@/features/views/api/raiderio.ts';
+} from '@/features/views/api/wow-types.ts';
 import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
 import { CharacterRun } from './character-run.tsx';
 import { Pager } from '@/features/views/components/shared/pager.tsx';
 
 export interface CharacterDungeonScore {
-  character: RaiderioProfile;
+  character: WowProfile;
   bestRun: MythicPlusBestRun | undefined;
 }
 
@@ -18,7 +18,7 @@ interface DungeonCardProps {
   dungeon: Season['dungeons'][number];
   characterScores: CharacterDungeonScore[];
   winningRun: MythicPlusRun | undefined;
-  cachedProfiles: RaiderioProfile[];
+  cachedProfiles: WowProfile[];
 }
 
 export function DungeonCard({

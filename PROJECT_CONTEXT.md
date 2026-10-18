@@ -281,7 +281,7 @@ This looks like an inconsistency and is not. Do not unify them.
 | Type | `id: string` | `id: number` |
 | Source | `crypto.randomUUID()` | `profile.id`, or `nextTempId()` |
 
-`EditableCharacter.id` has to round-trip through `RaiderioProfile.id`, which is the **real
+`EditableCharacter.id` has to round-trip through `WowProfile.id`, which is the **real
 backend entity id**, so it must be a number. A character added in the edit dialog has no
 backend id yet, so it borrows a **negative** one: the backend only ever issues positives,
 which makes a collision impossible while both share a list.

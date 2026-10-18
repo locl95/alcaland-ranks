@@ -4,7 +4,7 @@ import { useToast } from '@/shared/components/toaster/toast.ts';
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectUsername } from '@/app/authSlice.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
-import { RaiderioProfile } from '@/features/views/api/raiderio.ts';
+import { WowProfile } from '@/features/views/api/wow-types.ts';
 import { OperationResult, ViewRequest } from '@/features/views/api/view-types.ts';
 import { haveSameCharacters, toRealmSlug } from '@/features/views/utils.ts';
 import {
@@ -24,8 +24,8 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
   const username = useAppSelector(selectUsername);
   const { showError } = useToast();
 
-  const [pendingCharacters, setPendingCharacters] = useState<RaiderioProfile[] | null>(null);
-  const [syncError, setSyncError] = useState<RaiderioProfile[] | null>(null);
+  const [pendingCharacters, setPendingCharacters] = useState<WowProfile[] | null>(null);
+  const [syncError, setSyncError] = useState<WowProfile[] | null>(null);
 
   const isValidViewId = !!viewId && UUID_REGEX.test(viewId);
   const safeViewId = viewId ?? '';
@@ -50,16 +50,16 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
   const { data: season } = useStaticData();
 
   const profiles = useMemo(() => {
-    const raiderioProfiles = viewData?.data ?? [];
-    if (!pendingCharacters) return raiderioProfiles;
-    const raiderioProfilesMap = new Map(raiderioProfiles.map((c) => [getCharacterName(c), c]));
+    const fetchedProfiles = viewData?.data ?? [];
+    if (!pendingCharacters) return fetchedProfiles;
+    const fetchedProfilesMap = new Map(fetchedProfiles.map((c) => [getCharacterName(c), c]));
     return pendingCharacters.map((c) => {
       if (c.score === null) return c;
-      return raiderioProfilesMap.get(getCharacterName(c)) ?? c;
+      return fetchedProfilesMap.get(getCharacterName(c)) ?? c;
     });
   }, [viewData, pendingCharacters]);
 
-  function handleSaveCharacters(characters: RaiderioProfile[], request: ViewRequest) {
+  function handleSaveCharacters(characters: WowProfile[], request: ViewRequest) {
     const submittedCharacters = new Set(characters.map(getCharacterName));
     const deletedCharacters = profiles
       .filter((p) => !submittedCharacters.has(getCharacterName(p)))
@@ -98,7 +98,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
       });
   }
 
-  const saveCharacters = (characters: RaiderioProfile[]) => {
+  const saveCharacters = (characters: WowProfile[]) => {
     if (haveSameCharacters(characters, profiles)) return;
     setSyncError(null);
 

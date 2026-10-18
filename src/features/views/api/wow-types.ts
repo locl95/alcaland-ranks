@@ -46,7 +46,7 @@ export interface MythicPlusRecentRun extends MythicPlusRun {
 
 export { formatClearTime, formatDate } from '@/features/views/utils.ts';
 
-export interface RaiderioProfile {
+export interface WowProfile {
   id: number;
   name: string;
   realm: string;
@@ -61,7 +61,7 @@ export interface RaiderioProfile {
 }
 
 export interface ViewData {
-  data: RaiderioProfile[];
+  data: WowProfile[];
   viewName: string;
 }
 

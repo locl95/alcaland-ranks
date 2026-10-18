@@ -1,7 +1,7 @@
 import { Page, Route } from '@playwright/test';
 import { SimpleView } from '@/features/views/api/view-types';
 import { API } from '../constants';
-import { mockSeason } from './raiderioMocks';
+import { mockSeason } from './wowMocks';
 
 export function makeSimpleView(id: string, name: string, owner = 'testuser'): SimpleView {
   return {
