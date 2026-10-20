@@ -1,5 +1,6 @@
 export interface ViewExtraArguments {
-  [key: string]: unknown;
+  type: 'wow';
+  isGuild: boolean;
 }
 
 export interface ViewMetadata {
@@ -29,7 +30,7 @@ export interface WowEntityRequest {
   name: string;
   region: string;
   realm: string;
-  type: string;
+  type: 'wow';
 }
 
 export interface ViewRequest {

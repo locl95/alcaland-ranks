@@ -64,7 +64,7 @@ describe('useCreateViewForm', () => {
       expect(mockCheckEntitiesExist).toHaveBeenCalledWith('POST', '/entities/exists', {
         entities: [
           {
-            type: 'com.kos.entities.domain.WowEntityRequest',
+            type: 'wow',
             name: 'Arthas',
             region: 'eu',
             realm: 'tarren-mill',
@@ -459,7 +459,7 @@ describe('useCreateViewForm', () => {
               name: 'Arthas',
               region: 'eu',
               realm: 'tarren-mill',
-              type: 'com.kos.entities.domain.WowEntityRequest',
+              type: 'wow',
             },
           ],
         }),
@@ -662,7 +662,7 @@ describe('useCreateViewForm', () => {
     });
 
     describe('handleSubmit', () => {
-      it('posts one entity pointing at the guild, with the resolve extra arguments', async () => {
+      it('posts one entity pointing at the guild, with isGuild extra arguments', async () => {
         const { result } = renderForm();
         act(() => result.current.selectMode('guild'));
         act(() => result.current.setName('Guild Ladder'));
@@ -677,17 +677,13 @@ describe('useCreateViewForm', () => {
               name: 'Frikis y un Calvo',
               region: 'eu',
               realm: 'dun-modr',
-              type: 'com.kos.entities.domain.WowEntityRequest',
+              type: 'wow',
             },
           ],
           published: true,
           featured: false,
           game: 'WOW',
-          extraArguments: {
-            type: 'com.kos.views.WowExtraArguments',
-            guild: 'RESOLVE',
-            season: 0,
-          },
+          extraArguments: { type: 'wow', isGuild: true },
         });
         expect(onCreateView).toHaveBeenCalledWith(
           expect.objectContaining({ operationId: 'op-123', status: 'pending' }),

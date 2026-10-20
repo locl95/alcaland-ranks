@@ -108,7 +108,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
         name: c.name,
         region: c.region,
         realm: toRealmSlug(c.realm, c.region),
-        type: 'com.kos.entities.domain.WowEntityRequest',
+        type: 'wow',
       })),
       published: true,
       featured: false,
