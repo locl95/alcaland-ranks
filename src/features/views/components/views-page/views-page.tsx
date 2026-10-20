@@ -74,6 +74,7 @@ export function ViewsPage() {
     navigate(`/${viewId}`, {
       state: {
         owner: view?.simpleView.owner,
+        isGuild: view?.simpleView.extraArguments?.isGuild ?? false,
         entitiesCount: view?.simpleView.entitiesIds.length ?? 0,
       },
     });

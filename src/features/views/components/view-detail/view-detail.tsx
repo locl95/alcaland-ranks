@@ -15,8 +15,9 @@ export function ViewDetail() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const locationState = location.state as { owner?: string } | null;
+  const locationState = location.state as { owner?: string; isGuild?: boolean } | null;
   const owner = locationState?.owner ?? null;
+  const isGuild = locationState?.isGuild ?? false;
 
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -32,7 +33,7 @@ export function ViewDetail() {
     isViewIdValid,
     saveCharacters,
     clearSyncError,
-  } = useViewDetail(viewId, owner);
+  } = useViewDetail(viewId, owner, isGuild);
 
   const {
     isRunning,

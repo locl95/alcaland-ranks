@@ -21,6 +21,12 @@ export interface SimpleView {
   lastSyncedAt?: string | null;
 }
 
+// GET /views/{id} returns the full view; only the fields the frontend reads.
+export interface ViewResponse {
+  owner: string;
+  extraArguments?: ViewExtraArguments | null;
+}
+
 export interface GetViewsResponse {
   metadata?: ViewMetadata | null;
   records: SimpleView[];

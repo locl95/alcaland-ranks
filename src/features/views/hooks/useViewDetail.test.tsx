@@ -113,13 +113,13 @@ describe('useViewDetail', () => {
   describe('UUID validation', () => {
     it('marks an invalid UUID as invalid', () => {
       const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewDetail(INVALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(INVALID_ID, OWNER, false), { wrapper });
       expect(result.current.isViewIdValid).toBe(false);
     });
 
     it('marks a valid UUID as valid', () => {
       const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
       expect(result.current.isViewIdValid).toBe(true);
     });
   });
@@ -128,7 +128,7 @@ describe('useViewDetail', () => {
     it('is true once data is available in the cache', async () => {
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
       await waitFor(() => expect(result.current.initialized).toBe(true));
     });
   });
@@ -137,7 +137,7 @@ describe('useViewDetail', () => {
     it('returns empty array when there is no data', async () => {
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, []);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
       await waitFor(() => expect(result.current.initialized).toBe(true));
       expect(result.current.profiles).toEqual([]);
     });
@@ -146,7 +146,7 @@ describe('useViewDetail', () => {
       const charA = makeProfile('Arthas');
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
       expect(result.current.profiles[0].name).toBe('Arthas');
     });
@@ -165,7 +165,7 @@ describe('useViewDetail', () => {
 
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
@@ -198,7 +198,7 @@ describe('useViewDetail', () => {
 
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA, charB]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(2));
 
@@ -224,22 +224,82 @@ describe('useViewDetail', () => {
     it('is true when the logged-in user is the view owner', () => {
       const { wrapper, queryClient } = makeWrapper(OWNER);
       seedCache(queryClient);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
       expect(result.current.canEdit).toBe(true);
     });
 
     it('is false when the logged-in user is not the owner', () => {
       const { wrapper, queryClient } = makeWrapper('otheruser');
       seedCache(queryClient);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
       expect(result.current.canEdit).toBe(false);
     });
 
     it('is false when the user is not authenticated', () => {
       const { wrapper, queryClient } = makeWrapper(null);
       seedCache(queryClient);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
       expect(result.current.canEdit).toBe(false);
+    });
+
+    it('is false for a guild ladder, even for its owner', () => {
+      const { wrapper, queryClient } = makeWrapper(OWNER);
+      seedCache(queryClient);
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, true), { wrapper });
+      expect(result.current.canEdit).toBe(false);
+    });
+
+    it('does not fetch the view when the owner came from navigation state', () => {
+      const { wrapper, queryClient } = makeWrapper(OWNER);
+      seedCache(queryClient);
+      renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
+      expect(mockUserRequest).not.toHaveBeenCalledWith('GET', `/views/${VALID_ID}`);
+    });
+
+    describe('without navigation state', () => {
+      it('fetches the view and is true for its owner', async () => {
+        mockUserRequest.mockResolvedValue({ owner: OWNER });
+        const { wrapper, queryClient } = makeWrapper(OWNER);
+        seedCache(queryClient);
+        const { result } = renderHook(() => useViewDetail(VALID_ID, null, false), { wrapper });
+
+        await waitFor(() => expect(result.current.canEdit).toBe(true));
+        expect(mockUserRequest).toHaveBeenCalledWith('GET', `/views/${VALID_ID}`);
+      });
+
+      it('is false when the fetched view is a guild ladder', async () => {
+        mockUserRequest.mockResolvedValue({
+          owner: OWNER,
+          extraArguments: { type: 'wow', isGuild: true },
+        });
+        const { wrapper, queryClient } = makeWrapper(OWNER);
+        seedCache(queryClient);
+        const { result } = renderHook(() => useViewDetail(VALID_ID, null, false), { wrapper });
+
+        await waitFor(() =>
+          expect(queryClient.getQueryData(viewKeys.detail(VALID_ID))).toBeDefined(),
+        );
+        expect(result.current.canEdit).toBe(false);
+      });
+
+      it('is false when the backend refuses the view (not the owner)', async () => {
+        mockUserRequest.mockRejectedValue(new Error('403'));
+        const { wrapper, queryClient } = makeWrapper('otheruser');
+        seedCache(queryClient);
+        const { result } = renderHook(() => useViewDetail(VALID_ID, null, false), { wrapper });
+
+        await waitFor(() =>
+          expect(queryClient.getQueryState(viewKeys.detail(VALID_ID))?.status).toBe('error'),
+        );
+        expect(result.current.canEdit).toBe(false);
+      });
+
+      it('does not fetch the view when the user is not authenticated', () => {
+        const { wrapper, queryClient } = makeWrapper(null);
+        seedCache(queryClient);
+        renderHook(() => useViewDetail(VALID_ID, null, false), { wrapper });
+        expect(mockUserRequest).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -252,7 +312,7 @@ describe('useViewDetail', () => {
 
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
@@ -273,7 +333,7 @@ describe('useViewDetail', () => {
       const charA = makeProfile('Arthas');
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
       await act(async () => result.current.saveCharacters([charA]));
@@ -286,7 +346,7 @@ describe('useViewDetail', () => {
       const charB = makeProfile('Sylvanas');
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
       await act(async () => result.current.saveCharacters([charA, charB]));
@@ -304,7 +364,7 @@ describe('useViewDetail', () => {
 
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [existing]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
       await act(async () => result.current.saveCharacters([existing, added, irregular]));
@@ -324,7 +384,7 @@ describe('useViewDetail', () => {
 
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
@@ -341,7 +401,7 @@ describe('useViewDetail', () => {
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
@@ -362,7 +422,7 @@ describe('useViewDetail', () => {
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
@@ -382,7 +442,7 @@ describe('useViewDetail', () => {
 
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA, charB]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(2));
 
@@ -404,7 +464,7 @@ describe('useViewDetail', () => {
 
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
@@ -426,7 +486,7 @@ describe('useViewDetail', () => {
 
       const { wrapper, queryClient } = makeWrapper();
       seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER), { wrapper });
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 

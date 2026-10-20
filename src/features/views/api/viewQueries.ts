@@ -1,6 +1,10 @@
 import { serviceGet, userRequest } from '@/shared/api/httpClient.ts';
 import { poll } from '@/shared/utils/poll.ts';
-import { GetViewsResponse, OperationResult } from '@/features/views/api/view-types.ts';
+import {
+  GetViewsResponse,
+  OperationResult,
+  ViewResponse,
+} from '@/features/views/api/view-types.ts';
 import { Season, ViewData } from '@/features/views/api/wow-types.ts';
 import { View } from '@/features/views/model/view.ts';
 
@@ -10,6 +14,7 @@ export const viewKeys = {
   listPage: (page: number) => ['views', 'featured', page] as const,
   ownList: () => ['views', 'own'] as const,
   ownListPage: (page: number) => ['views', 'own', page] as const,
+  detail: (viewId: string) => ['view', viewId] as const,
   data: (viewId: string) => ['viewData', viewId] as const,
   cachedData: (viewId: string) => ['viewCachedData', viewId] as const,
   static: () => ['wowStatic'] as const,
@@ -39,6 +44,10 @@ export const fetchViews = async (page: number): Promise<ViewsPage> =>
 
 export const fetchOwnViews = async (page: number): Promise<ViewsPage> =>
   toViewsPage(await userRequest<GetViewsResponse>('GET', viewsPath(page)));
+
+// User JWT: the backend only serves this to the view's owner (403 otherwise).
+export const fetchView = (viewId: string): Promise<ViewResponse> =>
+  userRequest<ViewResponse>('GET', `/views/${viewId}`);
 
 export const fetchViewData = (viewId: string): Promise<ViewData> =>
   serviceGet<ViewData>(`/views/${viewId}/data`);
