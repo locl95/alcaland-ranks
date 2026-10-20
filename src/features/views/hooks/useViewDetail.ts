@@ -50,7 +50,6 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
 
   const { data: season } = useStaticData();
 
-  // Entering by URL leaves no navigation state; ask the backend who owns the view.
   const { data: fetchedView } = useQuery({
     queryKey: viewKeys.detail(safeViewId),
     queryFn: () => fetchView(safeViewId),

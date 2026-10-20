@@ -45,7 +45,6 @@ export const fetchViews = async (page: number): Promise<ViewsPage> =>
 export const fetchOwnViews = async (page: number): Promise<ViewsPage> =>
   toViewsPage(await userRequest<GetViewsResponse>('GET', viewsPath(page)));
 
-// User JWT: the backend only serves this to the view's owner (403 otherwise).
 export const fetchView = (viewId: string): Promise<ViewResponse> =>
   userRequest<ViewResponse>('GET', `/views/${viewId}`);
 
