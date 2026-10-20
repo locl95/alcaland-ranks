@@ -154,7 +154,7 @@ describe('EditView', () => {
     expect(mockCheckEntitiesExist).toHaveBeenCalledWith('POST', '/entities/exists', {
       entities: [
         {
-          type: 'com.kos.entities.domain.WowEntityRequest',
+          type: 'wow',
           name: 'Arthas',
           region: 'eu',
           realm: 'tarren-mill',

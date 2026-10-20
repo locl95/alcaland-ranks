@@ -1,5 +1,6 @@
 export interface ViewExtraArguments {
-  [key: string]: unknown;
+  type: 'wow';
+  isGuild: boolean;
 }
 
 export interface ViewMetadata {
@@ -20,6 +21,11 @@ export interface SimpleView {
   lastSyncedAt?: string | null;
 }
 
+export interface ViewResponse {
+  owner: string;
+  extraArguments?: ViewExtraArguments | null;
+}
+
 export interface GetViewsResponse {
   metadata?: ViewMetadata | null;
   records: SimpleView[];
@@ -29,7 +35,7 @@ export interface WowEntityRequest {
   name: string;
   region: string;
   realm: string;
-  type: string;
+  type: 'wow';
 }
 
 export interface ViewRequest {

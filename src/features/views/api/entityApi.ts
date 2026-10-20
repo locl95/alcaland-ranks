@@ -15,7 +15,7 @@ export interface EntitiesExistResponse {
 export async function checkEntitiesExist(entities: EntityRef[]): Promise<EntitiesExistResponse> {
   return serviceRequest<EntitiesExistResponse>('POST', '/entities/exists', {
     entities: entities.map(({ name, region, realm }) => ({
-      type: 'com.kos.entities.domain.WowEntityRequest',
+      type: 'wow',
       name,
       region,
       realm,

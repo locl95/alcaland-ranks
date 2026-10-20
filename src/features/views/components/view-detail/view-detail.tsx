@@ -15,8 +15,9 @@ export function ViewDetail() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const locationState = location.state as { owner?: string } | null;
+  const locationState = location.state as { owner?: string; isGuild?: boolean } | null;
   const owner = locationState?.owner ?? null;
+  const isGuild = locationState?.isGuild ?? false;
 
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -32,7 +33,7 @@ export function ViewDetail() {
     isViewIdValid,
     saveCharacters,
     clearSyncError,
-  } = useViewDetail(viewId, owner);
+  } = useViewDetail(viewId, owner, isGuild);
 
   const {
     isRunning,
@@ -56,6 +57,8 @@ export function ViewDetail() {
 
   if (!initialized) return null;
 
+  const syncLabel = isRunning ? 'Syncing...' : countdownLabel;
+
   return (
     <div className="page">
       <div className="page-inner page-inner--wide">
@@ -73,11 +76,10 @@ export function ViewDetail() {
                 title={
                   statusMessage ?? (countdownLabel ? `Next sync in ${countdownLabel}` : undefined)
                 }
+                aria-label={syncLabel ? undefined : 'Sync'}
               >
                 <RefreshCw className={`header-icon${isRunning ? ' spin' : ''}`} />
-                <span className="header-button-text">
-                  {isRunning ? 'Syncing...' : (countdownLabel ?? 'Sync')}
-                </span>
+                {syncLabel && <span className="header-button-text">{syncLabel}</span>}
               </button>
               {canEdit && (
                 <button

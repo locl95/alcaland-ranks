@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { View } from '@/features/views/model/view.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
+import { ViewExtraArguments } from '@/features/views/api/view-types.ts';
 import { entityKey, verifyEntity, verifyGuild } from '@/features/views/api/entityApi.ts';
 import { CheckStatus } from '@/features/views/components/shared/verification-badge.tsx';
 import { formatDuplicateMessage, formatNotFoundMessage } from '@/features/views/utils.ts';
@@ -17,11 +18,7 @@ export interface EntityRow {
   status: RowStatus;
 }
 
-const GUILD_EXTRA_ARGUMENTS = {
-  type: 'com.kos.views.WowExtraArguments',
-  guild: 'RESOLVE',
-  season: 0,
-};
+const GUILD_EXTRA_ARGUMENTS: ViewExtraArguments = { type: 'wow', isGuild: true };
 
 const isSubmittable = (row: EntityRow) => row.status === 'valid' || row.status === 'unverified';
 
@@ -128,7 +125,7 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
           name: r.name.trim(),
           region: r.region,
           realm: r.realm,
-          type: 'com.kos.entities.domain.WowEntityRequest',
+          type: 'wow',
         })),
         published: true,
         featured: false,

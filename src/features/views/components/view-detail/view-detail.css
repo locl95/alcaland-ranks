@@ -198,7 +198,7 @@
   /* Hidden from the eye, kept for the ear. `display: none` here left Sync and Edit with
      no accessible name at all on a phone — they are icon-only, and neither carries an
      aria-label. Clipping instead keeps each button's name tied to its own label, which
-     for Sync is a moving target: "Syncing...", the countdown, or "Sync". */
+     for Sync is a moving target: "Syncing..." or the countdown. */
   .header-button-text {
     position: absolute;
     width: 1px;

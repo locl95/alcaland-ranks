@@ -9,6 +9,7 @@ import { OperationResult, ViewRequest } from '@/features/views/api/view-types.ts
 import { haveSameCharacters, toRealmSlug } from '@/features/views/utils.ts';
 import {
   viewKeys,
+  fetchView,
   fetchViewData,
   fetchCachedViewData,
   pollOperation,
@@ -19,7 +20,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 const getCharacterName = (c: { name: string }) => c.name.toLowerCase();
 const REFETCH_INTERVAL = 2000;
 
-export function useViewDetail(viewId: string | undefined, owner: string | null) {
+export function useViewDetail(viewId: string | undefined, owner: string | null, isGuild: boolean) {
   const queryClient = useQueryClient();
   const username = useAppSelector(selectUsername);
   const { showError } = useToast();
@@ -48,6 +49,16 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
   });
 
   const { data: season } = useStaticData();
+
+  const { data: fetchedView } = useQuery({
+    queryKey: viewKeys.detail(safeViewId),
+    queryFn: () => fetchView(safeViewId),
+    enabled: isValidViewId && owner === null && username !== null,
+    retry: false,
+  });
+
+  const viewOwner = owner ?? fetchedView?.owner ?? null;
+  const viewIsGuild = owner !== null ? isGuild : (fetchedView?.extraArguments?.isGuild ?? false);
 
   const profiles = useMemo(() => {
     const fetchedProfiles = viewData?.data ?? [];
@@ -108,7 +119,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
         name: c.name,
         region: c.region,
         realm: toRealmSlug(c.realm, c.region),
-        type: 'com.kos.entities.domain.WowEntityRequest',
+        type: 'wow',
       })),
       published: true,
       featured: false,
@@ -126,7 +137,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null) 
     initialized: !isLoading,
     isSyncing: pendingCharacters !== null,
     syncError,
-    canEdit: username !== null && username === owner,
+    canEdit: username !== null && username === viewOwner && !viewIsGuild,
     isViewIdValid: isValidViewId,
     saveCharacters,
     clearSyncError: () => setSyncError(null),
