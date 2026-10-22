@@ -277,14 +277,10 @@ describe('ViewsPage', () => {
     });
 
     it('replaces a pending view with the synced one when the poll resolves', async () => {
-      vi.mocked(pollOperation).mockResolvedValueOnce({
-        id: 'pending-id',
-        status: 'COMPLETED',
-        resourceId: 'real-id',
-      });
+      vi.mocked(pollOperation).mockResolvedValueOnce({ id: 'op-id', status: 'COMPLETED' });
       fetchMocks.userRequest
         .mockResolvedValueOnce({ records: [] })
-        .mockResolvedValue({ records: [makeSimpleView('real-id', 'Pending View')] });
+        .mockResolvedValue({ records: [makeSimpleView('pending-id', 'Pending View')] });
 
       renderViewsPage();
       await waitFor(() => screen.getByTestId('list-create-btn'));
@@ -292,10 +288,8 @@ describe('ViewsPage', () => {
       await userEvent.click(screen.getByTestId('list-create-btn'));
       await userEvent.click(screen.getByTestId('submit-create'));
 
-      await waitFor(() => {
-        expect(screen.queryByTestId('view-item-pending-id')).not.toBeInTheDocument();
-        expect(screen.getByTestId('view-item-real-id')).toBeInTheDocument();
-      });
+      await waitFor(() => expect(screen.queryByText('Pending...')).not.toBeInTheDocument());
+      expect(screen.getAllByTestId('view-item-pending-id')).toHaveLength(1);
     });
   });
 });

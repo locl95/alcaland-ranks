@@ -39,7 +39,7 @@ async function addRow(
 describe('useCreateViewForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUserRequest.mockResolvedValue({ id: 'op-123' });
+    mockUserRequest.mockResolvedValue({ id: 'op-123', resourceId: 'view-123' });
     mockCheckEntitiesExist.mockResolvedValue({ exist: [], nonExisting: [], unchecked: [] });
     mockCheckGuildExists.mockResolvedValue({
       guild: { name: 'frikis y un calvo', realm: 'dun-modr', region: 'eu', blizzardId: 12345 },
@@ -414,7 +414,11 @@ describe('useCreateViewForm', () => {
 
       expect(onCreateView).toHaveBeenCalledOnce();
       expect(onCreateView).toHaveBeenCalledWith(
-        expect.objectContaining({ operationId: 'op-123', status: 'pending' }),
+        expect.objectContaining({
+          operationId: 'op-123',
+          status: 'pending',
+          simpleView: expect.objectContaining({ id: 'view-123' }),
+        }),
       );
       expect(onClose).toHaveBeenCalledOnce();
       expect(result.current.errorMessage).toBeNull();

@@ -9,9 +9,15 @@ import {
   fetchViews,
   fetchOwnViews,
   pollOperation,
+  OPERATION_TIMED_OUT,
   ViewsPage,
   VIEWS_PAGE_SIZE,
 } from '@/features/views/api/viewQueries.ts';
+
+const GUILD_POLL_INTERVAL_MS = 5000;
+const GUILD_MAX_POLL_ATTEMPTS = 12;
+const BACKGROUND_POLL_INTERVAL_MS = 15000;
+const BACKGROUND_MAX_POLL_ATTEMPTS = 20;
 
 function usePagedViews(
   keyForPage: (page: number) => readonly unknown[],
@@ -65,8 +71,9 @@ function usePagedViews(
 
 export function useViewsData(isAuthenticated: boolean) {
   const queryClient = useQueryClient();
-  const { showError } = useToast();
+  const { showError, showInfo } = useToast();
   const [pendingViews, setPendingViews] = useState<View[]>([]);
+  const [incompleteViewIds, setIncompleteViewIds] = useState<Set<string>>(new Set());
   const [deletingViewId, setDeletingViewId] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
 
@@ -85,39 +92,61 @@ export function useViewsData(isAuthenticated: boolean) {
   const ownViews = useMemo(() => {
     const serverIds = new Set(serverOwnViews.map((v) => v.simpleView.id));
     const stillPending = pendingViews.filter((v) => !serverIds.has(v.simpleView.id));
-    const all = [...serverOwnViews, ...stillPending];
+    const all = [...serverOwnViews, ...stillPending].map((v) =>
+      incompleteViewIds.has(v.simpleView.id) ? { ...v, status: 'incomplete' as const } : v,
+    );
     return deletingViewId
       ? all.map((v) =>
           v.simpleView.id === deletingViewId ? { ...v, status: 'deleting' as const } : v,
         )
       : all;
-  }, [serverOwnViews, pendingViews, deletingViewId]);
+  }, [serverOwnViews, pendingViews, deletingViewId, incompleteViewIds]);
+
+  const removeIncomplete = (viewId: string) =>
+    setIncompleteViewIds((prev) => {
+      const next = new Set(prev);
+      next.delete(viewId);
+      return next;
+    });
+
+  const keepSyncingInBackground = (view: View) => {
+    const { id: viewId, name } = view.simpleView;
+    setIncompleteViewIds((prev) => new Set(prev).add(viewId));
+
+    pollOperation(view.operationId!, BACKGROUND_POLL_INTERVAL_MS, BACKGROUND_MAX_POLL_ATTEMPTS)
+      .then((result) => {
+        if (result.reason === OPERATION_TIMED_OUT) return;
+        removeIncomplete(viewId);
+        queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+        if (result.status === 'COMPLETED') showInfo(`${name} is ready`);
+        else showError(`${name} failed to sync`);
+      })
+      .catch(() => {});
+  };
 
   const createView = (pendingView: View) => {
     setPendingViews((prev) => [...prev, pendingView]);
 
-    pollOperation(pendingView.operationId!)
+    const removePending = () =>
+      setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
+    const isGuild = pendingView.simpleView.extraArguments?.isGuild ?? false;
+    const operation = isGuild
+      ? pollOperation(pendingView.operationId!, GUILD_POLL_INTERVAL_MS, GUILD_MAX_POLL_ATTEMPTS)
+      : pollOperation(pendingView.operationId!);
+
+    operation
       .then((result) => {
-        if (result.status === 'COMPLETED' && result.resourceId) {
-          setPendingViews((prev) =>
-            prev.map((v) =>
-              v.operationId === pendingView.operationId
-                ? { ...v, simpleView: { ...v.simpleView, id: result.resourceId! } }
-                : v,
-            ),
-          );
-          queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
-        } else {
-          setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
-          if (result.status === 'COMPLETED') {
-            queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
-          } else {
-            setCreateError('Failed to create ladder. Please try again.');
-          }
+        queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+        if (result.status === 'COMPLETED') return;
+        if (isGuild && result.reason === OPERATION_TIMED_OUT) {
+          keepSyncingInBackground(pendingView);
+          return;
         }
+        removePending();
+        setCreateError('Failed to create ladder. Please try again.');
       })
       .catch(() => {
-        setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
+        removePending();
         queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
       });
   };

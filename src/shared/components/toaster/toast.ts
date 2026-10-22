@@ -3,11 +3,13 @@ import { createContext, useContext } from 'react';
 export interface Toast {
   id: number;
   message: string;
+  variant: 'error' | 'info';
 }
 
 export interface ToastContextValue {
   toasts: Toast[];
   showError: (message: string) => void;
+  showInfo: (message: string) => void;
   dismiss: (id: number) => void;
 }
 

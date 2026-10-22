@@ -119,24 +119,28 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
     const extraArguments = mode === 'guild' ? GUILD_EXTRA_ARGUMENTS : null;
 
     try {
-      const { id: operationId } = await userRequest<{ id: string }>('POST', '/views', {
-        name,
-        entities: addedRows.map((r) => ({
-          name: r.name.trim(),
-          region: r.region,
-          realm: r.realm,
-          type: 'wow',
-        })),
-        published: true,
-        featured: false,
-        game: 'WOW',
-        ...(extraArguments && { extraArguments }),
-      });
+      const { id: operationId, resourceId } = await userRequest<{ id: string; resourceId: string }>(
+        'POST',
+        '/views',
+        {
+          name,
+          entities: addedRows.map((r) => ({
+            name: r.name.trim(),
+            region: r.region,
+            realm: r.realm,
+            type: 'wow',
+          })),
+          published: true,
+          featured: false,
+          game: 'WOW',
+          ...(extraArguments && { extraArguments }),
+        },
+      );
 
       onCreateView({
         operationId,
         simpleView: {
-          id: operationId,
+          id: resourceId,
           name,
           owner: '',
           published: true,

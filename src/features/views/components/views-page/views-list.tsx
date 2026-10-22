@@ -1,9 +1,10 @@
-import { ChevronRight, Plus, Star, User, Users, Loader2, Trash2 } from 'lucide-react';
+import { ChevronRight, CircleAlert, Plus, Star, User, Users, Loader2, Trash2 } from 'lucide-react';
 import './views-list.css';
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectUsername } from '@/app/authSlice.ts';
 import { View } from '@/features/views/model/view.ts';
 import { Pager, Pagination } from '@/features/views/components/shared/pager.tsx';
+import { useToast } from '@/shared/components/toaster/toast.ts';
 
 interface ViewsListProps {
   views: View[];
@@ -27,6 +28,7 @@ export function ViewsList({
   pagination,
 }: Readonly<ViewsListProps>) {
   const username = useAppSelector(selectUsername);
+  const { showInfo } = useToast();
   const pendingViews = views.some((v) => v.status === 'pending');
 
   if (isLoadingViews && views.length === 0) return null;
@@ -114,6 +116,21 @@ export function ViewsList({
 
             <div className="view-row-actions">
               {isDisabled && <Loader2 className="loading-icon" />}
+
+              {view.status === 'incomplete' && (
+                <button
+                  className="view-row-incomplete-btn"
+                  title="Still syncing"
+                  aria-label="Still syncing"
+                  onClick={() =>
+                    showInfo(
+                      `${view.simpleView.name} is still syncing its characters. It's already usable and will be complete in a few minutes.`,
+                    )
+                  }
+                >
+                  <CircleAlert className="view-row-menu-icon" />
+                </button>
+              )}
 
               {!isDisabled && username === view.simpleView.owner && (
                 <button

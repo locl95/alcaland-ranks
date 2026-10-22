@@ -305,6 +305,23 @@
   cursor: not-allowed;
 }
 
+.view-row-incomplete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--rad-sm);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--gold);
+}
+
+.view-row-incomplete-btn:hover {
+  background: rgba(245, 183, 61, 0.12);
+}
+
 .view-row-menu-icon {
   width: 1.0625rem;
   height: 1.0625rem;

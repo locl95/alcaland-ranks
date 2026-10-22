@@ -1,10 +1,10 @@
 import React from 'react';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act, waitFor, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastProvider } from '@/shared/components/toaster/ToastProvider.tsx';
 import { useViewsData } from './useViewsData.ts';
-import { viewKeys } from '@/features/views/api/viewQueries.ts';
+import { OPERATION_TIMED_OUT, viewKeys } from '@/features/views/api/viewQueries.ts';
 import { View } from '@/features/views/model/view.ts';
 import { SimpleView } from '@/features/views/api/view-types.ts';
 
@@ -146,15 +146,11 @@ describe('useViewsData', () => {
     });
 
     it('promotes the pending view to synced when the operation completes', async () => {
-      mockPollOperation.mockResolvedValue({
-        id: 'op-123',
-        status: 'COMPLETED',
-        resourceId: 'real-view-id',
-      });
+      mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'COMPLETED' });
       mockUserRequest
         .mockResolvedValueOnce({ records: [], metadata: { totalCount: 0 } })
         .mockResolvedValue({
-          records: [makeSimpleView('real-view-id', 'New View')],
+          records: [makeSimpleView('op-123', 'New View')],
           metadata: { totalCount: 1 },
         });
 
@@ -166,11 +162,9 @@ describe('useViewsData', () => {
       const pending = makeView('op-123', 'New View', 'pending');
       act(() => result.current.createView(pending));
 
-      await waitFor(() => {
-        const view = result.current.ownViews.find((v) => v.simpleView.name === 'New View');
-        expect(view?.simpleView.id).toBe('real-view-id');
-        expect(view?.status).toBe('synced');
-      });
+      await waitFor(() =>
+        expect(result.current.ownViews).toEqual([makeView('op-123', 'New View')]),
+      );
     });
 
     it('removes the pending view and sets createError when the operation fails', async () => {
@@ -218,6 +212,91 @@ describe('useViewsData', () => {
         expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: viewKeys.ownList() });
       });
       expect(result.current.createError).toBeNull();
+    });
+
+    describe('guild ladder', () => {
+      const makeGuildView = (): View => ({
+        operationId: 'op-123',
+        simpleView: {
+          ...makeSimpleView('view-1', 'Guild Ladder'),
+          extraArguments: { type: 'wow', isGuild: true },
+        },
+        status: 'pending',
+      });
+
+      const timedOut = { id: 'op-123', status: 'FAILED', reason: OPERATION_TIMED_OUT };
+
+      const createTimedOutGuild = async (backgroundResult: Promise<unknown>) => {
+        mockPollOperation.mockResolvedValueOnce(timedOut).mockReturnValueOnce(backgroundResult);
+        mockUserRequest.mockResolvedValue({
+          records: [makeSimpleView('view-1', 'Guild Ladder')],
+          metadata: { totalCount: 1 },
+        });
+        const { wrapper } = makeWrapper();
+        const { result } = renderHook(() => useViewsData(true), { wrapper });
+        await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
+        act(() => result.current.createView(makeGuildView()));
+        return result;
+      };
+
+      it('polls every 5 seconds for up to 1 minute', async () => {
+        mockPollOperation.mockReturnValue(new Promise(() => {}));
+        const { wrapper } = makeWrapper();
+        const { result } = renderHook(() => useViewsData(true), { wrapper });
+
+        await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
+
+        act(() => result.current.createView(makeGuildView()));
+
+        expect(mockPollOperation).toHaveBeenCalledWith('op-123', 5000, 12);
+      });
+
+      it('marks the ladder incomplete and keeps polling in the background on timeout', async () => {
+        const result = await createTimedOutGuild(new Promise(() => {}));
+
+        await waitFor(() =>
+          expect(result.current.ownViews).toContainEqual(
+            expect.objectContaining({ status: 'incomplete' }),
+          ),
+        );
+        expect(mockPollOperation).toHaveBeenLastCalledWith('op-123', 15000, 20);
+        expect(result.current.createError).toBeNull();
+      });
+
+      it('clears the mark and announces the ladder once the background sync completes', async () => {
+        const result = await createTimedOutGuild(
+          Promise.resolve({ id: 'op-123', status: 'COMPLETED' }),
+        );
+
+        expect(await screen.findByRole('status')).toHaveTextContent('Guild Ladder is ready');
+        expect(result.current.ownViews[0].status).toBe('synced');
+      });
+
+      it('shows the generic error when the operation fails for another reason', async () => {
+        mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'FAILED', reason: 'boom' });
+        const { wrapper } = makeWrapper();
+        const { result } = renderHook(() => useViewsData(true), { wrapper });
+
+        await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
+
+        act(() => result.current.createView(makeGuildView()));
+
+        await waitFor(() =>
+          expect(result.current.createError).toBe('Failed to create ladder. Please try again.'),
+        );
+      });
+    });
+
+    it('polls with the default interval for a character ladder', async () => {
+      mockPollOperation.mockReturnValue(new Promise(() => {}));
+      const { wrapper } = makeWrapper();
+      const { result } = renderHook(() => useViewsData(true), { wrapper });
+
+      await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
+
+      act(() => result.current.createView(makeView('op-123', 'New View', 'pending')));
+
+      expect(mockPollOperation).toHaveBeenCalledWith('op-123');
     });
 
     it('keeps pending views in the list when a server refetch does not yet include them', async () => {
