@@ -17,6 +17,11 @@ export const toRealmSlug = (realm: string, region: string): string => {
   return match?.slug ?? realm.trim().toLowerCase().replace(/\s+/g, '-');
 };
 
+export const toRealmLabel = (slug: string, region: string): string => {
+  const realms = region.toLowerCase() === 'us' ? NA_REALMS : EU_REALMS;
+  return realms.find((r) => r.slug === slug)?.label ?? slug;
+};
+
 export const getClassSlug = (className: string): string =>
   className.toLowerCase().replace(/\s+/g, '-');
 

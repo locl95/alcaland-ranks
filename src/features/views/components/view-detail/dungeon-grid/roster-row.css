@@ -49,10 +49,11 @@
   text-overflow: ellipsis;
 }
 
-.run-details-score {
+.run-details-ilvl {
   font-family: var(--font-data);
   font-weight: 600;
   font-size: 0.8125rem;
+  color: var(--ink-2);
   flex-shrink: 0;
   align-self: center;
 }

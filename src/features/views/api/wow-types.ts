@@ -80,53 +80,17 @@ export interface Season {
   dungeons: Dungeon[];
 }
 
-export interface RunDetailsCharacterClass {
+export interface RunDetailsMember {
   name: string;
-}
-
-export interface RunDetailsCharacterSpec {
-  name: string;
-}
-
-export interface RunDetailsCharacterRealm {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-export interface RunDetailsCharacterRegion {
-  name: string;
-  shortName: string;
-  slug: string;
-}
-
-export interface RunDetailsCharacter {
-  name: string;
-  class: RunDetailsCharacterClass;
-  spec: RunDetailsCharacterSpec;
-  realm: RunDetailsCharacterRealm;
-  region: RunDetailsCharacterRegion;
-}
-
-export interface RunDetailsRosterRanks {
-  score: number;
-}
-
-export interface RunDetailsRosterEntry {
-  character: RunDetailsCharacter;
-  role: string;
-  ranks: RunDetailsRosterRanks;
-}
-
-export interface RunDetailsDeath {
-  approximateDiedAt: number;
+  realm: string;
+  class: string;
+  spec: RecentRunSpec;
+  race: string;
+  itemLevel: number;
 }
 
 export interface RunDetails {
-  roster: RunDetailsRosterEntry[];
-  loggedDetails?: {
-    deaths?: RunDetailsDeath[];
-  };
+  members: RunDetailsMember[];
 }
 
 export interface MythicPlusBestRun {

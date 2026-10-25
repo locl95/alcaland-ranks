@@ -1,5 +1,4 @@
 import './run-details-panel.css';
-import { Skull } from 'lucide-react';
 import { MythicPlusRun, RunDetails, formatDate } from '@/features/views/api/wow-types.ts';
 import { RosterRow } from './roster-row.tsx';
 
@@ -20,23 +19,17 @@ export function RunDetailsPanel({ run, details, characterRegion }: Readonly<RunD
     );
   }
 
-  const deathCount = details.loggedDetails?.deaths?.length ?? 0;
-  const sortedRoster = [...details.roster].sort(
-    (a, b) => (ROLE_ORDER[a.role] ?? 99) - (ROLE_ORDER[b.role] ?? 99),
+  const sortedMembers = [...details.members].sort(
+    (a, b) => (ROLE_ORDER[a.spec.role] ?? 99) - (ROLE_ORDER[b.spec.role] ?? 99),
   );
 
   return (
     <div className="run-details-panel">
-      <div className="run-details-top">
-        <span className="run-details-deaths">
-          <Skull className="skull-icon" />x {deathCount}
-        </span>
-      </div>
       <div className="run-details-roster">
-        {sortedRoster.map((entry) => (
+        {sortedMembers.map((member) => (
           <RosterRow
-            key={`${entry.character.name}-${entry.character.realm.slug}`}
-            entry={entry}
+            key={`${member.name}-${member.realm}`}
+            member={member}
             characterRegion={characterRegion}
           />
         ))}

@@ -1,9 +1,9 @@
 import './roster-row.css';
-import { RunDetailsRosterEntry } from '@/features/views/api/wow-types.ts';
+import { RunDetailsMember } from '@/features/views/api/wow-types.ts';
 import { SPEC_IMAGES, getSpecImageKey } from '@/features/views/constants/spec-images.ts';
 import { ROLE_IMAGES } from '@/features/views/constants/role-images.ts';
 import { CLASS_TEXT_COLORS } from '@/features/views/constants/class-colors.ts';
-import { getClassSlug, getScoreClass, openExternalProfile } from '@/features/views/utils.ts';
+import { getClassSlug, openExternalProfile, toRealmLabel } from '@/features/views/utils.ts';
 
 const ROLE_LABEL: Record<string, string> = {
   tank: 'Tank',
@@ -12,30 +12,30 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 interface RosterRowProps {
-  entry: RunDetailsRosterEntry;
+  member: RunDetailsMember;
   characterRegion: string;
 }
 
-export function RosterRow({ entry, characterRegion }: Readonly<RosterRowProps>) {
-  const specImg =
-    SPEC_IMAGES[getSpecImageKey(entry.character.class.name, entry.character.spec.name)];
+export function RosterRow({ member, characterRegion }: Readonly<RosterRowProps>) {
+  const specImg = SPEC_IMAGES[getSpecImageKey(member.class, member.spec.name)];
+  const role = member.spec.role;
 
   return (
     <div className="run-details-row">
       <div className="run-details-icons">
-        {ROLE_IMAGES[entry.role] && (
+        {ROLE_IMAGES[role] && (
           <img
-            src={ROLE_IMAGES[entry.role]}
-            alt={ROLE_LABEL[entry.role] ?? entry.role}
-            title={ROLE_LABEL[entry.role] ?? entry.role}
+            src={ROLE_IMAGES[role]}
+            alt={ROLE_LABEL[role] ?? role}
+            title={ROLE_LABEL[role] ?? role}
             className="role-icon"
           />
         )}
         {specImg && (
           <img
             src={specImg}
-            alt={entry.character.spec.name}
-            title={entry.character.spec.name}
+            alt={member.spec.name}
+            title={member.spec.name}
             className="spec-icon"
           />
         )}
@@ -46,8 +46,8 @@ export function RosterRow({ entry, characterRegion }: Readonly<RosterRowProps>) 
           e.stopPropagation();
           openExternalProfile(
             {
-              name: entry.character.name,
-              realm: entry.character.realm.slug,
+              name: member.name,
+              realm: member.realm,
               region: characterRegion,
             },
             'raiderio',
@@ -57,16 +57,16 @@ export function RosterRow({ entry, characterRegion }: Readonly<RosterRowProps>) 
         <span className="run-details-name">
           <span
             style={{
-              color: CLASS_TEXT_COLORS[getClassSlug(entry.character.class.name)] ?? 'var(--ink)',
+              color: CLASS_TEXT_COLORS[getClassSlug(member.class)] ?? 'var(--ink)',
             }}
           >
-            {entry.character.name}
+            {member.name}
           </span>
         </span>
-        <span className="run-details-realm">{entry.character.realm.name}</span>
+        <span className="run-details-realm">{toRealmLabel(member.realm, characterRegion)}</span>
       </div>
-      <span className={`run-details-score ${getScoreClass(entry.ranks.score)}`}>
-        {Math.round(entry.ranks.score)}
+      <span className="run-details-ilvl" title="Equipped item level">
+        {member.itemLevel}
       </span>
     </div>
   );

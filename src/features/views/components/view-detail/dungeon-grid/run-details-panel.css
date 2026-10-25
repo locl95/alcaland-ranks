@@ -4,27 +4,6 @@
   padding: 0.625rem 0.875rem;
 }
 
-.run-details-top {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.4375rem;
-}
-
-.run-details-deaths {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-family: var(--font-data);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--down);
-}
-
-.skull-icon {
-  width: 0.8125rem;
-  height: 0.8125rem;
-}
-
 .run-details-roster {
   display: flex;
   flex-direction: column;

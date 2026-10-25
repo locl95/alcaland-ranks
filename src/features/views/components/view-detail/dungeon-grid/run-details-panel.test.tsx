@@ -1,15 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { RunDetailsPanel } from './run-details-panel.tsx';
-import {
-  MythicPlusRun,
-  RunDetails,
-  RunDetailsRosterEntry,
-} from '@/features/views/api/wow-types.ts';
+import { MythicPlusRun, RunDetails, RunDetailsMember } from '@/features/views/api/wow-types.ts';
 
 vi.mock('./roster-row.tsx', () => ({
-  RosterRow: ({ entry }: { entry: RunDetailsRosterEntry }) => (
-    <div data-testid={`roster-${entry.character.name}`}>{entry.role}</div>
+  RosterRow: ({ member }: { member: RunDetailsMember }) => (
+    <div data-testid={`roster-${member.name}`}>{member.spec.role}</div>
   ),
 }));
 
@@ -32,24 +28,16 @@ const makeRun = (): MythicPlusRun => ({
   affixes: [],
 });
 
-const makeEntry = (name: string, role: string): RunDetailsRosterEntry => ({
-  character: {
-    name,
-    class: { name: 'Warrior' },
-    spec: { name: 'Arms' },
-    realm: { id: 1, name: 'Tarren Mill', slug: 'tarren-mill' },
-    region: { name: 'Europe', shortName: 'EU', slug: 'eu' },
-  },
-  role,
-  ranks: { score: 2000 },
+const makeMember = (name: string, role: string): RunDetailsMember => ({
+  name,
+  realm: 'tarren-mill',
+  class: 'Warrior',
+  spec: { id: 71, name: 'Arms', role },
+  race: 'Human',
+  itemLevel: 328,
 });
 
-const makeDetails = (roster: RunDetailsRosterEntry[], deathCount = 0): RunDetails => ({
-  roster,
-  loggedDetails: {
-    deaths: Array(deathCount).fill({ approximateDiedAt: 0 }),
-  },
-});
+const makeDetails = (members: RunDetailsMember[]): RunDetails => ({ members });
 
 describe('RunDetailsPanel', () => {
   it('renders the unavailable message when details is null', () => {
@@ -57,33 +45,11 @@ describe('RunDetailsPanel', () => {
     expect(screen.getByText('Run details are currently unavailable.')).toBeInTheDocument();
   });
 
-  it('shows death count from loggedDetails', () => {
-    render(
-      <RunDetailsPanel
-        run={makeRun()}
-        details={makeDetails([makeEntry('Arthas', 'dps')], 3)}
-        characterRegion="eu"
-      />,
-    );
-    expect(screen.getByText(/x 3/, { selector: '.run-details-deaths' })).toBeInTheDocument();
-  });
-
-  it('shows zero deaths when loggedDetails has no deaths', () => {
-    render(
-      <RunDetailsPanel
-        run={makeRun()}
-        details={{ roster: [makeEntry('Arthas', 'dps')], loggedDetails: {} }}
-        characterRegion="eu"
-      />,
-    );
-    expect(screen.getByText(/x 0/, { selector: '.run-details-deaths' })).toBeInTheDocument();
-  });
-
   it('shows the formatted run date', () => {
     render(
       <RunDetailsPanel
         run={makeRun()}
-        details={makeDetails([makeEntry('Arthas', 'dps')])}
+        details={makeDetails([makeMember('Arthas', 'dps')])}
         characterRegion="eu"
       />,
     );
@@ -95,9 +61,9 @@ describe('RunDetailsPanel', () => {
       <RunDetailsPanel
         run={makeRun()}
         details={makeDetails([
-          makeEntry('DpsPlayer', 'dps'),
-          makeEntry('TankPlayer', 'tank'),
-          makeEntry('HealerPlayer', 'healer'),
+          makeMember('DpsPlayer', 'dps'),
+          makeMember('TankPlayer', 'tank'),
+          makeMember('HealerPlayer', 'healer'),
         ])}
         characterRegion="eu"
       />,

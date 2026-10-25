@@ -46,7 +46,7 @@ const makeBestRun = (score = 200, level = 20): MythicPlusBestRun => ({
     affixes: [],
     spec: { name: 'Arms', id: 0, role: 'dps' },
   },
-  details: { roster: [] },
+  details: { members: [] },
 });
 
 describe('CharacterRun', () => {
