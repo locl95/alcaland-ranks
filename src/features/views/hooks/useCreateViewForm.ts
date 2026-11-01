@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { View } from '@/features/views/model/view.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
+import { ApiError } from '@/shared/api/ApiError.ts';
 import { ViewExtraArguments } from '@/features/views/api/view-types.ts';
 import { entityKey, verifyEntity, verifyGuild } from '@/features/views/api/entityApi.ts';
 import { CheckStatus } from '@/features/views/components/shared/verification-badge.tsx';
@@ -19,6 +20,11 @@ export interface EntityRow {
 }
 
 const GUILD_EXTRA_ARGUMENTS: ViewExtraArguments = { type: 'wow', isGuild: true };
+
+const LIMIT_ERRORS: Record<string, string> = {
+  TOO_MANY_VIEWS: "You've reached the maximum number of ladders.",
+  TOO_MANY_ENTITIES: 'This ladder has more characters than allowed.',
+};
 
 const isSubmittable = (row: EntityRow) => row.status === 'valid' || row.status === 'unverified';
 
@@ -153,11 +159,13 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
       });
 
       onClose();
-    } catch {
+    } catch (err) {
+      const limitError = err instanceof ApiError && err.code ? LIMIT_ERRORS[err.code] : undefined;
       setSubmitError(
-        mode === 'guild'
-          ? 'Failed to create guild ladder. Please try again.'
-          : 'Failed to create ladder. Please try again.',
+        limitError ??
+          (mode === 'guild'
+            ? 'Failed to create guild ladder. Please try again.'
+            : 'Failed to create ladder. Please try again.'),
       );
     } finally {
       setIsSubmitting(false);

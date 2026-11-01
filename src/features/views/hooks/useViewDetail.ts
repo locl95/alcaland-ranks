@@ -4,6 +4,7 @@ import { useToast } from '@/shared/components/toaster/toast.ts';
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectUsername } from '@/app/authSlice.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
+import { ApiError } from '@/shared/api/ApiError.ts';
 import { WowProfile } from '@/features/views/api/wow-types.ts';
 import { OperationResult, ViewRequest } from '@/features/views/api/view-types.ts';
 import { haveSameCharacters, toRealmSlug } from '@/features/views/utils.ts';
@@ -102,10 +103,14 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
       .then(async (operation) => {
         await reconcileView(operation);
       })
-      .catch(() => {
+      .catch((err) => {
         setPendingCharacters(null);
         queryClient.invalidateQueries({ queryKey: viewKeys.data(safeViewId) });
-        showError('Failed to save changes — please try again');
+        showError(
+          err instanceof ApiError && err.code === 'TOO_MANY_ENTITIES'
+            ? 'This ladder has more characters than allowed.'
+            : 'Failed to save changes — please try again',
+        );
       });
   }
 

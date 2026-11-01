@@ -19,11 +19,11 @@ const LAST_SYNCED_KEY = `alcaland:lastSyncedAt:${VIEW_ID}`;
 
 const makeTask = (
   status: 'SUCCESSFUL' | 'ERROR',
-  { message = '', retryAfter = null }: { message?: string; retryAfter?: string | null } = {},
+  { retryAfter = null }: { retryAfter?: string | null } = {},
 ) => ({
   id: 'task-1',
   type: 'CACHE_GAME_VIEW_DATA_TASK',
-  taskStatus: { status, message, retryAfter },
+  taskStatus: { status, retryAfter },
   inserted: new Date().toISOString(),
 });
 
@@ -227,21 +227,7 @@ describe('useSyncView', () => {
     expect(result.current.isDisabled).toBe(true);
   });
 
-  it('sets statusMessage from the server message on ERROR without retryAfter', async () => {
-    mockCreateSyncTask.mockResolvedValue({ id: 'task-1' });
-    mockPollSyncTask.mockResolvedValue(makeTask('ERROR', { message: 'Something went wrong' }));
-    const { wrapper } = makeWrapper();
-
-    const { result } = renderHook(() => useSyncView(VIEW_ID), { wrapper });
-    await act(async () => {
-      result.current.triggerSync();
-    });
-
-    expect(result.current.statusMessage).toBe('Something went wrong');
-    expect(result.current.isRunning).toBe(false);
-  });
-
-  it('falls back to "Sync failed" when ERROR has an empty message and no retryAfter', async () => {
+  it('sets "Sync failed" on ERROR without retryAfter', async () => {
     mockCreateSyncTask.mockResolvedValue({ id: 'task-1' });
     mockPollSyncTask.mockResolvedValue(makeTask('ERROR'));
     const { wrapper } = makeWrapper();

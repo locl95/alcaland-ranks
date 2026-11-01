@@ -2,6 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { FormEvent } from 'react';
 import { useCreateViewForm } from './useCreateViewForm.ts';
+import { ApiError } from '@/shared/api/ApiError.ts';
 
 const mockUserRequest = vi.fn();
 const mockCheckEntitiesExist = vi.fn();
@@ -435,6 +436,20 @@ describe('useCreateViewForm', () => {
       expect(result.current.errorMessage).toBe('Failed to create ladder. Please try again.');
       expect(onClose).not.toHaveBeenCalled();
       expect(onCreateView).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['TOO_MANY_VIEWS', "You've reached the maximum number of ladders."],
+      ['TOO_MANY_ENTITIES', 'This ladder has more characters than allowed.'],
+    ])('shows the limit message when the POST fails with %s', async (code, message) => {
+      mockUserRequest.mockRejectedValue(new ApiError(400, 'Bad Request', code));
+      const { result } = renderForm();
+      act(() => result.current.setName('My Ladder'));
+      await addRow(result, 'Arthas');
+
+      await act(async () => result.current.handleSubmit(makeSubmitEvent()));
+
+      expect(result.current.errorMessage).toBe(message);
     });
 
     it('refuses to submit while the trailing row holds an unadded character', async () => {

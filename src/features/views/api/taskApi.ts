@@ -3,7 +3,6 @@ import { poll } from '@/shared/utils/poll.ts';
 
 export interface TaskStatusDetails {
   status: 'PENDING' | 'SUCCESSFUL' | 'ERROR';
-  message: string;
   retryAfter: string | null;
 }
 
@@ -39,7 +38,7 @@ export async function pollSyncTask(taskId: string, signal?: AbortSignal): Promis
     )) ?? {
       id: taskId,
       type: 'CACHE_GAME_VIEW_DATA_TASK',
-      taskStatus: { status: 'ERROR', message: 'Sync timed out', retryAfter: null },
+      taskStatus: { status: 'ERROR', retryAfter: null },
       inserted: new Date().toISOString(),
     }
   );

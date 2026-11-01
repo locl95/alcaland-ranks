@@ -9,7 +9,6 @@ import {
   fetchViews,
   fetchOwnViews,
   pollOperation,
-  OPERATION_TIMED_OUT,
   ViewsPage,
   VIEWS_PAGE_SIZE,
 } from '@/features/views/api/viewQueries.ts';
@@ -115,7 +114,7 @@ export function useViewsData(isAuthenticated: boolean) {
 
     pollOperation(view.operationId!, BACKGROUND_POLL_INTERVAL_MS, BACKGROUND_MAX_POLL_ATTEMPTS)
       .then((result) => {
-        if (result.reason === OPERATION_TIMED_OUT) return;
+        if (result.timedOut) return;
         removeIncomplete(viewId);
         queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
         if (result.status === 'COMPLETED') showInfo(`${name} is ready`);
@@ -138,7 +137,7 @@ export function useViewsData(isAuthenticated: boolean) {
       .then((result) => {
         queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
         if (result.status === 'COMPLETED') return;
-        if (isGuild && result.reason === OPERATION_TIMED_OUT) {
+        if (isGuild && result.timedOut) {
           keepSyncingInBackground(pendingView);
           return;
         }

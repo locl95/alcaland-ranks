@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastProvider } from '@/shared/components/toaster/ToastProvider.tsx';
 import { useViewsData } from './useViewsData.ts';
-import { OPERATION_TIMED_OUT, viewKeys } from '@/features/views/api/viewQueries.ts';
+import { viewKeys } from '@/features/views/api/viewQueries.ts';
 import { View } from '@/features/views/model/view.ts';
 import { SimpleView } from '@/features/views/api/view-types.ts';
 
@@ -224,7 +224,7 @@ describe('useViewsData', () => {
         status: 'pending',
       });
 
-      const timedOut = { id: 'op-123', status: 'FAILED', reason: OPERATION_TIMED_OUT };
+      const timedOut = { id: 'op-123', status: 'FAILED', timedOut: true };
 
       const createTimedOutGuild = async (backgroundResult: Promise<unknown>) => {
         mockPollOperation.mockResolvedValueOnce(timedOut).mockReturnValueOnce(backgroundResult);
@@ -273,7 +273,7 @@ describe('useViewsData', () => {
       });
 
       it('shows the generic error when the operation fails for another reason', async () => {
-        mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'FAILED', reason: 'boom' });
+        mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'FAILED' });
         const { wrapper } = makeWrapper();
         const { result } = renderHook(() => useViewsData(true), { wrapper });
 

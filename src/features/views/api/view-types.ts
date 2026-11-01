@@ -52,5 +52,4 @@ export interface OperationResult {
   id: string;
   status: OperationStatus;
   resourceId?: string;
-  reason?: string;
 }

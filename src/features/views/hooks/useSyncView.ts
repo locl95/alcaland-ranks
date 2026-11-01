@@ -79,7 +79,7 @@ export function useSyncView(viewId: string | undefined): SyncViewResult {
     try {
       const { id: taskId } = await createSyncTask(viewId);
       const task = await pollSyncTask(taskId, controller.signal);
-      const { status, message, retryAfter: retryAfterStr } = task.taskStatus;
+      const { status, retryAfter: retryAfterStr } = task.taskStatus;
 
       if (status === 'SUCCESSFUL') {
         const syncedAt = new Date().toISOString();
@@ -100,7 +100,7 @@ export function useSyncView(viewId: string | undefined): SyncViewResult {
         localStorage.setItem(storageKey(viewId, 'cooldown'), date.toISOString());
         setStatusMessage('Synced too recently');
       } else {
-        setStatusMessage(message || 'Sync failed');
+        setStatusMessage('Sync failed');
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;

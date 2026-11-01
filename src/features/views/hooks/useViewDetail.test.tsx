@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act, waitFor, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
@@ -9,6 +9,7 @@ import authReducer from '@/app/authSlice.ts';
 import { useViewDetail } from './useViewDetail.ts';
 import { viewKeys } from '@/features/views/api/viewQueries.ts';
 import { WowProfile } from '@/features/views/api/wow-types.ts';
+import { ApiError } from '@/shared/api/ApiError.ts';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -391,6 +392,22 @@ describe('useViewDetail', () => {
       await act(async () => result.current.saveCharacters([charA, charB]));
 
       expect(result.current.isSyncing).toBe(false);
+    });
+
+    it('tells the user when the ladder exceeds the character limit', async () => {
+      const charA = makeProfile('Arthas');
+      const charB = makeProfile('Sylvanas');
+      mockUserRequest.mockRejectedValue(new ApiError(400, 'Bad Request', 'TOO_MANY_ENTITIES'));
+
+      const { wrapper, queryClient } = makeWrapper();
+      seedCache(queryClient, [charA]);
+      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
+
+      await waitFor(() => expect(result.current.profiles).toHaveLength(1));
+
+      await act(async () => result.current.saveCharacters([charA, charB]));
+
+      expect(screen.getByText('This ladder has more characters than allowed.')).toBeInTheDocument();
     });
 
     it('clears isSyncing and refreshes view data when an unexpected polling error occurs', async () => {

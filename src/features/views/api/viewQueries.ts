@@ -62,19 +62,19 @@ const fetchOperation = (operationId: string, signal?: AbortSignal): Promise<Oper
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_ATTEMPTS = 30;
 
-export const OPERATION_TIMED_OUT = 'Operation timed out';
+export type PolledOperation = OperationResult & { timedOut?: true };
 
 export async function pollOperation(
   operationId: string,
   intervalMs = POLL_INTERVAL_MS,
   maxAttempts = MAX_POLL_ATTEMPTS,
-): Promise<OperationResult> {
+): Promise<PolledOperation> {
   return (
     (await poll(
       (sig) => fetchOperation(operationId, sig),
       (op) => op.status !== 'PENDING',
       intervalMs,
       maxAttempts,
-    )) ?? { id: operationId, status: 'FAILED', reason: OPERATION_TIMED_OUT }
+    )) ?? { id: operationId, status: 'FAILED', timedOut: true }
   );
 }
