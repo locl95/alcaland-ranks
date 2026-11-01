@@ -57,7 +57,7 @@ describe('RealmSelect', () => {
 
       const names = realmOptions().map((o) => o.textContent);
       expect(names.slice(0, 3)).toEqual(['Sanguino', 'Sargeras', 'Saurfang']);
-      expect(names.indexOf('Sindragosa')).toBeGreaterThan(2);
+      expect(names.indexOf('Ambossar')).toBeGreaterThan(2);
     });
 
     it('matches text anywhere in the name', async () => {
