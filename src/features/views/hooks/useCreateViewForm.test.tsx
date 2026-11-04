@@ -671,26 +671,26 @@ describe('useCreateViewForm', () => {
         expect(result.current.canSubmit).toBe(true);
       });
 
-      it('is false when the ladder name is empty', async () => {
+      it('does not need a ladder name', async () => {
         const { result } = renderForm();
         act(() => result.current.selectMode('guild'));
         await addGuild(result);
 
-        expect(result.current.canSubmit).toBe(false);
+        expect(result.current.canSubmit).toBe(true);
       });
     });
 
     describe('handleSubmit', () => {
-      it('posts one entity pointing at the guild, with isGuild extra arguments', async () => {
+      it('posts one entity pointing at the guild, named after the guild, with isGuild extra arguments', async () => {
         const { result } = renderForm();
+        act(() => result.current.setName('Typed Before Switching'));
         act(() => result.current.selectMode('guild'));
-        act(() => result.current.setName('Guild Ladder'));
-        await addGuild(result);
+        await addGuild(result, '  Frikis y un Calvo  ');
 
         await act(async () => result.current.handleSubmit(makeSubmitEvent()));
 
         expect(mockUserRequest).toHaveBeenCalledWith('POST', '/views', {
-          name: 'Guild Ladder',
+          name: 'Frikis y un Calvo',
           entities: [
             {
               name: 'Frikis y un Calvo',
@@ -705,7 +705,11 @@ describe('useCreateViewForm', () => {
           extraArguments: { type: 'wow', isGuild: true },
         });
         expect(onCreateView).toHaveBeenCalledWith(
-          expect.objectContaining({ operationId: 'op-123', status: 'pending' }),
+          expect.objectContaining({
+            operationId: 'op-123',
+            status: 'pending',
+            simpleView: expect.objectContaining({ name: 'Frikis y un Calvo' }),
+          }),
         );
         expect(onClose).toHaveBeenCalledOnce();
       });

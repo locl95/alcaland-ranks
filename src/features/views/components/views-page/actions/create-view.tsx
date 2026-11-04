@@ -54,15 +54,6 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
 
           <form className="dialog-form" onSubmit={handleSubmit}>
             <div className="form-content">
-              <div className="form-field">
-                <label className="form-label">Ladder name</label>
-                <input
-                  className="form-input"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., Main Push Team"
-                />
-              </div>
               <div className="create-mode-toggle" role="group" aria-label="Ladder contents">
                 <button
                   type="button"
@@ -81,6 +72,18 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
                   Guild
                 </button>
               </div>
+
+              {mode === 'characters' && (
+                <div className="form-field">
+                  <label className="form-label">Ladder name</label>
+                  <input
+                    className="form-input"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g., Main Push Team"
+                  />
+                </div>
+              )}
 
               {rows.map((row, index) => (
                 <div key={row.id} className="entity-row">
@@ -141,7 +144,7 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
                   canSubmit
                     ? undefined
                     : mode === 'guild'
-                      ? 'Name the ladder and add a guild'
+                      ? 'Add a guild'
                       : 'Name the ladder and add at least one character'
                 }
               >

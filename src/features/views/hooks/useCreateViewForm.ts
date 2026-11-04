@@ -105,10 +105,14 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
     formatNotFoundMessage(notFound.map((r) => r.name.trim())) ??
     submitError;
 
+  const addedRows = rows.filter(isSubmittable);
+  // A guild ladder is named after its guild; only character ladders ask for a name.
+  const ladderName = mode === 'guild' ? (addedRows[0]?.name.trim() ?? '') : name;
+
   const hasUnverifiedInput = rows.some((r) => r.status === 'draft' && !!r.name.trim());
   const canSubmit =
     !isSubmitting &&
-    !!name.trim() &&
+    !!ladderName.trim() &&
     !hasUnverifiedInput &&
     notFound.length === 0 &&
     !rows.some((r) => r.status === 'checking') &&
@@ -121,7 +125,6 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
     setSubmitError(null);
     setIsSubmitting(true);
 
-    const addedRows = rows.filter(isSubmittable);
     const extraArguments = mode === 'guild' ? GUILD_EXTRA_ARGUMENTS : null;
 
     try {
@@ -129,7 +132,7 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
         'POST',
         '/views',
         {
-          name,
+          name: ladderName,
           entities: addedRows.map((r) => ({
             name: r.name.trim(),
             region: r.region,
@@ -147,7 +150,7 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
         operationId,
         simpleView: {
           id: resourceId,
-          name,
+          name: ladderName,
           owner: '',
           published: true,
           entitiesIds: addedRows.map((_, i) => i),
