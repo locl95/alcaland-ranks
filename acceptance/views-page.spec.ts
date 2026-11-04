@@ -228,7 +228,7 @@ test.describe('create view', () => {
     );
     await page.route(`${API}/views`, (route) => {
       created = true;
-      route.fulfill({ json: { id: 'op-123' } });
+      route.fulfill({ json: { id: 'op-123', resourceId: VALID_VIEW_ID } });
     });
     await page.route(`${API}/operations/op-123`, (route) =>
       route.fulfill({ json: { id: 'op-123', status: 'COMPLETED', resourceId: VALID_VIEW_ID } }),

@@ -9,6 +9,9 @@ export const mockCharacter: WowProfile = {
   class: 'Death Knight',
   spec: 'Frost',
   quantile: 1,
+  race: 'Human',
+  faction: 'alliance',
+  equippedItemLevel: 330,
   mythicPlusBestRuns: [],
   mythicPlusRecentRuns: [],
   mythicPlusRanks: {
