@@ -35,7 +35,7 @@ export const LadderRow = memo(function LadderRow({
   const cachedCharacter = cachedIndex !== -1 ? cachedCharacters[cachedIndex] : undefined;
   const scoreGain =
     !isSyncing && cachedCharacter && cachedCharacter.score !== null
-      ? character.score! - cachedCharacter.score
+      ? Math.round(character.score! - cachedCharacter.score)
       : 0;
 
   return (
@@ -106,9 +106,7 @@ export const LadderRow = memo(function LadderRow({
             </div>
           ) : (
             <div className="ladder-score">
-              {scoreGain > 0 && (
-                <span className="score-improvement num">+{Math.round(scoreGain)}</span>
-              )}
+              {scoreGain > 0 && <span className="score-improvement num">+{scoreGain}</span>}
               <p className={`ladder-score-value num ${getScoreClass(character.score!)}`}>
                 {character.score!.toLocaleString()}
               </p>

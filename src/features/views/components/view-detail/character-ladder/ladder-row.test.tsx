@@ -162,4 +162,28 @@ describe('LadderRow', () => {
     );
     expect(screen.queryByAltText('Human')).not.toBeInTheDocument();
   });
+
+  it('shows the score gain rounded to the nearest point', () => {
+    render(
+      <LadderRow
+        index={0}
+        character={makeProfile({ score: 3001.6 })}
+        cachedCharacters={[makeProfile({ score: 3000 })]}
+        season={null}
+      />,
+    );
+    expect(screen.getByText('+2')).toBeInTheDocument();
+  });
+
+  it('shows no score gain when it rounds to zero', () => {
+    render(
+      <LadderRow
+        index={0}
+        character={makeProfile({ score: 3000.3 })}
+        cachedCharacters={[makeProfile({ score: 3000 })]}
+        season={null}
+      />,
+    );
+    expect(screen.queryByText(/^\+/)).not.toBeInTheDocument();
+  });
 });
