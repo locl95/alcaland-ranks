@@ -23,6 +23,9 @@ const makeProfile = (id: number, name: string, score: number): WowProfile => ({
   class: 'Warrior',
   spec: 'Arms',
   quantile: 1,
+  race: 'Human',
+  faction: 'alliance',
+  equippedItemLevel: 330,
   mythicPlusBestRuns: [],
   mythicPlusRecentRuns: [],
   mythicPlusRanks: {

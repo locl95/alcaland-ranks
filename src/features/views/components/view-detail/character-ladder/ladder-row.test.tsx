@@ -26,6 +26,9 @@ const makeProfile = (overrides: Partial<WowProfile> = {}): WowProfile => ({
   class: 'Warrior',
   spec: 'Arms',
   quantile: 1,
+  race: 'Human',
+  faction: 'alliance',
+  equippedItemLevel: 330,
   mythicPlusBestRuns: [],
   mythicPlusRecentRuns: [],
   mythicPlusRanks: {

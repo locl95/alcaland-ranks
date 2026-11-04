@@ -42,6 +42,9 @@ const toProfile = ({ id, name, realm, region, profile }: EditableCharacter): Wow
     class: '',
     spec: '',
     quantile: 0,
+    race: '',
+    faction: '',
+    equippedItemLevel: 0,
     mythicPlusBestRuns: [],
     mythicPlusRanks: {
       overall: { world: 0, region: 0, realm: 0 },

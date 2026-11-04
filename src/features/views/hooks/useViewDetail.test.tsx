@@ -48,6 +48,9 @@ const makeProfile = (name: string, id = Date.now() + Math.random()): WowProfile 
   class: 'Warrior',
   spec: 'Arms',
   quantile: 1.5,
+  race: 'Human',
+  faction: 'alliance',
+  equippedItemLevel: 330,
   mythicPlusBestRuns: [],
   mythicPlusRecentRuns: [],
   mythicPlusRanks: {

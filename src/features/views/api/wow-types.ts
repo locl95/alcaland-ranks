@@ -55,6 +55,10 @@ export interface WowProfile {
   class: string;
   spec: string;
   quantile: number;
+  race: string;
+  faction: string;
+  equippedItemLevel: number;
+  guild?: string;
   mythicPlusRanks: MythicPlusRanks;
   mythicPlusBestRuns: MythicPlusBestRun[];
   mythicPlusRecentRuns: MythicPlusRecentRun[];
