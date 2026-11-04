@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/shared/components/toaster/toast.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
@@ -24,7 +24,7 @@ function usePagedViews(
 ) {
   const [requestedPage, setRequestedPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
+  const { data: queryData, isLoading } = useQuery({
     queryKey: keyForPage(requestedPage),
     queryFn: () => fetchPage(requestedPage),
     enabled,
@@ -33,6 +33,10 @@ function usePagedViews(
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
+
+  // keepPreviousData would otherwise go on serving the last page after sign-out, even once
+  // its cache entry is removed: the observer still holds it.
+  const data = enabled ? queryData : undefined;
 
   const knownTotal = data?.totalCount ?? null;
   const loadedCount = data?.views.length ?? 0;
@@ -74,6 +78,26 @@ export function useViewsData(isAuthenticated: boolean) {
   const [incompleteViewIds, setIncompleteViewIds] = useState<Set<string>>(new Set());
   const [deletingViewId, setDeletingViewId] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [wasAuthenticated, setWasAuthenticated] = useState(isAuthenticated);
+
+  // Sign-out ends the session's client-side state too: ladders still being created and the
+  // still-syncing marks would otherwise outlive it. Reset during render, like usePagedViews.
+  if (wasAuthenticated !== isAuthenticated) {
+    setWasAuthenticated(isAuthenticated);
+    if (!isAuthenticated) {
+      setPendingViews([]);
+      setIncompleteViewIds(new Set());
+      setCreateError(null);
+    }
+  }
+
+  // Polls started in this session end with it, so nothing reports back after sign-out.
+  const sessionAbort = useRef(new AbortController());
+  useEffect(() => {
+    if (isAuthenticated) return;
+    sessionAbort.current.abort();
+    sessionAbort.current = new AbortController();
+  }, [isAuthenticated]);
 
   const {
     views: serverOwnViews,
@@ -103,11 +127,17 @@ export function useViewsData(isAuthenticated: boolean) {
 
   const keepSyncingInBackground = (view: View) => {
     const { id: viewId, name } = view.simpleView;
+    const { signal } = sessionAbort.current;
     setIncompleteViewIds((prev) => new Set(prev).add(viewId));
 
-    pollOperation(view.operationId!, BACKGROUND_POLL_INTERVAL_MS, BACKGROUND_MAX_POLL_ATTEMPTS)
+    pollOperation(
+      view.operationId!,
+      BACKGROUND_POLL_INTERVAL_MS,
+      BACKGROUND_MAX_POLL_ATTEMPTS,
+      signal,
+    )
       .then((result) => {
-        if (result.timedOut) return;
+        if (result.timedOut || signal.aborted) return;
         removeIncomplete(viewId);
         queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
         if (result.status === 'COMPLETED') showInfo(`${name} is ready`);
@@ -122,12 +152,19 @@ export function useViewsData(isAuthenticated: boolean) {
     const removePending = () =>
       setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
     const isGuild = pendingView.simpleView.extraArguments?.isGuild ?? false;
+    const { signal } = sessionAbort.current;
     const operation = isGuild
-      ? pollOperation(pendingView.operationId!, GUILD_POLL_INTERVAL_MS, GUILD_MAX_POLL_ATTEMPTS)
-      : pollOperation(pendingView.operationId!);
+      ? pollOperation(
+          pendingView.operationId!,
+          GUILD_POLL_INTERVAL_MS,
+          GUILD_MAX_POLL_ATTEMPTS,
+          signal,
+        )
+      : pollOperation(pendingView.operationId!, undefined, undefined, signal);
 
     operation
       .then((result) => {
+        if (signal.aborted) return;
         queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
         if (result.status === 'COMPLETED') return;
         if (isGuild && result.timedOut) {
@@ -144,12 +181,13 @@ export function useViewsData(isAuthenticated: boolean) {
   };
 
   const deleteView = async (viewId: string) => {
+    const { signal } = sessionAbort.current;
     setDeletingViewId(viewId);
     try {
       const { id: operationId } = await userRequest<{ id: string }>('DELETE', `/views/${viewId}`);
-      await pollOperation(operationId);
+      await pollOperation(operationId, undefined, undefined, signal);
     } catch {
-      showError('Failed to delete ladder — please try again');
+      if (!signal.aborted) showError('Failed to delete ladder — please try again');
     } finally {
       setDeletingViewId(null);
       queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });

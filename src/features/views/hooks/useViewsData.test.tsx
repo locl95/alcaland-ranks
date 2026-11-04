@@ -77,7 +77,116 @@ describe('useViewsData', () => {
     mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'COMPLETED' });
   });
 
+  describe('signing out with operations in flight', () => {
+    // A poll that only ends when its signal is aborted, the way the real one does.
+    const pollUntilAborted = (...args: unknown[]) => {
+      const signal = args[3] as AbortSignal | undefined;
+      return new Promise((_, reject) =>
+        signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError'))),
+      );
+    };
+
+    const renderSignedIn = async () => {
+      const { wrapper } = makeWrapper();
+      const hook = renderHook(({ isAuthenticated }) => useViewsData(isAuthenticated), {
+        wrapper,
+        initialProps: { isAuthenticated: true },
+      });
+      await waitFor(() => expect(hook.result.current.isLoadingOwn).toBe(false));
+      return hook;
+    };
+
+    it('stops polling a ladder being created, without reporting anything', async () => {
+      mockPollOperation.mockImplementation(pollUntilAborted);
+      const { result, rerender } = await renderSignedIn();
+      act(() => result.current.createView(makeView('op-123', 'Pending View', 'pending')));
+      const signal = mockPollOperation.mock.calls[0][3] as AbortSignal;
+
+      await act(async () => rerender({ isAuthenticated: false }));
+
+      expect(signal.aborted).toBe(true);
+      expect(result.current.createError).toBeNull();
+    });
+
+    it('stops the background sync of a guild ladder, without a toast', async () => {
+      mockPollOperation
+        .mockResolvedValueOnce({ id: 'op-123', status: 'PENDING', timedOut: true })
+        .mockImplementation(pollUntilAborted);
+      const { result, rerender } = await renderSignedIn();
+      const guildView = makeView('op-123', 'Guild Ladder', 'pending');
+      guildView.simpleView.extraArguments = { type: 'wow', isGuild: true };
+      act(() => result.current.createView(guildView));
+      await waitFor(() => expect(mockPollOperation).toHaveBeenCalledTimes(2));
+      const signal = mockPollOperation.mock.calls[1][3] as AbortSignal;
+
+      await act(async () => rerender({ isAuthenticated: false }));
+
+      expect(signal.aborted).toBe(true);
+      expect(screen.queryByText(/Guild Ladder/)).not.toBeInTheDocument();
+    });
+
+    it('stops polling a delete, without the failure toast', async () => {
+      mockUserRequest.mockImplementation((method: string) =>
+        method === 'DELETE'
+          ? Promise.resolve({ id: 'del-op' })
+          : Promise.resolve({ records: [], metadata: { totalCount: 0 } }),
+      );
+      mockPollOperation.mockImplementation(pollUntilAborted);
+      const { result, rerender } = await renderSignedIn();
+      act(() => {
+        result.current.deleteView('v1');
+      });
+      await waitFor(() => expect(mockPollOperation).toHaveBeenCalled());
+      const signal = mockPollOperation.mock.calls[0][3] as AbortSignal;
+
+      await act(async () => rerender({ isAuthenticated: false }));
+
+      expect(signal.aborted).toBe(true);
+      expect(screen.queryByText(/Failed to delete/)).not.toBeInTheDocument();
+    });
+  });
+
   describe('own views', () => {
+    it('drops a ladder still being created when the user signs out, and does not bring it back', async () => {
+      mockPollOperation.mockReturnValue(new Promise(() => {}));
+      const { wrapper, queryClient } = makeWrapper();
+      const { result, rerender } = renderHook(
+        ({ isAuthenticated }) => useViewsData(isAuthenticated),
+        { wrapper, initialProps: { isAuthenticated: true } },
+      );
+      await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
+      act(() => result.current.createView(makeView('op-123', 'Pending View', 'pending')));
+      expect(result.current.ownViews).toHaveLength(1);
+
+      rerender({ isAuthenticated: false });
+      act(() => queryClient.removeQueries({ queryKey: viewKeys.ownList() }));
+      expect(result.current.ownViews).toEqual([]);
+
+      rerender({ isAuthenticated: true });
+      await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
+      expect(result.current.ownViews).toEqual([]);
+    });
+
+    it('drops the own views when the user signs out', async () => {
+      mockUserRequest.mockResolvedValue({
+        records: [makeSimpleView('v1', 'My View')],
+        metadata: { totalCount: 1 },
+      });
+      const { wrapper, queryClient } = makeWrapper();
+      const { result, rerender } = renderHook(
+        ({ isAuthenticated }) => useViewsData(isAuthenticated),
+        { wrapper, initialProps: { isAuthenticated: true } },
+      );
+      await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
+
+      // What sign-out does: the session goes, then the cached own list is removed.
+      rerender({ isAuthenticated: false });
+      act(() => queryClient.removeQueries({ queryKey: viewKeys.ownList() }));
+
+      expect(result.current.ownViews).toEqual([]);
+      expect(result.current.ownPagination.total).toBe(0);
+    });
+
     it('fetches no views at all when not authenticated', async () => {
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(false), { wrapper });
@@ -227,7 +336,7 @@ describe('useViewsData', () => {
 
         act(() => result.current.createView(makeGuildView()));
 
-        expect(mockPollOperation).toHaveBeenCalledWith('op-123', 5000, 12);
+        expect(mockPollOperation).toHaveBeenCalledWith('op-123', 5000, 12, expect.any(AbortSignal));
       });
 
       it('marks the ladder incomplete and keeps polling in the background on timeout', async () => {
@@ -238,7 +347,12 @@ describe('useViewsData', () => {
             expect.objectContaining({ status: 'incomplete' }),
           ),
         );
-        expect(mockPollOperation).toHaveBeenLastCalledWith('op-123', 15000, 20);
+        expect(mockPollOperation).toHaveBeenLastCalledWith(
+          'op-123',
+          15000,
+          20,
+          expect.any(AbortSignal),
+        );
         expect(result.current.createError).toBeNull();
       });
 
@@ -275,7 +389,12 @@ describe('useViewsData', () => {
 
       act(() => result.current.createView(makeView('op-123', 'New View', 'pending')));
 
-      expect(mockPollOperation).toHaveBeenCalledWith('op-123');
+      expect(mockPollOperation).toHaveBeenCalledWith(
+        'op-123',
+        undefined,
+        undefined,
+        expect.any(AbortSignal),
+      );
     });
 
     it('keeps pending views in the list when a server refetch does not yet include them', async () => {

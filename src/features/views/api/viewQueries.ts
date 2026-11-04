@@ -63,6 +63,7 @@ export async function pollOperation(
   operationId: string,
   intervalMs = POLL_INTERVAL_MS,
   maxAttempts = MAX_POLL_ATTEMPTS,
+  signal?: AbortSignal,
 ): Promise<PolledOperation> {
   return (
     (await poll(
@@ -70,6 +71,7 @@ export async function pollOperation(
       (op) => op.status !== 'PENDING',
       intervalMs,
       maxAttempts,
+      signal,
     )) ?? { id: operationId, status: 'FAILED', timedOut: true }
   );
 }
