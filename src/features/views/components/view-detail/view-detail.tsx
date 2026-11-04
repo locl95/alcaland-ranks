@@ -50,9 +50,10 @@ export function ViewDetail() {
     }
   }, [viewId, isViewIdValid, navigate]);
 
-  const handleSavedCharacters = (characters: typeof profiles) => {
-    setIsEditOpen(false);
-    saveCharacters(characters);
+  const handleSavedCharacters = async (characters: typeof profiles) => {
+    const error = await saveCharacters(characters);
+    if (error === null) setIsEditOpen(false);
+    return error;
   };
 
   if (!initialized) return null;

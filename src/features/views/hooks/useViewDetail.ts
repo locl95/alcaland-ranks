@@ -71,12 +71,14 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
     });
   }, [viewData, pendingCharacters]);
 
-  function handleSaveCharacters(characters: WowProfile[], request: ViewRequest) {
+  async function handleSaveCharacters(
+    characters: WowProfile[],
+    request: ViewRequest,
+  ): Promise<string | null> {
     const submittedCharacters = new Set(characters.map(getCharacterName));
     const deletedCharacters = profiles
       .filter((p) => !submittedCharacters.has(getCharacterName(p)))
       .map((p) => ({ ...p, score: null }));
-    setPendingCharacters([...characters, ...deletedCharacters]);
 
     async function reconcileView(operation: OperationResult) {
       setPendingCharacters(null);
@@ -98,24 +100,32 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
       }
     }
 
-    userRequest<{ id: string }>('PUT', `/views/${safeViewId}`, request)
-      .then(({ id: operationId }) => pollOperation(operationId))
-      .then(async (operation) => {
-        await reconcileView(operation);
-      })
-      .catch((err) => {
+    let operationId: string;
+    try {
+      ({ id: operationId } = await userRequest<{ id: string }>(
+        'PUT',
+        `/views/${safeViewId}`,
+        request,
+      ));
+    } catch (err) {
+      return err instanceof ApiError && err.code === 'TOO_MANY_ENTITIES'
+        ? 'This ladder has more characters than allowed.'
+        : 'Failed to save changes — please try again';
+    }
+
+    setPendingCharacters([...characters, ...deletedCharacters]);
+    pollOperation(operationId)
+      .then(reconcileView)
+      .catch(() => {
         setPendingCharacters(null);
         queryClient.invalidateQueries({ queryKey: viewKeys.data(safeViewId) });
-        showError(
-          err instanceof ApiError && err.code === 'TOO_MANY_ENTITIES'
-            ? 'This ladder has more characters than allowed.'
-            : 'Failed to save changes — please try again',
-        );
+        showError('Failed to save changes — please try again');
       });
+    return null;
   }
 
-  const saveCharacters = (characters: WowProfile[]) => {
-    if (haveSameCharacters(characters, profiles)) return;
+  const saveCharacters = async (characters: WowProfile[]): Promise<string | null> => {
+    if (haveSameCharacters(characters, profiles)) return null;
     setSyncError(null);
 
     const request: ViewRequest = {
@@ -131,7 +141,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
       game: 'WOW',
     };
 
-    handleSaveCharacters(characters, request);
+    return handleSaveCharacters(characters, request);
   };
 
   return {

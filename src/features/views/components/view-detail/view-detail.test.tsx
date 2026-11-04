@@ -32,7 +32,11 @@ vi.mock('./dungeon-grid/dungeon-grid.tsx', () => ({
   DungeonGrid: () => <div data-testid="dungeon-grid" />,
 }));
 vi.mock('./actions/edit-view.tsx', () => ({
-  EditView: () => <div data-testid="edit-view" />,
+  EditView: ({ onSave }: { onSave: (characters: unknown[]) => Promise<string | null> }) => (
+    <div data-testid="edit-view">
+      <button onClick={() => onSave([])}>Save</button>
+    </div>
+  ),
 }));
 vi.mock('./actions/sync-error-dialog.tsx', () => ({
   SyncErrorDialog: () => null,
@@ -152,6 +156,23 @@ describe('ViewDetail — edit button', () => {
     renderView({ canEdit: true });
     expect(screen.queryByTestId('edit-view')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /edit/i }));
+    expect(screen.getByTestId('edit-view')).toBeInTheDocument();
+  });
+
+  it('closes the edit panel when the save is accepted', async () => {
+    renderView({ canEdit: true, saveCharacters: vi.fn().mockResolvedValue(null) });
+    await userEvent.click(screen.getByRole('button', { name: /edit/i }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(screen.queryByTestId('edit-view')).not.toBeInTheDocument();
+  });
+
+  it('keeps the edit panel open when the save is rejected', async () => {
+    renderView({
+      canEdit: true,
+      saveCharacters: vi.fn().mockResolvedValue('This ladder has more characters than allowed.'),
+    });
+    await userEvent.click(screen.getByRole('button', { name: /edit/i }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(screen.getByTestId('edit-view')).toBeInTheDocument();
   });
 });

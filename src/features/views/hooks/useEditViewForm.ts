@@ -51,7 +51,10 @@ const toProfile = ({ id, name, realm, region, profile }: EditableCharacter): Wow
     mythicPlusRecentRuns: [],
   };
 
-export function useEditViewForm(characters: WowProfile[], onSave: (c: WowProfile[]) => void) {
+export function useEditViewForm(
+  characters: WowProfile[],
+  onSave: (c: WowProfile[]) => Promise<string | null>,
+) {
   const [editingCharacters, setEditingCharacters] = useState<EditableCharacter[]>(() =>
     characters.filter((c) => c.score !== null).map(fromProfile),
   );
@@ -62,10 +65,13 @@ export function useEditViewForm(characters: WowProfile[], onSave: (c: WowProfile
   const [duplicateName, setDuplicateName] = useState<string | null>(null);
   const [notFoundName, setNotFoundName] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const clearFeedback = () => {
     setDuplicateName(null);
     setNotFoundName(null);
+    setSaveError(null);
   };
 
   const setName = (value: string) => {
@@ -84,6 +90,7 @@ export function useEditViewForm(characters: WowProfile[], onSave: (c: WowProfile
   };
 
   const deleteCharacter = (id: number) => {
+    setSaveError(null);
     setEditingCharacters((prev) => prev.filter((c) => c.id !== id));
     setStatuses(({ [id]: _removed, ...rest }) => rest);
   };
@@ -118,7 +125,16 @@ export function useEditViewForm(characters: WowProfile[], onSave: (c: WowProfile
     setNewRegion('eu');
   };
 
-  const canSave = !newName.trim() && !isChecking;
+  const canSave = !newName.trim() && !isChecking && !isSaving;
+
+  const save = async () => {
+    setIsSaving(true);
+    const error = await onSave(editingCharacters.map(toProfile));
+    if (error !== null) {
+      setSaveError(error);
+      setIsSaving(false);
+    }
+  };
 
   return {
     editingCharacters,
@@ -130,12 +146,13 @@ export function useEditViewForm(characters: WowProfile[], onSave: (c: WowProfile
     setRealm,
     setRegion,
     errorMessage:
+      saveError ??
       formatDuplicateMessage(duplicateName) ??
       formatNotFoundMessage(notFoundName ? [notFoundName] : []),
     isChecking,
     canSave,
     addCharacter,
     deleteCharacter,
-    save: () => onSave(editingCharacters.map(toProfile)),
+    save,
   };
 }

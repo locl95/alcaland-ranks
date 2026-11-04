@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act, waitFor, screen } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
@@ -378,7 +378,7 @@ describe('useViewDetail', () => {
       ]);
     });
 
-    it('clears isSyncing when the PUT request itself fails', async () => {
+    it('returns the generic error and does not sync when the PUT request itself fails', async () => {
       const charA = makeProfile('Arthas');
       const charB = makeProfile('Sylvanas');
       mockUserRequest.mockRejectedValue(new Error('Network error'));
@@ -389,12 +389,17 @@ describe('useViewDetail', () => {
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
-      await act(async () => result.current.saveCharacters([charA, charB]));
+      let error: string | null = null;
+      await act(async () => {
+        error = await result.current.saveCharacters([charA, charB]);
+      });
 
+      expect(error).toBe('Failed to save changes — please try again');
       expect(result.current.isSyncing).toBe(false);
+      expect(mockPollOperation).not.toHaveBeenCalled();
     });
 
-    it('tells the user when the ladder exceeds the character limit', async () => {
+    it('returns the limit message when the ladder exceeds the character limit', async () => {
       const charA = makeProfile('Arthas');
       const charB = makeProfile('Sylvanas');
       mockUserRequest.mockRejectedValue(new ApiError(400, 'Bad Request', 'TOO_MANY_ENTITIES'));
@@ -405,9 +410,13 @@ describe('useViewDetail', () => {
 
       await waitFor(() => expect(result.current.profiles).toHaveLength(1));
 
-      await act(async () => result.current.saveCharacters([charA, charB]));
+      let error: string | null = null;
+      await act(async () => {
+        error = await result.current.saveCharacters([charA, charB]);
+      });
 
-      expect(screen.getByText('This ladder has more characters than allowed.')).toBeInTheDocument();
+      expect(error).toBe('This ladder has more characters than allowed.');
+      expect(result.current.isSyncing).toBe(false);
     });
 
     it('clears isSyncing and refreshes view data when an unexpected polling error occurs', async () => {

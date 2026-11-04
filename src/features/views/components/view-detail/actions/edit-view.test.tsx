@@ -121,6 +121,14 @@ describe('EditView', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  it('shows the error returned by onSave and lets the user retry', async () => {
+    const onSave = vi.fn().mockResolvedValue('This ladder has more characters than allowed.');
+    render(<EditView characters={[]} onClose={vi.fn()} onSave={onSave} />);
+    await userEvent.click(screen.getByText('Done'));
+    expect(screen.getByText('This ladder has more characters than allowed.')).toBeInTheDocument();
+    expect(screen.getByText('Done')).toBeEnabled();
+  });
+
   it('calls onSave with current characters when Done is clicked', async () => {
     const onSave = vi.fn();
     render(<EditView characters={[makeProfile(1, 'Arthas')]} onClose={vi.fn()} onSave={onSave} />);

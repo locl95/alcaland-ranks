@@ -20,7 +20,7 @@ const DARK_CLASSES = new Set(['death-knight', 'warlock', 'demon-hunter']);
 interface EditViewProps {
   characters: WowProfile[];
   onClose: () => void;
-  onSave: (characters: WowProfile[]) => void;
+  onSave: (characters: WowProfile[]) => Promise<string | null>;
 }
 
 export function EditView({ characters, onClose, onSave }: Readonly<EditViewProps>) {
