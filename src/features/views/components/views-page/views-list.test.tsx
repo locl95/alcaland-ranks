@@ -110,7 +110,6 @@ describe('ViewsList', () => {
       expect(screen.getByText("Track your group's Mythic+ climb")).toBeInTheDocument();
       expect(screen.queryByText('Create your first ladder')).not.toBeInTheDocument();
 
-      // The page decides where this goes: login when there is no session.
       await userEvent.click(screen.getByText('Sign in to get started'));
       expect(onCreateView).toHaveBeenCalledOnce();
     });

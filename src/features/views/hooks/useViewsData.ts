@@ -34,8 +34,6 @@ function usePagedViews(
     refetchOnReconnect: false,
   });
 
-  // keepPreviousData would otherwise go on serving the last page after sign-out, even once
-  // its cache entry is removed: the observer still holds it.
   const data = enabled ? queryData : undefined;
 
   const knownTotal = data?.totalCount ?? null;
@@ -80,8 +78,6 @@ export function useViewsData(isAuthenticated: boolean) {
   const [createError, setCreateError] = useState<string | null>(null);
   const [wasAuthenticated, setWasAuthenticated] = useState(isAuthenticated);
 
-  // Sign-out ends the session's client-side state too: ladders still being created and the
-  // still-syncing marks would otherwise outlive it. Reset during render, like usePagedViews.
   if (wasAuthenticated !== isAuthenticated) {
     setWasAuthenticated(isAuthenticated);
     if (!isAuthenticated) {
@@ -91,12 +87,11 @@ export function useViewsData(isAuthenticated: boolean) {
     }
   }
 
-  // Polls started in this session end with it, so nothing reports back after sign-out.
-  const sessionAbort = useRef(new AbortController());
+  const sessionAbortController = useRef(new AbortController());
   useEffect(() => {
     if (isAuthenticated) return;
-    sessionAbort.current.abort();
-    sessionAbort.current = new AbortController();
+    sessionAbortController.current.abort();
+    sessionAbortController.current = new AbortController();
   }, [isAuthenticated]);
 
   const {
@@ -127,15 +122,14 @@ export function useViewsData(isAuthenticated: boolean) {
 
   const keepSyncingInBackground = (view: View) => {
     const { id: viewId, name } = view.simpleView;
-    const { signal } = sessionAbort.current;
+    const { signal } = sessionAbortController.current;
     setIncompleteViewIds((prev) => new Set(prev).add(viewId));
 
-    pollOperation(
-      view.operationId!,
-      BACKGROUND_POLL_INTERVAL_MS,
-      BACKGROUND_MAX_POLL_ATTEMPTS,
+    pollOperation(view.operationId!, {
+      intervalMs: BACKGROUND_POLL_INTERVAL_MS,
+      maxAttempts: BACKGROUND_MAX_POLL_ATTEMPTS,
       signal,
-    )
+    })
       .then((result) => {
         if (result.timedOut || signal.aborted) return;
         removeIncomplete(viewId);
@@ -152,15 +146,14 @@ export function useViewsData(isAuthenticated: boolean) {
     const removePending = () =>
       setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
     const isGuild = pendingView.simpleView.extraArguments?.isGuild ?? false;
-    const { signal } = sessionAbort.current;
+    const { signal } = sessionAbortController.current;
     const operation = isGuild
-      ? pollOperation(
-          pendingView.operationId!,
-          GUILD_POLL_INTERVAL_MS,
-          GUILD_MAX_POLL_ATTEMPTS,
+      ? pollOperation(pendingView.operationId!, {
+          intervalMs: GUILD_POLL_INTERVAL_MS,
+          maxAttempts: GUILD_MAX_POLL_ATTEMPTS,
           signal,
-        )
-      : pollOperation(pendingView.operationId!, undefined, undefined, signal);
+        })
+      : pollOperation(pendingView.operationId!, { signal });
 
     operation
       .then((result) => {
@@ -181,11 +174,11 @@ export function useViewsData(isAuthenticated: boolean) {
   };
 
   const deleteView = async (viewId: string) => {
-    const { signal } = sessionAbort.current;
+    const { signal } = sessionAbortController.current;
     setDeletingViewId(viewId);
     try {
       const { id: operationId } = await userRequest<{ id: string }>('DELETE', `/views/${viewId}`);
-      await pollOperation(operationId, undefined, undefined, signal);
+      await pollOperation(operationId, { signal });
     } catch {
       if (!signal.aborted) showError('Failed to delete ladder — please try again');
     } finally {

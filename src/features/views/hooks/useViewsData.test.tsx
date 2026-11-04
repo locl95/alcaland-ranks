@@ -78,9 +78,7 @@ describe('useViewsData', () => {
   });
 
   describe('signing out with operations in flight', () => {
-    // A poll that only ends when its signal is aborted, the way the real one does.
-    const pollUntilAborted = (...args: unknown[]) => {
-      const signal = args[3] as AbortSignal | undefined;
+    const pollUntilAborted = (_operationId: string, { signal }: { signal?: AbortSignal } = {}) => {
       return new Promise((_, reject) =>
         signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError'))),
       );
@@ -100,7 +98,7 @@ describe('useViewsData', () => {
       mockPollOperation.mockImplementation(pollUntilAborted);
       const { result, rerender } = await renderSignedIn();
       act(() => result.current.createView(makeView('op-123', 'Pending View', 'pending')));
-      const signal = mockPollOperation.mock.calls[0][3] as AbortSignal;
+      const signal = mockPollOperation.mock.calls[0][1].signal as AbortSignal;
 
       await act(async () => rerender({ isAuthenticated: false }));
 
@@ -117,7 +115,7 @@ describe('useViewsData', () => {
       guildView.simpleView.extraArguments = { type: 'wow', isGuild: true };
       act(() => result.current.createView(guildView));
       await waitFor(() => expect(mockPollOperation).toHaveBeenCalledTimes(2));
-      const signal = mockPollOperation.mock.calls[1][3] as AbortSignal;
+      const signal = mockPollOperation.mock.calls[1][1].signal as AbortSignal;
 
       await act(async () => rerender({ isAuthenticated: false }));
 
@@ -137,7 +135,7 @@ describe('useViewsData', () => {
         result.current.deleteView('v1');
       });
       await waitFor(() => expect(mockPollOperation).toHaveBeenCalled());
-      const signal = mockPollOperation.mock.calls[0][3] as AbortSignal;
+      const signal = mockPollOperation.mock.calls[0][1].signal as AbortSignal;
 
       await act(async () => rerender({ isAuthenticated: false }));
 
@@ -179,7 +177,6 @@ describe('useViewsData', () => {
       );
       await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
 
-      // What sign-out does: the session goes, then the cached own list is removed.
       rerender({ isAuthenticated: false });
       act(() => queryClient.removeQueries({ queryKey: viewKeys.ownList() }));
 
@@ -336,7 +333,11 @@ describe('useViewsData', () => {
 
         act(() => result.current.createView(makeGuildView()));
 
-        expect(mockPollOperation).toHaveBeenCalledWith('op-123', 5000, 12, expect.any(AbortSignal));
+        expect(mockPollOperation).toHaveBeenCalledWith('op-123', {
+          intervalMs: 5000,
+          maxAttempts: 12,
+          signal: expect.any(AbortSignal),
+        });
       });
 
       it('marks the ladder incomplete and keeps polling in the background on timeout', async () => {
@@ -347,12 +348,11 @@ describe('useViewsData', () => {
             expect.objectContaining({ status: 'incomplete' }),
           ),
         );
-        expect(mockPollOperation).toHaveBeenLastCalledWith(
-          'op-123',
-          15000,
-          20,
-          expect.any(AbortSignal),
-        );
+        expect(mockPollOperation).toHaveBeenLastCalledWith('op-123', {
+          intervalMs: 15000,
+          maxAttempts: 20,
+          signal: expect.any(AbortSignal),
+        });
         expect(result.current.createError).toBeNull();
       });
 
@@ -389,12 +389,7 @@ describe('useViewsData', () => {
 
       act(() => result.current.createView(makeView('op-123', 'New View', 'pending')));
 
-      expect(mockPollOperation).toHaveBeenCalledWith(
-        'op-123',
-        undefined,
-        undefined,
-        expect.any(AbortSignal),
-      );
+      expect(mockPollOperation).toHaveBeenCalledWith('op-123', { signal: expect.any(AbortSignal) });
     });
 
     it('keeps pending views in the list when a server refetch does not yet include them', async () => {

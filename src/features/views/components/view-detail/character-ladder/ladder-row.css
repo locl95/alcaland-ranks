@@ -147,15 +147,7 @@
   line-height: 1.15;
 }
 
-.class-icon {
-  width: 1.875rem;
-  height: 1.875rem;
-  border-radius: var(--rad-sm);
-  object-fit: cover;
-  flex-shrink: 0;
-  box-shadow: 0 0 0 1px var(--rule);
-}
-
+.class-icon,
 .race-icon {
   width: 1.875rem;
   height: 1.875rem;

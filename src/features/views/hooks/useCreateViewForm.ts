@@ -106,7 +106,6 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
     submitError;
 
   const addedRows = rows.filter(isSubmittable);
-  // A guild ladder is named after its guild; only character ladders ask for a name.
   const ladderName = mode === 'guild' ? (addedRows[0]?.name.trim() ?? '') : name;
 
   const hasUnverifiedInput = rows.some((r) => r.status === 'draft' && !!r.name.trim());

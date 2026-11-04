@@ -59,11 +59,19 @@ const MAX_POLL_ATTEMPTS = 30;
 
 export type PolledOperation = OperationResult & { timedOut?: true };
 
+interface PollOperationOptions {
+  intervalMs?: number;
+  maxAttempts?: number;
+  signal?: AbortSignal;
+}
+
 export async function pollOperation(
   operationId: string,
-  intervalMs = POLL_INTERVAL_MS,
-  maxAttempts = MAX_POLL_ATTEMPTS,
-  signal?: AbortSignal,
+  {
+    intervalMs = POLL_INTERVAL_MS,
+    maxAttempts = MAX_POLL_ATTEMPTS,
+    signal,
+  }: PollOperationOptions = {},
 ): Promise<PolledOperation> {
   return (
     (await poll(

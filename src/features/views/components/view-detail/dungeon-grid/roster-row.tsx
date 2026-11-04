@@ -67,7 +67,7 @@ export function RosterRow({ member, characterRegion }: Readonly<RosterRowProps>)
         <span className="run-details-realm">{toRealmLabel(member.realm, characterRegion)}</span>
       </div>
       <span className="run-details-ilvl" title="Equipped item level">
-        <Swords className="run-details-ilvl-icon" aria-hidden="true" />
+        <Swords className="run-details-ilvl-icon" aria-hidden={true} />
         {member.itemLevel}
       </span>
     </div>

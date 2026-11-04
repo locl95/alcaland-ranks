@@ -83,7 +83,7 @@ export const LadderRow = memo(function LadderRow({
             {!isSyncing && (
               <div className="ladder-character-meta">
                 <span className="ladder-character-ilvl num">
-                  <Swords className="ladder-character-ilvl-icon" aria-hidden="true" />
+                  <Swords className="ladder-character-ilvl-icon" aria-hidden={true} />
                   {Math.floor(character.equippedItemLevel)}
                 </span>
                 {character.guild && (
