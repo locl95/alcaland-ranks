@@ -1,4 +1,5 @@
 import './roster-row.css';
+import { Swords } from 'lucide-react';
 import { RunDetailsMember } from '@/features/views/api/wow-types.ts';
 import { SPEC_IMAGES, getSpecImageKey } from '@/features/views/constants/spec-images.ts';
 import { ROLE_IMAGES } from '@/features/views/constants/role-images.ts';
@@ -66,6 +67,7 @@ export function RosterRow({ member, characterRegion }: Readonly<RosterRowProps>)
         <span className="run-details-realm">{toRealmLabel(member.realm, characterRegion)}</span>
       </div>
       <span className="run-details-ilvl" title="Equipped item level">
+        <Swords className="run-details-ilvl-icon" aria-hidden="true" />
         {member.itemLevel}
       </span>
     </div>

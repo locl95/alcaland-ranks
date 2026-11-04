@@ -50,10 +50,18 @@
 }
 
 .run-details-ilvl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1875rem;
   font-family: var(--font-data);
   font-weight: 600;
   font-size: 0.8125rem;
   color: var(--ink-2);
   flex-shrink: 0;
   align-self: center;
+}
+
+.run-details-ilvl-icon {
+  width: 0.8125rem;
+  height: 0.8125rem;
 }
