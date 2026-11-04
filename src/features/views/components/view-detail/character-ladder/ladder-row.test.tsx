@@ -69,13 +69,7 @@ describe('LadderRow', () => {
     expect(screen.getByText('Deleting…')).toBeInTheDocument();
   });
 
-  it('does not show syncing indicator for normal characters', () => {
-    render(<LadderRow index={0} character={makeProfile()} cachedCharacters={[]} season={null} />);
-    expect(screen.queryByText('Syncing…')).not.toBeInTheDocument();
-    expect(screen.queryByText('Deleting…')).not.toBeInTheDocument();
-  });
-
-  it('shows score for non-syncing characters', () => {
+  it('shows the score, and no syncing indicator, for a ranked character', () => {
     render(
       <LadderRow
         index={0}
@@ -85,6 +79,8 @@ describe('LadderRow', () => {
       />,
     );
     expect(screen.getByText('3,000')).toBeInTheDocument();
+    expect(screen.queryByText('Syncing…')).not.toBeInTheDocument();
+    expect(screen.queryByText('Deleting…')).not.toBeInTheDocument();
   });
 
   it('shows position improvement when ranked higher than cached', () => {

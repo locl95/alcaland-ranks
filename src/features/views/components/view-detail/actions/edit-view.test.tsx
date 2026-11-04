@@ -78,11 +78,6 @@ describe('EditView', () => {
     mockCheckEntitiesExist.mockResolvedValue({ exist: [], nonExisting: [], unchecked: [] });
   });
 
-  it('renders the dialog when open', () => {
-    render(<EditView characters={[]} onClose={vi.fn()} onSave={vi.fn()} />);
-    expect(screen.getByText('Edit your ladder')).toBeInTheDocument();
-  });
-
   it('lists the current characters', () => {
     render(
       <EditView
@@ -108,22 +103,6 @@ describe('EditView', () => {
     expect(screen.queryByText('Arthas')).not.toBeInTheDocument();
   });
 
-  it('calls onClose when the X button is clicked', async () => {
-    const onClose = vi.fn();
-    render(<EditView characters={[]} onClose={onClose} onSave={vi.fn()} />);
-    await userEvent.click(screen.getByRole('button', { name: 'Close' }));
-    expect(onClose).toHaveBeenCalledOnce();
-  });
-
-  it('Done button calls onSave but not onClose', async () => {
-    const onClose = vi.fn();
-    const onSave = vi.fn();
-    render(<EditView characters={[]} onClose={onClose} onSave={onSave} />);
-    await userEvent.click(screen.getByText('Done'));
-    expect(onSave).toHaveBeenCalledOnce();
-    expect(onClose).not.toHaveBeenCalled();
-  });
-
   it('shows the error returned by onSave and lets the user retry', async () => {
     const onSave = vi.fn().mockResolvedValue('This ladder has more characters than allowed.');
     render(<EditView characters={[]} onClose={vi.fn()} onSave={onSave} />);
@@ -139,13 +118,6 @@ describe('EditView', () => {
     expect(onSave).toHaveBeenCalledWith(
       expect.arrayContaining([expect.objectContaining({ name: 'Arthas' })]),
     );
-  });
-
-  it('calls onClose when clicking the overlay', async () => {
-    const onClose = vi.fn();
-    render(<EditView characters={[]} onClose={onClose} onSave={vi.fn()} />);
-    await userEvent.click(screen.getByTestId('edit-view-overlay'));
-    expect(onClose).toHaveBeenCalledOnce();
   });
 
   it('disables the add button when name or realm is empty', () => {

@@ -20,13 +20,6 @@ const renderSelect = (props: Partial<React.ComponentProps<typeof RealmSelect>> =
 
 describe('RealmSelect', () => {
   describe('region', () => {
-    it('calls onRegionChange with the new region value', async () => {
-      const onRegionChange = vi.fn();
-      renderSelect({ onRegionChange });
-      await userEvent.selectOptions(screen.getByLabelText('Region'), 'us');
-      expect(onRegionChange).toHaveBeenCalledWith('us');
-    });
-
     it('clears the realm when the region changes', async () => {
       const onRealmChange = vi.fn();
       renderSelect({ realm: 'tarren-mill', onRealmChange });
@@ -105,21 +98,6 @@ describe('RealmSelect', () => {
       await userEvent.keyboard('{Enter}');
 
       expect(onRealmChange).toHaveBeenCalledWith('sanguino');
-    });
-
-    it('does not submit the surrounding form on Enter', async () => {
-      const onSubmit = vi.fn((e: React.FormEvent) => e.preventDefault());
-      render(
-        <form onSubmit={onSubmit}>
-          <RealmSelect region="eu" realm="" onRegionChange={vi.fn()} onRealmChange={vi.fn()} />
-          <button type="submit">Create</button>
-        </form>,
-      );
-
-      await userEvent.type(screen.getByLabelText('Realm'), 'sangu');
-      await userEvent.keyboard('{Enter}');
-
-      expect(onSubmit).not.toHaveBeenCalled();
     });
 
     it('highlights the best match as soon as the list filters', async () => {

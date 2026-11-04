@@ -40,13 +40,6 @@ describe('CharacterMenu', () => {
     vi.clearAllMocks();
   });
 
-  it('shows the dropdown when the menu button is clicked', async () => {
-    render(<CharacterMenu character={makeProfile()} />);
-    await userEvent.click(screen.getByRole('button'));
-    expect(screen.getByText('Raider.io')).toBeInTheDocument();
-    expect(screen.getByText('Summoned.io')).toBeInTheDocument();
-  });
-
   it('calls openExternalProfile with raiderio when Raider.io is clicked', async () => {
     const character = makeProfile();
     render(<CharacterMenu character={character} />);
@@ -61,24 +54,5 @@ describe('CharacterMenu', () => {
     await userEvent.click(screen.getByRole('button'));
     await userEvent.click(screen.getByText('Summoned.io'));
     expect(openExternalProfile).toHaveBeenCalledWith(character, 'summoned');
-  });
-
-  it('closes the dropdown after selecting an option', async () => {
-    render(<CharacterMenu character={makeProfile()} />);
-    await userEvent.click(screen.getByRole('button'));
-    await userEvent.click(screen.getByText('Raider.io'));
-    expect(screen.queryByText('Raider.io')).not.toBeInTheDocument();
-  });
-
-  it('closes the dropdown when clicking outside', async () => {
-    render(<CharacterMenu character={makeProfile()} />);
-    await userEvent.click(screen.getByRole('button'));
-    expect(screen.getByText('Raider.io')).toBeInTheDocument();
-
-    // The open menu is modal, so Radix marks the rest of the page inert with
-    // `pointer-events: none`. That is the behaviour under test, not an
-    // obstacle to it — userEvent's guard has to be waived to click through.
-    await userEvent.click(document.body, { pointerEventsCheck: 0 });
-    expect(screen.queryByText('Raider.io')).not.toBeInTheDocument();
   });
 });

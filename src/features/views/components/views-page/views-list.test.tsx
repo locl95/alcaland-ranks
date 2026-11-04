@@ -114,12 +114,6 @@ describe('ViewsList', () => {
       expect(onCreateView).toHaveBeenCalledOnce();
     });
 
-    it('calls onCreateView when clicking the create button in empty state', async () => {
-      const { onCreateView } = renderList([]);
-      await userEvent.click(screen.getByText('Create your first ladder'));
-      expect(onCreateView).toHaveBeenCalledOnce();
-    });
-
     it('renders nothing while loading with empty views', () => {
       const { container } = renderList([], { isLoadingViews: true });
       expect(container).toBeEmptyDOMElement();

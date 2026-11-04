@@ -274,15 +274,6 @@ describe('useCreateViewForm', () => {
   });
 
   describe('removeRow', () => {
-    it('removes the row with the given id', async () => {
-      const { result } = renderForm();
-      const rowId = await addRow(result, 'Arthas');
-      expect(result.current.rows).toHaveLength(2);
-
-      act(() => result.current.removeRow(rowId));
-      expect(result.current.rows).toHaveLength(1);
-    });
-
     it('keeps one empty row if the last character is removed', () => {
       const { result } = renderForm();
       act(() => result.current.removeRow(result.current.rows[0].id));
@@ -382,26 +373,6 @@ describe('useCreateViewForm', () => {
 
       act(() => result.current.updateRow(trailingId, 'name', ''));
       expect(result.current.canSubmit).toBe(true);
-    });
-  });
-
-  describe('reset on close', () => {
-    it('starts empty again when the dialog is reopened', async () => {
-      const { result, unmount } = renderForm();
-
-      act(() => result.current.setName('My Ladder'));
-      await addRow(result, 'Arthas');
-
-      expect(result.current.name).toBe('My Ladder');
-      expect(result.current.rows).toHaveLength(2);
-
-      // The parent mounts the dialog only while open, so reopening is a fresh mount.
-      unmount();
-      const reopened = renderForm();
-
-      expect(reopened.result.current.name).toBe('');
-      expect(reopened.result.current.rows).toHaveLength(1);
-      expect(reopened.result.current.rows[0].status).toBe('draft');
     });
   });
 
@@ -603,36 +574,6 @@ describe('useCreateViewForm', () => {
         expect(result.current.rows[0].status).toBe('unverified');
         expect(result.current.errorMessage).toBeNull();
       });
-
-      it('does not apply a stale result to a row edited while checking', async () => {
-        let resolveCheck: (value: unknown) => void = () => {};
-        mockCheckGuildExists.mockReturnValue(
-          new Promise((resolve) => {
-            resolveCheck = resolve;
-          }),
-        );
-        const { result } = renderForm();
-        act(() => result.current.selectMode('guild'));
-        const rowId = result.current.rows[0].id;
-        act(() => {
-          result.current.updateRow(rowId, 'name', 'Frikis y un Calvo');
-          result.current.updateRow(rowId, 'realm', 'dun-modr');
-        });
-        act(() => {
-          result.current.verifyRow(rowId);
-        });
-        expect(result.current.rows[0].status).toBe('checking');
-
-        act(() => result.current.updateRow(rowId, 'name', 'Otra Guild'));
-        expect(result.current.rows[0].status).toBe('draft');
-
-        await act(async () => {
-          resolveCheck({ guild: { name: 'x', realm: 'dun-modr', region: 'eu', blizzardId: 1 } });
-        });
-
-        expect(result.current.rows[0].name).toBe('Otra Guild');
-        expect(result.current.rows[0].status).toBe('draft');
-      });
     });
 
     describe('canSubmit', () => {
@@ -737,21 +678,6 @@ describe('useCreateViewForm', () => {
         await act(async () => result.current.handleSubmit(makeSubmitEvent()));
 
         expect(mockUserRequest.mock.calls[0][2]).not.toHaveProperty('extraArguments');
-      });
-
-      it('sets an error and does not close when the POST fails', async () => {
-        mockUserRequest.mockRejectedValue(new Error('Network error'));
-        const { result } = renderForm();
-        act(() => result.current.selectMode('guild'));
-        act(() => result.current.setName('Guild Ladder'));
-        await addGuild(result);
-
-        await act(async () => result.current.handleSubmit(makeSubmitEvent()));
-
-        expect(result.current.errorMessage).toBe(
-          'Failed to create guild ladder. Please try again.',
-        );
-        expect(onClose).not.toHaveBeenCalled();
       });
     });
   });

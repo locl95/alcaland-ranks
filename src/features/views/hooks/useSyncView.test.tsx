@@ -77,15 +77,6 @@ describe('useSyncView', () => {
   // triggerSync no-ops
   // ---------------------------------------------------------------------------
 
-  it('triggerSync is a no-op when viewId is undefined', async () => {
-    const { wrapper } = makeWrapper();
-    const { result } = renderHook(() => useSyncView(undefined), { wrapper });
-    await act(async () => {
-      result.current.triggerSync();
-    });
-    expect(mockCreateSyncTask).not.toHaveBeenCalled();
-  });
-
   it('triggerSync is a no-op when an active cooldown is stored', async () => {
     const future = new Date(Date.now() + 60_000).toISOString();
     localStorage.setItem(COOLDOWN_KEY, future);

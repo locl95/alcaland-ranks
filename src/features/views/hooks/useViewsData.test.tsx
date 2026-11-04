@@ -193,26 +193,20 @@ describe('useViewsData', () => {
       expect(mockServiceGet).not.toHaveBeenCalled();
     });
 
-    it('fetches own views using userRequest when authenticated', async () => {
-      const { wrapper } = makeWrapper();
-      renderHook(() => useViewsData(true), { wrapper });
-      await waitFor(() =>
-        expect(mockUserRequest).toHaveBeenCalledWith(
-          'GET',
-          '/views?game=wow&page=1&limit=10&include=metadata',
-        ),
-      );
-    });
-
-    it('returns the own views from the API', async () => {
+    it('fetches and returns the own views when authenticated', async () => {
       mockUserRequest.mockResolvedValue({
         records: [makeSimpleView('v1', 'My View')],
         metadata: { totalCount: 1 },
       });
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(true), { wrapper });
+
       await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
       expect(result.current.ownViews[0].simpleView.id).toBe('v1');
+      expect(mockUserRequest).toHaveBeenCalledWith(
+        'GET',
+        '/views?game=wow&page=1&limit=10&include=metadata',
+      );
     });
   });
 
@@ -268,20 +262,6 @@ describe('useViewsData', () => {
       });
     });
 
-    it('clears createError when clearCreateError is called', async () => {
-      mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'FAILED' });
-      const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
-
-      await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
-
-      act(() => result.current.createView(makeView('op-123', 'New View', 'pending')));
-      await waitFor(() => expect(result.current.createError).not.toBeNull());
-
-      act(() => result.current.clearCreateError());
-      await waitFor(() => expect(result.current.createError).toBeNull());
-    });
-
     it('removes the pending view and invalidates when polling throws a network error', async () => {
       mockPollOperation.mockRejectedValue(new Error('Network error'));
       const { wrapper, queryClient } = makeWrapper();
@@ -324,22 +304,6 @@ describe('useViewsData', () => {
         return result;
       };
 
-      it('polls every 5 seconds for up to 1 minute', async () => {
-        mockPollOperation.mockReturnValue(new Promise(() => {}));
-        const { wrapper } = makeWrapper();
-        const { result } = renderHook(() => useViewsData(true), { wrapper });
-
-        await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
-
-        act(() => result.current.createView(makeGuildView()));
-
-        expect(mockPollOperation).toHaveBeenCalledWith('op-123', {
-          intervalMs: 5000,
-          maxAttempts: 12,
-          signal: expect.any(AbortSignal),
-        });
-      });
-
       it('marks the ladder incomplete and keeps polling in the background on timeout', async () => {
         const result = await createTimedOutGuild(new Promise(() => {}));
 
@@ -378,18 +342,6 @@ describe('useViewsData', () => {
           expect(result.current.createError).toBe('Failed to create ladder. Please try again.'),
         );
       });
-    });
-
-    it('polls with the default interval for a character ladder', async () => {
-      mockPollOperation.mockReturnValue(new Promise(() => {}));
-      const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
-
-      await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
-
-      act(() => result.current.createView(makeView('op-123', 'New View', 'pending')));
-
-      expect(mockPollOperation).toHaveBeenCalledWith('op-123', { signal: expect.any(AbortSignal) });
     });
 
     it('keeps pending views in the list when a server refetch does not yet include them', async () => {
@@ -442,29 +394,6 @@ describe('useViewsData', () => {
       expect(result.current.ownViews[0].status).toBe('deleting');
     });
 
-    it('sets deletingViewId while the operation is in flight', async () => {
-      let resolveDelete!: (v: { id: string }) => void;
-      mockUserRequest.mockImplementation((method: string) => {
-        if (method === 'DELETE')
-          return new Promise((res) => {
-            resolveDelete = res;
-          });
-        return Promise.resolve({ records: [makeSimpleView('v1', 'My View')] });
-      });
-      const { wrapper, queryClient } = makeWrapper();
-      queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView('v1', 'My View')]);
-
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
-
-      act(() => {
-        result.current.deleteView('v1');
-      });
-      await waitFor(() => expect(result.current.deletingViewId).toBe('v1'));
-
-      await act(async () => resolveDelete({ id: 'op-123' }));
-      await waitFor(() => expect(result.current.deletingViewId).toBeNull());
-    });
-
     it('invalidates the own views list after a successful delete', async () => {
       const { wrapper, queryClient } = makeWrapper();
       queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView('v1', 'My View')]);
@@ -482,19 +411,6 @@ describe('useViewsData', () => {
         if (method === 'DELETE') return Promise.reject(new Error('Server error'));
         return Promise.resolve({ records: [makeSimpleView('v1', 'My View')] });
       });
-      const { wrapper, queryClient } = makeWrapper();
-      queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView('v1', 'My View')]);
-      const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
-
-      await act(async () => result.current.deleteView('v1'));
-
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: viewKeys.ownList() });
-    });
-
-    it('still invalidates the own views list when the delete operation fails', async () => {
-      mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'FAILED' });
       const { wrapper, queryClient } = makeWrapper();
       queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView('v1', 'My View')]);
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');

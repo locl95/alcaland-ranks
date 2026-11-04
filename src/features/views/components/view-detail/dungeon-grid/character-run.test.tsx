@@ -77,8 +77,8 @@ describe('CharacterRun', () => {
     expect(screen.getByText('216')).toBeInTheDocument();
   });
 
-  it('renders the crown icon when isHighest is true', () => {
-    const { container } = render(
+  it('crowns only the highest run', () => {
+    const { container, rerender } = render(
       <CharacterRun
         character={makeProfile()}
         bestRun={makeBestRun()}
@@ -87,10 +87,8 @@ describe('CharacterRun', () => {
       />,
     );
     expect(container.querySelector('.crown-icon')).toBeInTheDocument();
-  });
 
-  it('does not render the crown icon when isHighest is false', () => {
-    const { container } = render(
+    rerender(
       <CharacterRun
         character={makeProfile()}
         bestRun={makeBestRun()}

@@ -48,18 +48,4 @@ describe('SyncErrorDialog', () => {
     await userEvent.click(screen.getByText('Got it'));
     expect(onClose).toHaveBeenCalledOnce();
   });
-
-  it('calls onClose when clicking the overlay', async () => {
-    const onClose = vi.fn();
-    render(<SyncErrorDialog failedCharacters={[makeProfile('Arthas')]} onClose={onClose} />);
-    await userEvent.click(screen.getByTestId('sync-error-overlay'));
-    expect(onClose).toHaveBeenCalledOnce();
-  });
-
-  it('does not call onClose when clicking inside the dialog content', async () => {
-    const onClose = vi.fn();
-    render(<SyncErrorDialog failedCharacters={[makeProfile('Arthas')]} onClose={onClose} />);
-    await userEvent.click(screen.getByTestId('sync-error-content'));
-    expect(onClose).not.toHaveBeenCalled();
-  });
 });

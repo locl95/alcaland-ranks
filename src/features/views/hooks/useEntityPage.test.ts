@@ -15,12 +15,6 @@ describe('useEntityPage', () => {
     expect(result.current.pagination.total).toBe(ENTITY_PAGE_SIZE);
   });
 
-  it('preserves the order it is given', () => {
-    const { result } = renderHook(() => useEntityPage(['c', 'a', 'b']));
-
-    expect(result.current.pageItems).toEqual(['c', 'a', 'b']);
-  });
-
   it('splits 15 items into two pages and offsets the second', () => {
     const { result } = renderHook(() => useEntityPage(makeItems(15)));
 

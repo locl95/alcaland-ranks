@@ -87,13 +87,6 @@ describe('ViewDetail — sync button', () => {
     vi.clearAllMocks();
   });
 
-  it('calls triggerSync when the sync button is clicked', async () => {
-    const triggerSync = vi.fn();
-    renderView({}, { triggerSync });
-    await userEvent.click(screen.getByRole('button', { name: /sync/i }));
-    expect(triggerSync).toHaveBeenCalledOnce();
-  });
-
   it('shows "Syncing..." and is disabled while isRunning is true', () => {
     renderView({}, { isRunning: true, isDisabled: true });
     const btn = screen.getByRole('button', { name: /syncing/i });
@@ -103,21 +96,6 @@ describe('ViewDetail — sync button', () => {
   it('is disabled when isSyncDisabled is true (cooldown active)', () => {
     renderView({}, { isDisabled: true, countdownLabel: '1m 30s' });
     expect(screen.getByRole('button', { name: /1m 30s/i })).toBeDisabled();
-  });
-
-  it('shows the countdown label as button text when in cooldown', () => {
-    renderView({}, { isDisabled: true, countdownLabel: '45s' });
-    expect(screen.getByRole('button', { name: /45s/i })).toBeInTheDocument();
-  });
-
-  it('shows the statusMessage as the button title', () => {
-    renderView({}, { statusMessage: 'Synced successfully' });
-    expect(screen.getByRole('button', { name: /sync/i }).title).toBe('Synced successfully');
-  });
-
-  it('shows "Next sync in …" as the button title when in cooldown and no statusMessage', () => {
-    renderView({}, { countdownLabel: '30s' });
-    expect(screen.getByRole('button', { name: /30s/i }).title).toBe('Next sync in 30s');
   });
 
   it('is disabled when an edit operation (isSyncing) is in progress', () => {

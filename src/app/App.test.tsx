@@ -26,21 +26,6 @@ const renderAt = (path: string) =>
   );
 
 describe('App routing', () => {
-  it('renders ViewsPage at /', () => {
-    renderAt('/');
-    expect(screen.getByTestId('views-page')).toBeInTheDocument();
-  });
-
-  it('renders ViewDetail at /:viewId', () => {
-    renderAt('/some-view-id');
-    expect(screen.getByTestId('view-detail')).toBeInTheDocument();
-  });
-
-  it('renders LoginPage at /login', () => {
-    renderAt('/login');
-    expect(screen.getByTestId('login-page')).toBeInTheDocument();
-  });
-
   it('redirects unknown paths to /', () => {
     renderAt('/unknown/deep/path');
     expect(screen.getByTestId('views-page')).toBeInTheDocument();

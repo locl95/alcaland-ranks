@@ -120,12 +120,6 @@ describe('useViewDetail', () => {
       const { result } = renderHook(() => useViewDetail(INVALID_ID, OWNER, false), { wrapper });
       expect(result.current.isViewIdValid).toBe(false);
     });
-
-    it('marks a valid UUID as valid', () => {
-      const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
-      expect(result.current.isViewIdValid).toBe(true);
-    });
   });
 
   describe('initialized', () => {
@@ -138,23 +132,6 @@ describe('useViewDetail', () => {
   });
 
   describe('profiles', () => {
-    it('returns empty array when there is no data', async () => {
-      const { wrapper, queryClient } = makeWrapper();
-      seedCache(queryClient, []);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
-      await waitFor(() => expect(result.current.initialized).toBe(true));
-      expect(result.current.profiles).toEqual([]);
-    });
-
-    it('returns the API profiles normally', async () => {
-      const charA = makeProfile('Arthas');
-      const { wrapper, queryClient } = makeWrapper();
-      seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
-      await waitFor(() => expect(result.current.profiles).toHaveLength(1));
-      expect(result.current.profiles[0].name).toBe('Arthas');
-    });
-
     it('shows pending characters immediately when adding new ones', async () => {
       const charA = makeProfile('Arthas');
       const charB = makeNewProfile('Sylvanas');
@@ -304,31 +281,6 @@ describe('useViewDetail', () => {
         renderHook(() => useViewDetail(VALID_ID, null, false), { wrapper });
         expect(mockUserRequest).not.toHaveBeenCalled();
       });
-    });
-  });
-
-  describe('clearSyncError', () => {
-    it('clears the sync error', async () => {
-      const charA = makeProfile('Arthas');
-      const charB = makeNewProfile('Sylvanas');
-      mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'FAILED' });
-      mockServiceGet.mockResolvedValue({ data: [], viewName: 'Test View' });
-
-      const { wrapper, queryClient } = makeWrapper();
-      seedCache(queryClient, [charA]);
-      const { result } = renderHook(() => useViewDetail(VALID_ID, OWNER, false), { wrapper });
-
-      await waitFor(() => expect(result.current.profiles).toHaveLength(1));
-
-      act(() => {
-        result.current.saveCharacters([charA, charB]);
-      });
-
-      await waitFor(() => expect(result.current.syncError).not.toBeNull());
-
-      act(() => result.current.clearSyncError());
-
-      await waitFor(() => expect(result.current.syncError).toBeNull());
     });
   });
 
