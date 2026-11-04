@@ -156,6 +156,15 @@
   box-shadow: 0 0 0 1px var(--rule);
 }
 
+.race-icon {
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: var(--rad-sm);
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
 .ladder-syncing-indicator {
   display: flex;
   align-items: center;
@@ -214,6 +223,27 @@
 .ladder-character-realm {
   font-size: 0.75rem;
   color: var(--ink-3);
+}
+
+.ladder-character-ilvl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1875rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.ladder-character-ilvl-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.ladder-character-guild {
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  white-space: nowrap;
 }
 
 .ladder-region-badge {
@@ -283,9 +313,16 @@
     font-size: 0.75rem;
   }
 
-  .ladder-rank .class-icon {
+  .ladder-rank .class-icon,
+  .ladder-rank .race-icon {
     width: 1.5rem;
     height: 1.5rem;
+  }
+
+  .ladder-character-ilvl,
+  .ladder-character-guild {
+    font-size: 0.625rem;
+    flex-shrink: 0;
   }
 
   .ladder-character-info {

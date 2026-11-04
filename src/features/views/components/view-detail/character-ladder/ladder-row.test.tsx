@@ -17,6 +17,11 @@ vi.mock('@/features/views/constants/class-images.ts', () => ({
   getClassImageKey: () => 'warrior',
 }));
 
+vi.mock('@/features/views/constants/race-images.ts', () => ({
+  RACE_IMAGES: { nightelf: 'nightelf.png' } as Record<string, string>,
+  getRaceImageKey: (race: string) => race.toLowerCase().replace(/\s+/g, ''),
+}));
+
 const makeProfile = (overrides: Partial<WowProfile> = {}): WowProfile => ({
   id: 1,
   name: 'Arthas',
@@ -103,5 +108,58 @@ describe('LadderRow', () => {
     expect(screen.getByTestId('ladder-row-expanded')).toBeInTheDocument();
     await userEvent.click(screen.getByText('Arthas'));
     expect(screen.queryByTestId('ladder-row-expanded')).not.toBeInTheDocument();
+  });
+
+  it('shows the equipped item level rounded down', () => {
+    render(
+      <LadderRow
+        index={0}
+        character={makeProfile({ equippedItemLevel: 335.8 })}
+        cachedCharacters={[]}
+        season={null}
+      />,
+    );
+    expect(screen.getByText('335')).toBeInTheDocument();
+  });
+
+  it('shows the guild wrapped in angle brackets', () => {
+    render(
+      <LadderRow
+        index={0}
+        character={makeProfile({ guild: 'De Tardes' })}
+        cachedCharacters={[]}
+        season={null}
+      />,
+    );
+    expect(screen.getByText('<De Tardes>')).toBeInTheDocument();
+  });
+
+  it('shows no guild when the character has none', () => {
+    render(<LadderRow index={0} character={makeProfile()} cachedCharacters={[]} season={null} />);
+    expect(screen.queryByText(/^<.*>$/)).not.toBeInTheDocument();
+  });
+
+  it('shows the race icon when an image exists for the race', () => {
+    render(
+      <LadderRow
+        index={0}
+        character={makeProfile({ race: 'Night Elf' })}
+        cachedCharacters={[]}
+        season={null}
+      />,
+    );
+    expect(screen.getByAltText('Night Elf')).toHaveAttribute('src', 'nightelf.png');
+  });
+
+  it('shows no race icon when there is no image for the race', () => {
+    render(
+      <LadderRow
+        index={0}
+        character={makeProfile({ race: 'Human' })}
+        cachedCharacters={[]}
+        season={null}
+      />,
+    );
+    expect(screen.queryByAltText('Human')).not.toBeInTheDocument();
   });
 });

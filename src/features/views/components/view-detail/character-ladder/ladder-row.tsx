@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react';
+import { Loader2, Swords } from 'lucide-react';
 import './ladder-row.css';
 import { memo, useState } from 'react';
 import { WowProfile, Season } from '@/features/views/api/wow-types.ts';
@@ -7,6 +7,7 @@ import { LadderRowExpanded } from './ladder-row-expanded.tsx';
 
 import { getClassSlug, getScoreClass, getScoreTier } from '@/features/views/utils.ts';
 import { CLASS_IMAGES, getClassImageKey } from '@/features/views/constants/class-images.ts';
+import { RACE_IMAGES, getRaceImageKey } from '@/features/views/constants/race-images.ts';
 
 interface LadderRowProps {
   index: number;
@@ -30,6 +31,7 @@ export const LadderRow = memo(function LadderRow({
 
   const showPositionChange =
     !isSyncing && hasHistoricalData && positionChange !== null && positionChange !== 0;
+  const raceImage = RACE_IMAGES[getRaceImageKey(character.race)];
   const cachedCharacter = cachedIndex !== -1 ? cachedCharacters[cachedIndex] : undefined;
   const scoreGain =
     !isSyncing && cachedCharacter && cachedCharacter.score !== null
@@ -55,6 +57,14 @@ export const LadderRow = memo(function LadderRow({
                 className={`class-icon ${getClassSlug(character.class)}`}
               />
             )}
+            {!isSyncing && raceImage && (
+              <img
+                src={raceImage}
+                alt={character.race}
+                title={character.race}
+                className="race-icon"
+              />
+            )}
           </div>
 
           <div className="ladder-character-info">
@@ -72,6 +82,13 @@ export const LadderRow = memo(function LadderRow({
             </div>
             {!isSyncing && (
               <div className="ladder-character-meta">
+                <span className="ladder-character-ilvl num">
+                  <Swords className="ladder-character-ilvl-icon" aria-hidden="true" />
+                  {Math.floor(character.equippedItemLevel)}
+                </span>
+                {character.guild && (
+                  <span className="ladder-character-guild">&lt;{character.guild}&gt;</span>
+                )}
                 <span className="ladder-character-realm">{character.realm}</span>
                 <span className={`ladder-region-badge ${character.region}`}>
                   {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
