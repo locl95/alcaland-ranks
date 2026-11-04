@@ -77,35 +77,14 @@ describe('useViewsData', () => {
     mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'COMPLETED' });
   });
 
-  describe('featured views', () => {
-    it('fetches featured views using serviceGet on mount', async () => {
-      const { wrapper } = makeWrapper();
-      renderHook(() => useViewsData(false), { wrapper });
-      await waitFor(() =>
-        expect(mockServiceGet).toHaveBeenCalledWith(
-          '/views?game=wow&featured=true&page=1&limit=10&include=metadata',
-        ),
-      );
-    });
-
-    it('returns the featured views from the API', async () => {
-      mockServiceGet.mockResolvedValue({
-        records: [makeSimpleView('v1', 'Featured')],
-        metadata: { totalCount: 1 },
-      });
+  describe('own views', () => {
+    it('fetches no views at all when not authenticated', async () => {
       const { wrapper } = makeWrapper();
       const { result } = renderHook(() => useViewsData(false), { wrapper });
-      await waitFor(() => expect(result.current.featuredViews).toHaveLength(1));
-      expect(result.current.featuredViews[0].simpleView.id).toBe('v1');
-    });
-  });
-
-  describe('own views', () => {
-    it('does not fetch own views when not authenticated', async () => {
-      const { wrapper } = makeWrapper();
-      renderHook(() => useViewsData(false), { wrapper });
-      await waitFor(() => expect(mockServiceGet).toHaveBeenCalled());
+      expect(result.current.isLoadingOwn).toBe(false);
+      expect(result.current.ownViews).toEqual([]);
       expect(mockUserRequest).not.toHaveBeenCalled();
+      expect(mockServiceGet).not.toHaveBeenCalled();
     });
 
     it('fetches own views using userRequest when authenticated', async () => {
@@ -554,18 +533,5 @@ describe('useViewsData — paging', () => {
 
     await waitFor(() => expect(result.current.ownViews).toHaveLength(2));
     expect(result.current.ownPagination.count).toBe(1);
-  });
-
-  it('pages the featured list separately from the own list', async () => {
-    mockServiceGet.mockResolvedValue(pageOfViews(1, 45));
-    mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
-    const { wrapper } = makeWrapper();
-    const { result } = renderHook(() => useViewsData(true), { wrapper });
-    await waitFor(() => expect(result.current.featuredPagination.pageCount).toBe(5));
-
-    act(() => result.current.featuredPagination.goNext());
-
-    await waitFor(() => expect(result.current.featuredPagination.page).toBe(2));
-    expect(result.current.ownPagination.page).toBe(1);
   });
 });

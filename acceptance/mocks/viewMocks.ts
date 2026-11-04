@@ -33,12 +33,6 @@ function fulfillPage(route: Route, views: SimpleView[]) {
   });
 }
 
-export async function mockFeaturedViews(page: Page, views: SimpleView[] = []) {
-  await page.route(`${API}/views?game=wow&featured=true&page=*`, (route) =>
-    fulfillPage(route, views),
-  );
-}
-
 export async function mockOwnViews(page: Page, views: SimpleView[] = []) {
   await page.route(`${API}/views?game=wow&page=*`, (route) => fulfillPage(route, views));
 }

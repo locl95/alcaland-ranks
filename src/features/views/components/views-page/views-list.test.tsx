@@ -62,14 +62,14 @@ const renderList = (
   options: {
     username?: string | null;
     isLoadingViews?: boolean;
-    activeTab?: 'featured' | 'own';
+    isAuthenticated?: boolean;
     pagination?: Pagination;
   } = {},
 ) => {
   const {
     username = 'testuser',
     isLoadingViews = false,
-    activeTab = 'own',
+    isAuthenticated = true,
     pagination = makePagination(),
   } = options;
   const onViewClick = vi.fn();
@@ -81,7 +81,7 @@ const renderList = (
       <ToastProvider>
         <ViewsList
           views={views}
-          activeTab={activeTab}
+          isAuthenticated={isAuthenticated}
           isLoadingViews={isLoadingViews}
           deletingViewId={null}
           onViewClick={onViewClick}
@@ -100,17 +100,19 @@ describe('ViewsList', () => {
   describe('empty state', () => {
     it('invites you to create one when you have no ladders of your own', () => {
       renderList([]);
-      expect(screen.getByText('No ladders yet')).toBeInTheDocument();
+      expect(screen.getByText('Start your first ladder')).toBeInTheDocument();
       expect(screen.getByText('Create your first ladder')).toBeInTheDocument();
     });
 
-    it('explains the featured tab instead of offering to create one', () => {
-      renderList([], { activeTab: 'featured' });
+    it('invites a signed-out visitor to sign in instead', async () => {
+      const { onCreateView } = renderList([], { isAuthenticated: false });
 
-      expect(screen.getByText('No featured ladders right now')).toBeInTheDocument();
-      // Featured ladders are curated, so creating one is not something the
-      // reader can do from here.
+      expect(screen.getByText("Track your group's Mythic+ climb")).toBeInTheDocument();
       expect(screen.queryByText('Create your first ladder')).not.toBeInTheDocument();
+
+      // The page decides where this goes: login when there is no session.
+      await userEvent.click(screen.getByText('Sign in to get started'));
+      expect(onCreateView).toHaveBeenCalledOnce();
     });
 
     it('calls onCreateView when clicking the create button in empty state', async () => {

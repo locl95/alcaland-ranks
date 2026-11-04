@@ -1,11 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN } from './mocks/authMocks';
-import { mockFeaturedViews, mockOwnViews } from './mocks/viewMocks';
+import { mockOwnViews } from './mocks/viewMocks';
 
 import { API } from './constants';
 
 test.beforeEach(async ({ page }) => {
-  await mockFeaturedViews(page);
   await mockOwnViews(page);
 });
 

@@ -69,7 +69,6 @@ Feature-based folders under `src/features/`, with `src/shared/` for cross-cuttin
 
 | Key | Notes |
 | --- | --- |
-| `["views", "featured"]` | Service token, public, `staleTime: Infinity` |
 | `["views", "own"]` | User JWT, only when authenticated, cleared on logout |
 | `["view", id]` | User JWT, owner-only. Fetched only when the detail page has no navigation state (entered by URL), to learn `owner` / `isGuild` |
 | `["viewData", id]` | Live data; polls every 2s while any character has `score === null` |
@@ -259,8 +258,9 @@ this.
 
 ### Ownership
 
-- **featured** — curated public ladders, service token, visible logged out
-- **own** — the user's ladders, user JWT; editing requires `username === view.owner`
+- **own** — the user's ladders, user JWT; editing requires `username === view.owner`. The landing
+  lists only these; logged out it shows a sign-in invitation. (Featured ladders were removed until
+  the backend supports them.)
 
 ## Mythic+ jargon appearing in types
 

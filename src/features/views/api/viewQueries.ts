@@ -11,7 +11,6 @@ import { View } from '@/features/views/model/view.ts';
 export const VIEWS_PAGE_SIZE = 10;
 
 export const viewKeys = {
-  listPage: (page: number) => ['views', 'featured', page] as const,
   ownList: () => ['views', 'own'] as const,
   ownListPage: (page: number) => ['views', 'own', page] as const,
   detail: (viewId: string) => ['view', viewId] as const,
@@ -25,9 +24,8 @@ export interface ViewsPage {
   totalCount: number | null;
 }
 
-const viewsPath = (page: number, featured = false) => {
+const viewsPath = (page: number) => {
   const params = new URLSearchParams({ game: 'wow' });
-  if (featured) params.set('featured', 'true');
   params.set('page', String(page));
   params.set('limit', String(VIEWS_PAGE_SIZE));
   params.set('include', 'metadata');
@@ -38,9 +36,6 @@ const toViewsPage = (res: GetViewsResponse): ViewsPage => ({
   views: res.records.map((v) => ({ operationId: null, simpleView: v, status: 'synced' })),
   totalCount: res.metadata?.totalCount ?? null,
 });
-
-export const fetchViews = async (page: number): Promise<ViewsPage> =>
-  toViewsPage(await serviceGet<GetViewsResponse>(viewsPath(page, true)));
 
 export const fetchOwnViews = async (page: number): Promise<ViewsPage> =>
   toViewsPage(await userRequest<GetViewsResponse>('GET', viewsPath(page)));

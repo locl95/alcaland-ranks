@@ -124,7 +124,7 @@ const renderViewsPage = (authenticated = true) => {
   return { ...result, queryClient: testQueryClient };
 };
 
-// Authenticated users land on "own" tab — own views use userRequest.
+// Own views use userRequest.
 const renderWithViews = async (views = [makeSimpleView('v1', 'My View')]) => {
   fetchMocks.userRequest.mockResolvedValue({ records: views });
   const result = renderViewsPage();
@@ -148,10 +148,18 @@ describe('ViewsPage', () => {
   afterEach(() => vi.unstubAllEnvs());
 
   describe('fetching views on mount', () => {
-    it('does not fetch own views when unauthenticated', async () => {
+    it('fetches no views when unauthenticated', async () => {
       renderViewsPage(false);
-      await waitFor(() => expect(fetchMocks.serviceGet).toHaveBeenCalled());
+      await waitFor(() => screen.getByTestId('views-list'));
       expect(fetchMocks.userRequest).not.toHaveBeenCalled();
+      expect(fetchMocks.serviceGet).not.toHaveBeenCalledWith(expect.stringContaining('/views?'));
+    });
+
+    it('shows no Featured or Own tabs', async () => {
+      renderViewsPage();
+      await waitFor(() => screen.getByTestId('views-list'));
+      expect(screen.queryByRole('button', { name: 'Featured' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Own' })).not.toBeInTheDocument();
     });
 
     it('displays fetched own views', async () => {

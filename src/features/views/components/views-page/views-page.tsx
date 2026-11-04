@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { viewKeys } from '@/features/views/api/viewQueries.ts';
@@ -29,26 +29,14 @@ export function ViewsPage() {
   const username = useAppSelector(selectUsername);
 
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'featured' | 'own'>(
-    isAuthenticated ? 'own' : 'featured',
-  );
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setActiveTab('featured');
-    }
-  }, [isAuthenticated]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const { data: season } = useStaticData();
 
   const {
-    featuredViews,
-    isLoadingFeatured,
-    featuredPagination,
-    ownViews,
-    isLoadingOwn,
-    ownPagination,
+    ownViews: views,
+    isLoadingOwn: isLoadingViews,
+    ownPagination: pagination,
     createView,
     deleteView,
     deletingViewId,
@@ -56,9 +44,6 @@ export function ViewsPage() {
     clearCreateError,
   } = useViewsData(isAuthenticated);
 
-  const views = activeTab === 'featured' ? featuredViews : ownViews;
-  const isLoadingViews = activeTab === 'featured' ? isLoadingFeatured : isLoadingOwn;
-  const pagination = activeTab === 'featured' ? featuredPagination : ownPagination;
   const isSyncing = views.some((v) => v.status === 'pending');
 
   const requireAuth = (action: () => void) => {
@@ -81,8 +66,6 @@ export function ViewsPage() {
   };
 
   const handleCreateClick = () => requireAuth(() => setIsCreateDialogOpen(true));
-
-  const handleOwnTabClick = () => requireAuth(() => setActiveTab('own'));
 
   const handleDeleteView = (viewId: string) => requireAuth(() => deleteView(viewId));
 
@@ -154,21 +137,6 @@ export function ViewsPage() {
           </div>
         </header>
 
-        <div className="views-tab-toggle">
-          <button
-            className={`views-tab-btn${activeTab === 'featured' ? ' views-tab-btn--active' : ''}`}
-            onClick={() => setActiveTab('featured')}
-          >
-            Featured
-          </button>
-          <button
-            className={`views-tab-btn${activeTab === 'own' ? ' views-tab-btn--active' : ''}`}
-            onClick={handleOwnTabClick}
-          >
-            Own
-          </button>
-        </div>
-
         {createError && (
           <div className="create-error-banner" role="alert">
             <span>{createError}</span>
@@ -184,7 +152,7 @@ export function ViewsPage() {
 
         <ViewsList
           views={views}
-          activeTab={activeTab}
+          isAuthenticated={isAuthenticated}
           isLoadingViews={isLoadingViews}
           deletingViewId={deletingViewId}
           onViewClick={handleViewClick}

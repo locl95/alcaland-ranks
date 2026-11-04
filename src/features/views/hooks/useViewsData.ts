@@ -6,7 +6,6 @@ import { View } from '@/features/views/model/view.ts';
 import { Pagination } from '@/features/views/components/shared/pager.tsx';
 import {
   viewKeys,
-  fetchViews,
   fetchOwnViews,
   pollOperation,
   ViewsPage,
@@ -75,12 +74,6 @@ export function useViewsData(isAuthenticated: boolean) {
   const [incompleteViewIds, setIncompleteViewIds] = useState<Set<string>>(new Set());
   const [deletingViewId, setDeletingViewId] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
-
-  const {
-    views: featuredViews,
-    isLoading: isLoadingFeatured,
-    pagination: featuredPagination,
-  } = usePagedViews(viewKeys.listPage, fetchViews, true);
 
   const {
     views: serverOwnViews,
@@ -164,9 +157,6 @@ export function useViewsData(isAuthenticated: boolean) {
   };
 
   return {
-    featuredViews,
-    isLoadingFeatured,
-    featuredPagination,
     ownViews,
     isLoadingOwn,
     ownPagination,

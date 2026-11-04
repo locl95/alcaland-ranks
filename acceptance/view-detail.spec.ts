@@ -1,11 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { seedAuth } from './mocks/authMocks';
-import {
-  makeSimpleView,
-  mockEntitiesExist,
-  mockFeaturedViews,
-  mockOwnViews,
-} from './mocks/viewMocks';
+import { makeSimpleView, mockEntitiesExist, mockOwnViews } from './mocks/viewMocks';
 import { mockCharacter, mockSeason } from './mocks/wowMocks';
 
 import { API, VALID_VIEW_ID } from './constants';
@@ -146,7 +141,6 @@ test.describe('view detail', () => {
   });
 
   test('edit: deleting all characters hides the ladder', async ({ page }) => {
-    await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
 
     // override the beforeEach data mock so the refetch after PUT returns empty
@@ -178,7 +172,6 @@ test.describe('view detail', () => {
   });
 
   test('edit: adding a character shows it as syncing in the ladder', async ({ page }) => {
-    await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
 
     await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) =>
@@ -209,7 +202,6 @@ test.describe('view detail', () => {
   });
 
   test('edit: never adds a character that does not exist, and blocks saving', async ({ page }) => {
-    await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
     await page.route(`${API}/entities/exists`, (route) =>
       route.fulfill({
@@ -243,7 +235,6 @@ test.describe('view detail', () => {
   test('edit: opening the realm list does not resize the dialog or show scrollbars', async ({
     page,
   }) => {
-    await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
 
     await page.goto('/');
@@ -275,7 +266,6 @@ test.describe('view detail', () => {
   });
 
   test('edit: blocks saving while a typed character has not been added', async ({ page }) => {
-    await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
 
     await page.goto('/');
@@ -295,7 +285,6 @@ test.describe('view detail', () => {
       score: 3000 - i * 30,
     }));
     await mockViewDetailApis(page, { data: crowd, viewName: 'My Ladder' });
-    await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
 
     await page.setViewportSize({ width: 1200, height: 500 });
@@ -314,7 +303,6 @@ test.describe('view detail', () => {
   test('edit: shows sync error dialog when an added character is not found after poll completes', async ({
     page,
   }) => {
-    await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
 
     await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) =>
@@ -403,7 +391,6 @@ test.describe('view detail', () => {
   });
 
   test('edit: added character is reconciled after refetch returns real score', async ({ page }) => {
-    await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
 
     const mockAddedCharacter = {

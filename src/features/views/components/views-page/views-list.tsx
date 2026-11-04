@@ -1,4 +1,4 @@
-import { ChevronRight, CircleAlert, Plus, Star, User, Users, Loader2, Trash2 } from 'lucide-react';
+import { ChevronRight, CircleAlert, LogIn, Plus, User, Loader2, Trash2 } from 'lucide-react';
 import './views-list.css';
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectUsername } from '@/app/authSlice.ts';
@@ -8,7 +8,7 @@ import { useToast } from '@/shared/components/toaster/toast.ts';
 
 interface ViewsListProps {
   views: View[];
-  activeTab: 'featured' | 'own';
+  isAuthenticated: boolean;
   isLoadingViews: boolean;
   deletingViewId: string | null;
   onViewClick: (viewId: string) => void;
@@ -19,7 +19,7 @@ interface ViewsListProps {
 
 export function ViewsList({
   views,
-  activeTab,
+  isAuthenticated,
   isLoadingViews,
   deletingViewId,
   onViewClick,
@@ -37,25 +37,37 @@ export function ViewsList({
     return (
       <div className="views-empty-state">
         <div className="views-empty-content">
-          {activeTab === 'featured' ? (
+          <div className="views-empty-preview" aria-hidden={true}>
+            {(['legendary', 'epic', 'rare'] as const).map((tier, i) => (
+              <div key={tier} className={`views-empty-ghost-row views-empty-ghost-row--${tier}`}>
+                <span className="views-empty-ghost-rank num">{i + 1}</span>
+                <span className="views-empty-ghost-name" />
+                <span className="views-empty-ghost-score" />
+              </div>
+            ))}
+          </div>
+          {isAuthenticated ? (
             <>
-              <Star className="views-empty-icon" />
-              <h3 className="views-empty-title">No featured ladders right now</h3>
+              <h3 className="views-empty-title">Start your first ladder</h3>
               <p className="views-empty-text">
-                Featured ladders are hand-picked by the site. Check back later, or open Own to build
-                your own.
-              </p>
-            </>
-          ) : (
-            <>
-              <Users className="views-empty-icon" />
-              <h3 className="views-empty-title">No ladders yet</h3>
-              <p className="views-empty-text">
-                Create your first ladder to start tracking characters
+                Track the characters you play with, or pull in a whole guild, and see who's climbing
+                this season.
               </p>
               <button onClick={onCreateView} className="create-view-btn">
                 <Plus className="view-row-icon" />
                 Create your first ladder
+              </button>
+            </>
+          ) : (
+            <>
+              <h3 className="views-empty-title">Track your group's Mythic+ climb</h3>
+              <p className="views-empty-text">
+                Build a ladder from your characters or a whole guild and follow every score through
+                the season.
+              </p>
+              <button onClick={onCreateView} className="create-view-btn">
+                <LogIn className="view-row-icon" />
+                Sign in to get started
               </button>
             </>
           )}

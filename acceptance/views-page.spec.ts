@@ -1,12 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { seedAuth } from './mocks/authMocks';
-import {
-  makeSimpleView,
-  mockEntitiesExist,
-  mockFeaturedViews,
-  mockOwnViews,
-  mockStaticData,
-} from './mocks/viewMocks';
+import { makeSimpleView, mockEntitiesExist, mockOwnViews, mockStaticData } from './mocks/viewMocks';
 
 import { API, VALID_VIEW_ID } from './constants';
 import { expectListAnchoredToInput, pickRealm } from './helpers';
@@ -14,14 +8,15 @@ import { expectListAnchoredToInput, pickRealm } from './helpers';
 test.describe('unauthenticated', () => {
   test.beforeEach(async ({ page }) => {
     await mockStaticData(page);
-    await mockFeaturedViews(page, [makeSimpleView('f1', 'Featured Ladder', 'someone')]);
     await mockOwnViews(page);
   });
 
-  test('shows the app title and featured views', async ({ page }) => {
+  test('shows the app title and invites the visitor to sign in', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByText('Mythic+ ladder tracker')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Featured Ladder' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: "Track your group's Mythic+ climb" }),
+    ).toBeVisible();
   });
 
   test('shows the current season name from the API', async ({ page }) => {
@@ -29,9 +24,9 @@ test.describe('unauthenticated', () => {
     await expect(page.getByText('Midnight Season 1')).toBeVisible();
   });
 
-  test('redirects to login when clicking own ladders tab without auth', async ({ page }) => {
+  test('sends the visitor to login from the empty state', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('button', { name: 'Own' }).click();
+    await page.getByRole('button', { name: 'Sign in to get started' }).click();
     await expect(page).toHaveURL('/login');
   });
 });
@@ -40,7 +35,6 @@ test.describe('authenticated', () => {
   test.beforeEach(async ({ page }) => {
     await seedAuth(page);
     await mockStaticData(page);
-    await mockFeaturedViews(page);
     await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
   });
 
@@ -64,7 +58,6 @@ test.describe('create view', () => {
   test.beforeEach(async ({ page }) => {
     await seedAuth(page);
     await mockStaticData(page);
-    await mockFeaturedViews(page);
     await mockOwnViews(page, []);
     await mockEntitiesExist(page);
   });
@@ -265,7 +258,6 @@ test.describe('paging the ladder list', () => {
   test.beforeEach(async ({ page }) => {
     await seedAuth(page);
     await mockStaticData(page);
-    await mockFeaturedViews(page);
     await mockOwnViews(page, manyViews);
   });
 
@@ -273,8 +265,7 @@ test.describe('paging the ladder list', () => {
     const requestedPages: string[] = [];
     page.on('request', (request) => {
       const url = new URL(request.url());
-      const isOwnList = !url.searchParams.has('featured');
-      if (url.pathname.endsWith('/views') && url.searchParams.has('page') && isOwnList) {
+      if (url.pathname.endsWith('/views') && url.searchParams.has('page')) {
         requestedPages.push(url.searchParams.get('page')!);
       }
     });
@@ -333,11 +324,7 @@ test.describe('paging the ladder list', () => {
     const [request] = await Promise.all([
       page.waitForRequest((req) => {
         const url = new URL(req.url());
-        return (
-          url.pathname.endsWith('/views') &&
-          req.method() === 'GET' &&
-          !url.searchParams.has('featured')
-        );
+        return url.pathname.endsWith('/views') && req.method() === 'GET';
       }),
       page.goto('/'),
     ]);
@@ -353,7 +340,6 @@ test.describe('delete view', () => {
   test('removes the view from the list immediately on delete', async ({ page }) => {
     await seedAuth(page);
     await mockStaticData(page);
-    await mockFeaturedViews(page);
 
     let deleted = false;
     await page.route(`${API}/views?game=wow&page=*`, (route) =>
