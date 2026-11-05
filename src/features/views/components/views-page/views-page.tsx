@@ -19,6 +19,7 @@ import { useViewsData } from '@/features/views/hooks/useViewsData.ts';
 import { GameSwitcher } from '@/shared/components/game-switcher.tsx';
 import { useGame } from '@/shared/game/game.ts';
 import { View } from '@/features/views/model/view.ts';
+import { ViewResponse } from '@/features/views/api/view-types.ts';
 import { LadderListCopy, ViewsList } from './views-list.tsx';
 import './views-page.css';
 
@@ -68,13 +69,8 @@ export function ViewsPage({ mark, title, subtitle, copy, CreateDialog }: Readonl
 
   const handleViewClick = (viewId: string) => {
     const view = views.find((v) => v.simpleView.id === viewId);
-    navigate(`/${game}/${viewId}`, {
-      state: {
-        owner: view?.simpleView.owner,
-        isGuild: view?.simpleView.extraArguments?.isGuild ?? false,
-        entitiesCount: view?.simpleView.entitiesIds.length ?? 0,
-      },
-    });
+    if (view) queryClient.setQueryData<ViewResponse>(viewKeys.detail(viewId), view.simpleView);
+    navigate(`/${game}/${viewId}`);
   };
 
   const handleCreateClick = () => requireAuth(() => setIsCreateDialogOpen(true));

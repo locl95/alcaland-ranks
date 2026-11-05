@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastProvider } from '@/shared/components/toaster/ToastProvider.tsx';
 import { ViewsPage } from './views-page.tsx';
 import { GameContext } from '@/shared/game/game.ts';
+import { viewKeys } from '@/features/views/api/viewQueries.ts';
 import authReducer from '@/app/authSlice.ts';
 import { MockViewsList, MockCreateView, makeSimpleView } from '@/app/App.mocks.tsx';
 
@@ -121,13 +122,15 @@ const renderViewsPage = (authenticated = true) => {
       </QueryClientProvider>
     </Provider>,
   );
+  return testQueryClient;
 };
 
 // Own views use userRequest.
 const renderWithViews = async (views = [makeSimpleView('v1', 'My View')]) => {
   fetchMocks.userRequest.mockResolvedValue({ records: views });
-  renderViewsPage();
+  const queryClient = renderViewsPage();
   await waitFor(() => screen.getByTestId(`view-item-${views[0].id}`));
+  return queryClient;
 };
 
 describe('ViewsPage', () => {
@@ -176,6 +179,15 @@ describe('ViewsPage', () => {
       await userEvent.click(screen.getByTestId('open-v1'));
 
       expect(navState.path).toBe('/wow/v1');
+    });
+
+    it('caches the opened view, so the detail knows its owner without fetching it', async () => {
+      const view = makeSimpleView('v1', 'My View');
+      const queryClient = await renderWithViews([view]);
+      const setQueryData = vi.spyOn(queryClient, 'setQueryData');
+      await userEvent.click(screen.getByTestId('open-v1'));
+
+      expect(setQueryData).toHaveBeenCalledWith(viewKeys.detail('v1'), view);
     });
   });
 });

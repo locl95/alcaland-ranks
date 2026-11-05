@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Edit } from 'lucide-react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useViewDetail } from '@/games/wow/hooks/useViewDetail.ts';
 import { useSyncView } from '@/features/views/hooks/useSyncView.ts';
 import { useGame } from '@/shared/game/game.ts';
@@ -14,12 +14,7 @@ import '@/features/views/components/shared/empty-state.css';
 export function WowViewDetail() {
   const { viewId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const game = useGame();
-
-  const locationState = location.state as { owner?: string; isGuild?: boolean } | null;
-  const owner = locationState?.owner ?? null;
-  const isGuild = locationState?.isGuild ?? false;
 
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -35,7 +30,7 @@ export function WowViewDetail() {
     isViewIdValid,
     saveCharacters,
     clearSyncError,
-  } = useViewDetail(viewId, owner, isGuild);
+  } = useViewDetail(viewId);
 
   const sync = useSyncView(viewId);
 

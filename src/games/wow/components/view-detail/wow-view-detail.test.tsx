@@ -13,7 +13,6 @@ const mockNavigate = vi.fn();
 vi.mock('react-router-dom', () => ({
   useParams: () => ({ viewId: '11111111-1111-1111-1111-111111111111' }),
   useNavigate: () => mockNavigate,
-  useLocation: () => ({ state: null }),
 }));
 
 const mockUseViewDetail = vi.fn();

@@ -1,8 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/shared/components/toaster/toast.ts';
-import { useAppSelector } from '@/app/hooks.ts';
-import { selectUsername } from '@/app/authSlice.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
 import { ApiError } from '@/shared/api/ApiError.ts';
 import { WowProfile } from '@/games/wow/api/wow-types.ts';
@@ -11,19 +9,18 @@ import { isViewId } from '@/features/views/utils.ts';
 import { haveSameCharacters, toRealmSlug } from '@/games/wow/utils.ts';
 import {
   viewKeys,
-  fetchView,
   fetchViewData,
   fetchCachedViewData,
   pollOperation,
 } from '@/features/views/api/viewQueries.ts';
 import { useStaticData } from '@/games/wow/hooks/useStaticData.ts';
+import { useView } from '@/features/views/hooks/useView.ts';
 
 const getCharacterName = (c: { name: string }) => c.name.toLowerCase();
 const REFETCH_INTERVAL = 2000;
 
-export function useViewDetail(viewId: string | undefined, owner: string | null, isGuild: boolean) {
+export function useViewDetail(viewId: string | undefined) {
   const queryClient = useQueryClient();
-  const username = useAppSelector(selectUsername);
   const { showError } = useToast();
 
   const [pendingCharacters, setPendingCharacters] = useState<WowProfile[] | null>(null);
@@ -51,15 +48,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
 
   const { data: season } = useStaticData();
 
-  const { data: fetchedView } = useQuery({
-    queryKey: viewKeys.detail(safeViewId),
-    queryFn: () => fetchView(safeViewId),
-    enabled: isValidViewId && owner === null && username !== null,
-    retry: false,
-  });
-
-  const viewOwner = owner ?? fetchedView?.owner ?? null;
-  const viewIsGuild = owner !== null ? isGuild : (fetchedView?.extraArguments?.isGuild ?? false);
+  const { view, isOwner } = useView(viewId);
 
   const profiles = useMemo(() => {
     const fetchedProfiles = viewData?.data ?? [];
@@ -152,7 +141,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
     initialized: !isLoading,
     isSyncing: pendingCharacters !== null,
     syncError,
-    canEdit: username !== null && username === viewOwner && !viewIsGuild,
+    canEdit: isOwner && !view?.extraArguments?.isGuild,
     isViewIdValid: isValidViewId,
     saveCharacters,
     clearSyncError: () => setSyncError(null),

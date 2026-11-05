@@ -163,7 +163,7 @@ test.describe('view detail', () => {
       route.fulfill({ json: { id: 'edit-op-123', status: 'COMPLETED' } }),
     );
 
-    // navigate from views-page so location.state carries the owner → canEdit = true
+    // navigate from views-page so the cached view carries the owner → canEdit = true
     await page.goto('/');
     await page.getByText('My Ladder').click();
 

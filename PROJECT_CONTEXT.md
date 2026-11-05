@@ -78,7 +78,7 @@ the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts).
 | Key | Notes |
 | --- | --- |
 | `["views", "own"]` | User JWT, only when authenticated, cleared on logout |
-| `["view", id]` | User JWT, owner-only. Fetched only when the detail page has no navigation state (entered by URL), to learn `owner` / `isGuild` |
+| `["view", id]` | User JWT, owner-only. The landing seeds it with the clicked `SimpleView`; fetched only when the detail is entered by URL. Read through `useView` for `owner` / `isGuild` |
 | `["viewData", id]` | Live data; polls every 2s while any character has `score === null` |
 | `["viewCachedData", id]` | Previous snapshot, `staleTime: Infinity` |
 | `["wowStatic"]` | Season + dungeon list, `staleTime: Infinity` |
