@@ -4,6 +4,7 @@ import { useToast } from '@/shared/components/toaster/toast.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
 import { View } from '@/features/views/model/view.ts';
 import { Pagination } from '@/features/views/components/shared/pager.tsx';
+import { GameSlug } from '@/shared/game/game.ts';
 import {
   viewKeys,
   fetchOwnViews,
@@ -69,7 +70,7 @@ function usePagedViews(
   return { views: data?.views ?? [], isLoading, pagination };
 }
 
-export function useViewsData(isAuthenticated: boolean) {
+export function useViewsData(isAuthenticated: boolean, game: GameSlug) {
   const queryClient = useQueryClient();
   const { showError, showInfo } = useToast();
   const [pendingViews, setPendingViews] = useState<View[]>([]);
@@ -98,7 +99,11 @@ export function useViewsData(isAuthenticated: boolean) {
     views: serverOwnViews,
     isLoading: isLoadingOwn,
     pagination: ownPagination,
-  } = usePagedViews(viewKeys.ownListPage, fetchOwnViews, isAuthenticated);
+  } = usePagedViews(
+    (page) => viewKeys.ownListPage(game, page),
+    (page) => fetchOwnViews(game, page),
+    isAuthenticated,
+  );
 
   const ownViews = useMemo(() => {
     const serverIds = new Set(serverOwnViews.map((v) => v.simpleView.id));

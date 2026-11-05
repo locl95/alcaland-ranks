@@ -7,12 +7,13 @@ import {
 } from '@/features/views/api/view-types.ts';
 import { Season, ViewData } from '@/features/views/api/wow-types.ts';
 import { View } from '@/features/views/model/view.ts';
+import { GameSlug } from '@/shared/game/game.ts';
 
 export const VIEWS_PAGE_SIZE = 10;
 
 export const viewKeys = {
   ownList: () => ['views', 'own'] as const,
-  ownListPage: (page: number) => ['views', 'own', page] as const,
+  ownListPage: (game: GameSlug, page: number) => ['views', 'own', game, page] as const,
   detail: (viewId: string) => ['view', viewId] as const,
   data: (viewId: string) => ['viewData', viewId] as const,
   cachedData: (viewId: string) => ['viewCachedData', viewId] as const,
@@ -24,8 +25,8 @@ export interface ViewsPage {
   totalCount: number | null;
 }
 
-const viewsPath = (page: number) => {
-  const params = new URLSearchParams({ game: 'wow' });
+const viewsPath = (game: GameSlug, page: number) => {
+  const params = new URLSearchParams({ game });
   params.set('page', String(page));
   params.set('limit', String(VIEWS_PAGE_SIZE));
   params.set('include', 'metadata');
@@ -37,8 +38,8 @@ const toViewsPage = (res: GetViewsResponse): ViewsPage => ({
   totalCount: res.metadata?.totalCount ?? null,
 });
 
-export const fetchOwnViews = async (page: number): Promise<ViewsPage> =>
-  toViewsPage(await userRequest<GetViewsResponse>('GET', viewsPath(page)));
+export const fetchOwnViews = async (game: GameSlug, page: number): Promise<ViewsPage> =>
+  toViewsPage(await userRequest<GetViewsResponse>('GET', viewsPath(game, page)));
 
 export const fetchView = (viewId: string): Promise<ViewResponse> =>
   userRequest<ViewResponse>('GET', `/views/${viewId}`);

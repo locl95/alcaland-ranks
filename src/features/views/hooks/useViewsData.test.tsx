@@ -86,7 +86,7 @@ describe('useViewsData', () => {
 
     const renderSignedIn = async () => {
       const { wrapper } = makeWrapper();
-      const hook = renderHook(({ isAuthenticated }) => useViewsData(isAuthenticated), {
+      const hook = renderHook(({ isAuthenticated }) => useViewsData(isAuthenticated, 'wow'), {
         wrapper,
         initialProps: { isAuthenticated: true },
       });
@@ -149,7 +149,7 @@ describe('useViewsData', () => {
       mockPollOperation.mockReturnValue(new Promise(() => {}));
       const { wrapper, queryClient } = makeWrapper();
       const { result, rerender } = renderHook(
-        ({ isAuthenticated }) => useViewsData(isAuthenticated),
+        ({ isAuthenticated }) => useViewsData(isAuthenticated, 'wow'),
         { wrapper, initialProps: { isAuthenticated: true } },
       );
       await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
@@ -172,7 +172,7 @@ describe('useViewsData', () => {
       });
       const { wrapper, queryClient } = makeWrapper();
       const { result, rerender } = renderHook(
-        ({ isAuthenticated }) => useViewsData(isAuthenticated),
+        ({ isAuthenticated }) => useViewsData(isAuthenticated, 'wow'),
         { wrapper, initialProps: { isAuthenticated: true } },
       );
       await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
@@ -186,7 +186,7 @@ describe('useViewsData', () => {
 
     it('fetches no views at all when not authenticated', async () => {
       const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewsData(false), { wrapper });
+      const { result } = renderHook(() => useViewsData(false, 'wow'), { wrapper });
       expect(result.current.isLoadingOwn).toBe(false);
       expect(result.current.ownViews).toEqual([]);
       expect(mockUserRequest).not.toHaveBeenCalled();
@@ -199,7 +199,7 @@ describe('useViewsData', () => {
         metadata: { totalCount: 1 },
       });
       const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
       await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
       expect(result.current.ownViews[0].simpleView.id).toBe('v1');
@@ -214,7 +214,7 @@ describe('useViewsData', () => {
     it('adds the pending view to the list immediately', async () => {
       mockPollOperation.mockReturnValue(new Promise(() => {}));
       const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
       await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
 
@@ -234,7 +234,7 @@ describe('useViewsData', () => {
         });
 
       const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
       await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
 
@@ -249,7 +249,7 @@ describe('useViewsData', () => {
     it('removes the pending view and sets createError when the operation fails', async () => {
       mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'FAILED' });
       const { wrapper } = makeWrapper();
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
       await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
 
@@ -266,7 +266,7 @@ describe('useViewsData', () => {
       mockPollOperation.mockRejectedValue(new Error('Network error'));
       const { wrapper, queryClient } = makeWrapper();
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
       await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
 
@@ -298,7 +298,7 @@ describe('useViewsData', () => {
           metadata: { totalCount: 1 },
         });
         const { wrapper } = makeWrapper();
-        const { result } = renderHook(() => useViewsData(true), { wrapper });
+        const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
         await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
         act(() => result.current.createView(makeGuildView()));
         return result;
@@ -332,7 +332,7 @@ describe('useViewsData', () => {
       it('shows the generic error when the operation fails for another reason', async () => {
         mockPollOperation.mockResolvedValue({ id: 'op-123', status: 'FAILED' });
         const { wrapper } = makeWrapper();
-        const { result } = renderHook(() => useViewsData(true), { wrapper });
+        const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
         await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
 
@@ -349,7 +349,7 @@ describe('useViewsData', () => {
       mockUserRequest.mockResolvedValue({ records: [] });
 
       const { wrapper, queryClient } = makeWrapper();
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
       await waitFor(() => expect(result.current.isLoadingOwn).toBe(false));
 
@@ -383,7 +383,7 @@ describe('useViewsData', () => {
       const { wrapper, queryClient } = makeWrapper();
       queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView('v1', 'My View')]);
 
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
       await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
 
       act(() => {
@@ -399,7 +399,7 @@ describe('useViewsData', () => {
       queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView('v1', 'My View')]);
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
       await act(async () => result.current.deleteView('v1'));
 
@@ -415,7 +415,7 @@ describe('useViewsData', () => {
       queryClient.setQueryData<View[]>(viewKeys.ownList(), [makeView('v1', 'My View')]);
       const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
-      const { result } = renderHook(() => useViewsData(true), { wrapper });
+      const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
       await act(async () => result.current.deleteView('v1'));
 
@@ -439,7 +439,7 @@ describe('useViewsData — paging', () => {
   it('reports how many pages the server says there are', async () => {
     mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
     const { wrapper } = makeWrapper();
-    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
     await waitFor(() => expect(result.current.ownPagination.total).toBe(45));
     expect(result.current.ownPagination.pageCount).toBe(5);
@@ -450,7 +450,7 @@ describe('useViewsData — paging', () => {
   it('asks the server for the next page', async () => {
     mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
     const { wrapper } = makeWrapper();
-    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
     await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
 
     mockUserRequest.mockResolvedValue(pageOfViews(2, 45));
@@ -469,7 +469,7 @@ describe('useViewsData — paging', () => {
   it('steps back when the page it is on no longer exists', async () => {
     mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
     const { wrapper } = makeWrapper();
-    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
     await waitFor(() => expect(result.current.ownPagination.pageCount).toBe(5));
 
     mockUserRequest.mockResolvedValue(pageOfViews(2, 45));
@@ -495,7 +495,7 @@ describe('useViewsData — paging', () => {
       records: Array.from({ length: 10 }, (_, i) => makeSimpleView(`v${i + 1}`, `View ${i + 1}`)),
     });
     const { wrapper } = makeWrapper();
-    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
     await waitFor(() => expect(result.current.ownViews).toHaveLength(10));
     expect(result.current.ownPagination.pageCount).toBe(2);
@@ -520,7 +520,7 @@ describe('useViewsData — paging', () => {
       records: [makeSimpleView('v1', 'View 1')],
     });
     const { wrapper } = makeWrapper();
-    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
     await waitFor(() => expect(result.current.ownViews).toHaveLength(1));
 
@@ -531,7 +531,7 @@ describe('useViewsData — paging', () => {
   it('asks the server for the last page, then the first', async () => {
     mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
     const { wrapper } = makeWrapper();
-    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
     await waitFor(() => expect(result.current.ownPagination.pageCount).toBe(5));
 
     act(() => result.current.ownPagination.goLast());
@@ -555,7 +555,7 @@ describe('useViewsData — paging', () => {
     mockPollOperation.mockReturnValue(new Promise(() => {}));
     mockUserRequest.mockResolvedValue(pageOfViews(1, 45));
     const { wrapper } = makeWrapper();
-    const { result } = renderHook(() => useViewsData(true), { wrapper });
+    const { result } = renderHook(() => useViewsData(true, 'wow'), { wrapper });
 
     await waitFor(() => expect(result.current.ownPagination.count).toBe(1));
 

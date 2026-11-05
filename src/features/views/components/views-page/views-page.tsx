@@ -45,7 +45,7 @@ export function ViewsPage() {
     deletingViewId,
     createError,
     clearCreateError,
-  } = useViewsData(isAuthenticated);
+  } = useViewsData(isAuthenticated, game);
 
   const isSyncing = views.some((v) => v.status === 'pending');
 
