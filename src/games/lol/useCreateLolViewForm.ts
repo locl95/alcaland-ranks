@@ -2,30 +2,19 @@ import { FormEvent, useState } from 'react';
 import { View } from '@/features/views/model/view.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
 import { ApiError } from '@/shared/api/ApiError.ts';
-import { CheckStatus } from '@/features/views/components/shared/verification-badge.tsx';
+import { useEntityRows } from '@/features/views/hooks/useEntityRows.ts';
 import { formatDuplicateMessage } from '@/features/views/utils.ts';
 import { parseRiotId, riotIdKey } from './riot-id.ts';
 import { verifyRiotId } from './lol-entity-api.ts';
 
-export interface PlayerRow {
-  id: string;
+interface PlayerFields {
   riotId: string;
-  status: 'draft' | CheckStatus;
 }
 
 const LIMIT_ERRORS: Record<string, string> = {
   TOO_MANY_VIEWS: "You've reached the maximum number of ladders.",
   TOO_MANY_ENTITIES: 'This ladder has more players than allowed.',
 };
-
-const isSubmittable = (row: PlayerRow) => row.status === 'valid' || row.status === 'unverified';
-
-const keyOf = (row: PlayerRow): string | null => {
-  const parsed = parseRiotId(row.riotId);
-  return parsed && riotIdKey(parsed);
-};
-
-const emptyRow = (): PlayerRow => ({ id: crypto.randomUUID(), riotId: '', status: 'draft' });
 
 const formatNotFoundMessage = (riotIds: string[]): string | null =>
   riotIds.length === 0
@@ -34,66 +23,28 @@ const formatNotFoundMessage = (riotIds: string[]): string | null =>
 
 export function useCreateLolViewForm(onClose: () => void, onCreateView: (view: View) => void) {
   const [name, setName] = useState('');
-  const [rows, setRows] = useState<PlayerRow[]>(() => [emptyRow()]);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [duplicateRiotId, setDuplicateRiotId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const updateRow = (id: string, riotId: string) => {
-    setDuplicateRiotId(null);
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, riotId, status: 'draft' } : r)));
-  };
-
-  const verifyRow = async (id: string) => {
-    const row = rows.find((r) => r.id === id);
-    const riotId = row && parseRiotId(row.riotId);
-    if (!riotId) return;
-
-    const key = riotIdKey(riotId);
-    if (rows.some((r) => r.id !== id && r.status !== 'draft' && keyOf(r) === key)) {
-      setDuplicateRiotId(row.riotId.trim());
-      return;
-    }
-    setDuplicateRiotId(null);
-
-    const isLastRow = rows[rows.length - 1].id === id;
-    setRows((prev) => {
-      const updated = prev.map((r) => (r.id === id ? { ...r, status: 'checking' as const } : r));
-      return isLastRow ? [...updated, emptyRow()] : updated;
+  const { rows, updateRow, verifyRow, removeRow, addedRows, notFoundRows, duplicate, isReady } =
+    useEntityRows<PlayerFields>({
+      emptyFields: () => ({ riotId: '' }),
+      keyOf: ({ riotId }) => {
+        const parsed = parseRiotId(riotId);
+        return parsed && riotIdKey(parsed);
+      },
+      isBlank: ({ riotId }) => !riotId.trim(),
+      verify: ({ riotId }) => verifyRiotId(parseRiotId(riotId)!),
+      growsOnVerify: true,
     });
 
-    const result = await verifyRiotId(riotId);
-
-    setRows((prev) =>
-      prev.map((r) =>
-        r.id === id && r.status === 'checking' && keyOf(r) === key ? { ...r, status: result } : r,
-      ),
-    );
-  };
-
-  const removeRow = (id: string) => {
-    setDuplicateRiotId(null);
-    setRows((prev) => {
-      const updated = prev.filter((r) => r.id !== id);
-      return updated.length ? updated : [emptyRow()];
-    });
-  };
-
-  const notFound = rows.filter((r) => r.status === 'invalid');
   const errorMessage =
-    formatDuplicateMessage(duplicateRiotId) ??
-    formatNotFoundMessage(notFound.map((r) => r.riotId.trim())) ??
+    formatDuplicateMessage(duplicate && duplicate.riotId.trim()) ??
+    formatNotFoundMessage(notFoundRows.map((r) => r.riotId.trim())) ??
     submitError;
 
-  const addedPlayers = rows.filter(isSubmittable).flatMap((r) => parseRiotId(r.riotId) ?? []);
-  const hasUnverifiedInput = rows.some((r) => r.status === 'draft' && !!r.riotId.trim());
-  const canSubmit =
-    !isSubmitting &&
-    !!name.trim() &&
-    !hasUnverifiedInput &&
-    notFound.length === 0 &&
-    !rows.some((r) => r.status === 'checking') &&
-    addedPlayers.length > 0;
+  const addedPlayers = addedRows.flatMap((r) => parseRiotId(r.riotId) ?? []);
+  const canSubmit = !isSubmitting && !!name.trim() && isReady;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -145,7 +96,7 @@ export function useCreateLolViewForm(onClose: () => void, onCreateView: (view: V
     canSubmit,
     errorMessage,
     isSubmitting,
-    updateRow,
+    updateRow: (id: string, riotId: string) => updateRow(id, { riotId }),
     verifyRow,
     removeRow,
     handleSubmit,
