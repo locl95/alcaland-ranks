@@ -1,4 +1,4 @@
-import { WowProfile, Season } from '@/features/views/api/wow-types';
+import { WowProfile, Season } from '@/games/wow/api/wow-types';
 
 export const mockCharacter: WowProfile = {
   id: 1,

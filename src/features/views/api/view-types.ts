@@ -14,6 +14,8 @@ export interface ViewMetadata {
 
 export type Game = 'WOW' | 'LOL';
 
+export type VerifyResult = 'valid' | 'invalid' | 'unverified';
+
 export interface SimpleView {
   id: string;
   name: string;

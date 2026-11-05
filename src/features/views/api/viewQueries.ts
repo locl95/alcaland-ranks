@@ -6,7 +6,6 @@ import {
   ViewDataResponse,
   ViewResponse,
 } from '@/features/views/api/view-types.ts';
-import { Season } from '@/features/views/api/wow-types.ts';
 import { View } from '@/features/views/model/view.ts';
 import { GameSlug } from '@/shared/game/game.ts';
 
@@ -18,7 +17,6 @@ export const viewKeys = {
   detail: (viewId: string) => ['view', viewId] as const,
   data: (viewId: string) => ['viewData', viewId] as const,
   cachedData: (viewId: string) => ['viewCachedData', viewId] as const,
-  static: () => ['wowStatic'] as const,
 };
 
 export interface ViewsPage {
@@ -50,8 +48,6 @@ export const fetchViewData = <T>(viewId: string): Promise<ViewDataResponse<T>> =
 
 export const fetchCachedViewData = <T>(viewId: string): Promise<ViewDataResponse<T>> =>
   serviceGet<ViewDataResponse<T>>(`/views/${viewId}/cached-data`);
-
-export const fetchWowStatic = (): Promise<Season> => serviceGet<Season>(`/sources/wow/static`);
 
 const fetchOperation = (operationId: string, signal?: AbortSignal): Promise<OperationResult> =>
   serviceGet<OperationResult>(`/operations/${operationId}`, signal);

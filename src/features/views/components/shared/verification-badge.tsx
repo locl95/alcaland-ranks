@@ -1,5 +1,5 @@
 import { Check, HelpCircle, Loader2, XCircle } from 'lucide-react';
-import { VerifyResult } from '@/features/views/api/entityApi.ts';
+import { VerifyResult } from '@/features/views/api/view-types.ts';
 import './verification-badge.css';
 
 export type CheckStatus = VerifyResult | 'checking';

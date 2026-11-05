@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { VerifyResult } from '@/features/views/api/entityApi.ts';
+import { VerifyResult } from '@/features/views/api/view-types.ts';
 import { CheckStatus } from '@/features/views/components/shared/verification-badge.tsx';
 
 export type EntityRow<F> = F & { id: string; status: 'draft' | CheckStatus };
