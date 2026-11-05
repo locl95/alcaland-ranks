@@ -2,24 +2,14 @@ import { FormEvent, useState } from 'react';
 import { View } from '@/features/views/model/view.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
 import { ApiError } from '@/shared/api/ApiError.ts';
-import { useEntityRows } from '@/features/views/hooks/useEntityRows.ts';
 import { formatDuplicateMessage } from '@/features/views/utils.ts';
-import { parseRiotId, riotIdKey } from '@/games/lol/model/riot-id.ts';
-import { verifyRiotId } from '@/games/lol/api/lol-entity-api.ts';
-
-interface PlayerFields {
-  riotId: string;
-}
+import { formatNotFoundMessage, parseRiotId } from '@/games/lol/model/riot-id.ts';
+import { useRiotIdRows } from '@/games/lol/hooks/useRiotIdRows.ts';
 
 const LIMIT_ERRORS: Record<string, string> = {
   TOO_MANY_VIEWS: "You've reached the maximum number of ladders.",
   TOO_MANY_ENTITIES: 'This ladder has more players than allowed.',
 };
-
-const formatNotFoundMessage = (riotIds: string[]): string | null =>
-  riotIds.length === 0
-    ? null
-    : `${riotIds.join(', ')} ${riotIds.length === 1 ? 'was' : 'were'} not found. Check the Riot ID.`;
 
 export function useCreateLolViewForm(onClose: () => void, onCreateView: (view: View) => void) {
   const [name, setName] = useState('');
@@ -27,16 +17,7 @@ export function useCreateLolViewForm(onClose: () => void, onCreateView: (view: V
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { rows, updateRow, verifyRow, removeRow, addedRows, notFoundRows, duplicate, isReady } =
-    useEntityRows<PlayerFields>({
-      emptyFields: () => ({ riotId: '' }),
-      keyOf: ({ riotId }) => {
-        const parsed = parseRiotId(riotId);
-        return parsed && riotIdKey(parsed);
-      },
-      isBlank: ({ riotId }) => !riotId.trim(),
-      verify: ({ riotId }) => verifyRiotId(parseRiotId(riotId)!),
-      growsOnVerify: true,
-    });
+    useRiotIdRows();
 
   const errorMessage =
     formatDuplicateMessage(duplicate && duplicate.riotId.trim()) ??

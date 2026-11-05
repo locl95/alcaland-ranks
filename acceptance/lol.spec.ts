@@ -184,4 +184,66 @@ test.describe('League of Legends ladder', () => {
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
   });
+
+  test('the owner edits the ladder, keeping players that have not synced yet', async ({ page }) => {
+    let editBody: unknown;
+    await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) => {
+      if (route.request().method() === 'PUT') {
+        editBody = route.request().postDataJSON();
+        return route.fulfill({ json: { id: 'edit-op' } });
+      }
+      return route.fulfill({
+        json: {
+          owner: 'testuser',
+          entities: [
+            { id: 1, name: 'Faker', tag: 'EUW', alias: null },
+            { id: 2, name: 'Caps', tag: 'EUW', alias: null },
+            { id: 3, name: 'Rookie', tag: 'EUW', alias: null },
+          ],
+        },
+      });
+    });
+    await page.route(`${API}/operations/edit-op`, (route) =>
+      route.fulfill({ json: { id: 'edit-op', status: 'COMPLETED' } }),
+    );
+    await page.route(`${API}/entities/exists`, (route) =>
+      route.fulfill({
+        json: { exist: [{ name: 'Chovy', tag: 'KR2' }], nonExisting: [], unchecked: [] },
+      }),
+    );
+
+    await page.goto('/lol');
+    await page.getByText('Flex Squad').click();
+    await page.getByRole('button', { name: 'Edit' }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByText('Rookie#EUW')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Remove Caps#EUW' }).click();
+    await dialog.getByLabel('Riot ID').fill('Chovy#KR2');
+    await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+    await expect(dialog.getByTitle('Player found')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Save' }).click();
+
+    await expect(dialog).toBeHidden();
+    expect(editBody).toEqual({
+      name: 'Flex Squad',
+      entities: [
+        { type: 'lol', name: 'Faker', tag: 'EUW' },
+        { type: 'lol', name: 'Rookie', tag: 'EUW' },
+        { type: 'lol', name: 'Chovy', tag: 'KR2' },
+      ],
+      published: true,
+      featured: false,
+      game: 'LOL',
+    });
+  });
+
+  test('someone else opening a shared link does not get the Edit button', async ({ page }) => {
+    await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) => route.fulfill({ status: 403 }));
+
+    await page.goto(`/lol/${VALID_VIEW_ID}`);
+
+    await expect(page.getByText('Challenger · 1200 LP')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Edit' })).toHaveCount(0);
+  });
 });

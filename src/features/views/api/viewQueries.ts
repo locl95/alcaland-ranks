@@ -40,8 +40,8 @@ const toViewsPage = (res: GetViewsResponse): ViewsPage => ({
 export const fetchOwnViews = async (game: GameSlug, page: number): Promise<ViewsPage> =>
   toViewsPage(await userRequest<GetViewsResponse>('GET', viewsPath(game, page)));
 
-export const fetchView = (viewId: string): Promise<ViewResponse> =>
-  userRequest<ViewResponse>('GET', `/views/${viewId}`);
+export const fetchView = <E = unknown>(viewId: string): Promise<ViewResponse<E>> =>
+  userRequest<ViewResponse<E>>('GET', `/views/${viewId}`);
 
 export const fetchViewData = <T>(viewId: string): Promise<ViewDataResponse<T>> =>
   serviceGet<ViewDataResponse<T>>(`/views/${viewId}/data`);

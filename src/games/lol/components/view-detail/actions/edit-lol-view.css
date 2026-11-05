@@ -1,0 +1,31 @@
+.edit-lol-status {
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+.edit-lol-members {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.edit-lol-member {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem 0.375rem 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--rad-md);
+  background: var(--panel);
+}
+
+.edit-lol-member-id {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  font-size: 0.875rem;
+}

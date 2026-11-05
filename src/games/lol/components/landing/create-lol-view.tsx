@@ -1,12 +1,10 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { Plus, X } from 'lucide-react';
-import { VerificationBadge } from '@/features/views/components/shared/verification-badge.tsx';
+import { X } from 'lucide-react';
 import { CreateDialogProps } from '@/features/views/components/views-page/views-page.tsx';
 import '@/features/views/components/shared/dialog.css';
 import '@/features/views/components/shared/form-controls.css';
-import { parseRiotId } from '@/games/lol/model/riot-id.ts';
 import { useCreateLolViewForm } from '@/games/lol/hooks/useCreateLolViewForm.ts';
-import './create-lol-view.css';
+import { RiotIdRow } from '@/games/lol/components/shared/riot-id-row.tsx';
 
 export function CreateLolView({ onClose, onCreateView }: Readonly<CreateDialogProps>) {
   const {
@@ -47,40 +45,15 @@ export function CreateLolView({ onClose, onCreateView }: Readonly<CreateDialogPr
               </div>
 
               {rows.map((row, index) => (
-                <div key={row.id} className="player-row">
-                  <input
-                    className="form-input"
-                    placeholder="Riot ID, e.g. Faker#KR1"
-                    aria-label="Riot ID"
-                    value={row.riotId}
-                    onChange={(e) => updateRow(row.id, e.target.value)}
-                  />
-
-                  {row.status === 'draft' ? (
-                    <button
-                      type="button"
-                      className="btn-icon btn-icon-primary"
-                      onClick={() => verifyRow(row.id)}
-                      disabled={!parseRiotId(row.riotId)}
-                      title="Add"
-                    >
-                      <Plus size={16} />
-                    </button>
-                  ) : (
-                    <VerificationBadge status={row.status} noun="Player" />
-                  )}
-
-                  {index < rows.length - 1 && (
-                    <button
-                      type="button"
-                      className="btn-icon btn-icon-outline"
-                      onClick={() => removeRow(row.id)}
-                      title="Remove"
-                    >
-                      <X size={16} />
-                    </button>
-                  )}
-                </div>
+                <RiotIdRow
+                  key={row.id}
+                  riotId={row.riotId}
+                  status={row.status}
+                  canRemove={index < rows.length - 1}
+                  onChange={(riotId) => updateRow(row.id, riotId)}
+                  onVerify={() => verifyRow(row.id)}
+                  onRemove={() => removeRow(row.id)}
+                />
               ))}
 
               {errorMessage && <p className="form-error">{errorMessage}</p>}
