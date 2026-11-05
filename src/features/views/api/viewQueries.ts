@@ -3,9 +3,10 @@ import { poll } from '@/shared/utils/poll.ts';
 import {
   GetViewsResponse,
   OperationResult,
+  ViewDataResponse,
   ViewResponse,
 } from '@/features/views/api/view-types.ts';
-import { Season, ViewData } from '@/features/views/api/wow-types.ts';
+import { Season } from '@/features/views/api/wow-types.ts';
 import { View } from '@/features/views/model/view.ts';
 import { GameSlug } from '@/shared/game/game.ts';
 
@@ -44,11 +45,11 @@ export const fetchOwnViews = async (game: GameSlug, page: number): Promise<Views
 export const fetchView = (viewId: string): Promise<ViewResponse> =>
   userRequest<ViewResponse>('GET', `/views/${viewId}`);
 
-export const fetchViewData = (viewId: string): Promise<ViewData> =>
-  serviceGet<ViewData>(`/views/${viewId}/data`);
+export const fetchViewData = <T>(viewId: string): Promise<ViewDataResponse<T>> =>
+  serviceGet<ViewDataResponse<T>>(`/views/${viewId}/data`);
 
-export const fetchCachedViewData = (viewId: string): Promise<ViewData> =>
-  serviceGet<ViewData>(`/views/${viewId}/cached-data`);
+export const fetchCachedViewData = <T>(viewId: string): Promise<ViewDataResponse<T>> =>
+  serviceGet<ViewDataResponse<T>>(`/views/${viewId}/cached-data`);
 
 export const fetchWowStatic = (): Promise<Season> => serviceGet<Season>(`/sources/wow/static`);
 

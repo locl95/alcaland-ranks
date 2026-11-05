@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import { ArrowLeft, Edit, RefreshCw } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useViewDetail } from '@/features/views/hooks/useViewDetail.ts';
 import { useSyncView } from '@/features/views/hooks/useSyncView.ts';
 import { useGame } from '@/shared/game/game.ts';
 import { CharacterLadder } from './character-ladder/character-ladder.tsx';
 import { DungeonGrid } from './dungeon-grid/dungeon-grid.tsx';
+import { ViewDetailHeader } from './view-detail-header.tsx';
 import { EditView } from './actions/edit-view.tsx';
 import { SyncErrorDialog } from './actions/sync-error-dialog.tsx';
 import './view-detail.css';
@@ -37,14 +37,7 @@ export function ViewDetail() {
     clearSyncError,
   } = useViewDetail(viewId, owner, isGuild);
 
-  const {
-    isRunning,
-    isDisabled: isSyncDisabled,
-    countdownLabel,
-    statusMessage,
-    lastSyncedAt,
-    triggerSync,
-  } = useSyncView(viewId);
+  const sync = useSyncView(viewId);
 
   useEffect(() => {
     if (viewId && !isViewIdValid) {
@@ -60,49 +53,27 @@ export function ViewDetail() {
 
   if (!initialized) return null;
 
-  const syncLabel = isRunning ? 'Syncing...' : countdownLabel;
-
   return (
     <div className="page">
       <div className="page-inner page-inner--wide">
-        <div className="view-detail-header">
-          <button onClick={() => navigate(`/${game}`)} className="header-back-button">
-            <ArrowLeft className="header-icon" />
-          </button>
-          <h1 className="header-view-title">{viewName}</h1>
-          <div className="header-actions">
-            <div className="header-actions-buttons">
+        <ViewDetailHeader
+          title={viewName}
+          sync={sync}
+          isSyncBlocked={isSyncing || isEditOpen}
+          actions={
+            canEdit && (
               <button
-                className="header-sync-button"
-                onClick={triggerSync}
-                disabled={isSyncDisabled || isSyncing || isEditOpen}
-                title={
-                  statusMessage ?? (countdownLabel ? `Next sync in ${countdownLabel}` : undefined)
-                }
-                aria-label={syncLabel ? undefined : 'Sync'}
+                className="header-edit-button"
+                onClick={() => setIsEditOpen(!isEditOpen)}
+                disabled={isSyncing || sync.isRunning}
+                title={isSyncing || sync.isRunning ? 'Wait for sync to complete' : undefined}
               >
-                <RefreshCw className={`header-icon${isRunning ? ' spin' : ''}`} />
-                {syncLabel && <span className="header-button-text">{syncLabel}</span>}
+                <Edit className="header-icon" />
+                <span className="header-button-text">Edit</span>
               </button>
-              {canEdit && (
-                <button
-                  className="header-edit-button"
-                  onClick={() => setIsEditOpen(!isEditOpen)}
-                  disabled={isSyncing || isRunning}
-                  title={isSyncing || isRunning ? 'Wait for sync to complete' : undefined}
-                >
-                  <Edit className="header-icon" />
-                  <span className="header-button-text">Edit</span>
-                </button>
-              )}
-            </div>
-            {lastSyncedAt && (
-              <p className="header-last-synced">
-                Last synced {formatDistanceToNow(new Date(lastSyncedAt), { addSuffix: true })}
-              </p>
-            )}
-          </div>
-        </div>
+            )
+          }
+        />
 
         {profiles.length === 0 ? (
           <div className="empty-state">

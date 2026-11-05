@@ -3,6 +3,11 @@ export interface ViewExtraArguments {
   isGuild: boolean;
 }
 
+export interface ViewDataResponse<T> {
+  viewName: string;
+  data: T[];
+}
+
 export interface ViewMetadata {
   totalCount?: number | null;
 }

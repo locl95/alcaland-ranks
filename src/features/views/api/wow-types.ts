@@ -1,3 +1,5 @@
+import { ViewDataResponse } from '@/features/views/api/view-types.ts';
+
 interface Affix {
   name: string;
 }
@@ -64,10 +66,7 @@ export interface WowProfile {
   mythicPlusRecentRuns: MythicPlusRecentRun[];
 }
 
-export interface ViewData {
-  data: WowProfile[];
-  viewName: string;
-}
+export type ViewData = ViewDataResponse<WowProfile>;
 
 export interface Dungeon {
   name: string;

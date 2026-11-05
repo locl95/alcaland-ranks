@@ -1,6 +1,11 @@
 import { EU_REALMS } from '@/features/views/constants/euRealms.ts';
 import { NA_REALMS } from '@/features/views/constants/naRealms.ts';
 
+const VIEW_ID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export const isViewId = (value: string | undefined): value is string =>
+  !!value && VIEW_ID_REGEX.test(value);
+
 export const normalizeKey = (s: string): string => s.toLowerCase().replace(/\s+/g, '');
 
 export const formatNotFoundMessage = (names: string[]): string | null =>

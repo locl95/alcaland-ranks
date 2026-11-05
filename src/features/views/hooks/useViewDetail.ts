@@ -7,7 +7,7 @@ import { userRequest } from '@/shared/api/httpClient.ts';
 import { ApiError } from '@/shared/api/ApiError.ts';
 import { WowProfile } from '@/features/views/api/wow-types.ts';
 import { OperationResult, ViewRequest } from '@/features/views/api/view-types.ts';
-import { haveSameCharacters, toRealmSlug } from '@/features/views/utils.ts';
+import { haveSameCharacters, isViewId, toRealmSlug } from '@/features/views/utils.ts';
 import {
   viewKeys,
   fetchView,
@@ -17,7 +17,6 @@ import {
 } from '@/features/views/api/viewQueries.ts';
 import { useStaticData } from '@/features/views/hooks/useStaticData.ts';
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const getCharacterName = (c: { name: string }) => c.name.toLowerCase();
 const REFETCH_INTERVAL = 2000;
 
@@ -29,12 +28,12 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
   const [pendingCharacters, setPendingCharacters] = useState<WowProfile[] | null>(null);
   const [syncError, setSyncError] = useState<WowProfile[] | null>(null);
 
-  const isValidViewId = !!viewId && UUID_REGEX.test(viewId);
+  const isValidViewId = isViewId(viewId);
   const safeViewId = viewId ?? '';
 
   const { data: viewData, isLoading } = useQuery({
     queryKey: viewKeys.data(safeViewId),
-    queryFn: () => fetchViewData(safeViewId),
+    queryFn: () => fetchViewData<WowProfile>(safeViewId),
     enabled: isValidViewId,
     refetchInterval: (query) => {
       const hasPendingCharacters = query.state.data?.data?.some((c) => c.score === null);
@@ -44,7 +43,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
 
   const { data: cachedViewData } = useQuery({
     queryKey: viewKeys.cachedData(safeViewId),
-    queryFn: () => fetchCachedViewData(safeViewId),
+    queryFn: () => fetchCachedViewData<WowProfile>(safeViewId),
     enabled: isValidViewId,
     staleTime: Infinity,
   });
@@ -83,7 +82,7 @@ export function useViewDetail(viewId: string | undefined, owner: string | null, 
     async function reconcileView(operation: OperationResult) {
       setPendingCharacters(null);
       queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
-      const refetchedViewData = await fetchViewData(safeViewId).catch(() => null);
+      const refetchedViewData = await fetchViewData<WowProfile>(safeViewId).catch(() => null);
       if (refetchedViewData) {
         queryClient.setQueryData(viewKeys.data(safeViewId), refetchedViewData);
         if (operation.status === 'FAILED') {
