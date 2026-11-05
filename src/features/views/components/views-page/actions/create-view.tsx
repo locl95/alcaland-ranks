@@ -39,7 +39,7 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
         <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content
           ref={panelRef}
-          className="dialog-panel create-view-panel"
+          className="dialog-panel dialog-panel--form"
           aria-describedby={undefined}
           onEscapeKeyDown={(e) => {
             if (hasOpenPopupInside(panelRef.current)) e.preventDefault();

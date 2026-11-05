@@ -1,92 +1,5 @@
-/* Overlay, panel frame and close button live in shared/dialog.css. */
-.create-view-panel {
-  max-width: 27rem;
-  padding: 1.5rem;
-  overflow-y: auto;
-}
-
-.dialog-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 1.25rem;
-  gap: 1rem;
-}
-
-.dialog-title {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--ink);
-  letter-spacing: 0.015em;
-}
-
-.dialog-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-  padding: 0.5rem 0 0;
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4375rem;
-}
-
-.form-label {
-  color: var(--ink-2);
-  font-size: 0.8125rem;
-  font-weight: 500;
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-}
-
-.btn {
-  padding: 0.5rem 1.25rem;
-  border-radius: var(--rad-md);
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  cursor: pointer;
-  transition:
-    background var(--motion-base),
-    border-color var(--motion-base),
-    color var(--motion-base);
-  border: 1px solid;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-primary {
-  background: var(--beacon-soft);
-  border-color: var(--beacon-edge);
-  color: var(--beacon);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: rgba(55, 201, 240, 0.18);
-  border-color: var(--beacon);
-  color: #b8ecfa;
-}
-
-.btn-primary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
+/* Overlay, panel, header and footer live in shared/dialog.css; fields and buttons in
+   shared/form-controls.css. This file is only what the WoW create dialog adds. */
 .entity-row {
   display: flex;
   gap: 0.5rem;
@@ -150,14 +63,6 @@
    at ~190px. Lives here rather than in form-controls.css because this file is imported
    after it, and an equally specific `display: flex` there would win. */
 @media (max-width: 640px) {
-  .create-view-panel {
-    padding: 1.125rem;
-  }
-
-  .dialog-title {
-    font-size: 1.25rem;
-  }
-
   .entity-row {
     display: grid;
     grid-template-columns: 4.5rem minmax(0, 1fr) auto auto;

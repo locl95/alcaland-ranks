@@ -77,3 +77,47 @@
     opacity: 1;
   }
 }
+
+.dialog-panel--form {
+  max-width: 27rem;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+}
+
+.dialog-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.015em;
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .dialog-panel--form {
+    padding: 1.125rem;
+  }
+
+  .dialog-title {
+    font-size: 1.25rem;
+  }
+}

@@ -4,7 +4,6 @@ import { LolMatch } from '@/games/lol/lol-types.ts';
 import { ChampionIcon } from './champion-icon.tsx';
 import { formatKda, formatMinutes, kda, RESULT_LABEL, resultOf } from './match-stats.ts';
 import '@/features/views/components/shared/dialog.css';
-import '@/features/views/components/views-page/actions/create-view.css';
 import './matchup-dialog.css';
 
 interface MatchupDialogProps {

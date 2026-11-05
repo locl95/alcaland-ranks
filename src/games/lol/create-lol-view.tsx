@@ -4,7 +4,6 @@ import { VerificationBadge } from '@/features/views/components/shared/verificati
 import { CreateDialogProps } from '@/features/views/components/views-page/views-page.tsx';
 import '@/features/views/components/shared/dialog.css';
 import '@/features/views/components/shared/form-controls.css';
-import '@/features/views/components/views-page/actions/create-view.css';
 import { parseRiotId } from './riot-id.ts';
 import { useCreateLolViewForm } from './useCreateLolViewForm.ts';
 import './create-lol-view.css';
@@ -27,7 +26,7 @@ export function CreateLolView({ onClose, onCreateView }: Readonly<CreateDialogPr
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="dialog-overlay" />
-        <Dialog.Content className="dialog-panel create-view-panel" aria-describedby={undefined}>
+        <Dialog.Content className="dialog-panel dialog-panel--form" aria-describedby={undefined}>
           <div className="dialog-header">
             <Dialog.Title className="dialog-title">Create new ranked ladder</Dialog.Title>
             <Dialog.Close className="dialog-close-btn" aria-label="Close">
