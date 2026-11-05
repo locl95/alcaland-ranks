@@ -1,0 +1,182 @@
+.lol-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem 1.25rem 1.25rem;
+  white-space: normal;
+}
+
+.lol-details-empty {
+  padding: 1rem 1.25rem;
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+.lol-details-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.625rem;
+  color: var(--ink);
+}
+
+.lol-details-winrate {
+  font-weight: 600;
+}
+
+.lol-details-remakes {
+  color: var(--ink-4);
+  font-size: 0.8125rem;
+}
+
+.lol-details-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.5rem;
+}
+
+.lol-details-heading {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.lol-champions,
+.lol-roles,
+.lol-matches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.lol-champion {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr) 2rem 3rem 5rem;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+}
+
+.lol-champion-icon,
+.lol-match-champion {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--rad-sm);
+  background: var(--panel-3);
+}
+
+.lol-champion-name {
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lol-champion-kda {
+  text-align: right;
+}
+
+.lol-role {
+  display: grid;
+  grid-template-columns: 1.125rem minmax(0, 1fr) 1.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+}
+
+.lol-role img {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lol-role-bar {
+  height: 0.375rem;
+  border-radius: 999px;
+  background: var(--panel-3);
+  overflow: hidden;
+}
+
+.lol-role-fill {
+  display: block;
+  height: 100%;
+  background: var(--ink-3);
+}
+
+.lol-match {
+  display: grid;
+  grid-template-columns: 1.75rem 1.125rem 5rem minmax(0, 1fr) 3.5rem 2.5rem;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid var(--rule);
+  border-left-width: 3px;
+  border-radius: var(--rad-md);
+  background: var(--panel);
+  color: var(--ink-2);
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--motion-base);
+}
+
+.lol-match:hover {
+  background: var(--panel-3);
+}
+
+.lol-match--win {
+  border-left-color: var(--up);
+}
+
+.lol-match--loss {
+  border-left-color: var(--down);
+}
+
+.lol-match--remake {
+  border-left-color: var(--ink-4);
+  color: var(--ink-4);
+}
+
+.lol-match-position {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lol-match-kda {
+  color: var(--ink);
+}
+
+.lol-match--win .lol-match-result {
+  color: var(--up);
+}
+
+.lol-match--loss .lol-match-result {
+  color: var(--down);
+}
+
+.lol-match-duration {
+  text-align: right;
+  color: var(--ink-3);
+}
+
+@media (max-width: 640px) {
+  .lol-details {
+    padding: 0.875rem 0.75rem 1rem;
+  }
+
+  .lol-details-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lol-match {
+    grid-template-columns: 1.75rem 1.125rem minmax(0, 1fr) 3rem 2.25rem;
+  }
+
+  .lol-match-ratio {
+    display: none;
+  }
+}

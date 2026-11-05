@@ -160,7 +160,7 @@ th[aria-sort] .lol-sort-btn {
   white-space: nowrap;
 }
 
-.lol-row:last-child td {
+.lol-table tbody tr:last-child > td {
   border-bottom: none;
 }
 
@@ -304,4 +304,36 @@ th[aria-sort] .lol-sort-btn {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+.lol-player-toggle {
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.lol-player-chevron {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--ink-4);
+  transition: transform var(--motion-base);
+}
+
+.lol-player-toggle[aria-expanded='true'] .lol-player-chevron {
+  transform: rotate(180deg);
+}
+
+.lol-player-toggle:hover .lol-player-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.lol-details-row > td {
+  padding: 0;
+  border-bottom: 1px solid var(--rule);
+  background: var(--panel-2);
 }

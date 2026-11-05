@@ -2,22 +2,10 @@ import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { LolPlayer, Position, Queue } from '@/games/lol/lol-types.ts';
 import { useDataDragonVersion } from '@/games/lol/data-dragon.ts';
-import top from '@/assets/lol/positions/top.svg';
-import jungle from '@/assets/lol/positions/jungle.svg';
-import middle from '@/assets/lol/positions/middle.svg';
-import bottom from '@/assets/lol/positions/bottom.svg';
-import utility from '@/assets/lol/positions/utility.svg';
+import { POSITIONS } from '@/games/lol/positions.ts';
 import { buildLadder, matchesFilters, Sort, SortKey, sortLadder } from './ladder.ts';
 import { LolLadderRow } from './lol-ladder-row.tsx';
 import './lol-ladder.css';
-
-const POSITIONS: { key: Position; label: string; icon: string }[] = [
-  { key: 'TOP', label: 'Top', icon: top },
-  { key: 'JUNGLE', label: 'Jungle', icon: jungle },
-  { key: 'MIDDLE', label: 'Mid', icon: middle },
-  { key: 'BOTTOM', label: 'ADC', icon: bottom },
-  { key: 'UTILITY', label: 'Support', icon: utility },
-];
 
 const COLUMNS: { key: SortKey; label: string; className?: string }[] = [
   { key: 'name', label: 'Player' },

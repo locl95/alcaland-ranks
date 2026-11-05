@@ -9,6 +9,7 @@ const league = (tier: string, rank: string, leaguePoints: number): League => ({
   gamesPlayed: 10,
   winrate: 0.5,
   teamPosition: 'TOP',
+  matches: [],
 });
 
 describe('totalLp', () => {

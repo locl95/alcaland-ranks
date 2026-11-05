@@ -85,6 +85,23 @@ const lolPlayer = (name: string, solo: object | undefined, flex: object | undefi
   leagues: { SOLO_Q: solo, FLEX_Q: flex },
 });
 
+const midMatch = {
+  id: 'EUW1_1',
+  championId: 7,
+  championName: 'Leblanc',
+  individualPosition: 'MIDDLE',
+  kills: 9,
+  deaths: 1,
+  assists: 6,
+  wardsPlaced: 12,
+  visionWardsBoughtInGame: 2,
+  totalTimeSpentDead: 40,
+  gameDuration: 1700,
+  gameFinishedCorrectly: true,
+  win: true,
+  matchUp: { championId: 103, championName: 'Ahri', kills: 2, deaths: 7, assists: 3 },
+};
+
 const rankedLeague = (tier: string, rank: string, leaguePoints: number) => ({
   tier,
   rank,
@@ -92,7 +109,7 @@ const rankedLeague = (tier: string, rank: string, leaguePoints: number) => ({
   gamesPlayed: 20,
   winrate: 0.55,
   teamPosition: 'MIDDLE',
-  matches: [],
+  matches: [midMatch],
 });
 
 test.describe('League of Legends ladder', () => {
@@ -106,7 +123,9 @@ test.describe('League of Legends ladder', () => {
     await page.route('https://ddragon.leagueoflegends.com/**', (route) =>
       route.request().url().endsWith('versions.json')
         ? route.fulfill({ json: ['15.1.1'] })
-        : route.abort(),
+        : route.request().url().endsWith('champion.json')
+          ? route.fulfill({ json: { data: {} } })
+          : route.abort(),
     );
     await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
       route.fulfill({
@@ -150,5 +169,19 @@ test.describe('League of Legends ladder', () => {
       'true',
     );
     await expect(page.getByText('Gold I · 10 LP')).toBeVisible();
+  });
+
+  test('expands a player into their recent games and opens a matchup', async ({ page }) => {
+    await page.goto(`/lol/${VALID_VIEW_ID}`);
+    await page.getByRole('button', { name: /Faker/ }).click();
+
+    await expect(page.getByText('Last 1 games')).toBeVisible();
+    await page.getByRole('button', { name: /9\/1\/6/ }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByText('Victory')).toBeVisible();
+    await expect(dialog.getByText('2 / 7 / 3')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
   });
 });

@@ -2,21 +2,46 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { League, LolPlayer } from '@/games/lol/lol-types.ts';
+import { League, LolMatch, LolPlayer } from '@/games/lol/lol-types.ts';
 import { LolLadder } from './lol-ladder.tsx';
 
 vi.mock('@/games/lol/data-dragon.ts', () => ({
   useDataDragonVersion: () => undefined,
+  useChampion: () => () => undefined,
   profileIconUrl: () => '',
 }));
 
-const league = (tier: string, rank: string, lp: number, winrate = 0.5): League => ({
+const soloMatch: LolMatch = {
+  id: 'EUW1_1',
+  championId: 64,
+  championName: 'LeeSin',
+  individualPosition: 'JUNGLE',
+  kills: 7,
+  deaths: 2,
+  assists: 11,
+  wardsPlaced: 14,
+  visionWardsBoughtInGame: 3,
+  totalTimeSpentDead: 95,
+  gameDuration: 1680,
+  gameFinishedCorrectly: true,
+  win: true,
+  matchUp: { championId: 254, championName: 'Vi', kills: 3, deaths: 6, assists: 4 },
+};
+
+const league = (
+  tier: string,
+  rank: string,
+  lp: number,
+  winrate = 0.5,
+  matches: LolMatch[] = [],
+): League => ({
   tier,
   rank,
   leaguePoints: lp,
   gamesPlayed: 20,
   winrate,
   teamPosition: 'TOP',
+  matches,
 });
 
 const player = (name: string, solo?: League, flex?: League): LolPlayer => ({
@@ -30,7 +55,7 @@ const player = (name: string, solo?: League, flex?: League): LolPlayer => ({
 
 const players = [
   player('Silvy', league('SILVER', 'II', 40, 0.7), league('GOLD', 'IV', 10)),
-  player('Goldie', league('GOLD', 'I', 5, 0.4)),
+  player('Goldie', league('GOLD', 'I', 5, 0.4, [soloMatch])),
   player('NoRanked'),
 ];
 
@@ -95,5 +120,27 @@ describe('LolLadder', () => {
 
     await userEvent.type(screen.getByRole('searchbox'), 'silver');
     expect(playerNames()).toEqual(['Silvy#EUW']);
+  });
+
+  it('expands a player into their games in the selected queue and opens a matchup', async () => {
+    renderLadder();
+
+    await userEvent.click(screen.getByRole('button', { name: /Goldie/ }));
+    expect(screen.getByRole('button', { name: /Goldie/ })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('Last 1 games')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /7\/2\/11/ }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Victory')).toBeInTheDocument();
+    expect(within(dialog).getByText('3 / 6 / 4')).toBeInTheDocument();
+    expect(within(dialog).getByText('1:35')).toBeInTheDocument();
+
+    await userEvent.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('does not let an unranked player expand', () => {
+    renderLadder();
+    expect(screen.queryByRole('button', { name: /NoRanked/ })).not.toBeInTheDocument();
   });
 });
