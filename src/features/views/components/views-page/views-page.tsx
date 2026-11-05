@@ -17,6 +17,7 @@ import { selectIsAuthenticated, selectUsername } from '@/app/authSlice.ts';
 import { logout } from '@/features/auth/authApi.ts';
 import { useStaticData } from '@/features/views/hooks/useStaticData.ts';
 import { useViewsData } from '@/features/views/hooks/useViewsData.ts';
+import { GameSwitcher } from '@/shared/components/game-switcher.tsx';
 import keystone from '@/assets/keystone.webp';
 import { ViewsList } from './views-list.tsx';
 import { CreateView } from './actions/create-view.tsx';
@@ -78,6 +79,7 @@ export function ViewsPage() {
   return (
     <div className="page">
       <div className="page-inner">
+        <GameSwitcher />
         <header className="masthead">
           <div className="masthead-brand">
             <img src={keystone} alt="" aria-hidden={true} className="masthead-mark" />
