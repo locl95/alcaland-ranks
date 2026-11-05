@@ -72,7 +72,6 @@ const renderList = (
     isLoadingViews?: boolean;
     isAuthenticated?: boolean;
     pagination?: Pagination;
-    canOpen?: boolean;
   } = {},
 ) => {
   const {
@@ -80,7 +79,6 @@ const renderList = (
     isLoadingViews = false,
     isAuthenticated = true,
     pagination = makePagination(),
-    canOpen = true,
   } = options;
   const onViewClick = vi.fn();
   const onCreateView = vi.fn();
@@ -95,7 +93,7 @@ const renderList = (
           copy={COPY}
           isLoadingViews={isLoadingViews}
           deletingViewId={null}
-          onViewClick={canOpen ? onViewClick : undefined}
+          onViewClick={onViewClick}
           onCreateView={onCreateView}
           onDeleteView={onDeleteView}
           pagination={pagination}
@@ -132,12 +130,6 @@ describe('ViewsList', () => {
   });
 
   describe('view rows', () => {
-    it('lists ladders without letting them open when the game has no ladder page yet', () => {
-      renderList([makeView('v1', 'My Ladder')], { canOpen: false });
-
-      expect(screen.getByRole('button', { name: /My Ladder/ })).toBeDisabled();
-    });
-
     it('calls onViewClick with the view id when a row is clicked', async () => {
       const { onViewClick } = renderList([makeView('v1', 'My Ladder')]);
       await userEvent.click(screen.getByText('My Ladder'));

@@ -17,7 +17,6 @@ export function LolLanding() {
       title="Ranked ladder tracker"
       copy={LOL_COPY}
       CreateDialog={CreateLolView}
-      canOpenLadders={false}
     />
   );
 }

@@ -3,6 +3,7 @@ import { Spinner } from '@/shared/components/spinner.tsx';
 import { Footer } from '@/shared/components/footer.tsx';
 import { WowLanding } from '@/games/wow/wow-landing.tsx';
 import { LolLanding } from '@/games/lol/lol-landing.tsx';
+import { LolViewDetail } from '@/games/lol/view-detail/lol-view-detail.tsx';
 import { ViewDetail } from '@/features/views/components/view-detail/view-detail.tsx';
 import { LoginPage } from '@/features/auth/LoginPage.tsx';
 import { GameLayout } from '@/shared/game/game-layout.tsx';
@@ -22,6 +23,7 @@ export function App() {
           </Route>
           <Route path="/lol" element={<GameLayout key="lol" game="lol" />}>
             <Route index element={<LolLanding />} />
+            <Route path=":viewId" element={<LolViewDetail />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/:viewId" element={<LegacyViewRedirect />} />

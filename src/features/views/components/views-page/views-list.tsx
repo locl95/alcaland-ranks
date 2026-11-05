@@ -20,7 +20,7 @@ interface ViewsListProps {
   copy: LadderListCopy;
   isLoadingViews: boolean;
   deletingViewId: string | null;
-  onViewClick?: (viewId: string) => void;
+  onViewClick: (viewId: string) => void;
   onCreateView: () => void;
   onDeleteView: (viewId: string) => void;
   pagination: Pagination;
@@ -104,8 +104,8 @@ export function ViewsList({
             <button
               type="button"
               className="view-row-open"
-              disabled={isDisabled || !onViewClick}
-              onClick={() => onViewClick?.(view.simpleView.id)}
+              disabled={isDisabled}
+              onClick={() => onViewClick(view.simpleView.id)}
             >
               <div className="view-row-content">
                 <h3 className="view-row-title">{view.simpleView.name}</h3>
@@ -161,9 +161,7 @@ export function ViewsList({
                 </button>
               )}
 
-              {!isDisabled && onViewClick && (
-                <ChevronRight className="view-row-chevron" aria-hidden={true} />
-              )}
+              {!isDisabled && <ChevronRight className="view-row-chevron" aria-hidden={true} />}
             </div>
           </div>
         );

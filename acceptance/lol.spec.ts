@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { seedAuth } from './mocks/authMocks';
 import { makeSimpleView, mockOwnViews, mockStaticData } from './mocks/viewMocks';
-import { API } from './constants';
+import { API, VALID_VIEW_ID } from './constants';
 
 const wowLadders = Array.from({ length: 15 }, (_, i) =>
   makeSimpleView(`w${i + 1}`, `WoW Ladder ${i + 1}`),
@@ -73,5 +73,82 @@ test.describe('League of Legends', () => {
       featured: false,
       game: 'LOL',
     });
+  });
+});
+
+const lolPlayer = (name: string, solo: object | undefined, flex: object | undefined) => ({
+  type: 'lol',
+  summonerIcon: 1,
+  summonerLevel: 300,
+  summonerName: name,
+  summonerTag: 'EUW',
+  leagues: { SOLO_Q: solo, FLEX_Q: flex },
+});
+
+const rankedLeague = (tier: string, rank: string, leaguePoints: number) => ({
+  tier,
+  rank,
+  leaguePoints,
+  gamesPlayed: 20,
+  winrate: 0.55,
+  teamPosition: 'MIDDLE',
+  matches: [],
+});
+
+test.describe('League of Legends ladder', () => {
+  test.beforeEach(async ({ page }) => {
+    await seedAuth(page);
+    await mockOwnViews(
+      page,
+      [makeSimpleView(VALID_VIEW_ID, 'Flex Squad', 'testuser', 'LOL')],
+      'lol',
+    );
+    await page.route('https://ddragon.leagueoflegends.com/**', (route) =>
+      route.request().url().endsWith('versions.json')
+        ? route.fulfill({ json: ['15.1.1'] })
+        : route.abort(),
+    );
+    await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
+      route.fulfill({
+        json: {
+          viewName: 'Flex Squad',
+          data: [
+            lolPlayer('Faker', rankedLeague('CHALLENGER', 'I', 1200), undefined),
+            lolPlayer('Caps', rankedLeague('DIAMOND', 'II', 40), rankedLeague('GOLD', 'I', 10)),
+          ],
+        },
+      }),
+    );
+    await page.route(`${API}/views/${VALID_VIEW_ID}/cached-data`, (route) =>
+      route.fulfill({ json: { viewName: 'Flex Squad', data: [] } }),
+    );
+  });
+
+  test('opens a LoL ladder from the landing, ranked by Solo/Duo', async ({ page }) => {
+    await page.goto('/lol');
+    await page.getByText('Flex Squad').click();
+
+    await expect(page).toHaveURL(`/lol/${VALID_VIEW_ID}`);
+    await expect(page.getByText('Challenger · 1200 LP')).toBeVisible();
+    await expect(page.getByText('Diamond II · 40 LP')).toBeVisible();
+  });
+
+  test('switching to Flex keeps the queue in the link', async ({ page }) => {
+    await page.goto(`/lol/${VALID_VIEW_ID}`);
+    await page.getByRole('button', { name: 'Flex' }).click();
+
+    await expect(page).toHaveURL(`/lol/${VALID_VIEW_ID}?queue=flex`);
+    await expect(page.getByText('Gold I · 10 LP')).toBeVisible();
+    await expect(page.getByText('Unranked')).toBeVisible();
+  });
+
+  test('a shared Flex link opens on Flex', async ({ page }) => {
+    await page.goto(`/lol/${VALID_VIEW_ID}?queue=flex`);
+
+    await expect(page.getByRole('button', { name: 'Flex' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(page.getByText('Gold I · 10 LP')).toBeVisible();
   });
 });

@@ -33,17 +33,9 @@ interface ViewsPageProps {
   subtitle?: { label: string; value: string };
   copy: LadderListCopy;
   CreateDialog: ComponentType<CreateDialogProps>;
-  canOpenLadders?: boolean;
 }
 
-export function ViewsPage({
-  mark,
-  title,
-  subtitle,
-  copy,
-  CreateDialog,
-  canOpenLadders = true,
-}: Readonly<ViewsPageProps>) {
+export function ViewsPage({ mark, title, subtitle, copy, CreateDialog }: Readonly<ViewsPageProps>) {
   const navigate = useNavigate();
   const location = useLocation();
   const game = useGame();
@@ -177,7 +169,7 @@ export function ViewsPage({
           copy={copy}
           isLoadingViews={isLoadingViews}
           deletingViewId={deletingViewId}
-          onViewClick={canOpenLadders ? handleViewClick : undefined}
+          onViewClick={handleViewClick}
           onCreateView={handleCreateClick}
           onDeleteView={handleDeleteView}
           pagination={pagination}
