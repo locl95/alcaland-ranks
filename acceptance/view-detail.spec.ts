@@ -77,7 +77,7 @@ test.describe('view detail', () => {
   });
 
   test('a ladder row expands from the keyboard and tabs on to its menu', async ({ page }) => {
-    await page.goto(`/${VALID_VIEW_ID}`);
+    await page.goto(`/wow/${VALID_VIEW_ID}`);
     await page.locator('.ladder-row-toggle').first().focus();
 
     await page.keyboard.press('Enter');
@@ -91,8 +91,15 @@ test.describe('view detail', () => {
     await expect(page.getByRole('menu')).toBeVisible();
   });
 
-  test('renders the character ladder and dungeon grid', async ({ page }) => {
+  test('a ladder link shared before game paths existed opens under /wow', async ({ page }) => {
     await page.goto(`/${VALID_VIEW_ID}`);
+
+    await expect(page).toHaveURL(`/wow/${VALID_VIEW_ID}`);
+    await expect(page.getByText('Arthas').first()).toBeVisible();
+  });
+
+  test('renders the character ladder and dungeon grid', async ({ page }) => {
+    await page.goto(`/wow/${VALID_VIEW_ID}`);
 
     await expect(page.getByText('Ladder', { exact: true })).toBeVisible();
     await expect(page.getByText('Arthas').first()).toBeVisible();
@@ -103,7 +110,7 @@ test.describe('view detail', () => {
     await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
       route.fulfill({ json: makeLadder(15) }),
     );
-    await page.goto(`/${VALID_VIEW_ID}`);
+    await page.goto(`/wow/${VALID_VIEW_ID}`);
 
     const ladder = page.locator('.ladder-card');
     const dungeon = page.locator('.dungeon-card');
@@ -361,7 +368,7 @@ test.describe('view detail', () => {
       route.fulfill({ json: makeTaskResponse('SUCCESSFUL', retryAfter) }),
     );
 
-    await page.goto(`/${VALID_VIEW_ID}`);
+    await page.goto(`/wow/${VALID_VIEW_ID}`);
     await expect(page.getByText('Arthas').first()).toBeVisible();
 
     await page.getByRole('button', { name: 'Sync' }).click();
@@ -381,7 +388,7 @@ test.describe('view detail', () => {
       polled = true;
     });
 
-    await page.goto(`/${VALID_VIEW_ID}`);
+    await page.goto(`/wow/${VALID_VIEW_ID}`);
     await page.getByRole('button', { name: 'Sync' }).click();
 
     await expect(page.getByRole('button', { name: 'Syncing...' })).toBeDisabled();

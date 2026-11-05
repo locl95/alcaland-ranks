@@ -20,7 +20,7 @@ test('user can log in and is redirected to the views page', async ({ page }) => 
   await page.getByLabel('Password').fill('secret');
   await page.getByRole('button', { name: 'Sign in' }).click();
 
-  await expect(page).toHaveURL('/');
+  await expect(page).toHaveURL('/wow');
   await expect(page.getByText('Mythic+ ladder tracker')).toBeVisible();
 });
 

@@ -18,6 +18,7 @@ import { logout } from '@/features/auth/authApi.ts';
 import { useStaticData } from '@/features/views/hooks/useStaticData.ts';
 import { useViewsData } from '@/features/views/hooks/useViewsData.ts';
 import { GameSwitcher } from '@/shared/components/game-switcher.tsx';
+import { useGame } from '@/shared/game/game.ts';
 import keystone from '@/assets/keystone.webp';
 import { ViewsList } from './views-list.tsx';
 import { CreateView } from './actions/create-view.tsx';
@@ -26,6 +27,7 @@ import './views-page.css';
 export function ViewsPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const game = useGame();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const username = useAppSelector(selectUsername);
 
@@ -57,7 +59,7 @@ export function ViewsPage() {
 
   const handleViewClick = (viewId: string) => {
     const view = views.find((v) => v.simpleView.id === viewId);
-    navigate(`/${viewId}`, {
+    navigate(`/${game}/${viewId}`, {
       state: {
         owner: view?.simpleView.owner,
         isGuild: view?.simpleView.extraArguments?.isGuild ?? false,
@@ -73,7 +75,7 @@ export function ViewsPage() {
   const handleLogout = async () => {
     await logout();
     queryClient.removeQueries({ queryKey: viewKeys.ownList() });
-    navigate('/');
+    navigate(`/${game}`);
   };
 
   return (

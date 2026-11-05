@@ -4,6 +4,7 @@ import { ArrowLeft, Edit, RefreshCw } from 'lucide-react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useViewDetail } from '@/features/views/hooks/useViewDetail.ts';
 import { useSyncView } from '@/features/views/hooks/useSyncView.ts';
+import { useGame } from '@/shared/game/game.ts';
 import { CharacterLadder } from './character-ladder/character-ladder.tsx';
 import { DungeonGrid } from './dungeon-grid/dungeon-grid.tsx';
 import { EditView } from './actions/edit-view.tsx';
@@ -14,6 +15,7 @@ export function ViewDetail() {
   const { viewId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const game = useGame();
 
   const locationState = location.state as { owner?: string; isGuild?: boolean } | null;
   const owner = locationState?.owner ?? null;
@@ -46,9 +48,9 @@ export function ViewDetail() {
 
   useEffect(() => {
     if (viewId && !isViewIdValid) {
-      navigate('/');
+      navigate(`/${game}`);
     }
-  }, [viewId, isViewIdValid, navigate]);
+  }, [viewId, isViewIdValid, navigate, game]);
 
   const handleSavedCharacters = async (characters: typeof profiles) => {
     const error = await saveCharacters(characters);
@@ -64,7 +66,7 @@ export function ViewDetail() {
     <div className="page">
       <div className="page-inner page-inner--wide">
         <div className="view-detail-header">
-          <button onClick={() => navigate('/')} className="header-back-button">
+          <button onClick={() => navigate(`/${game}`)} className="header-back-button">
             <ArrowLeft className="header-icon" />
           </button>
           <h1 className="header-view-title">{viewName}</h1>

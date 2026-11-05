@@ -7,6 +7,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastProvider } from '@/shared/components/toaster/ToastProvider.tsx';
 import { ViewsPage } from './views-page.tsx';
+import { GameContext } from '@/shared/game/game.ts';
 import authReducer from '@/app/authSlice.ts';
 import { MockViewsList, MockCreateView, makeSimpleView } from '@/app/App.mocks.tsx';
 
@@ -104,7 +105,9 @@ const renderViewsPage = (authenticated = true) => {
     <Provider store={store}>
       <QueryClientProvider client={testQueryClient}>
         <ToastProvider>
-          <Wrapper />
+          <GameContext.Provider value="wow">
+            <Wrapper />
+          </GameContext.Provider>
         </ToastProvider>
       </QueryClientProvider>
     </Provider>,
@@ -163,7 +166,7 @@ describe('ViewsPage', () => {
       await renderWithViews();
       await userEvent.click(screen.getByTestId('open-v1'));
 
-      expect(navState.path).toBe('/v1');
+      expect(navState.path).toBe('/wow/v1');
     });
   });
 });

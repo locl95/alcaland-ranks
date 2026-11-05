@@ -50,7 +50,7 @@ test.describe('authenticated', () => {
 
     await page.goto('/');
     await page.getByText('My Ladder').click();
-    await expect(page).toHaveURL(`/${VALID_VIEW_ID}`);
+    await expect(page).toHaveURL(`/wow/${VALID_VIEW_ID}`);
   });
 });
 

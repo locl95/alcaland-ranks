@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ViewDetail } from './view-detail.tsx';
+import { GameContext } from '@/shared/game/game.ts';
 import type { SyncViewResult } from '@/features/views/hooks/useSyncView.ts';
 
 // ---------------------------------------------------------------------------
@@ -75,7 +76,11 @@ const renderView = (
 ) => {
   mockUseViewDetail.mockReturnValue({ ...defaultViewDetail, ...viewDetail });
   mockUseSyncView.mockReturnValue({ ...defaultSyncView, ...syncView });
-  return render(<ViewDetail />);
+  return render(
+    <GameContext.Provider value="wow">
+      <ViewDetail />
+    </GameContext.Provider>,
+  );
 };
 
 // ---------------------------------------------------------------------------
