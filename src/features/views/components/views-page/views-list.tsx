@@ -6,12 +6,21 @@ import { View } from '@/features/views/model/view.ts';
 import { Pager, Pagination } from '@/features/views/components/shared/pager.tsx';
 import { useToast } from '@/shared/components/toaster/toast.ts';
 
+export interface LadderListCopy {
+  members: string;
+  emptyTitle: string;
+  emptyText: string;
+  signedOutTitle: string;
+  signedOutText: string;
+}
+
 interface ViewsListProps {
   views: View[];
   isAuthenticated: boolean;
+  copy: LadderListCopy;
   isLoadingViews: boolean;
   deletingViewId: string | null;
-  onViewClick: (viewId: string) => void;
+  onViewClick?: (viewId: string) => void;
   onCreateView: () => void;
   onDeleteView: (viewId: string) => void;
   pagination: Pagination;
@@ -20,6 +29,7 @@ interface ViewsListProps {
 export function ViewsList({
   views,
   isAuthenticated,
+  copy,
   isLoadingViews,
   deletingViewId,
   onViewClick,
@@ -48,11 +58,8 @@ export function ViewsList({
           </div>
           {isAuthenticated ? (
             <>
-              <h3 className="views-empty-title">Start your first ladder</h3>
-              <p className="views-empty-text">
-                Track the characters you play with, or pull in a whole guild, and see who's climbing
-                this season.
-              </p>
+              <h3 className="views-empty-title">{copy.emptyTitle}</h3>
+              <p className="views-empty-text">{copy.emptyText}</p>
               <button onClick={onCreateView} className="create-view-btn">
                 <Plus className="view-row-icon" />
                 Create your first ladder
@@ -60,11 +67,8 @@ export function ViewsList({
             </>
           ) : (
             <>
-              <h3 className="views-empty-title">Track your group's Mythic+ climb</h3>
-              <p className="views-empty-text">
-                Build a ladder from your characters or a whole guild and follow every score through
-                the season.
-              </p>
+              <h3 className="views-empty-title">{copy.signedOutTitle}</h3>
+              <p className="views-empty-text">{copy.signedOutText}</p>
               <button onClick={onCreateView} className="create-view-btn">
                 <LogIn className="view-row-icon" />
                 Sign in to get started
@@ -80,7 +84,7 @@ export function ViewsList({
     <div className="views-list-container-box">
       <div className="views-list-head">
         <span className="eyebrow">Ladder</span>
-        <span className="eyebrow views-list-head-stat">Characters</span>
+        <span className="eyebrow views-list-head-stat">{copy.members}</span>
       </div>
       {views.map((view, index) => {
         const isPending = view.status === 'pending';
@@ -100,8 +104,8 @@ export function ViewsList({
             <button
               type="button"
               className="view-row-open"
-              disabled={isDisabled}
-              onClick={() => onViewClick(view.simpleView.id)}
+              disabled={isDisabled || !onViewClick}
+              onClick={() => onViewClick?.(view.simpleView.id)}
             >
               <div className="view-row-content">
                 <h3 className="view-row-title">{view.simpleView.name}</h3>
@@ -136,7 +140,7 @@ export function ViewsList({
                   aria-label="Still syncing"
                   onClick={() =>
                     showInfo(
-                      `${view.simpleView.name} is still syncing its characters. It's already usable and will be complete in a few minutes.`,
+                      `${view.simpleView.name} is still syncing its ${copy.members.toLowerCase()}. It's already usable and will be complete in a few minutes.`,
                     )
                   }
                 >
@@ -157,7 +161,9 @@ export function ViewsList({
                 </button>
               )}
 
-              {!isDisabled && <ChevronRight className="view-row-chevron" aria-hidden={true} />}
+              {!isDisabled && onViewClick && (
+                <ChevronRight className="view-row-chevron" aria-hidden={true} />
+              )}
             </div>
           </div>
         );

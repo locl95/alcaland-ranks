@@ -1,7 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Spinner } from '@/shared/components/spinner.tsx';
 import { Footer } from '@/shared/components/footer.tsx';
-import { ViewsPage } from '@/features/views/components/views-page/views-page.tsx';
+import { WowLanding } from '@/games/wow/wow-landing.tsx';
+import { LolLanding } from '@/games/lol/lol-landing.tsx';
 import { ViewDetail } from '@/features/views/components/view-detail/view-detail.tsx';
 import { LoginPage } from '@/features/auth/LoginPage.tsx';
 import { GameLayout } from '@/shared/game/game-layout.tsx';
@@ -15,9 +16,12 @@ export function App() {
       <main className="app-main">
         <Routes>
           <Route path="/" element={<Navigate to="/wow" replace />} />
-          <Route path="/wow" element={<GameLayout game="wow" />}>
-            <Route index element={<ViewsPage />} />
+          <Route path="/wow" element={<GameLayout key="wow" game="wow" />}>
+            <Route index element={<WowLanding />} />
             <Route path=":viewId" element={<ViewDetail />} />
+          </Route>
+          <Route path="/lol" element={<GameLayout key="lol" game="lol" />}>
+            <Route index element={<LolLanding />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/:viewId" element={<LegacyViewRedirect />} />

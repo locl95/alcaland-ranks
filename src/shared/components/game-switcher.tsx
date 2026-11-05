@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Check, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
@@ -6,23 +7,19 @@ import {
   DropdownMenuPortal,
   DropdownMenuTrigger,
 } from '@radix-ui/react-dropdown-menu';
+import { GAMES, useGame } from '@/shared/game/game.ts';
 import './game-switcher.css';
 
-const GAMES = [
-  'World of Warcraft Retail',
-  'World of Warcraft Hardcore Era',
-  'World of Warcraft Forever',
-  'League of Legends',
-];
-
-const CURRENT_GAME = GAMES[0];
-
 export function GameSwitcher() {
+  const navigate = useNavigate();
+  const currentGame = useGame();
+  const currentLabel = GAMES.find((g) => g.slug === currentGame)?.label;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="game-switcher-btn">
-          {CURRENT_GAME}
+          {currentLabel}
           <ChevronDown className="game-switcher-chevron" aria-hidden={true} />
         </button>
       </DropdownMenuTrigger>
@@ -33,10 +30,14 @@ export function GameSwitcher() {
           sideOffset={6}
           collisionPadding={12}
         >
-          {GAMES.map((game) => (
-            <DropdownMenuItem key={game} className="game-switcher-item">
-              {game}
-              {game === CURRENT_GAME && (
+          {GAMES.map(({ slug, label }) => (
+            <DropdownMenuItem
+              key={slug}
+              className="game-switcher-item"
+              onSelect={() => navigate(`/${slug}`)}
+            >
+              {label}
+              {slug === currentGame && (
                 <Check className="game-switcher-check" aria-label="Current" />
               )}
             </DropdownMenuItem>

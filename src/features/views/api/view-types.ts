@@ -7,7 +7,7 @@ export interface ViewMetadata {
   totalCount?: number | null;
 }
 
-export type Game = 'WOW';
+export type Game = 'WOW' | 'LOL';
 
 export interface SimpleView {
   id: string;

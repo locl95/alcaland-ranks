@@ -44,6 +44,14 @@ const makeStore = (username: string | null = 'testuser') =>
     },
   });
 
+const COPY = {
+  members: 'Characters',
+  emptyTitle: 'Start your first ladder',
+  emptyText: 'Track the characters you play with.',
+  signedOutTitle: "Track your group's Mythic+ climb",
+  signedOutText: 'Build a ladder from your characters.',
+};
+
 const makePagination = (overrides: Partial<Pagination> = {}): Pagination => ({
   page: 1,
   pageCount: 1,
@@ -64,6 +72,7 @@ const renderList = (
     isLoadingViews?: boolean;
     isAuthenticated?: boolean;
     pagination?: Pagination;
+    canOpen?: boolean;
   } = {},
 ) => {
   const {
@@ -71,6 +80,7 @@ const renderList = (
     isLoadingViews = false,
     isAuthenticated = true,
     pagination = makePagination(),
+    canOpen = true,
   } = options;
   const onViewClick = vi.fn();
   const onCreateView = vi.fn();
@@ -82,9 +92,10 @@ const renderList = (
         <ViewsList
           views={views}
           isAuthenticated={isAuthenticated}
+          copy={COPY}
           isLoadingViews={isLoadingViews}
           deletingViewId={null}
-          onViewClick={onViewClick}
+          onViewClick={canOpen ? onViewClick : undefined}
           onCreateView={onCreateView}
           onDeleteView={onDeleteView}
           pagination={pagination}
@@ -121,6 +132,12 @@ describe('ViewsList', () => {
   });
 
   describe('view rows', () => {
+    it('lists ladders without letting them open when the game has no ladder page yet', () => {
+      renderList([makeView('v1', 'My Ladder')], { canOpen: false });
+
+      expect(screen.getByRole('button', { name: /My Ladder/ })).toBeDisabled();
+    });
+
     it('calls onViewClick with the view id when a row is clicked', async () => {
       const { onViewClick } = renderList([makeView('v1', 'My Ladder')]);
       await userEvent.click(screen.getByText('My Ladder'));

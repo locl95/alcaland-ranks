@@ -1,16 +1,21 @@
 import { Page, Route } from '@playwright/test';
-import { SimpleView } from '@/features/views/api/view-types';
+import { Game, SimpleView } from '@/features/views/api/view-types';
 import { API } from '../constants';
 import { mockSeason } from './wowMocks';
 
-export function makeSimpleView(id: string, name: string, owner = 'testuser'): SimpleView {
+export function makeSimpleView(
+  id: string,
+  name: string,
+  owner = 'testuser',
+  game: Game = 'WOW',
+): SimpleView {
   return {
     id,
     name,
     owner,
     published: false,
     entitiesIds: [1, 2],
-    game: 'WOW',
+    game,
     featured: false,
     extraArguments: null,
   };
@@ -33,8 +38,8 @@ function fulfillPage(route: Route, views: SimpleView[]) {
   });
 }
 
-export async function mockOwnViews(page: Page, views: SimpleView[] = []) {
-  await page.route(`${API}/views?game=wow&page=*`, (route) => fulfillPage(route, views));
+export async function mockOwnViews(page: Page, views: SimpleView[] = [], game = 'wow') {
+  await page.route(`${API}/views?game=${game}&page=*`, (route) => fulfillPage(route, views));
 }
 
 export async function mockEntitiesExist(page: Page) {

@@ -3,8 +3,12 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import App from './App';
 
-vi.mock('@/features/views/components/views-page/views-page.tsx', () => ({
-  ViewsPage: () => <div data-testid="views-page" />,
+vi.mock('@/games/wow/wow-landing.tsx', () => ({
+  WowLanding: () => <div data-testid="wow-landing" />,
+}));
+
+vi.mock('@/games/lol/lol-landing.tsx', () => ({
+  LolLanding: () => <div data-testid="lol-landing" />,
 }));
 
 vi.mock('@/features/views/components/view-detail/view-detail.tsx', () => ({
@@ -30,7 +34,12 @@ const renderAt = (path: string) =>
 describe('App routing', () => {
   it('redirects unknown paths to the WoW landing', () => {
     renderAt('/unknown/deep/path');
-    expect(screen.getByTestId('views-page')).toBeInTheDocument();
+    expect(screen.getByTestId('wow-landing')).toBeInTheDocument();
+  });
+
+  it('serves the League of Legends landing under /lol', () => {
+    renderAt('/lol');
+    expect(screen.getByTestId('lol-landing')).toBeInTheDocument();
   });
 
   it('opens a ladder under its game path', () => {

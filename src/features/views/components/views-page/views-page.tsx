@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ComponentType, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { viewKeys } from '@/features/views/api/viewQueries.ts';
@@ -15,16 +15,35 @@ import {
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectIsAuthenticated, selectUsername } from '@/app/authSlice.ts';
 import { logout } from '@/features/auth/authApi.ts';
-import { useStaticData } from '@/features/views/hooks/useStaticData.ts';
 import { useViewsData } from '@/features/views/hooks/useViewsData.ts';
 import { GameSwitcher } from '@/shared/components/game-switcher.tsx';
 import { useGame } from '@/shared/game/game.ts';
-import keystone from '@/assets/keystone.webp';
-import { ViewsList } from './views-list.tsx';
-import { CreateView } from './actions/create-view.tsx';
+import { View } from '@/features/views/model/view.ts';
+import { LadderListCopy, ViewsList } from './views-list.tsx';
 import './views-page.css';
 
-export function ViewsPage() {
+export interface CreateDialogProps {
+  onClose: () => void;
+  onCreateView: (view: View) => void;
+}
+
+interface ViewsPageProps {
+  mark: string;
+  title: string;
+  subtitle?: { label: string; value: string };
+  copy: LadderListCopy;
+  CreateDialog: ComponentType<CreateDialogProps>;
+  canOpenLadders?: boolean;
+}
+
+export function ViewsPage({
+  mark,
+  title,
+  subtitle,
+  copy,
+  CreateDialog,
+  canOpenLadders = true,
+}: Readonly<ViewsPageProps>) {
   const navigate = useNavigate();
   const location = useLocation();
   const game = useGame();
@@ -33,8 +52,6 @@ export function ViewsPage() {
 
   const queryClient = useQueryClient();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-
-  const { data: season } = useStaticData();
 
   const {
     ownViews: views,
@@ -84,13 +101,13 @@ export function ViewsPage() {
         <GameSwitcher />
         <header className="masthead">
           <div className="masthead-brand">
-            <img src={keystone} alt="" aria-hidden={true} className="masthead-mark" />
+            <img src={mark} alt="" aria-hidden={true} className="masthead-mark" />
             <div className="masthead-lines">
-              <h1 className="masthead-title">Mythic+ ladder tracker</h1>
-              {season?.name && (
+              <h1 className="masthead-title">{title}</h1>
+              {subtitle && (
                 <p className="masthead-season">
-                  <span className="eyebrow">Season</span>
-                  <span className="masthead-season-name">{season.name}</span>
+                  <span className="eyebrow">{subtitle.label}</span>
+                  <span className="masthead-season-name">{subtitle.value}</span>
                 </p>
               )}
             </div>
@@ -157,9 +174,10 @@ export function ViewsPage() {
         <ViewsList
           views={views}
           isAuthenticated={isAuthenticated}
+          copy={copy}
           isLoadingViews={isLoadingViews}
           deletingViewId={deletingViewId}
-          onViewClick={handleViewClick}
+          onViewClick={canOpenLadders ? handleViewClick : undefined}
           onCreateView={handleCreateClick}
           onDeleteView={handleDeleteView}
           pagination={pagination}
@@ -167,7 +185,7 @@ export function ViewsPage() {
       </div>
 
       {isCreateDialogOpen && (
-        <CreateView onClose={() => setIsCreateDialogOpen(false)} onCreateView={createView} />
+        <CreateDialog onClose={() => setIsCreateDialogOpen(false)} onCreateView={createView} />
       )}
     </div>
   );

@@ -112,7 +112,10 @@ export function CreateView({ onClose, onCreateView }: Readonly<CreateViewDialogP
                       <Plus size={16} />
                     </button>
                   ) : (
-                    <VerificationBadge status={row.status} />
+                    <VerificationBadge
+                      status={row.status}
+                      noun={mode === 'guild' ? 'Guild' : 'Character'}
+                    />
                   )}
 
                   {index < rows.length - 1 && (

@@ -63,10 +63,6 @@ vi.mock('@/features/views/components/views-page/views-list.tsx', () => ({
   ViewsList: (props: Parameters<typeof MockViewsList>[0]) => <MockViewsList {...props} />,
 }));
 
-vi.mock('@/features/views/components/views-page/actions/create-view.tsx', () => ({
-  CreateView: (props: Parameters<typeof MockCreateView>[0]) => <MockCreateView {...props} />,
-}));
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -98,7 +94,20 @@ const renderViewsPage = (authenticated = true) => {
   function Wrapper() {
     const [, tick] = useState(0);
     useEffect(() => navState.subscribe(() => tick((n) => n + 1)), []);
-    return <ViewsPage />;
+    return (
+      <ViewsPage
+        mark=""
+        title="Ladder tracker"
+        copy={{
+          members: 'Characters',
+          emptyTitle: 'Start your first ladder',
+          emptyText: '',
+          signedOutTitle: 'Sign in',
+          signedOutText: '',
+        }}
+        CreateDialog={MockCreateView}
+      />
+    );
   }
 
   render(
