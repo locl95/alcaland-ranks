@@ -45,11 +45,12 @@ const makeProfile = (overrides: Partial<WowProfile> = {}): WowProfile => ({
 });
 
 describe('LadderRow', () => {
-  it('shows Syncing… indicator when score is null and class is empty (new character)', () => {
+  it('shows Syncing… indicator for a character being added', () => {
     render(
       <LadderRow
         index={0}
         character={makeProfile({ score: null, class: '', spec: '' })}
+        pendingStatus="syncing"
         cachedCharacters={[]}
         season={null}
       />,
@@ -57,11 +58,12 @@ describe('LadderRow', () => {
     expect(screen.getByText('Syncing…')).toBeInTheDocument();
   });
 
-  it('shows Deleting… indicator when score is null and class is set (existing character being deleted)', () => {
+  it('shows Deleting… indicator for a character being removed', () => {
     render(
       <LadderRow
         index={0}
         character={makeProfile({ score: null, class: 'Warrior' })}
+        pendingStatus="deleting"
         cachedCharacters={[]}
         season={null}
       />,

@@ -1,31 +1,16 @@
-import { useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@/shared/components/toaster/toast.ts';
-import { userRequest } from '@/shared/api/httpClient.ts';
-import { ApiError } from '@/shared/api/ApiError.ts';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { WowProfile } from '@/games/wow/api/wow-types.ts';
-import { OperationResult, ViewRequest } from '@/features/views/api/view-types.ts';
 import { isViewId } from '@/features/views/utils.ts';
-import { haveSameCharacters, toRealmSlug } from '@/games/wow/utils.ts';
-import {
-  viewKeys,
-  fetchViewData,
-  fetchCachedViewData,
-  pollOperation,
-} from '@/features/views/api/viewQueries.ts';
+import { characterKey, toRealmSlug } from '@/games/wow/utils.ts';
+import { viewKeys, fetchViewData, fetchCachedViewData } from '@/features/views/api/viewQueries.ts';
 import { useStaticData } from '@/games/wow/hooks/useStaticData.ts';
 import { useView } from '@/features/views/hooks/useView.ts';
+import { EntityStatus, useSaveEntities } from '@/features/views/hooks/useSaveEntities.ts';
 
-const getCharacterName = (c: { name: string }) => c.name.toLowerCase();
 const REFETCH_INTERVAL = 2000;
 
 export function useViewDetail(viewId: string | undefined) {
-  const queryClient = useQueryClient();
-  const { showError } = useToast();
-
-  const [pendingCharacters, setPendingCharacters] = useState<WowProfile[] | null>(null);
-  const [syncError, setSyncError] = useState<WowProfile[] | null>(null);
-
   const isValidViewId = isViewId(viewId);
   const safeViewId = viewId ?? '';
 
@@ -50,100 +35,51 @@ export function useViewDetail(viewId: string | undefined) {
 
   const { view, isOwner } = useView(viewId);
 
-  const profiles = useMemo(() => {
-    const fetchedProfiles = viewData?.data ?? [];
-    if (!pendingCharacters) return fetchedProfiles;
-    const fetchedProfilesMap = new Map(fetchedProfiles.map((c) => [getCharacterName(c), c]));
-    return pendingCharacters.map((c) => {
-      if (c.score === null) return c;
-      return fetchedProfilesMap.get(getCharacterName(c)) ?? c;
-    });
-  }, [viewData, pendingCharacters]);
-
-  async function handleSaveCharacters(
-    characters: WowProfile[],
-    request: ViewRequest,
-  ): Promise<string | null> {
-    const submittedCharacters = new Set(characters.map(getCharacterName));
-    const deletedCharacters = profiles
-      .filter((p) => !submittedCharacters.has(getCharacterName(p)))
-      .map((p) => ({ ...p, score: null }));
-
-    async function reconcileView(operation: OperationResult) {
-      setPendingCharacters(null);
-      queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
-      const refetchedViewData = await fetchViewData<WowProfile>(safeViewId).catch(() => null);
-      if (refetchedViewData) {
-        queryClient.setQueryData(viewKeys.data(safeViewId), refetchedViewData);
-        if (operation.status === 'FAILED') {
-          const synced = new Set((refetchedViewData.data ?? []).map(getCharacterName));
-          const failedAdds = characters.filter((c) => !synced.has(getCharacterName(c)));
-          const failedDeletes = (refetchedViewData.data ?? []).filter(
-            (c) => !submittedCharacters.has(getCharacterName(c)),
-          );
-          const failed = [...failedAdds, ...failedDeletes];
-          if (failed.length > 0) setSyncError(failed);
-        }
-      } else {
-        queryClient.invalidateQueries({ queryKey: viewKeys.data(safeViewId) });
-      }
-    }
-
-    let operationId: string;
-    try {
-      ({ id: operationId } = await userRequest<{ id: string }>(
-        'PUT',
-        `/views/${safeViewId}`,
-        request,
-      ));
-    } catch (err) {
-      return err instanceof ApiError && err.code === 'TOO_MANY_ENTITIES'
-        ? 'This ladder has more characters than allowed.'
-        : 'Failed to save changes — please try again';
-    }
-
-    setPendingCharacters([...characters, ...deletedCharacters]);
-    pollOperation(operationId)
-      .then(reconcileView)
-      .catch(() => {
-        setPendingCharacters(null);
-        queryClient.invalidateQueries({ queryKey: viewKeys.data(safeViewId) });
-        showError('Failed to save changes — please try again');
-      });
-    return null;
-  }
-
-  const saveCharacters = async (characters: WowProfile[]): Promise<string | null> => {
-    if (haveSameCharacters(characters, profiles)) return null;
-    setSyncError(null);
-
-    const request: ViewRequest = {
-      name: viewData?.viewName ?? '',
-      entities: characters.map((c) => ({
+  const viewName = viewData?.viewName ?? '';
+  const { pending, failed, isSaving, save, clearFailed } = useSaveEntities(
+    viewId,
+    viewName,
+    viewData?.data ?? [],
+    {
+      game: 'WOW',
+      noun: 'characters',
+      fromData: (profile: WowProfile) => profile,
+      key: characterKey,
+      toRequest: (c) => ({
         name: c.name,
         region: c.region,
         realm: toRealmSlug(c.realm, c.region),
         type: 'wow',
-      })),
-      published: true,
-      featured: false,
-      game: 'WOW',
-    };
+      }),
+    },
+  );
 
-    return handleSaveCharacters(characters, request);
-  };
+  // Pending characters stay in the ladder, scoreless so they sort last, until the save ends.
+  const { profiles, pendingStatuses } = useMemo(() => {
+    const statuses = new Map<string, EntityStatus>(
+      pending.map((p) => [characterKey(p.entity), p.status]),
+    );
+    return {
+      pendingStatuses: statuses,
+      profiles: [
+        ...(viewData?.data ?? []).filter((c) => !statuses.has(characterKey(c))),
+        ...pending.map((p) => ({ ...p.entity, score: null })),
+      ],
+    };
+  }, [viewData, pending]);
 
   return {
     profiles,
+    pendingStatuses,
     cachedProfiles: cachedViewData?.data ?? [],
-    viewName: viewData?.viewName ?? '',
+    viewName,
     season: season ?? null,
     initialized: !isLoading,
-    isSyncing: pendingCharacters !== null,
-    syncError,
+    isSyncing: isSaving,
+    syncError: failed,
     canEdit: isOwner && !view?.extraArguments?.isGuild,
     isViewIdValid: isValidViewId,
-    saveCharacters,
-    clearSyncError: () => setSyncError(null),
+    saveCharacters: save,
+    clearSyncError: clearFailed,
   };
 }

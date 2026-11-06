@@ -8,7 +8,8 @@ import { CharacterLadder } from './character-ladder/character-ladder.tsx';
 import { DungeonGrid } from './dungeon-grid/dungeon-grid.tsx';
 import { ViewDetailHeader } from '@/features/views/components/view-detail/view-detail-header.tsx';
 import { EditView } from './actions/edit-view.tsx';
-import { SyncErrorDialog } from './actions/sync-error-dialog.tsx';
+import { SyncErrorDialog } from '@/features/views/components/shared/sync-error-dialog.tsx';
+import { characterKey } from '@/games/wow/utils.ts';
 import '@/features/views/components/shared/empty-state.css';
 
 export function WowViewDetail() {
@@ -20,6 +21,7 @@ export function WowViewDetail() {
 
   const {
     profiles,
+    pendingStatuses,
     cachedProfiles,
     viewName,
     season,
@@ -84,6 +86,7 @@ export function WowViewDetail() {
           <>
             <CharacterLadder
               characters={profiles}
+              pendingStatuses={pendingStatuses}
               cachedCharacters={cachedProfiles}
               season={season}
             />
@@ -102,7 +105,16 @@ export function WowViewDetail() {
         />
       )}
 
-      <SyncErrorDialog failedCharacters={syncError ?? []} onClose={clearSyncError} />
+      <SyncErrorDialog
+        title="Some characters couldn't be synced"
+        description="The following characters were not found or couldn't be processed. Please check that the name, realm, and region are correct."
+        items={syncError.map((c) => ({
+          key: characterKey(c),
+          name: c.name,
+          meta: `${c.region.toUpperCase()} · ${c.realm}`,
+        }))}
+        onClose={clearSyncError}
+      />
     </div>
   );
 }

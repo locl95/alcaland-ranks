@@ -1,16 +1,28 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { AlertTriangle, X } from 'lucide-react';
-import { WowProfile } from '@/games/wow/api/wow-types.ts';
-import '@/features/views/components/shared/dialog.css';
+import './dialog.css';
 import './sync-error-dialog.css';
 
+export interface SyncErrorItem {
+  key: string;
+  name: string;
+  meta?: string;
+}
+
 interface SyncErrorDialogProps {
-  failedCharacters: WowProfile[];
+  title: string;
+  description: string;
+  items: SyncErrorItem[];
   onClose: () => void;
 }
 
-export function SyncErrorDialog({ failedCharacters, onClose }: Readonly<SyncErrorDialogProps>) {
-  if (failedCharacters.length === 0) return null;
+export function SyncErrorDialog({
+  title,
+  description,
+  items,
+  onClose,
+}: Readonly<SyncErrorDialogProps>) {
+  if (items.length === 0) return null;
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
@@ -24,9 +36,7 @@ export function SyncErrorDialog({ failedCharacters, onClose }: Readonly<SyncErro
           <div className="sync-error-header">
             <div className="sync-error-title-row">
               <AlertTriangle className="sync-error-icon" />
-              <Dialog.Title className="sync-error-title">
-                Some characters couldn&apos;t be synced
-              </Dialog.Title>
+              <Dialog.Title className="sync-error-title">{title}</Dialog.Title>
             </div>
             <Dialog.Close className="dialog-close-btn" aria-label="Close">
               <X size={20} />
@@ -34,18 +44,13 @@ export function SyncErrorDialog({ failedCharacters, onClose }: Readonly<SyncErro
           </div>
 
           <div className="sync-error-body">
-            <p className="sync-error-description">
-              The following characters were not found or couldn&apos;t be processed. Please check
-              that the name, realm, and region are correct.
-            </p>
+            <p className="sync-error-description">{description}</p>
 
             <ul className="sync-error-list">
-              {failedCharacters.map((c) => (
-                <li key={`${c.region}-${c.realm}-${c.name}`} className="sync-error-char-row">
-                  <span className="sync-error-char-name">{c.name}</span>
-                  <span className="sync-error-char-meta">
-                    {c.region.toUpperCase()} · {c.realm}
-                  </span>
+              {items.map((item) => (
+                <li key={item.key} className="sync-error-item-row">
+                  <span className="sync-error-item-name">{item.name}</span>
+                  {item.meta && <span className="sync-error-item-meta">{item.meta}</span>}
                 </li>
               ))}
             </ul>

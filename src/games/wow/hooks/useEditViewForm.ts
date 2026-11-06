@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { WowProfile } from '@/games/wow/api/wow-types.ts';
-import { entityKey, verifyEntity } from '@/games/wow/api/wow-entity-api.ts';
+import { verifyEntity } from '@/games/wow/api/wow-entity-api.ts';
 import { CheckStatus } from '@/features/views/components/shared/verification-badge.tsx';
 import { formatDuplicateMessage, formatNotFoundMessage } from '@/features/views/utils.ts';
-import { NOT_FOUND_HINT, toRealmSlug } from '@/games/wow/utils.ts';
+import { characterKey, NOT_FOUND_HINT } from '@/games/wow/utils.ts';
 
 export interface EditableCharacter {
   id: number;
@@ -17,9 +17,6 @@ type StatusById = Record<number, CheckStatus>;
 
 let lastTempId = 0;
 const nextTempId = () => --lastTempId;
-
-const characterKey = (c: { name: string; realm: string; region: string }) =>
-  entityKey({ name: c.name, region: c.region, realm: toRealmSlug(c.realm, c.region) });
 
 const fromProfile = (profile: WowProfile): EditableCharacter => ({
   id: profile.id,

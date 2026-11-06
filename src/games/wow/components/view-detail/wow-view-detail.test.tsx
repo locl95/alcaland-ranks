@@ -38,7 +38,7 @@ vi.mock('./actions/edit-view.tsx', () => ({
     </div>
   ),
 }));
-vi.mock('./actions/sync-error-dialog.tsx', () => ({
+vi.mock('@/features/views/components/shared/sync-error-dialog.tsx', () => ({
   SyncErrorDialog: () => null,
 }));
 
@@ -48,12 +48,13 @@ vi.mock('./actions/sync-error-dialog.tsx', () => ({
 
 const defaultViewDetail = {
   profiles: [],
+  pendingStatuses: new Map(),
   cachedProfiles: [],
   viewName: 'Test View',
   season: null,
   initialized: true,
   isSyncing: false,
-  syncError: null,
+  syncError: [],
   canEdit: false,
   isViewIdValid: true,
   saveCharacters: vi.fn(),

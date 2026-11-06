@@ -1,7 +1,9 @@
-import { Loader2, Swords } from 'lucide-react';
+import { Swords } from 'lucide-react';
 import './ladder-row.css';
 import { memo, useState } from 'react';
 import { WowProfile, Season } from '@/games/wow/api/wow-types.ts';
+import { EntityStatus } from '@/features/views/hooks/useSaveEntities.ts';
+import { PendingStatus } from '@/features/views/components/shared/pending-status.tsx';
 import { CharacterMenu } from './character-menu.tsx';
 import { LadderRowExpanded } from './ladder-row-expanded.tsx';
 
@@ -12,6 +14,7 @@ import { RACE_IMAGES, getRaceImageKey } from '@/games/wow/assets/race-images.ts'
 interface LadderRowProps {
   index: number;
   character: WowProfile;
+  pendingStatus?: EntityStatus;
   cachedCharacters: WowProfile[];
   season: Season | null;
 }
@@ -19,12 +22,12 @@ interface LadderRowProps {
 export const LadderRow = memo(function LadderRow({
   index,
   character,
+  pendingStatus,
   cachedCharacters,
   season,
 }: Readonly<LadderRowProps>) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isSyncing = character.score === null;
-  const isBeingDeleted = isSyncing && character.class !== '';
   const hasHistoricalData = cachedCharacters.length > 0;
   const cachedIndex = cachedCharacters.findIndex((c) => c.id === character.id);
   const positionChange = hasHistoricalData && cachedIndex !== -1 ? cachedIndex - index : null;
@@ -99,10 +102,7 @@ export const LadderRow = memo(function LadderRow({
 
           {isSyncing ? (
             <div className="ladder-syncing-indicator">
-              <span className="ladder-syncing-label">
-                {isBeingDeleted ? 'Deleting…' : 'Syncing…'}
-              </span>
-              <Loader2 className="ladder-syncing-spinner" />
+              <PendingStatus status={pendingStatus ?? 'syncing'} />
             </div>
           ) : (
             <div className="ladder-score">

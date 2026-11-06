@@ -1,5 +1,6 @@
 import { EU_REALMS } from '@/games/wow/constants/euRealms.ts';
 import { NA_REALMS } from '@/games/wow/constants/naRealms.ts';
+import { entityKey } from '@/games/wow/api/wow-entity-api.ts';
 
 export const normalizeKey = (s: string): string => s.toLowerCase().replace(/\s+/g, '');
 
@@ -19,11 +20,9 @@ export const toRealmLabel = (slug: string, region: string): string => {
 export const getClassSlug = (className: string): string =>
   className.toLowerCase().replace(/\s+/g, '-');
 
-export const haveSameCharacters = <T extends { id: number }>(a: T[], b: T[]): boolean => {
-  if (a.length !== b.length) return false;
-  const idsA = new Set(a.map((c) => c.id));
-  return b.every((c) => idsA.has(c.id));
-};
+/** Identifies a character whether its realm is a display name or a slug. */
+export const characterKey = (c: { name: string; realm: string; region: string }): string =>
+  entityKey({ name: c.name, region: c.region, realm: toRealmSlug(c.realm, c.region) });
 
 type ExternalService = 'raiderio' | 'summoned';
 

@@ -40,7 +40,12 @@ const makeLadder = (count: number) =>
 
 const renderLadder = (characters: WowProfile[], cachedCharacters: WowProfile[] = []) =>
   render(
-    <CharacterLadder characters={characters} cachedCharacters={cachedCharacters} season={null} />,
+    <CharacterLadder
+      characters={characters}
+      pendingStatuses={new Map()}
+      cachedCharacters={cachedCharacters}
+      season={null}
+    />,
   );
 
 describe('CharacterLadder', () => {

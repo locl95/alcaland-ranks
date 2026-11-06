@@ -4,17 +4,21 @@ import './character-ladder.css';
 import { memo, useMemo, useState } from 'react';
 import { WowProfile, Season } from '@/games/wow/api/wow-types.ts';
 import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
+import { EntityStatus } from '@/features/views/hooks/useSaveEntities.ts';
+import { characterKey } from '@/games/wow/utils.ts';
 import { LadderRow } from './ladder-row.tsx';
 import { Pager } from '@/features/views/components/shared/pager.tsx';
 
 interface CharacterLadderProps {
   characters: WowProfile[];
+  pendingStatuses: Map<string, EntityStatus>;
   cachedCharacters: WowProfile[];
   season: Season | null;
 }
 
 export const CharacterLadder = memo(function CharacterLadder({
   characters,
+  pendingStatuses,
   cachedCharacters,
   season,
 }: Readonly<CharacterLadderProps>) {
@@ -58,6 +62,7 @@ export const CharacterLadder = memo(function CharacterLadder({
                 key={character.id}
                 index={startIndex + index}
                 character={character}
+                pendingStatus={pendingStatuses.get(characterKey(character))}
                 cachedCharacters={sortedCachedCharacters}
                 season={season}
               />
