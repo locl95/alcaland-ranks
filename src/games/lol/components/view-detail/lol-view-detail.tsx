@@ -7,6 +7,7 @@ import { ViewDetailHeader } from '@/features/views/components/view-detail/view-d
 import { Queue } from '@/games/lol/api/lol-types.ts';
 import { useLolViewData } from '@/games/lol/hooks/useLolViewData.ts';
 import { useSaveLolView } from '@/games/lol/hooks/useSaveLolView.ts';
+import { riotIdKey } from '@/games/lol/model/riot-id.ts';
 import { LolLadder } from './lol-ladder.tsx';
 import { EditLolView } from './actions/edit-lol-view.tsx';
 import '@/features/views/components/shared/empty-state.css';
@@ -20,7 +21,10 @@ export function LolViewDetail() {
   const { isValid, isLoading, viewName, players, cachedPlayers } = useLolViewData(viewId);
   const sync = useSyncView(viewId);
   const { isOwner } = useView(viewId);
-  const { isSaving, save } = useSaveLolView(viewId, viewName);
+  const riotIds = players.map((p) => ({ name: p.summonerName, tag: p.summonerTag }));
+  const { isSaving, pending, save } = useSaveLolView(viewId, viewName, riotIds);
+  const pendingKeys = new Set(pending.map(riotIdKey));
+  const ladderPlayers = players.filter((_, i) => !pendingKeys.has(riotIdKey(riotIds[i])));
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
@@ -51,7 +55,7 @@ export function LolViewDetail() {
           }
         />
 
-        {players.length === 0 ? (
+        {players.length === 0 && pending.length === 0 ? (
           <div className="empty-state">
             <h3 className="empty-title">No players in this ladder</h3>
             {isOwner && (
@@ -62,8 +66,9 @@ export function LolViewDetail() {
           </div>
         ) : (
           <LolLadder
-            players={players}
+            players={ladderPlayers}
             cachedPlayers={cachedPlayers}
+            pending={pending}
             queue={queue}
             onQueueChange={(next) => setSearchParams({ queue: next }, { replace: true })}
           />
@@ -71,11 +76,7 @@ export function LolViewDetail() {
       </div>
 
       {isEditOpen && (
-        <EditLolView
-          players={players.map((p) => ({ name: p.summonerName, tag: p.summonerTag }))}
-          onClose={() => setIsEditOpen(false)}
-          onSave={save}
-        />
+        <EditLolView players={riotIds} onClose={() => setIsEditOpen(false)} onSave={save} />
       )}
     </div>
   );

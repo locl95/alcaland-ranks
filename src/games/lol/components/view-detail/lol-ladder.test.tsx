@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { League, LolMatch, LolPlayer } from '@/games/lol/api/lol-types.ts';
+import { PendingPlayer } from '@/games/lol/hooks/useSaveLolView.ts';
 import { LolLadder } from './lol-ladder.tsx';
 
 vi.mock('@/games/lol/api/data-dragon.ts', () => ({
@@ -59,12 +60,17 @@ const players = [
   player('NoRanked'),
 ];
 
-const renderLadder = (queue: 'solo' | 'flex' = 'solo', onQueueChange = vi.fn()) => {
+const renderLadder = (
+  queue: 'solo' | 'flex' = 'solo',
+  onQueueChange = vi.fn(),
+  pending: PendingPlayer[] = [],
+) => {
   render(
     <QueryClientProvider client={new QueryClient()}>
       <LolLadder
         players={players}
         cachedPlayers={[player('Goldie', league('GOLD', 'II', 80))]}
+        pending={pending}
         queue={queue}
         onQueueChange={onQueueChange}
       />
@@ -156,6 +162,18 @@ describe('LolLadder', () => {
   it('shows each player’s recent form', () => {
     renderLadder();
     expect(screen.getByRole('img', { name: 'Last 1 games: 1 wins, 0 losses' })).toBeInTheDocument();
+  });
+
+  it('lists players being added or removed at the bottom, without stats', () => {
+    renderLadder('solo', vi.fn(), [
+      { name: 'Chovy', tag: 'KR2', status: 'syncing' },
+      { name: 'Caps', tag: 'EUW', status: 'deleting' },
+    ]);
+
+    const rows = screen.getAllByRole('row').slice(-2);
+    expect(rows[0]).toHaveTextContent('Chovy#KR2Syncing…');
+    expect(rows[1]).toHaveTextContent('Caps#EUWDeleting…');
+    expect(within(rows[0]).queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('does not let an unranked player expand', () => {

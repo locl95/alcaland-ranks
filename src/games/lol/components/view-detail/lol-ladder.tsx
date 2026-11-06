@@ -10,7 +10,9 @@ import {
   SortKey,
   sortLadder,
 } from '@/games/lol/model/ladder.ts';
+import { PendingPlayer } from '@/games/lol/hooks/useSaveLolView.ts';
 import { LolLadderRow } from './lol-ladder-row.tsx';
+import { LolPendingRow } from './lol-pending-row.tsx';
 import './lol-ladder.css';
 
 const COLUMNS: { label: string; sortKey?: SortKey; className?: string }[] = [
@@ -26,6 +28,7 @@ const COLUMNS: { label: string; sortKey?: SortKey; className?: string }[] = [
 interface LolLadderProps {
   players: LolPlayer[];
   cachedPlayers: LolPlayer[];
+  pending: PendingPlayer[];
   queue: Queue;
   onQueueChange: (queue: Queue) => void;
 }
@@ -33,6 +36,7 @@ interface LolLadderProps {
 export function LolLadder({
   players,
   cachedPlayers,
+  pending,
   queue,
   onQueueChange,
 }: Readonly<LolLadderProps>) {
@@ -151,9 +155,14 @@ export function LolLadder({
                 dataDragonVersion={dataDragonVersion}
               />
             ))}
+            {pending.map((player) => (
+              <LolPendingRow key={`${player.name}#${player.tag}`} player={player} />
+            ))}
           </tbody>
         </table>
-        {visibleEntries.length === 0 && <p className="lol-no-results">No players match.</p>}
+        {visibleEntries.length === 0 && pending.length === 0 && (
+          <p className="lol-no-results">No players match.</p>
+        )}
       </div>
     </div>
   );
