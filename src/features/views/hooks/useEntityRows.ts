@@ -76,10 +76,11 @@ export function useEntityRows<F extends object>({
 
   const addedRows = rows.filter(isAdded);
   const notFoundRows = rows.filter((r) => r.status === 'invalid');
-  const isReady =
-    addedRows.length > 0 &&
-    notFoundRows.length === 0 &&
-    !rows.some((r) => r.status === 'checking' || (r.status === 'draft' && !isBlank(r)));
+  /** A row is still being verified, or has been typed but not added. */
+  const hasUnfinishedRows = rows.some(
+    (r) => r.status === 'checking' || (r.status === 'draft' && !isBlank(r)),
+  );
+  const isReady = addedRows.length > 0 && notFoundRows.length === 0 && !hasUnfinishedRows;
 
   return {
     rows,
@@ -90,6 +91,9 @@ export function useEntityRows<F extends object>({
     addedRows,
     notFoundRows,
     duplicate,
+    hasUnfinishedRows,
     isReady,
   };
 }
+
+export type EntityRows<F extends object> = ReturnType<typeof useEntityRows<F>>;

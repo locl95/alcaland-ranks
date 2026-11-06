@@ -69,9 +69,10 @@ A game's URL slug and the name the backend expects in `?game=` can differ
   - `userRequest` / `userRequestVoid` — user JWT, with 401 refresh + request queueing
 - `src/features/views/hooks/` and `src/games/<game>/hooks/` — one hook per **screen
   concern** (`useViewsData`, `useSyncView`; WoW: `useViewDetail`, `useCreateViewForm`,
-  `useEditViewForm`, `useStaticData`; LoL: `useLolViewData`, `useCreateLolViewForm`;
-  Forever: `useForeverViewData`, `useCreateForeverViewForm`, `useEditForeverViewForm`).
-  Saving a ladder edit is shared: `useSaveEntities`.
+  `useEditViewForm`, `useStaticData`; LoL: `useCreateLolViewForm`, `useEditLolViewForm`;
+  Forever: `useCreateForeverViewForm`, `useEditForeverViewForm`). Shared by every game
+  but WoW: `useLadderData` (a ladder's rows and snapshot) and `useEditEntitiesForm` (the
+  edit dialog). Saving a ladder edit is shared by all: `useSaveEntities`.
 - `src/features/views/components/shared/` — cross-screen UI parts and their mechanics
   (`verification-badge`, `pager`, `dialog.css` / `dialog.ts`, `form-controls.css`,
   `empty-state.css`). Not in `hooks/`, which is reserved for screen concerns.

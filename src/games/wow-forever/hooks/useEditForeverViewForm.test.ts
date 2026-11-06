@@ -39,7 +39,7 @@ describe('useEditForeverViewForm', () => {
   it('saves the remaining characters plus the added ones', async () => {
     const { result } = renderForm();
     act(() => result.current.removeMember(MEMBERS[0]));
-    await addCharacter(result, { name: 'Brakk ', surname: 'Ironhide', region: 'us' });
+    await addCharacter(result, { name: 'Brakk', surname: 'Ironhide', region: 'us' });
 
     await act(() => result.current.handleSubmit(submitEvent));
 

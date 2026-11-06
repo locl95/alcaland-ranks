@@ -1,8 +1,11 @@
 import { FormEvent, useState } from 'react';
 import { View } from '@/features/views/model/view.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
-import { ApiError } from '@/shared/api/ApiError.ts';
-import { formatDuplicateMessage, formatNotFoundMessage } from '@/features/views/utils.ts';
+import {
+  formatDuplicateMessage,
+  formatLimitError,
+  formatNotFoundMessage,
+} from '@/features/views/utils.ts';
 import {
   CharacterRef,
   formatCharacterName,
@@ -10,11 +13,6 @@ import {
 } from '@/games/wow-forever/model/character.ts';
 import { toEntityRequest } from '@/games/wow-forever/api/forever-entity-api.ts';
 import { useCharacterRows } from '@/games/wow-forever/hooks/useCharacterRows.ts';
-
-const LIMIT_ERRORS: Record<string, string> = {
-  TOO_MANY_VIEWS: "You've reached the maximum number of ladders.",
-  TOO_MANY_ENTITIES: 'This ladder has more characters than allowed.',
-};
 
 export function useCreateForeverViewForm(onClose: () => void, onCreateView: (view: View) => void) {
   const [name, setName] = useState('');
@@ -72,8 +70,9 @@ export function useCreateForeverViewForm(onClose: () => void, onCreateView: (vie
 
       onClose();
     } catch (err) {
-      const limitError = err instanceof ApiError && err.code ? LIMIT_ERRORS[err.code] : undefined;
-      setSubmitError(limitError ?? 'Failed to create ladder. Please try again.');
+      setSubmitError(
+        formatLimitError(err, 'characters') ?? 'Failed to create ladder. Please try again.',
+      );
     } finally {
       setIsSubmitting(false);
     }

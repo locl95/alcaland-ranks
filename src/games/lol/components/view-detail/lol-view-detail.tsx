@@ -5,7 +5,7 @@ import { useSyncView } from '@/features/views/hooks/useSyncView.ts';
 import { useView } from '@/features/views/hooks/useView.ts';
 import { ViewDetailHeader } from '@/features/views/components/view-detail/view-detail-header.tsx';
 import { LolPlayer, Queue } from '@/games/lol/api/lol-types.ts';
-import { useLolViewData } from '@/games/lol/hooks/useLolViewData.ts';
+import { useLadderData } from '@/features/views/hooks/useLadderData.ts';
 import { useSaveEntities } from '@/features/views/hooks/useSaveEntities.ts';
 import { SyncErrorDialog } from '@/features/views/components/shared/sync-error-dialog.tsx';
 import { riotIdKey } from '@/games/lol/model/riot-id.ts';
@@ -21,7 +21,13 @@ export function LolViewDetail() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queue: Queue = searchParams.get('queue') === 'flex' ? 'flex' : 'solo';
 
-  const { isValid, isLoading, viewName, players, cachedPlayers } = useLolViewData(viewId);
+  const {
+    isValid,
+    isLoading,
+    viewName,
+    rows: players,
+    cachedRows: cachedPlayers,
+  } = useLadderData<LolPlayer>(viewId);
   const sync = useSyncView(viewId);
   const { isOwner } = useView(viewId);
   const riotIds = players.map(toRiotId);

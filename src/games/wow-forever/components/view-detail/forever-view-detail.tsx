@@ -8,7 +8,7 @@ import { ViewDetailHeader } from '@/features/views/components/view-detail/view-d
 import { SyncErrorDialog } from '@/features/views/components/shared/sync-error-dialog.tsx';
 import { ForeverCharacter } from '@/games/wow-forever/api/forever-types.ts';
 import { toEntityRequest } from '@/games/wow-forever/api/forever-entity-api.ts';
-import { useForeverViewData } from '@/games/wow-forever/hooks/useForeverViewData.ts';
+import { useLadderData } from '@/features/views/hooks/useLadderData.ts';
 import {
   CharacterRef,
   characterKey,
@@ -29,7 +29,13 @@ const toRef = ({ name, surname, region }: ForeverCharacter): CharacterRef => ({
 export function ForeverViewDetail() {
   const { viewId } = useParams();
   const navigate = useNavigate();
-  const { isValid, isLoading, viewName, characters, cachedCharacters } = useForeverViewData(viewId);
+  const {
+    isValid,
+    isLoading,
+    viewName,
+    rows: characters,
+    cachedRows: cachedCharacters,
+  } = useLadderData<ForeverCharacter>(viewId);
   const sync = useSyncView(viewId);
   const { isOwner } = useView(viewId);
   const { isSaving, pending, failed, save, clearFailed } = useSaveEntities(

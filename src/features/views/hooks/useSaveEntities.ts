@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { userRequest } from '@/shared/api/httpClient.ts';
-import { ApiError } from '@/shared/api/ApiError.ts';
 import { useToast } from '@/shared/components/toaster/toast.ts';
 import { Game } from '@/features/views/api/view-types.ts';
+import { formatLimitError } from '@/features/views/utils.ts';
 import { fetchViewData, pollOperation, viewKeys } from '@/features/views/api/viewQueries.ts';
 
 export type EntityStatus = 'syncing' | 'deleting';
@@ -63,9 +63,7 @@ export function useSaveEntities<D, E>(
         game,
       }));
     } catch (err) {
-      return err instanceof ApiError && err.code === 'TOO_MANY_ENTITIES'
-        ? `This ladder has more ${noun} than allowed.`
-        : SAVE_FAILED;
+      return formatLimitError(err, noun) ?? SAVE_FAILED;
     }
 
     setPending([

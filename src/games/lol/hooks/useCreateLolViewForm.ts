@@ -1,15 +1,13 @@
 import { FormEvent, useState } from 'react';
 import { View } from '@/features/views/model/view.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
-import { ApiError } from '@/shared/api/ApiError.ts';
-import { formatDuplicateMessage, formatNotFoundMessage } from '@/features/views/utils.ts';
+import {
+  formatDuplicateMessage,
+  formatLimitError,
+  formatNotFoundMessage,
+} from '@/features/views/utils.ts';
 import { NOT_FOUND_HINT, parseRiotId } from '@/games/lol/model/riot-id.ts';
 import { useRiotIdRows } from '@/games/lol/hooks/useRiotIdRows.ts';
-
-const LIMIT_ERRORS: Record<string, string> = {
-  TOO_MANY_VIEWS: "You've reached the maximum number of ladders.",
-  TOO_MANY_ENTITIES: 'This ladder has more players than allowed.',
-};
 
 export function useCreateLolViewForm(onClose: () => void, onCreateView: (view: View) => void) {
   const [name, setName] = useState('');
@@ -66,8 +64,9 @@ export function useCreateLolViewForm(onClose: () => void, onCreateView: (view: V
 
       onClose();
     } catch (err) {
-      const limitError = err instanceof ApiError && err.code ? LIMIT_ERRORS[err.code] : undefined;
-      setSubmitError(limitError ?? 'Failed to create ladder. Please try again.');
+      setSubmitError(
+        formatLimitError(err, 'players') ?? 'Failed to create ladder. Please try again.',
+      );
     } finally {
       setIsSubmitting(false);
     }
