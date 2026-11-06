@@ -2,9 +2,9 @@ import './character-run.css';
 import { useState } from 'react';
 import { Crown } from 'lucide-react';
 import { MythicPlusBestRun, WowProfile, formatClearTime } from '@/games/wow/api/wow-types.ts';
-import { formatTimeDelta, getClassSlug } from '@/games/wow/utils.ts';
+import { formatTimeDelta } from '@/games/wow/utils.ts';
 import { KEYSTONE_DISPLAY } from '@/games/wow/constants/keystone.ts';
-import { CLASS_TEXT_COLORS } from '@/games/wow/constants/class-colors.ts';
+import { CLASS_TEXT_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
 import { SPEC_IMAGES, getSpecImageKey } from '@/games/wow/assets/spec-images.ts';
 import { RunDetailsPanel } from './run-details-panel.tsx';
 

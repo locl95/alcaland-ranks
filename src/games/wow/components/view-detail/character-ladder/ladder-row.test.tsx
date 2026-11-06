@@ -12,7 +12,7 @@ vi.mock('./ladder-row-expanded.tsx', () => ({
   LadderRowExpanded: () => <div data-testid="ladder-row-expanded" />,
 }));
 
-vi.mock('@/games/wow/assets/class-images.ts', () => ({
+vi.mock('@/shared/warcraft/class-images.ts', () => ({
   CLASS_IMAGES: {} as Record<string, string>,
   getClassImageKey: () => 'warrior',
 }));

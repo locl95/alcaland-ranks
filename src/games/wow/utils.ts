@@ -17,9 +17,6 @@ export const toRealmLabel = (slug: string, region: string): string => {
   return realms.find((r) => r.slug === slug)?.label ?? slug;
 };
 
-export const getClassSlug = (className: string): string =>
-  className.toLowerCase().replace(/\s+/g, '-');
-
 /** Identifies a character whether its realm is a display name or a slug. */
 export const characterKey = (c: { name: string; realm: string; region: string }): string =>
   entityKey({ name: c.name, region: c.region, realm: toRealmSlug(c.realm, c.region) });

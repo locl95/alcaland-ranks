@@ -7,8 +7,9 @@ import { PendingStatus } from '@/features/views/components/shared/pending-status
 import { CharacterMenu } from './character-menu.tsx';
 import { LadderRowExpanded } from './ladder-row-expanded.tsx';
 
-import { getClassSlug, getScoreClass, getScoreTier } from '@/games/wow/utils.ts';
-import { CLASS_IMAGES, getClassImageKey } from '@/games/wow/assets/class-images.ts';
+import { getScoreClass, getScoreTier } from '@/games/wow/utils.ts';
+import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.ts';
+import { getClassSlug } from '@/shared/warcraft/class-colors.ts';
 import { RACE_IMAGES, getRaceImageKey } from '@/games/wow/assets/race-images.ts';
 
 interface LadderRowProps {

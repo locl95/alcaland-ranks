@@ -1,3 +1,7 @@
+/** "Death Knight" → "death-knight", the key of the class colour maps. */
+export const getClassSlug = (className: string): string =>
+  className.toLowerCase().replace(/\s+/g, '-');
+
 export const CLASS_COLORS: Record<string, string> = {
   warrior: '#d97706',
   paladin: '#ec4899',

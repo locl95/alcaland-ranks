@@ -1,6 +1,6 @@
 import { WowProfile } from '@/games/wow/api/wow-types.ts';
-import { CLASS_TEXT_COLORS } from '@/games/wow/constants/class-colors.ts';
-import { getClassSlug, getRankChange, formatRankChange } from '@/games/wow/utils.ts';
+import { CLASS_TEXT_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
+import { getRankChange, formatRankChange } from '@/games/wow/utils.ts';
 import './rankings-table.css';
 
 interface RankingsTableProps {
