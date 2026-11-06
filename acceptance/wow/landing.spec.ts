@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { seedAuth } from './mocks/authMocks';
-import { makeSimpleView, mockEntitiesExist, mockOwnViews, mockStaticData } from './mocks/viewMocks';
+import { seedAuth } from '../mocks/authMocks';
+import { makeSimpleView, mockOwnViews } from '../mocks/viewMocks';
+import { mockEntitiesExist, mockStaticData } from './mocks';
 
-import { API, VALID_VIEW_ID } from './constants';
+import { API, VALID_VIEW_ID } from '../constants';
 import { expectListAnchoredToInput, pickRealm } from './helpers';
 
 test.describe('unauthenticated', () => {

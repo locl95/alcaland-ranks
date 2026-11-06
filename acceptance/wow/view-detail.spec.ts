@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { seedAuth } from './mocks/authMocks';
-import { makeSimpleView, mockEntitiesExist, mockOwnViews } from './mocks/viewMocks';
-import { mockCharacter, mockSeason } from './mocks/wowMocks';
+import { seedAuth } from '../mocks/authMocks';
+import { makeSimpleView, mockOwnViews } from '../mocks/viewMocks';
+import { mockCharacter, mockEntitiesExist, mockSeason } from './mocks';
 
-import { API, VALID_VIEW_ID } from './constants';
-import { expectListAnchoredToInput, pickRealm, wheelBackground } from './helpers';
-import { ViewData } from '../src/games/wow/api/wow-types';
+import { API, VALID_VIEW_ID } from '../constants';
+import { wheelBackground } from '../helpers';
+import { expectListAnchoredToInput, pickRealm } from './helpers';
+import { ViewData } from '../../src/games/wow/api/wow-types';
 
 const viewData: ViewData = { data: [mockCharacter], viewName: 'My Ladder' };
 const emptyViewData: ViewData = { data: [], viewName: 'My Ladder' };

@@ -1,7 +1,6 @@
 import { Page, Route } from '@playwright/test';
 import { Game, SimpleView } from '@/features/views/api/view-types';
 import { API } from '../constants';
-import { mockSeason } from './wowMocks';
 
 export function makeSimpleView(
   id: string,
@@ -21,10 +20,6 @@ export function makeSimpleView(
   };
 }
 
-export async function mockStaticData(page: Page) {
-  await page.route(`${API}/sources/wow/static`, (route) => route.fulfill({ json: mockSeason }));
-}
-
 function fulfillPage(route: Route, views: SimpleView[]) {
   const params = new URL(route.request().url()).searchParams;
   const page = Number(params.get('page') ?? 1);
@@ -40,19 +35,4 @@ function fulfillPage(route: Route, views: SimpleView[]) {
 
 export async function mockOwnViews(page: Page, views: SimpleView[] = [], game = 'wow') {
   await page.route(`${API}/views?game=${game}&page=*`, (route) => fulfillPage(route, views));
-}
-
-export async function mockEntitiesExist(page: Page) {
-  await page.route(`${API}/entities/exists`, async (route) => {
-    const { entities } = route.request().postDataJSON() as {
-      entities: { name: string; region: string; realm: string }[];
-    };
-    await route.fulfill({
-      json: {
-        exist: entities.map(({ name, region, realm }) => ({ name, region, realm })),
-        nonExisting: [],
-        unchecked: [],
-      },
-    });
-  });
 }

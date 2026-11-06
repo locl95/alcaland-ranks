@@ -1,4 +1,6 @@
+import { Page } from '@playwright/test';
 import { WowProfile, Season } from '@/games/wow/api/wow-types';
+import { API } from '../constants';
 
 export const mockCharacter: WowProfile = {
   id: 1,
@@ -35,3 +37,22 @@ export const mockSeason: Season = {
     },
   ],
 };
+
+export async function mockStaticData(page: Page) {
+  await page.route(`${API}/sources/wow/static`, (route) => route.fulfill({ json: mockSeason }));
+}
+
+export async function mockEntitiesExist(page: Page) {
+  await page.route(`${API}/entities/exists`, async (route) => {
+    const { entities } = route.request().postDataJSON() as {
+      entities: { name: string; region: string; realm: string }[];
+    };
+    await route.fulfill({
+      json: {
+        exist: entities.map(({ name, region, realm }) => ({ name, region, realm })),
+        nonExisting: [],
+        unchecked: [],
+      },
+    });
+  });
+}
