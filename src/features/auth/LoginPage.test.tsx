@@ -72,33 +72,26 @@ describe('LoginPage', () => {
     navMock.from = '/';
   });
 
-  it('disables submit when fields are empty', () => {
+  it('enables submit only once both fields are filled', async () => {
     renderPage();
-    expect(screen.getByRole('button', { name: 'Sign in' })).toBeDisabled();
-  });
+    const submit = screen.getByRole('button', { name: 'Sign in' });
+    expect(submit).toBeDisabled();
 
-  it('enables submit when both fields are filled', async () => {
-    renderPage();
     await userEvent.type(screen.getByLabelText('Username'), 'xavier');
+    expect(submit).toBeDisabled();
+
     await userEvent.type(screen.getByLabelText('Password'), 'secret');
-    expect(screen.getByRole('button', { name: 'Sign in' })).not.toBeDisabled();
+    expect(submit).not.toBeDisabled();
   });
 
-  it('calls login with username and password on submit', async () => {
-    renderPage();
-    await userEvent.type(screen.getByLabelText('Username'), 'xavier');
-    await userEvent.type(screen.getByLabelText('Password'), 'secret');
-    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
-    expect(authMocks.login).toHaveBeenCalledWith('xavier', 'secret');
-  });
-
-  it('dispatches setTokens and navigates on success', async () => {
+  it('logs in, stores the tokens and navigates on success', async () => {
     const { store } = renderPage();
     await userEvent.type(screen.getByLabelText('Username'), 'xavier');
     await userEvent.type(screen.getByLabelText('Password'), 'secret');
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
     await waitFor(() => expect(navMock.navigate).toHaveBeenCalledWith('/', { replace: true }));
+    expect(authMocks.login).toHaveBeenCalledWith('xavier', 'secret');
     expect(store.getState().auth.accessToken).toBe('acc');
   });
 

@@ -3,11 +3,18 @@ export interface ViewExtraArguments {
   isGuild: boolean;
 }
 
+export interface ViewDataResponse<T> {
+  viewName: string;
+  data: T[];
+}
+
 export interface ViewMetadata {
   totalCount?: number | null;
 }
 
-export type Game = 'WOW';
+export type Game = 'WOW' | 'LOL';
+
+export type VerifyResult = 'valid' | 'invalid' | 'unverified';
 
 export interface SimpleView {
   id: string;
@@ -52,5 +59,4 @@ export interface OperationResult {
   id: string;
   status: OperationStatus;
   resourceId?: string;
-  reason?: string;
 }

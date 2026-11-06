@@ -44,6 +44,26 @@ describe('serviceGet', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeResponse(404)));
     await expect(serviceGet('/missing')).rejects.toBeInstanceOf(ApiError);
   });
+
+  it('reads the problem code from the error body', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(makeResponse(400, { status: 400, code: 'TOO_MANY_VIEWS' })),
+    );
+    await expect(serviceGet('/views')).rejects.toMatchObject({
+      statusCode: 400,
+      code: 'TOO_MANY_VIEWS',
+    });
+  });
+
+  it('leaves the code undefined when the error has no body', async () => {
+    const emptyBody = { ...makeResponse(404), json: () => Promise.reject(new SyntaxError()) };
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(emptyBody));
+    await expect(serviceGet('/missing')).rejects.toMatchObject({
+      statusCode: 404,
+      code: undefined,
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------

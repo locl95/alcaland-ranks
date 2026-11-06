@@ -12,13 +12,22 @@
 .toast {
   padding: 0.75rem 1rem;
   background: var(--panel-2);
-  border: 1px solid var(--danger-edge);
-  border-left: 3px solid var(--danger);
   border-radius: var(--rad-md);
-  color: #ff9b9b;
   font-size: 0.875rem;
   max-width: 22rem;
   cursor: pointer;
   pointer-events: auto;
   box-shadow: var(--lift);
+}
+
+.toast--error {
+  border: 1px solid var(--danger-edge);
+  border-left: 3px solid var(--danger);
+  color: #ff9b9b;
+}
+
+.toast--info {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--gold);
+  color: var(--ink);
 }

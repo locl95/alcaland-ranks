@@ -1,0 +1,172 @@
+/* Header is a three-column grid so the title stays optically centred, but the
+   columns are sized to content instead of 1fr/auto/1fr, which left a wide
+   empty band either side of the title on desktop. */
+.view-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.header-back-button {
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rad-md);
+  flex-shrink: 0;
+  transition:
+    color var(--motion-base),
+    background var(--motion-base),
+    border-color var(--motion-base);
+}
+
+.header-back-button:hover {
+  color: var(--ink);
+  background: var(--panel-2);
+  border-color: var(--ink-4);
+}
+
+.header-view-title {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  line-height: 1.1;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.header-actions-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-last-synced {
+  font-size: 0.6875rem;
+  color: var(--ink-4);
+  line-height: 1;
+}
+
+.header-sync-button,
+.header-edit-button {
+  padding: 0.5rem 0.875rem;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  border-radius: var(--rad-md);
+  transition:
+    color var(--motion-base),
+    background var(--motion-base),
+    border-color var(--motion-base);
+}
+
+.header-sync-button:hover:not(:disabled),
+.header-edit-button:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--panel-2);
+  border-color: var(--ink-4);
+}
+
+.header-sync-button:disabled,
+.header-edit-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.header-edit-button.active {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.35);
+  color: var(--up);
+}
+
+.header-button-text {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.header-icon {
+  width: 1.0625rem;
+  height: 1.0625rem;
+}
+
+@media (max-width: 640px) {
+  .view-detail-header {
+    gap: 0.625rem;
+    padding-bottom: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  .header-view-title {
+    font-size: 1.25rem;
+  }
+
+  .header-back-button,
+  .header-edit-button,
+  .header-sync-button {
+    padding: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .header-last-synced {
+    display: none;
+  }
+
+  /* Hidden from the eye, kept for the ear. `display: none` here left Sync and Edit with
+     no accessible name at all on a phone — they are icon-only, and neither carries an
+     aria-label. Clipping instead keeps each button's name tied to its own label, which
+     for Sync is a moving target: "Syncing..." or the countdown. */
+  .header-button-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .header-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}

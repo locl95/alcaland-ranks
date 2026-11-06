@@ -1,17 +1,22 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/shared/components/toaster/toast.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
 import { View } from '@/features/views/model/view.ts';
 import { Pagination } from '@/features/views/components/shared/pager.tsx';
+import { GameSlug } from '@/shared/game/game.ts';
 import {
   viewKeys,
-  fetchViews,
   fetchOwnViews,
   pollOperation,
   ViewsPage,
   VIEWS_PAGE_SIZE,
 } from '@/features/views/api/viewQueries.ts';
+
+const GUILD_POLL_INTERVAL_MS = 5000;
+const GUILD_MAX_POLL_ATTEMPTS = 12;
+const BACKGROUND_POLL_INTERVAL_MS = 15000;
+const BACKGROUND_MAX_POLL_ATTEMPTS = 20;
 
 function usePagedViews(
   keyForPage: (page: number) => readonly unknown[],
@@ -20,7 +25,7 @@ function usePagedViews(
 ) {
   const [requestedPage, setRequestedPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
+  const { data: queryData, isLoading } = useQuery({
     queryKey: keyForPage(requestedPage),
     queryFn: () => fetchPage(requestedPage),
     enabled,
@@ -29,6 +34,8 @@ function usePagedViews(
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
+
+  const data = enabled ? queryData : undefined;
 
   const knownTotal = data?.totalCount ?? null;
   const loadedCount = data?.views.length ?? 0;
@@ -63,72 +70,122 @@ function usePagedViews(
   return { views: data?.views ?? [], isLoading, pagination };
 }
 
-export function useViewsData(isAuthenticated: boolean) {
+export function useViewsData(isAuthenticated: boolean, game: GameSlug) {
   const queryClient = useQueryClient();
-  const { showError } = useToast();
+  const { showError, showInfo } = useToast();
   const [pendingViews, setPendingViews] = useState<View[]>([]);
+  const [incompleteViewIds, setIncompleteViewIds] = useState<Set<string>>(new Set());
   const [deletingViewId, setDeletingViewId] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [wasAuthenticated, setWasAuthenticated] = useState(isAuthenticated);
 
-  const {
-    views: featuredViews,
-    isLoading: isLoadingFeatured,
-    pagination: featuredPagination,
-  } = usePagedViews(viewKeys.listPage, fetchViews, true);
+  if (wasAuthenticated !== isAuthenticated) {
+    setWasAuthenticated(isAuthenticated);
+    if (!isAuthenticated) {
+      setPendingViews([]);
+      setIncompleteViewIds(new Set());
+      setCreateError(null);
+    }
+  }
+
+  const sessionAbortController = useRef(new AbortController());
+  useEffect(() => {
+    if (isAuthenticated) return;
+    sessionAbortController.current.abort();
+    sessionAbortController.current = new AbortController();
+  }, [isAuthenticated]);
 
   const {
     views: serverOwnViews,
     isLoading: isLoadingOwn,
     pagination: ownPagination,
-  } = usePagedViews(viewKeys.ownListPage, fetchOwnViews, isAuthenticated);
+  } = usePagedViews(
+    (page) => viewKeys.ownListPage(game, page),
+    (page) => fetchOwnViews(game, page),
+    isAuthenticated,
+  );
 
   const ownViews = useMemo(() => {
     const serverIds = new Set(serverOwnViews.map((v) => v.simpleView.id));
     const stillPending = pendingViews.filter((v) => !serverIds.has(v.simpleView.id));
-    const all = [...serverOwnViews, ...stillPending];
+    const all = [...serverOwnViews, ...stillPending].map((v) =>
+      incompleteViewIds.has(v.simpleView.id) ? { ...v, status: 'incomplete' as const } : v,
+    );
     return deletingViewId
       ? all.map((v) =>
           v.simpleView.id === deletingViewId ? { ...v, status: 'deleting' as const } : v,
         )
       : all;
-  }, [serverOwnViews, pendingViews, deletingViewId]);
+  }, [serverOwnViews, pendingViews, deletingViewId, incompleteViewIds]);
+
+  const removeIncomplete = (viewId: string) =>
+    setIncompleteViewIds((prev) => {
+      const next = new Set(prev);
+      next.delete(viewId);
+      return next;
+    });
+
+  const keepSyncingInBackground = (view: View) => {
+    const { id: viewId, name } = view.simpleView;
+    const { signal } = sessionAbortController.current;
+    setIncompleteViewIds((prev) => new Set(prev).add(viewId));
+
+    pollOperation(view.operationId!, {
+      intervalMs: BACKGROUND_POLL_INTERVAL_MS,
+      maxAttempts: BACKGROUND_MAX_POLL_ATTEMPTS,
+      signal,
+    })
+      .then((result) => {
+        if (result.timedOut || signal.aborted) return;
+        removeIncomplete(viewId);
+        queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+        if (result.status === 'COMPLETED') showInfo(`${name} is ready`);
+        else showError(`${name} failed to sync`);
+      })
+      .catch(() => {});
+  };
 
   const createView = (pendingView: View) => {
     setPendingViews((prev) => [...prev, pendingView]);
 
-    pollOperation(pendingView.operationId!)
+    const removePending = () =>
+      setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
+    const isGuild = pendingView.simpleView.extraArguments?.isGuild ?? false;
+    const { signal } = sessionAbortController.current;
+    const operation = isGuild
+      ? pollOperation(pendingView.operationId!, {
+          intervalMs: GUILD_POLL_INTERVAL_MS,
+          maxAttempts: GUILD_MAX_POLL_ATTEMPTS,
+          signal,
+        })
+      : pollOperation(pendingView.operationId!, { signal });
+
+    operation
       .then((result) => {
-        if (result.status === 'COMPLETED' && result.resourceId) {
-          setPendingViews((prev) =>
-            prev.map((v) =>
-              v.operationId === pendingView.operationId
-                ? { ...v, simpleView: { ...v.simpleView, id: result.resourceId! } }
-                : v,
-            ),
-          );
-          queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
-        } else {
-          setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
-          if (result.status === 'COMPLETED') {
-            queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
-          } else {
-            setCreateError('Failed to create ladder. Please try again.');
-          }
+        if (signal.aborted) return;
+        queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
+        if (result.status === 'COMPLETED') return;
+        if (isGuild && result.timedOut) {
+          keepSyncingInBackground(pendingView);
+          return;
         }
+        removePending();
+        setCreateError('Failed to create ladder. Please try again.');
       })
       .catch(() => {
-        setPendingViews((prev) => prev.filter((v) => v.operationId !== pendingView.operationId));
+        removePending();
         queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
       });
   };
 
   const deleteView = async (viewId: string) => {
+    const { signal } = sessionAbortController.current;
     setDeletingViewId(viewId);
     try {
       const { id: operationId } = await userRequest<{ id: string }>('DELETE', `/views/${viewId}`);
-      await pollOperation(operationId);
+      await pollOperation(operationId, { signal });
     } catch {
-      showError('Failed to delete ladder — please try again');
+      if (!signal.aborted) showError('Failed to delete ladder — please try again');
     } finally {
       setDeletingViewId(null);
       queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
@@ -136,9 +193,6 @@ export function useViewsData(isAuthenticated: boolean) {
   };
 
   return {
-    featuredViews,
-    isLoadingFeatured,
-    featuredPagination,
     ownViews,
     isLoadingOwn,
     ownPagination,

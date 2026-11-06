@@ -10,6 +10,11 @@ import { ApiError } from '@/shared/api/ApiError';
 const BASE_URL = `${import.meta.env.VITE_API_HOST}/api`;
 const SERVICE_TOKEN = import.meta.env.VITE_SERVICE_TOKEN;
 
+async function toApiError(response: Response): Promise<ApiError> {
+  const problem = (await response.json().catch(() => null)) as { code?: string } | null;
+  return new ApiError(response.status, response.statusText, problem?.code);
+}
+
 export async function serviceGet<T>(endpoint: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
@@ -19,7 +24,7 @@ export async function serviceGet<T>(endpoint: string, signal?: AbortSignal): Pro
     signal,
   });
 
-  if (!response.ok) throw new ApiError(response.status, response.statusText);
+  if (!response.ok) throw await toApiError(response);
   return response.json() as Promise<T>;
 }
 
@@ -37,7 +42,7 @@ export async function serviceRequest<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  if (!response.ok) throw new ApiError(response.status, response.statusText);
+  if (!response.ok) throw await toApiError(response);
   return response.json() as Promise<T>;
 }
 
@@ -107,11 +112,11 @@ async function sendUserRequest(method: string, endpoint: string, body?: object):
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    if (!retryResponse.ok) throw new ApiError(retryResponse.status, retryResponse.statusText);
+    if (!retryResponse.ok) throw await toApiError(retryResponse);
     return retryResponse;
   }
 
-  if (!response.ok) throw new ApiError(response.status, response.statusText);
+  if (!response.ok) throw await toApiError(response);
   return response;
 }
 

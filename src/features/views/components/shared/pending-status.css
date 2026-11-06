@@ -1,0 +1,26 @@
+.pending-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.pending-status-spinner {
+  width: 1rem;
+  height: 1rem;
+  animation: pending-status-spin 0.8s linear infinite;
+}
+
+@keyframes pending-status-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pending-status-spinner {
+    animation: none;
+  }
+}

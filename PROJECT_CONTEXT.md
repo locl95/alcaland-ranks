@@ -47,6 +47,12 @@ deliberate — see "Dungeon icons" below.
 ## Architecture
 
 Feature-based folders under `src/features/`, with `src/shared/` for cross-cutting code.
+Each game lives in `src/games/<game>/` (`wow`, `lol`) and repeats the same layout:
+`api/` (types and calls), `assets/` (images and the modules that map them),
+`components/` (`landing/`, `view-detail/`), `constants/` (fixed data, no images),
+`hooks/` and `model/` (pure domain logic). `src/features/views/` keeps only what every
+game shares: the ladder list, the detail header, sync, the create-form row logic and
+the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts).
 
 - `src/app/App.tsx` — pure routing shell, no data logic
 - `src/app/App.css` — global layout. The background gradient and footer live in the
@@ -58,20 +64,21 @@ Feature-based folders under `src/features/`, with `src/shared/` for cross-cuttin
 - `src/shared/api/httpClient.ts` — two request tiers:
   - `serviceGet` / `serviceRequest` — service token, public data
   - `userRequest` / `userRequestVoid` — user JWT, with 401 refresh + request queueing
-- `src/features/views/hooks/` — one hook per **screen concern** (`useViewsData`,
-  `useViewDetail`, `useCreateViewForm`, `useEditViewForm`, `useSyncView`, `useStaticData`)
+- `src/features/views/hooks/` and `src/games/<game>/hooks/` — one hook per **screen
+  concern** (`useViewsData`, `useSyncView`; WoW: `useViewDetail`, `useCreateViewForm`,
+  `useEditViewForm`, `useStaticData`; LoL: `useLolViewData`, `useCreateLolViewForm`)
 - `src/features/views/components/shared/` — cross-screen UI parts and their mechanics
-  (`realm-select`, `verification-badge`, `dialog.css` / `dialog.ts`). Not in `hooks/`,
-  which is reserved for screen concerns.
-- `src/features/views/api/viewQueries.ts` — all query keys and fetch functions
+  (`verification-badge`, `pager`, `dialog.css` / `dialog.ts`, `form-controls.css`,
+  `empty-state.css`). Not in `hooks/`, which is reserved for screen concerns.
+- `src/features/views/api/viewQueries.ts` — the shared query keys and fetch functions;
+  game-only ones live in the game's `api/` (e.g. `wowStatic` in `games/wow/api/wow-static.ts`)
 
 ### Query keys
 
 | Key | Notes |
 | --- | --- |
-| `["views", "featured"]` | Service token, public, `staleTime: Infinity` |
 | `["views", "own"]` | User JWT, only when authenticated, cleared on logout |
-| `["view", id]` | User JWT, owner-only. Fetched only when the detail page has no navigation state (entered by URL), to learn `owner` / `isGuild` |
+| `["view", id]` | User JWT, owner-only. The landing seeds it with the clicked `SimpleView`; fetched only when the detail is entered by URL. Read through `useView` for `owner` / `isGuild` |
 | `["viewData", id]` | Live data; polls every 2s while any character has `score === null` |
 | `["viewCachedData", id]` | Previous snapshot, `staleTime: Infinity` |
 | `["wowStatic"]` | Season + dungeon list, `staleTime: Infinity` |
@@ -135,10 +142,11 @@ realm field well inside the animation's duration.
 
 ### Dialog behaviour comes from Radix, not from us
 
-All three modals (`create-view`, `edit-view`, `sync-error-dialog`) are
+Every modal (`create-wow-view`, `edit-view`, `sync-error-dialog`, `create-lol-view`,
+`edit-lol-view`, `matchup-dialog`) is
 `Dialog.Root` → `Dialog.Portal` → `Dialog.Overlay` + `Dialog.Content`. Focus trap, focus
 restore, scroll lock (`react-remove-scroll`), `aria-modal`, Escape and outside-click all
-come from Radix. `dialog.css` is **look only** — it exists so the three cannot drift
+come from Radix. `dialog.css` is **look only** — it exists so they cannot drift
 apart again.
 
 Don't hand-roll `body.style.overflow` or a keydown listener in a dialog. That was the
@@ -259,8 +267,9 @@ this.
 
 ### Ownership
 
-- **featured** — curated public ladders, service token, visible logged out
-- **own** — the user's ladders, user JWT; editing requires `username === view.owner`
+- **own** — the user's ladders, user JWT; editing requires `username === view.owner`. The landing
+  lists only these; logged out it shows a sign-in invitation. (Featured ladders were removed until
+  the backend supports them.)
 
 ## Mythic+ jargon appearing in types
 

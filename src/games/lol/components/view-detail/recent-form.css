@@ -1,0 +1,26 @@
+/* Newest game first, the same order as the expanded match list. */
+.lol-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  vertical-align: middle;
+}
+
+.lol-form-mark {
+  width: 5px;
+  height: 1rem;
+  border-radius: 1px;
+  background: var(--ink-4);
+}
+
+.lol-form-mark--win {
+  background: var(--up);
+}
+
+.lol-form-mark--loss {
+  background: var(--down);
+}
+
+.lol-form-mark--remake {
+  height: 0.375rem;
+}

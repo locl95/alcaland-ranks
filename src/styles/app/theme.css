@@ -85,7 +85,7 @@
 
   /* Semantic */
   --up: #4ade80;
-  --down: #f8717a;
+  --down: #d4767c;
   --gold: #f5b73d;
   --danger: #ef5a5a;
   --danger-soft: rgba(239, 90, 90, 0.09);
@@ -180,7 +180,7 @@ select {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink-4);
+  color: var(--ink-2);
 }
 
 /* Rarity tier colours, applied by getScoreClass. */

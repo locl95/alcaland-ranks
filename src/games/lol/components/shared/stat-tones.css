@@ -1,0 +1,17 @@
+/* Winrate: 50% or more reads as up, below as down. */
+.lol-tone--up {
+  color: var(--up);
+}
+
+.lol-tone--down {
+  color: var(--down);
+}
+
+/* KDA: kept off green and red so it never reads as a win or a loss. */
+.lol-kda--good {
+  color: var(--rarity-rare);
+}
+
+.lol-kda--great {
+  color: var(--rarity-legendary);
+}

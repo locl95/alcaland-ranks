@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { ComponentType, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { viewKeys } from '@/features/views/api/viewQueries.ts';
@@ -15,50 +15,48 @@ import {
 import { useAppSelector } from '@/app/hooks.ts';
 import { selectIsAuthenticated, selectUsername } from '@/app/authSlice.ts';
 import { logout } from '@/features/auth/authApi.ts';
-import { useStaticData } from '@/features/views/hooks/useStaticData.ts';
 import { useViewsData } from '@/features/views/hooks/useViewsData.ts';
-import keystone from '@/assets/keystone.webp';
-import { ViewsList } from './views-list.tsx';
-import { CreateView } from './actions/create-view.tsx';
+import { GameSwitcher } from '@/shared/components/game-switcher.tsx';
+import { useGame } from '@/shared/game/game.ts';
+import { View } from '@/features/views/model/view.ts';
+import { ViewResponse } from '@/features/views/api/view-types.ts';
+import { LadderListCopy, ViewsList } from './views-list.tsx';
 import './views-page.css';
 
-export function ViewsPage() {
+export interface CreateDialogProps {
+  onClose: () => void;
+  onCreateView: (view: View) => void;
+}
+
+interface ViewsPageProps {
+  mark: string;
+  title: string;
+  subtitle?: { label: string; value: string };
+  copy: LadderListCopy;
+  CreateDialog: ComponentType<CreateDialogProps>;
+}
+
+export function ViewsPage({ mark, title, subtitle, copy, CreateDialog }: Readonly<ViewsPageProps>) {
   const navigate = useNavigate();
   const location = useLocation();
+  const game = useGame();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const username = useAppSelector(selectUsername);
 
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'featured' | 'own'>(
-    isAuthenticated ? 'own' : 'featured',
-  );
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setActiveTab('featured');
-    }
-  }, [isAuthenticated]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  const { data: season } = useStaticData();
-
   const {
-    featuredViews,
-    isLoadingFeatured,
-    featuredPagination,
-    ownViews,
-    isLoadingOwn,
-    ownPagination,
+    ownViews: views,
+    isLoadingOwn: isLoadingViews,
+    ownPagination: pagination,
     createView,
     deleteView,
     deletingViewId,
     createError,
     clearCreateError,
-  } = useViewsData(isAuthenticated);
+  } = useViewsData(isAuthenticated, game);
 
-  const views = activeTab === 'featured' ? featuredViews : ownViews;
-  const isLoadingViews = activeTab === 'featured' ? isLoadingFeatured : isLoadingOwn;
-  const pagination = activeTab === 'featured' ? featuredPagination : ownPagination;
   const isSyncing = views.some((v) => v.status === 'pending');
 
   const requireAuth = (action: () => void) => {
@@ -71,39 +69,33 @@ export function ViewsPage() {
 
   const handleViewClick = (viewId: string) => {
     const view = views.find((v) => v.simpleView.id === viewId);
-    navigate(`/${viewId}`, {
-      state: {
-        owner: view?.simpleView.owner,
-        isGuild: view?.simpleView.extraArguments?.isGuild ?? false,
-        entitiesCount: view?.simpleView.entitiesIds.length ?? 0,
-      },
-    });
+    if (view) queryClient.setQueryData<ViewResponse>(viewKeys.detail(viewId), view.simpleView);
+    navigate(`/${game}/${viewId}`);
   };
 
   const handleCreateClick = () => requireAuth(() => setIsCreateDialogOpen(true));
-
-  const handleOwnTabClick = () => requireAuth(() => setActiveTab('own'));
 
   const handleDeleteView = (viewId: string) => requireAuth(() => deleteView(viewId));
 
   const handleLogout = async () => {
     await logout();
     queryClient.removeQueries({ queryKey: viewKeys.ownList() });
-    navigate('/');
+    navigate(`/${game}`);
   };
 
   return (
     <div className="page">
       <div className="page-inner">
+        <GameSwitcher />
         <header className="masthead">
           <div className="masthead-brand">
-            <img src={keystone} alt="" aria-hidden={true} className="masthead-mark" />
+            <img src={mark} alt="" aria-hidden={true} className="masthead-mark" />
             <div className="masthead-lines">
-              <h1 className="masthead-title">Mythic+ ladder tracker</h1>
-              {season?.name && (
+              <h1 className="masthead-title">{title}</h1>
+              {subtitle && (
                 <p className="masthead-season">
-                  <span className="eyebrow">Season</span>
-                  <span className="masthead-season-name">{season.name}</span>
+                  <span className="eyebrow">{subtitle.label}</span>
+                  <span className="masthead-season-name">{subtitle.value}</span>
                 </p>
               )}
             </div>
@@ -154,21 +146,6 @@ export function ViewsPage() {
           </div>
         </header>
 
-        <div className="views-tab-toggle">
-          <button
-            className={`views-tab-btn${activeTab === 'featured' ? ' views-tab-btn--active' : ''}`}
-            onClick={() => setActiveTab('featured')}
-          >
-            Featured
-          </button>
-          <button
-            className={`views-tab-btn${activeTab === 'own' ? ' views-tab-btn--active' : ''}`}
-            onClick={handleOwnTabClick}
-          >
-            Own
-          </button>
-        </div>
-
         {createError && (
           <div className="create-error-banner" role="alert">
             <span>{createError}</span>
@@ -184,7 +161,8 @@ export function ViewsPage() {
 
         <ViewsList
           views={views}
-          activeTab={activeTab}
+          isAuthenticated={isAuthenticated}
+          copy={copy}
           isLoadingViews={isLoadingViews}
           deletingViewId={deletingViewId}
           onViewClick={handleViewClick}
@@ -195,7 +173,7 @@ export function ViewsPage() {
       </div>
 
       {isCreateDialogOpen && (
-        <CreateView onClose={() => setIsCreateDialogOpen(false)} onCreateView={createView} />
+        <CreateDialog onClose={() => setIsCreateDialogOpen(false)} onCreateView={createView} />
       )}
     </div>
   );

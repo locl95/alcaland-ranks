@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '@/app/authSlice.ts';
+import { ToastProvider } from '@/shared/components/toaster/ToastProvider.tsx';
 import { ViewsList } from './views-list.tsx';
 import { View } from '@/features/views/model/view.ts';
 import { SimpleView } from '@/features/views/api/view-types.ts';
@@ -43,6 +44,14 @@ const makeStore = (username: string | null = 'testuser') =>
     },
   });
 
+const COPY = {
+  members: 'Characters',
+  emptyTitle: 'Start your first ladder',
+  emptyText: 'Track the characters you play with.',
+  signedOutTitle: "Track your group's Mythic+ climb",
+  signedOutText: 'Build a ladder from your characters.',
+};
+
 const makePagination = (overrides: Partial<Pagination> = {}): Pagination => ({
   page: 1,
   pageCount: 1,
@@ -61,14 +70,14 @@ const renderList = (
   options: {
     username?: string | null;
     isLoadingViews?: boolean;
-    activeTab?: 'featured' | 'own';
+    isAuthenticated?: boolean;
     pagination?: Pagination;
   } = {},
 ) => {
   const {
     username = 'testuser',
     isLoadingViews = false,
-    activeTab = 'own',
+    isAuthenticated = true,
     pagination = makePagination(),
   } = options;
   const onViewClick = vi.fn();
@@ -77,16 +86,19 @@ const renderList = (
 
   const result = render(
     <Provider store={makeStore(username)}>
-      <ViewsList
-        views={views}
-        activeTab={activeTab}
-        isLoadingViews={isLoadingViews}
-        deletingViewId={null}
-        onViewClick={onViewClick}
-        onCreateView={onCreateView}
-        onDeleteView={onDeleteView}
-        pagination={pagination}
-      />
+      <ToastProvider>
+        <ViewsList
+          views={views}
+          isAuthenticated={isAuthenticated}
+          copy={COPY}
+          isLoadingViews={isLoadingViews}
+          deletingViewId={null}
+          onViewClick={onViewClick}
+          onCreateView={onCreateView}
+          onDeleteView={onDeleteView}
+          pagination={pagination}
+        />
+      </ToastProvider>
     </Provider>,
   );
 
@@ -97,22 +109,17 @@ describe('ViewsList', () => {
   describe('empty state', () => {
     it('invites you to create one when you have no ladders of your own', () => {
       renderList([]);
-      expect(screen.getByText('No ladders yet')).toBeInTheDocument();
+      expect(screen.getByText('Start your first ladder')).toBeInTheDocument();
       expect(screen.getByText('Create your first ladder')).toBeInTheDocument();
     });
 
-    it('explains the featured tab instead of offering to create one', () => {
-      renderList([], { activeTab: 'featured' });
+    it('invites a signed-out visitor to sign in instead', async () => {
+      const { onCreateView } = renderList([], { isAuthenticated: false });
 
-      expect(screen.getByText('No featured ladders right now')).toBeInTheDocument();
-      // Featured ladders are curated, so creating one is not something the
-      // reader can do from here.
+      expect(screen.getByText("Track your group's Mythic+ climb")).toBeInTheDocument();
       expect(screen.queryByText('Create your first ladder')).not.toBeInTheDocument();
-    });
 
-    it('calls onCreateView when clicking the create button in empty state', async () => {
-      const { onCreateView } = renderList([]);
-      await userEvent.click(screen.getByText('Create your first ladder'));
+      await userEvent.click(screen.getByText('Sign in to get started'));
       expect(onCreateView).toHaveBeenCalledOnce();
     });
 
@@ -152,6 +159,26 @@ describe('ViewsList', () => {
       const { onViewClick } = renderList([makeView('', 'Pending', 'pending')]);
       await userEvent.click(screen.getByText('Pending'));
       expect(onViewClick).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('incomplete views', () => {
+    it('stays clickable', async () => {
+      const { onViewClick } = renderList([makeView('v1', 'Guild Ladder', 'incomplete')]);
+      await userEvent.click(screen.getByText('Guild Ladder'));
+      expect(onViewClick).toHaveBeenCalledWith('v1');
+    });
+
+    it('explains the still-syncing state when the warning is clicked', async () => {
+      const { onViewClick } = renderList([makeView('v1', 'Guild Ladder', 'incomplete')]);
+      await userEvent.click(screen.getByRole('button', { name: 'Still syncing' }));
+      expect(screen.getByRole('status')).toHaveTextContent('Guild Ladder is still syncing');
+      expect(onViewClick).not.toHaveBeenCalled();
+    });
+
+    it('shows no warning on a synced view', () => {
+      renderList([makeView('v1', 'My Ladder')]);
+      expect(screen.queryByRole('button', { name: 'Still syncing' })).not.toBeInTheDocument();
     });
   });
 
