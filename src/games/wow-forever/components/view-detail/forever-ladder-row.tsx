@@ -4,7 +4,7 @@ import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.t
 import { CLASS_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
 import { formatCharacterName } from '@/games/wow-forever/model/character.ts';
 import { LadderEntry } from '@/games/wow-forever/model/ladder.ts';
-import { REGIONS } from '@/games/wow-forever/constants/regions.ts';
+import { regionLabel } from '@/games/wow-forever/constants/regions.ts';
 
 interface ForeverLadderRowProps {
   position: number;
@@ -16,7 +16,6 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
   const [avatarFailed, setAvatarFailed] = useState(false);
   const classIcon = CLASS_IMAGES[getClassImageKey(character.characterClass)];
   const showAvatar = !!character.avatar && !avatarFailed;
-  const region = REGIONS.find((r) => r.value === character.region)?.label ?? character.region;
 
   return (
     <li
@@ -69,7 +68,7 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
           <span className="forever-badge" title="Ruleset">
             {character.ruleset}
           </span>
-          <span className="forever-badge">{region}</span>
+          <span className="forever-badge">{regionLabel(character.region)}</span>
         </div>
       </div>
 

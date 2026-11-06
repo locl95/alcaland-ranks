@@ -236,3 +236,13 @@
     font-size: 1.0625rem;
   }
 }
+
+.forever-portrait--empty {
+  border-radius: var(--rad-sm);
+  background: var(--panel-2);
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.forever-row--pending .forever-row-name {
+  color: var(--ink-3);
+}

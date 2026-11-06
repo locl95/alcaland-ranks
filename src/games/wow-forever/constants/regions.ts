@@ -5,3 +5,6 @@ export const REGIONS = [
   { value: 'kr', label: 'KR' },
   { value: 'tw', label: 'TW' },
 ];
+
+export const regionLabel = (region: string): string =>
+  REGIONS.find((r) => r.value === region.toLowerCase())?.label ?? region.toUpperCase();
