@@ -16,7 +16,7 @@ interface LolLadderRowProps {
 
 export function LolLadderRow({ entry, dataDragonVersion }: Readonly<LolLadderRowProps>) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { player, league, lpChange, standing } = entry;
+  const { player, league, lpChange, standing, standingChange } = entry;
   const riotId = `${player.summonerName}#${player.summonerTag}`;
   const opggUrl = `https://www.op.gg/summoners/euw/${encodeURIComponent(
     `${player.summonerName}-${player.summonerTag}`,
@@ -43,7 +43,16 @@ export function LolLadderRow({ entry, dataDragonVersion }: Readonly<LolLadderRow
         className={league ? 'lol-row lol-row--expandable' : 'lol-row lol-row--unranked'}
         onClick={league ? () => setIsExpanded((prev) => !prev) : undefined}
       >
-        <td className="lol-cell-standing num">{standing ?? '—'}</td>
+        <td className="lol-cell-standing num">
+          {standing ?? '—'}
+          {standingChange !== null && standingChange !== 0 && (
+            <span
+              className={`lol-change lol-standing-change ${standingChange > 0 ? 'lol-change--up' : 'lol-change--down'}`}
+            >
+              {standingChange > 0 ? `↑ ${standingChange}` : `↓ ${Math.abs(standingChange)}`}
+            </span>
+          )}
+        </td>
         <td>
           {league ? (
             <button

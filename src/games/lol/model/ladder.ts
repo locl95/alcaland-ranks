@@ -7,6 +7,7 @@ export interface LadderEntry {
   league: League | null;
   lpChange: number | null;
   standing: number | null;
+  standingChange: number | null;
 }
 
 export type SortKey = 'rank' | 'name' | 'level' | 'change' | 'games' | 'winrate';
@@ -18,6 +19,15 @@ export interface Sort {
 
 const playerKey = (p: LolPlayer) => riotIdKey({ name: p.summonerName, tag: p.summonerTag });
 
+const standingsOf = (players: LolPlayer[], queueKey: (typeof QUEUE_KEYS)[Queue]): number[] =>
+  players
+    .flatMap((p) => p.leagues[queueKey] ?? [])
+    .map(totalLp)
+    .sort((a, b) => b - a);
+
+const standingIn = (standings: number[], league: League): number =>
+  standings.indexOf(totalLp(league)) + 1;
+
 export function buildLadder(
   players: LolPlayer[],
   cachedPlayers: LolPlayer[],
@@ -26,18 +36,22 @@ export function buildLadder(
   const queueKey = QUEUE_KEYS[queue];
   const previous = new Map(cachedPlayers.map((p) => [playerKey(p), p.leagues[queueKey] ?? null]));
 
-  const standings = players
-    .flatMap((p) => p.leagues[queueKey] ?? [])
-    .map(totalLp)
-    .sort((a, b) => b - a);
+  const standings = standingsOf(players, queueKey);
+  const previousStandings = standingsOf(cachedPlayers, queueKey);
 
   return players.map((player) => {
     const league = player.leagues[queueKey] ?? null;
+    const previousLeague = previous.get(playerKey(player)) ?? null;
+    const standing = league && standingIn(standings, league);
     return {
       player,
       league,
-      lpChange: lpChange(league, previous.get(playerKey(player)) ?? null),
-      standing: league && standings.indexOf(totalLp(league)) + 1,
+      lpChange: lpChange(league, previousLeague),
+      standing,
+      standingChange:
+        standing && previousLeague
+          ? standingIn(previousStandings, previousLeague) - standing
+          : null,
     };
   });
 }
