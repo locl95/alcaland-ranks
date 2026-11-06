@@ -26,7 +26,7 @@ export function CreateForeverView({ onClose, onCreateView }: Readonly<CreateDial
         <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content className="dialog-panel dialog-panel--form" aria-describedby={undefined}>
           <div className="dialog-header">
-            <Dialog.Title className="dialog-title">Create new leveling ladder</Dialog.Title>
+            <Dialog.Title className="dialog-title">Create new Forever ladder</Dialog.Title>
             <Dialog.Close className="dialog-close-btn" aria-label="Close">
               <X size={20} />
             </Dialog.Close>
