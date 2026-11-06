@@ -185,23 +185,14 @@ test.describe('League of Legends ladder', () => {
     await expect(dialog).toBeHidden();
   });
 
-  test('the owner edits the ladder, keeping players that have not synced yet', async ({ page }) => {
+  test('the owner removes and adds players', async ({ page }) => {
     let editBody: unknown;
     await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) => {
-      if (route.request().method() === 'PUT') {
-        editBody = route.request().postDataJSON();
-        return route.fulfill({ json: { id: 'edit-op' } });
+      if (route.request().method() !== 'PUT') {
+        return route.fulfill({ json: { owner: 'testuser' } });
       }
-      return route.fulfill({
-        json: {
-          owner: 'testuser',
-          entities: [
-            { id: 1, name: 'Faker', tag: 'EUW', alias: null },
-            { id: 2, name: 'Caps', tag: 'EUW', alias: null },
-            { id: 3, name: 'Rookie', tag: 'EUW', alias: null },
-          ],
-        },
-      });
+      editBody = route.request().postDataJSON();
+      return route.fulfill({ json: { id: 'edit-op' } });
     });
     await page.route(`${API}/operations/edit-op`, (route) =>
       route.fulfill({ json: { id: 'edit-op', status: 'COMPLETED' } }),
@@ -217,7 +208,7 @@ test.describe('League of Legends ladder', () => {
     await page.getByRole('button', { name: 'Edit' }).click();
 
     const dialog = page.getByRole('dialog');
-    await expect(dialog.getByText('Rookie#EUW')).toBeVisible();
+    await expect(dialog.getByText('Faker#EUW')).toBeVisible();
     await dialog.getByRole('button', { name: 'Remove Caps#EUW' }).click();
     await dialog.getByLabel('Riot ID').fill('Chovy#KR2');
     await dialog.getByRole('button', { name: 'Add', exact: true }).click();
@@ -229,7 +220,6 @@ test.describe('League of Legends ladder', () => {
       name: 'Flex Squad',
       entities: [
         { type: 'lol', name: 'Faker', tag: 'EUW' },
-        { type: 'lol', name: 'Rookie', tag: 'EUW' },
         { type: 'lol', name: 'Chovy', tag: 'KR2' },
       ],
       published: true,

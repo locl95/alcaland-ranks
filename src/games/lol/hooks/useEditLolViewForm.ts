@@ -1,6 +1,4 @@
 import { FormEvent, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { fetchView, viewKeys } from '@/features/views/api/viewQueries.ts';
 import { formatDuplicateMessage } from '@/features/views/utils.ts';
 import {
   formatNotFoundMessage,
@@ -11,7 +9,7 @@ import {
 import { useRiotIdRows } from '@/games/lol/hooks/useRiotIdRows.ts';
 
 export function useEditLolViewForm(
-  viewId: string,
+  members: RiotId[],
   onSave: (players: RiotId[]) => Promise<string | null>,
   onClose: () => void,
 ) {
@@ -19,24 +17,10 @@ export function useEditLolViewForm(
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    data: view,
-    isFetching,
-    isError,
-  } = useQuery({
-    queryKey: viewKeys.detail(viewId),
-    queryFn: () => fetchView<RiotId>(viewId),
-    refetchOnMount: 'always',
-    retry: false,
-  });
-
   const { rows, updateRow, verifyRow, removeRow, addedRows, notFoundRows, duplicate } =
     useRiotIdRows();
 
-  const members = isFetching ? null : (view?.entities ?? null);
-  const remaining = (members ?? [])
-    .map(({ name, tag }) => ({ name, tag }))
-    .filter((m) => !removed.has(riotIdKey(m)));
+  const remaining = members.filter((m) => !removed.has(riotIdKey(m)));
   const remainingKeys = new Set(remaining.map(riotIdKey));
 
   const added = addedRows.flatMap((r) => parseRiotId(r.riotId) ?? []);
@@ -54,7 +38,6 @@ export function useEditLolViewForm(
     (r) => r.status === 'checking' || (r.status === 'draft' && !!r.riotId.trim()),
   );
   const canSave =
-    members !== null &&
     !isSubmitting &&
     (removed.size > 0 || added.length > 0) &&
     !hasPendingRows &&
@@ -77,8 +60,7 @@ export function useEditLolViewForm(
   };
 
   return {
-    members: members && remaining,
-    loadFailed: isError,
+    members: remaining,
     rows,
     canSave,
     errorMessage,

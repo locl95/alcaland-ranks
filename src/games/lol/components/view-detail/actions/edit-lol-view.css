@@ -1,8 +1,3 @@
-.edit-lol-status {
-  color: var(--ink-3);
-  font-size: 0.875rem;
-}
-
 .edit-lol-members {
   display: flex;
   flex-direction: column;

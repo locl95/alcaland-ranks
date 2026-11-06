@@ -1,30 +1,23 @@
-import React, { FormEvent } from 'react';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { FormEvent } from 'react';
+import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEditLolViewForm } from './useEditLolViewForm.ts';
 
-const mockUserRequest = vi.fn();
 const mockServiceRequest = vi.fn();
 
 vi.mock('@/shared/api/httpClient.ts', () => ({
-  userRequest: (...args: unknown[]) => mockUserRequest(...args),
   serviceRequest: (...args: unknown[]) => mockServiceRequest(...args),
 }));
 
-const VIEW_ID = '11111111-1111-1111-1111-111111111111';
+const MEMBERS = [
+  { name: 'Faker', tag: 'KR1' },
+  { name: 'Caps', tag: 'EUW' },
+];
 const onSave = vi.fn();
 const onClose = vi.fn();
 const submitEvent = { preventDefault: vi.fn() } as unknown as FormEvent;
 
-const renderForm = () => {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  queryClient.setQueryData(['view', VIEW_ID], { owner: 'testuser' });
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-  return renderHook(() => useEditLolViewForm(VIEW_ID, onSave, onClose), { wrapper });
-};
+const renderForm = () => renderHook(() => useEditLolViewForm(MEMBERS, onSave, onClose));
 
 async function addPlayer(
   result: { current: ReturnType<typeof useEditLolViewForm> },
@@ -38,39 +31,22 @@ async function addPlayer(
 describe('useEditLolViewForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUserRequest.mockResolvedValue({
-      owner: 'testuser',
-      entities: [
-        { id: 1, name: 'Faker', tag: 'KR1', puuid: 'p1', alias: null },
-        { id: 2, name: 'Caps', tag: 'EUW', puuid: 'p2', alias: null },
-      ],
-    });
     mockServiceRequest.mockResolvedValue({ exist: [], nonExisting: [], unchecked: [] });
     onSave.mockResolvedValue(null);
   });
 
-  it('lists the players from the view entities, refetched even when the landing cached the view', async () => {
+  it('lists the current players', () => {
     const { result } = renderForm();
-    expect(result.current.members).toBeNull();
-
-    await waitFor(() =>
-      expect(result.current.members).toEqual([
-        { name: 'Faker', tag: 'KR1' },
-        { name: 'Caps', tag: 'EUW' },
-      ]),
-    );
-    expect(mockUserRequest).toHaveBeenCalledWith('GET', `/views/${VIEW_ID}`);
+    expect(result.current.members).toEqual(MEMBERS);
   });
 
-  it('cannot save until something changed', async () => {
+  it('cannot save until something changed', () => {
     const { result } = renderForm();
-    await waitFor(() => expect(result.current.members).not.toBeNull());
     expect(result.current.canSave).toBe(false);
   });
 
   it('saves the remaining players plus the added ones, then closes', async () => {
     const { result } = renderForm();
-    await waitFor(() => expect(result.current.members).not.toBeNull());
 
     act(() => result.current.removeMember({ name: 'Caps', tag: 'EUW' }));
     await addPlayer(result, 'Chovy#KR2');
@@ -85,7 +61,6 @@ describe('useEditLolViewForm', () => {
 
   it('flags a player that is already in the ladder and blocks saving', async () => {
     const { result } = renderForm();
-    await waitFor(() => expect(result.current.members).not.toBeNull());
 
     await addPlayer(result, 'faker#kr1');
 
@@ -95,7 +70,6 @@ describe('useEditLolViewForm', () => {
 
   it('lets you add back a player you just removed', async () => {
     const { result } = renderForm();
-    await waitFor(() => expect(result.current.members).not.toBeNull());
 
     act(() => result.current.removeMember({ name: 'Caps', tag: 'EUW' }));
     await addPlayer(result, 'Caps#EUW');
@@ -107,7 +81,6 @@ describe('useEditLolViewForm', () => {
   it('keeps the dialog open and shows the error when saving fails', async () => {
     onSave.mockResolvedValue('This ladder has more players than allowed.');
     const { result } = renderForm();
-    await waitFor(() => expect(result.current.members).not.toBeNull());
 
     await addPlayer(result, 'Chovy#KR2');
     await act(async () => result.current.handleSubmit(submitEvent));

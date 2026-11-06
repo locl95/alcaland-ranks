@@ -28,10 +28,9 @@ export interface SimpleView {
   lastSyncedAt?: string | null;
 }
 
-export interface ViewResponse<E = unknown> {
+export interface ViewResponse {
   owner: string;
   extraArguments?: ViewExtraArguments | null;
-  entities?: E[];
 }
 
 export interface GetViewsResponse {

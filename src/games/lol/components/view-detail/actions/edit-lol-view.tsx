@@ -8,15 +8,14 @@ import { RiotIdRow } from '@/games/lol/components/shared/riot-id-row.tsx';
 import './edit-lol-view.css';
 
 interface EditLolViewProps {
-  viewId: string;
+  players: RiotId[];
   onClose: () => void;
   onSave: (players: RiotId[]) => Promise<string | null>;
 }
 
-export function EditLolView({ viewId, onClose, onSave }: Readonly<EditLolViewProps>) {
+export function EditLolView({ players, onClose, onSave }: Readonly<EditLolViewProps>) {
   const {
     members,
-    loadFailed,
     rows,
     canSave,
     errorMessage,
@@ -26,7 +25,7 @@ export function EditLolView({ viewId, onClose, onSave }: Readonly<EditLolViewPro
     verifyRow,
     removeRow,
     handleSubmit,
-  } = useEditLolViewForm(viewId, onSave, onClose);
+  } = useEditLolViewForm(players, onSave, onClose);
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
@@ -44,31 +43,25 @@ export function EditLolView({ viewId, onClose, onSave }: Readonly<EditLolViewPro
             <div className="form-content">
               <div className="form-field">
                 <span className="form-label">Players</span>
-                {members === null ? (
-                  <p className="edit-lol-status">
-                    {loadFailed ? "Couldn't load the players of this ladder." : 'Loading players…'}
-                  </p>
-                ) : (
-                  <ul className="edit-lol-members" aria-label="Players">
-                    {members.map((member) => {
-                      const riotId = `${member.name}#${member.tag}`;
-                      return (
-                        <li key={riotId} className="edit-lol-member">
-                          <span className="edit-lol-member-id">{riotId}</span>
-                          <button
-                            type="button"
-                            className="btn-icon btn-icon-outline"
-                            onClick={() => removeMember(member)}
-                            aria-label={`Remove ${riotId}`}
-                            title="Remove"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
+                <ul className="edit-lol-members" aria-label="Players">
+                  {members.map((member) => {
+                    const riotId = `${member.name}#${member.tag}`;
+                    return (
+                      <li key={riotId} className="edit-lol-member">
+                        <span className="edit-lol-member-id">{riotId}</span>
+                        <button
+                          type="button"
+                          className="btn-icon btn-icon-outline"
+                          onClick={() => removeMember(member)}
+                          aria-label={`Remove ${riotId}`}
+                          title="Remove"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
 
               <div className="form-field">

@@ -70,8 +70,12 @@ export function LolViewDetail() {
         )}
       </div>
 
-      {isEditOpen && viewId && (
-        <EditLolView viewId={viewId} onClose={() => setIsEditOpen(false)} onSave={save} />
+      {isEditOpen && (
+        <EditLolView
+          players={players.map((p) => ({ name: p.summonerName, tag: p.summonerTag }))}
+          onClose={() => setIsEditOpen(false)}
+          onSave={save}
+        />
       )}
     </div>
   );
