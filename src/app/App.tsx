@@ -3,6 +3,8 @@ import { Spinner } from '@/shared/components/spinner.tsx';
 import { Footer } from '@/shared/components/footer.tsx';
 import { WowLanding } from '@/games/wow/components/landing/wow-landing.tsx';
 import { LolLanding } from '@/games/lol/components/landing/lol-landing.tsx';
+import { ForeverLanding } from '@/games/wow-forever/components/landing/forever-landing.tsx';
+import { ForeverViewDetail } from '@/games/wow-forever/components/view-detail/forever-view-detail.tsx';
 import { LolViewDetail } from '@/games/lol/components/view-detail/lol-view-detail.tsx';
 import { WowViewDetail } from '@/games/wow/components/view-detail/wow-view-detail.tsx';
 import { LoginPage } from '@/features/auth/LoginPage.tsx';
@@ -24,6 +26,10 @@ export function App() {
           <Route path="/lol" element={<GameLayout key="lol" game="lol" />}>
             <Route index element={<LolLanding />} />
             <Route path=":viewId" element={<LolViewDetail />} />
+          </Route>
+          <Route path="/wow-forever" element={<GameLayout key="wow-forever" game="wow-forever" />}>
+            <Route index element={<ForeverLanding />} />
+            <Route path=":viewId" element={<ForeverViewDetail />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/:viewId" element={<LegacyViewRedirect />} />

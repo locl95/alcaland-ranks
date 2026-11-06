@@ -1,11 +1,14 @@
 import { FormEvent, useState } from 'react';
 import { View } from '@/features/views/model/view.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
-import { ApiError } from '@/shared/api/ApiError.ts';
 import { ViewExtraArguments } from '@/features/views/api/view-types.ts';
 import { entityKey, verifyEntity, verifyGuild } from '@/games/wow/api/wow-entity-api.ts';
 import { useEntityRows } from '@/features/views/hooks/useEntityRows.ts';
-import { formatDuplicateMessage, formatNotFoundMessage } from '@/features/views/utils.ts';
+import {
+  formatDuplicateMessage,
+  formatLimitError,
+  formatNotFoundMessage,
+} from '@/features/views/utils.ts';
 import { NOT_FOUND_HINT } from '@/games/wow/utils.ts';
 
 export type CreateMode = 'characters' | 'guild';
@@ -17,11 +20,6 @@ interface CharacterFields {
 }
 
 const GUILD_EXTRA_ARGUMENTS: ViewExtraArguments = { type: 'wow', isGuild: true };
-
-const LIMIT_ERRORS: Record<string, string> = {
-  TOO_MANY_VIEWS: "You've reached the maximum number of ladders.",
-  TOO_MANY_ENTITIES: 'This ladder has more characters than allowed.',
-};
 
 const toEntity = (fields: CharacterFields) => ({
   name: fields.name.trim(),
@@ -117,7 +115,7 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
 
       onClose();
     } catch (err) {
-      const limitError = err instanceof ApiError && err.code ? LIMIT_ERRORS[err.code] : undefined;
+      const limitError = formatLimitError(err, 'characters');
       setSubmitError(
         limitError ??
           (mode === 'guild'

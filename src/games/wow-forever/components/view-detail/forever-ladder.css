@@ -1,0 +1,248 @@
+/* Same card as the WoW Retail ladder. The spine on each row takes the
+   character's class colour: with no score tiers, class is what tells a
+   leveling group apart at a glance. */
+
+.forever-ladder {
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  border-radius: var(--rad-lg);
+  overflow: hidden;
+}
+
+.forever-ladder-cols {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1.75rem 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.forever-ladder-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.forever-ladder .pager {
+  padding-left: 1.25rem;
+  padding-right: 0.75rem;
+}
+
+.forever-row {
+  --class-color: var(--ink-4);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8125rem 1.75rem 0.8125rem 1rem;
+  border-bottom: 1px solid var(--rule-soft);
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--class-color) 12%, transparent) 0%,
+    transparent 9rem
+  );
+}
+
+.forever-row:last-child {
+  border-bottom: none;
+}
+
+.forever-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--class-color);
+}
+
+.forever-row:hover {
+  background-color: var(--panel-2);
+}
+
+.forever-row-position {
+  width: 1.75rem;
+  flex-shrink: 0;
+  text-align: right;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+/* The race is the portrait; the class icon sits on its corner. */
+.forever-portrait {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.forever-portrait-image {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--rad-sm);
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.forever-class-badge {
+  position: absolute;
+  right: -0.3125rem;
+  bottom: -0.3125rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px var(--panel);
+}
+
+.forever-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.forever-row-name-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.forever-row-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3125rem;
+  letter-spacing: 0.015em;
+  line-height: 1.15;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.forever-standing,
+.forever-level-gain {
+  font-family: var(--font-data);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 0.0625rem 0.3125rem;
+  border-radius: var(--rad-sm);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.forever-standing--up,
+.forever-level-gain {
+  color: var(--up);
+  background: color-mix(in srgb, var(--up) 10%, transparent);
+}
+
+.forever-standing--down {
+  color: var(--down);
+  background: color-mix(in srgb, var(--down) 10%, transparent);
+}
+
+.forever-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.forever-ilvl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1875rem;
+  font-weight: 700;
+}
+
+.forever-ilvl-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.forever-guild {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.forever-badge {
+  flex-shrink: 0;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 0.0625rem 0.3125rem;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
+
+.forever-level {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.forever-level-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+@media (max-width: 640px) {
+  .forever-ladder-cols {
+    padding: 0.4375rem 0.75rem 0.4375rem 0.875rem;
+  }
+
+  .forever-row {
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem 0.625rem 0.5rem;
+  }
+
+  .forever-row-position {
+    width: 1.125rem;
+    font-size: 0.75rem;
+  }
+
+  .forever-portrait {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .forever-class-badge {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .forever-row-name {
+    font-size: 1rem;
+  }
+
+  .forever-row-meta {
+    gap: 0.25rem;
+    font-size: 0.625rem;
+  }
+
+  .forever-badge {
+    font-size: 0.5rem;
+  }
+
+  .forever-level-value {
+    font-size: 1.0625rem;
+  }
+}
+
+.forever-portrait--empty {
+  border-radius: var(--rad-sm);
+  background: var(--panel-2);
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.forever-row--pending .forever-row-name {
+  color: var(--ink-3);
+}

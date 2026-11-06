@@ -7,7 +7,7 @@ import {
   ViewResponse,
 } from '@/features/views/api/view-types.ts';
 import { View } from '@/features/views/model/view.ts';
-import { GameSlug } from '@/shared/game/game.ts';
+import { GameSlug, gameQuery } from '@/shared/game/game.ts';
 
 export const VIEWS_PAGE_SIZE = 10;
 
@@ -25,7 +25,7 @@ export interface ViewsPage {
 }
 
 const viewsPath = (game: GameSlug, page: number) => {
-  const params = new URLSearchParams({ game });
+  const params = new URLSearchParams({ game: gameQuery(game) });
   params.set('page', String(page));
   params.set('limit', String(VIEWS_PAGE_SIZE));
   params.set('include', 'metadata');

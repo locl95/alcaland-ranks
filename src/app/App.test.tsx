@@ -11,6 +11,10 @@ vi.mock('@/games/lol/components/landing/lol-landing.tsx', () => ({
   LolLanding: () => <div data-testid="lol-landing" />,
 }));
 
+vi.mock('@/games/wow-forever/components/landing/forever-landing.tsx', () => ({
+  ForeverLanding: () => <div data-testid="forever-landing" />,
+}));
+
 vi.mock('@/games/wow/components/view-detail/wow-view-detail.tsx', () => ({
   WowViewDetail: () => <div data-testid="view-detail">{useLocation().pathname}</div>,
 }));
@@ -40,6 +44,11 @@ describe('App routing', () => {
   it('serves the League of Legends landing under /lol', () => {
     renderAt('/lol');
     expect(screen.getByTestId('lol-landing')).toBeInTheDocument();
+  });
+
+  it('serves the WoW Forever landing under /wow-forever', () => {
+    renderAt('/wow-forever');
+    expect(screen.getByTestId('forever-landing')).toBeInTheDocument();
   });
 
   it('opens a ladder under its game path', () => {

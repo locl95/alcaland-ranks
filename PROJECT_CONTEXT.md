@@ -47,12 +47,16 @@ deliberate — see "Dungeon icons" below.
 ## Architecture
 
 Feature-based folders under `src/features/`, with `src/shared/` for cross-cutting code.
-Each game lives in `src/games/<game>/` (`wow`, `lol`) and repeats the same layout:
+Each game lives in `src/games/<game>/` (`wow`, `lol`, `wow-forever`) and repeats the same layout:
 `api/` (types and calls), `assets/` (images and the modules that map them),
 `components/` (`landing/`, `view-detail/`), `constants/` (fixed data, no images),
 `hooks/` and `model/` (pure domain logic). `src/features/views/` keeps only what every
 game shares: the ladder list, the detail header, sync, the create-form row logic and
 the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts).
+`src/shared/warcraft/` holds the class icons and colours, and the race art (PNGs dropped
+in `assets/races/`), that every Warcraft game uses.
+A game's URL slug and the name the backend expects in `?game=` can differ
+(`wow-forever` / `wow_forever`): `GAMES` in `shared/game/game.ts` carries both.
 
 - `src/app/App.tsx` — pure routing shell, no data logic
 - `src/app/App.css` — global layout. The background gradient and footer live in the
@@ -66,7 +70,10 @@ the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts).
   - `userRequest` / `userRequestVoid` — user JWT, with 401 refresh + request queueing
 - `src/features/views/hooks/` and `src/games/<game>/hooks/` — one hook per **screen
   concern** (`useViewsData`, `useSyncView`; WoW: `useViewDetail`, `useCreateViewForm`,
-  `useEditViewForm`, `useStaticData`; LoL: `useLolViewData`, `useCreateLolViewForm`)
+  `useEditViewForm`, `useStaticData`; LoL: `useCreateLolViewForm`, `useEditLolViewForm`;
+  Forever: `useCreateForeverViewForm`, `useEditForeverViewForm`). Shared by every game
+  but WoW: `useLadderData` (a ladder's rows and snapshot) and `useEditEntitiesForm` (the
+  edit dialog). Saving a ladder edit is shared by all: `useSaveEntities`.
 - `src/features/views/components/shared/` — cross-screen UI parts and their mechanics
   (`verification-badge`, `pager`, `dialog.css` / `dialog.ts`, `form-controls.css`,
   `empty-state.css`). Not in `hooks/`, which is reserved for screen concerns.
@@ -143,7 +150,7 @@ realm field well inside the animation's duration.
 ### Dialog behaviour comes from Radix, not from us
 
 Every modal (`create-wow-view`, `edit-view`, `sync-error-dialog`, `create-lol-view`,
-`edit-lol-view`, `matchup-dialog`) is
+`edit-lol-view`, `matchup-dialog`, `create-forever-view`, `edit-forever-view`) is
 `Dialog.Root` → `Dialog.Portal` → `Dialog.Overlay` + `Dialog.Content`. Focus trap, focus
 restore, scroll lock (`react-remove-scroll`), `aria-modal`, Escape and outside-click all
 come from Radix. `dialog.css` is **look only** — it exists so they cannot drift

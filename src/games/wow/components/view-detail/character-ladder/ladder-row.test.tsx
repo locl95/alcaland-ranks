@@ -12,12 +12,12 @@ vi.mock('./ladder-row-expanded.tsx', () => ({
   LadderRowExpanded: () => <div data-testid="ladder-row-expanded" />,
 }));
 
-vi.mock('@/games/wow/assets/class-images.ts', () => ({
+vi.mock('@/shared/warcraft/class-images.ts', () => ({
   CLASS_IMAGES: {} as Record<string, string>,
   getClassImageKey: () => 'warrior',
 }));
 
-vi.mock('@/games/wow/assets/race-images.ts', () => ({
+vi.mock('@/shared/warcraft/race-images.ts', () => ({
   RACE_IMAGES: { nightelf: 'nightelf.png' } as Record<string, string>,
   getRaceImageKey: (race: string) => race.toLowerCase().replace(/\s+/g, ''),
 }));

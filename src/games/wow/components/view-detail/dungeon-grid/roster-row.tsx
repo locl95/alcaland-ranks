@@ -3,8 +3,8 @@ import { Swords } from 'lucide-react';
 import { RunDetailsMember } from '@/games/wow/api/wow-types.ts';
 import { SPEC_IMAGES, getSpecImageKey } from '@/games/wow/assets/spec-images.ts';
 import { ROLE_IMAGES } from '@/games/wow/assets/role-images.ts';
-import { CLASS_TEXT_COLORS } from '@/games/wow/constants/class-colors.ts';
-import { getClassSlug, openExternalProfile, toRealmLabel } from '@/games/wow/utils.ts';
+import { CLASS_TEXT_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
+import { openExternalProfile, toRealmLabel } from '@/games/wow/utils.ts';
 
 const ROLE_LABEL: Record<string, string> = {
   tank: 'Tank',

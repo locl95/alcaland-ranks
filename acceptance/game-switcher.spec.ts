@@ -7,6 +7,7 @@ const wowLadders = Array.from({ length: 15 }, (_, i) =>
   makeSimpleView(`w${i + 1}`, `WoW Ladder ${i + 1}`),
 );
 const lolLadder = makeSimpleView('l1', 'Flex Squad', 'testuser', 'LOL');
+const foreverLadder = makeSimpleView('f1', 'Fresh Start', 'testuser', 'WOW_FOREVER');
 
 test.describe('Game switcher', () => {
   test.beforeEach(async ({ page }) => {
@@ -14,6 +15,7 @@ test.describe('Game switcher', () => {
     await mockStaticData(page);
     await mockOwnViews(page, wowLadders);
     await mockOwnViews(page, [lolLadder], 'lol');
+    await mockOwnViews(page, [foreverLadder], 'wow_forever');
   });
 
   test('the game switcher takes you to your LoL ladders, starting from their first page', async ({
@@ -39,5 +41,16 @@ test.describe('Game switcher', () => {
     await expect(page.getByRole('heading', { name: 'Flex Squad' })).toBeVisible();
     await expect(page.getByText(/WoW Ladder/)).toHaveCount(0);
     expect(lolPagesRequested).toEqual(['1']);
+  });
+
+  test('the game switcher takes you to your WoW Forever ladders', async ({ page }) => {
+    await page.goto('/wow');
+    await page.getByRole('button', { name: 'World of Warcraft Retail' }).click();
+    await page.getByRole('menuitem', { name: 'World of Warcraft Forever' }).click();
+
+    await expect(page).toHaveURL('/wow-forever');
+    await expect(page.getByRole('heading', { name: 'Forever ladder' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Fresh Start' })).toBeVisible();
+    await expect(page.getByText(/WoW Ladder/)).toHaveCount(0);
   });
 });
