@@ -13,9 +13,10 @@ interface ForeverLadderRowProps {
 
 export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowProps>) {
   const { character, standingChange, levelGain } = entry;
-  const [avatarFailed, setAvatarFailed] = useState(false);
+  // Remembers which URL failed, so a new avatar after a sync gets its own chance to load.
+  const [failedAvatar, setFailedAvatar] = useState<string | null>(null);
   const classIcon = CLASS_IMAGES[getClassImageKey(character.characterClass)];
-  const showAvatar = !!character.avatar && !avatarFailed;
+  const showAvatar = !!character.avatar && character.avatar !== failedAvatar;
 
   return (
     <li
@@ -33,10 +34,15 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
             src={character.avatar!}
             alt=""
             loading="lazy"
-            onError={() => setAvatarFailed(true)}
+            onError={() => setFailedAvatar(character.avatar)}
           />
         ) : (
-          <img className="forever-avatar" src={classIcon} alt="" />
+          <img
+            className="forever-avatar"
+            src={classIcon}
+            alt={character.characterClass}
+            title={character.characterClass}
+          />
         )}
         {showAvatar && (
           <img
@@ -73,8 +79,15 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
       </div>
 
       <div className="forever-level">
-        {levelGain > 0 && <span className="forever-level-gain num">+{levelGain}</span>}
-        <span className="forever-level-value num">{character.level}</span>
+        {levelGain > 0 && (
+          <span className="forever-level-gain num" title="Levels gained since the last snapshot">
+            +{levelGain}
+          </span>
+        )}
+        <span className="forever-level-value num">
+          <span className="sr-only">Level </span>
+          {character.level}
+        </span>
       </div>
     </li>
   );

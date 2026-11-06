@@ -57,9 +57,10 @@ test.describe('WoW Forever ladder', () => {
   test('shows the class icon when the avatar is missing or fails to load', async ({ page }) => {
     await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
 
+    // Daxan's avatar fails to load; Siempre has none. Both fall back to their class icon.
     const rows = page.getByRole('listitem');
-    await expect(rows.nth(0).locator('img')).toHaveCount(1);
-    await expect(rows.nth(1).locator('img')).toHaveCount(1);
+    await expect(rows.nth(0).getByRole('img')).toHaveAttribute('alt', 'Mage');
+    await expect(rows.nth(1).getByRole('img')).toHaveAttribute('alt', 'Warrior');
   });
 
   test('the owner removes and adds characters, who sync in place', async ({ page }) => {

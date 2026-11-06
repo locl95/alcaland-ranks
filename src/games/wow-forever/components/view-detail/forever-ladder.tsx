@@ -1,18 +1,29 @@
+import { useMemo } from 'react';
 import { PendingEntity } from '@/features/views/hooks/useSaveEntities.ts';
 import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
 import { Pager } from '@/features/views/components/shared/pager.tsx';
 import { CharacterRef, characterKey } from '@/games/wow-forever/model/character.ts';
-import { LadderEntry } from '@/games/wow-forever/model/ladder.ts';
+import { ForeverCharacter } from '@/games/wow-forever/api/forever-types.ts';
+import { buildLadder } from '@/games/wow-forever/model/ladder.ts';
 import { ForeverLadderRow } from './forever-ladder-row.tsx';
 import { ForeverPendingRow } from './forever-pending-row.tsx';
 import './forever-ladder.css';
 
 interface ForeverLadderProps {
-  entries: LadderEntry[];
+  characters: ForeverCharacter[];
+  cachedCharacters: ForeverCharacter[];
   pending: PendingEntity<CharacterRef>[];
 }
 
-export function ForeverLadder({ entries, pending }: Readonly<ForeverLadderProps>) {
+export function ForeverLadder({
+  characters,
+  cachedCharacters,
+  pending,
+}: Readonly<ForeverLadderProps>) {
+  const entries = useMemo(
+    () => buildLadder(characters, cachedCharacters),
+    [characters, cachedCharacters],
+  );
   const { pageItems, startIndex, pagination } = useEntityPage(entries);
 
   return (

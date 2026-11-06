@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { FormEvent } from 'react';
+import { ApiError } from '@/shared/api/ApiError.ts';
 import { CharacterRef } from '@/games/wow-forever/model/character.ts';
 import { useCreateForeverViewForm } from './useCreateForeverViewForm.ts';
 
@@ -92,5 +93,16 @@ describe('useCreateForeverViewForm', () => {
       }),
     );
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('explains when the ladder has more characters than allowed', async () => {
+    mockUserRequest.mockRejectedValue(new ApiError(400, 'too many', 'TOO_MANY_ENTITIES'));
+    const { result } = renderForm();
+    act(() => result.current.setName('Crew'));
+    await addCharacter(result, { name: 'Daxan', surname: 'Windfury' });
+    await submit(result);
+
+    expect(result.current.errorMessage).toBe('This ladder has more characters than allowed.');
+    expect(onClose).not.toHaveBeenCalled();
   });
 });

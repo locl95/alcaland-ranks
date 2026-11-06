@@ -12,6 +12,9 @@ export const toCharacterRef = ({ name, surname, region }: CharacterRef): Charact
   region,
 });
 
+export const isCompleteCharacter = ({ name, surname }: CharacterRef): boolean =>
+  !!name.trim() && !!surname.trim();
+
 export const characterKey = ({ name, surname, region }: CharacterRef): string =>
   `${name.trim().toLowerCase()}|${surname.trim().toLowerCase()}|${region.toLowerCase()}`;
 

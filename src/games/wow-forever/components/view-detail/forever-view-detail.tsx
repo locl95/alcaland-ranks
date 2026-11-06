@@ -1,34 +1,29 @@
 import { useEffect, useState } from 'react';
 import { Edit } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useGame } from '@/shared/game/game.ts';
 import { useSyncView } from '@/features/views/hooks/useSyncView.ts';
 import { useView } from '@/features/views/hooks/useView.ts';
 import { useSaveEntities } from '@/features/views/hooks/useSaveEntities.ts';
 import { ViewDetailHeader } from '@/features/views/components/view-detail/view-detail-header.tsx';
 import { SyncErrorDialog } from '@/features/views/components/shared/sync-error-dialog.tsx';
-import { ForeverCharacter } from '@/games/wow-forever/api/forever-types.ts';
 import { toEntityRequest } from '@/games/wow-forever/api/forever-entity-api.ts';
 import { useLadderData } from '@/features/views/hooks/useLadderData.ts';
+import { ForeverCharacter } from '@/games/wow-forever/api/forever-types.ts';
 import {
-  CharacterRef,
   characterKey,
   formatCharacterName,
+  toCharacterRef,
 } from '@/games/wow-forever/model/character.ts';
 import { regionLabel } from '@/games/wow-forever/constants/regions.ts';
-import { buildLadder } from '@/games/wow-forever/model/ladder.ts';
 import { ForeverLadder } from './forever-ladder.tsx';
 import { EditForeverView } from './actions/edit-forever-view.tsx';
 import '@/features/views/components/shared/empty-state.css';
 
-const toRef = ({ name, surname, region }: ForeverCharacter): CharacterRef => ({
-  name,
-  surname,
-  region,
-});
-
 export function ForeverViewDetail() {
   const { viewId } = useParams();
   const navigate = useNavigate();
+  const game = useGame();
   const {
     isValid,
     isLoading,
@@ -45,7 +40,7 @@ export function ForeverViewDetail() {
     {
       game: 'WOW_FOREVER',
       noun: 'characters',
-      fromData: toRef,
+      fromData: toCharacterRef,
       key: characterKey,
       toRequest: toEntityRequest,
     },
@@ -55,8 +50,8 @@ export function ForeverViewDetail() {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
-    if (!isValid) navigate('/wow-forever');
-  }, [isValid, navigate]);
+    if (!isValid) navigate(`/${game}`);
+  }, [isValid, navigate, game]);
 
   if (isLoading) return null;
 
@@ -93,7 +88,8 @@ export function ForeverViewDetail() {
           </div>
         ) : (
           <ForeverLadder
-            entries={buildLadder(ladderCharacters, cachedCharacters)}
+            characters={ladderCharacters}
+            cachedCharacters={cachedCharacters}
             pending={pending}
           />
         )}
@@ -101,7 +97,7 @@ export function ForeverViewDetail() {
 
       {isEditOpen && (
         <EditForeverView
-          characters={characters.map(toRef)}
+          characters={characters.map(toCharacterRef)}
           onClose={() => setIsEditOpen(false)}
           onSave={save}
         />

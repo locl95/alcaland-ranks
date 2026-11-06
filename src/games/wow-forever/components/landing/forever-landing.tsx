@@ -1,4 +1,4 @@
-import warrior from '@/shared/warcraft/assets/classes/warrior.webp';
+import { CLASS_IMAGES } from '@/shared/warcraft/class-images.ts';
 import { ViewsPage } from '@/features/views/components/views-page/views-page.tsx';
 import { CreateForeverView } from './create-forever-view.tsx';
 
@@ -14,7 +14,7 @@ const FOREVER_COPY = {
 export function ForeverLanding() {
   return (
     <ViewsPage
-      mark={warrior}
+      mark={CLASS_IMAGES.warrior}
       title="Forever ladder"
       copy={FOREVER_COPY}
       CreateDialog={CreateForeverView}

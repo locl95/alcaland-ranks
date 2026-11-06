@@ -3,7 +3,7 @@ import {
   CheckStatus,
   VerificationBadge,
 } from '@/features/views/components/shared/verification-badge.tsx';
-import { CharacterRef } from '@/games/wow-forever/model/character.ts';
+import { CharacterRef, isCompleteCharacter } from '@/games/wow-forever/model/character.ts';
 import { REGIONS } from '@/games/wow-forever/constants/regions.ts';
 import './character-row.css';
 
@@ -24,8 +24,6 @@ export function CharacterRow({
   onVerify,
   onRemove,
 }: Readonly<CharacterRowProps>) {
-  const isComplete = !!character.name.trim() && !!character.surname.trim();
-
   return (
     <div className="forever-character-row">
       <input
@@ -60,7 +58,7 @@ export function CharacterRow({
           type="button"
           className="btn-icon btn-icon-primary"
           onClick={onVerify}
-          disabled={!isComplete}
+          disabled={!isCompleteCharacter(character)}
           title="Add"
         >
           <Plus size={16} />
