@@ -29,7 +29,6 @@ const character = (
   guild: 'TSALAB',
   experience: 0,
   ruleset: 'PvP',
-  avatar: `https://render.example/${name}.jpg`,
   lastLogin: '2026-11-05T20:00:00Z',
   ...overrides,
 });

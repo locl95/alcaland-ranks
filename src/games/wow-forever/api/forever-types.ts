@@ -15,6 +15,5 @@ export interface ForeverCharacter {
   guild: string | null;
   experience: number;
   ruleset: string;
-  avatar: string | null;
   lastLogin: string;
 }

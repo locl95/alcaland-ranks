@@ -23,7 +23,6 @@ const character = (
   guild: null,
   experience,
   ruleset: 'PvP',
-  avatar: null,
   lastLogin: '2026-11-05T20:00:00Z',
 });
 

@@ -19,7 +19,6 @@ export const foreverCharacter = (
   guild: 'TSALAB',
   experience: 1000,
   ruleset: 'PvP',
-  avatar: null,
   lastLogin: '2026-11-05T20:00:00Z',
   ...overrides,
 });
