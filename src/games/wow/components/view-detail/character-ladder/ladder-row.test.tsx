@@ -17,7 +17,7 @@ vi.mock('@/shared/warcraft/class-images.ts', () => ({
   getClassImageKey: () => 'warrior',
 }));
 
-vi.mock('@/games/wow/assets/race-images.ts', () => ({
+vi.mock('@/shared/warcraft/race-images.ts', () => ({
   RACE_IMAGES: { nightelf: 'nightelf.png' } as Record<string, string>,
   getRaceImageKey: (race: string) => race.toLowerCase().replace(/\s+/g, ''),
 }));

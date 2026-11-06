@@ -1,5 +1,3 @@
-export const AVATAR_HOST = 'https://render.worldofwarcraft.com';
-
 export const foreverCharacter = (
   name: string,
   surname: string,
@@ -21,7 +19,7 @@ export const foreverCharacter = (
   guild: 'TSALAB',
   experience: 1000,
   ruleset: 'PvP',
-  avatar: `${AVATAR_HOST}/eu/${name.toLowerCase()}-avatar.jpg`,
+  avatar: null,
   lastLogin: '2026-11-05T20:00:00Z',
   ...overrides,
 });

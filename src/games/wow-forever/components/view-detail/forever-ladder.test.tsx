@@ -1,7 +1,13 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, within } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import { ForeverCharacter } from '@/games/wow-forever/api/forever-types.ts';
 import { ForeverLadder } from './forever-ladder.tsx';
+
+// Only the Orc has race art here, as if just that PNG had been added.
+vi.mock('@/shared/warcraft/race-images.ts', () => ({
+  RACE_IMAGES: { orc: 'orc.png' } as Record<string, string>,
+  getRaceImageKey: (race: string) => race.toLowerCase().replace(/\s+/g, ''),
+}));
 
 const character = (
   name: string,
@@ -29,8 +35,7 @@ const character = (
 });
 
 const rowOf = (name: string) => screen.getByText(`${name} Test`).closest('li')!;
-// The avatar is decorative (alt=""), so it is not an accessible img: query the DOM.
-const imagesOf = (name: string) => [...rowOf(name).querySelectorAll('img')];
+const imagesOf = (name: string) => within(rowOf(name)).getAllByRole('img');
 
 describe('ForeverLadder', () => {
   it('shows each character with item level, guild, ruleset and region', () => {
@@ -62,30 +67,29 @@ describe('ForeverLadder', () => {
     expect(within(rowOf('Siempre')).queryByText(/</)).not.toBeInTheDocument();
   });
 
-  it('shows the avatar with the class icon on its corner', () => {
+  it('shows the race with the class icon on its corner', () => {
     render(
       <ForeverLadder characters={[character('Daxan', 22)]} cachedCharacters={[]} pending={[]} />,
     );
 
-    expect(imagesOf('Daxan')[0]).toHaveAttribute('src', 'https://render.example/Daxan.jpg');
-    expect(within(rowOf('Daxan')).getByAltText('Warrior')).toBeInTheDocument();
+    const [race, classBadge] = imagesOf('Daxan');
+    expect(race).toHaveAttribute('alt', 'Orc');
+    expect(race).toHaveAttribute('src', 'orc.png');
+    expect(classBadge).toHaveAttribute('alt', 'Warrior');
   });
 
-  it('names the class on the icon that stands in for a missing or broken avatar', () => {
+  it('shows the class icon alone for a race without art yet', () => {
     render(
       <ForeverLadder
-        characters={[character('Siempre', 14, { avatar: null }), character('Daxan', 22)]}
+        characters={[character('Siempre', 14, { race: 'Night Elf' })]}
         cachedCharacters={[]}
         pending={[]}
       />,
     );
-    fireEvent.error(imagesOf('Daxan')[0]);
 
-    for (const name of ['Siempre', 'Daxan']) {
-      const images = imagesOf(name);
-      expect(images).toHaveLength(1);
-      expect(images[0]).toHaveAttribute('alt', 'Warrior');
-    }
+    const images = imagesOf('Siempre');
+    expect(images).toHaveLength(1);
+    expect(images[0]).toHaveAttribute('alt', 'Warrior');
   });
 
   it('marks places and levels gained or lost since the last snapshot', () => {

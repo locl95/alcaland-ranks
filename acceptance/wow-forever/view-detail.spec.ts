@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { seedAuth } from '../mocks/authMocks';
 import { makeSimpleView, mockOwnViews } from '../mocks/viewMocks';
 import { API, VALID_VIEW_ID } from '../constants';
-import { AVATAR_HOST, foreverCharacter } from './mocks';
+import { foreverCharacter } from './mocks';
 
 test.describe('WoW Forever ladder', () => {
   test.beforeEach(async ({ page }) => {
@@ -12,13 +12,12 @@ test.describe('WoW Forever ladder', () => {
       [makeSimpleView(VALID_VIEW_ID, 'Fresh Start', 'testuser', 'WOW_FOREVER')],
       'wow_forever',
     );
-    await page.route(`${AVATAR_HOST}/**`, (route) => route.abort());
     await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
       route.fulfill({
         json: {
           viewName: 'Fresh Start',
           data: [
-            foreverCharacter('Siempre', 'Tarde', 14, { guild: null, avatar: null }),
+            foreverCharacter('Siempre', 'Tarde', 14, { guild: null }),
             foreverCharacter('Daxan', 'Windfury', 22, { characterClass: 'Mage', ruleset: 'PvE' }),
           ],
         },
@@ -54,10 +53,10 @@ test.describe('WoW Forever ladder', () => {
     await expect(rows.nth(1)).not.toContainText('<');
   });
 
-  test('shows the class icon when the avatar is missing or fails to load', async ({ page }) => {
+  test('shows the class icon while there is no race art', async ({ page }) => {
     await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
 
-    // Daxan's avatar fails to load; Siempre has none. Both fall back to their class icon.
+    // No race PNGs exist yet, so every portrait is the class icon.
     const rows = page.getByRole('listitem');
     await expect(rows.nth(0).getByRole('img')).toHaveAttribute('alt', 'Mage');
     await expect(rows.nth(1).getByRole('img')).toHaveAttribute('alt', 'Warrior');

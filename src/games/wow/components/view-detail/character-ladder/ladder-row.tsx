@@ -10,7 +10,7 @@ import { LadderRowExpanded } from './ladder-row-expanded.tsx';
 import { getScoreClass, getScoreTier } from '@/games/wow/utils.ts';
 import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.ts';
 import { getClassSlug } from '@/shared/warcraft/class-colors.ts';
-import { RACE_IMAGES, getRaceImageKey } from '@/games/wow/assets/race-images.ts';
+import { RACE_IMAGES, getRaceImageKey } from '@/shared/warcraft/race-images.ts';
 
 interface LadderRowProps {
   index: number;

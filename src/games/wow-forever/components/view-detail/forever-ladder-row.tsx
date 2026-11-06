@@ -1,7 +1,8 @@
-import { CSSProperties, useState } from 'react';
+import { CSSProperties } from 'react';
 import { Swords } from 'lucide-react';
 import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.ts';
 import { CLASS_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
+import { RACE_IMAGES, getRaceImageKey } from '@/shared/warcraft/race-images.ts';
 import { formatCharacterName } from '@/games/wow-forever/model/character.ts';
 import { LadderEntry } from '@/games/wow-forever/model/ladder.ts';
 import { regionLabel } from '@/games/wow-forever/constants/regions.ts';
@@ -13,10 +14,8 @@ interface ForeverLadderRowProps {
 
 export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowProps>) {
   const { character, standingChange, levelGain } = entry;
-  // Remembers which URL failed, so a new avatar after a sync gets its own chance to load.
-  const [failedAvatar, setFailedAvatar] = useState<string | null>(null);
   const classIcon = CLASS_IMAGES[getClassImageKey(character.characterClass)];
-  const showAvatar = !!character.avatar && character.avatar !== failedAvatar;
+  const raceImage = RACE_IMAGES[getRaceImageKey(character.race)];
 
   return (
     <li
@@ -28,25 +27,26 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
       <span className="forever-row-position num">{position}</span>
 
       <span className="forever-portrait">
-        {showAvatar ? (
-          <img
-            className="forever-avatar"
-            src={character.avatar!}
-            alt=""
-            loading="lazy"
-            onError={() => setFailedAvatar(character.avatar)}
-          />
+        {/* The race is the portrait, with the class on its corner; a race without art
+            yet leaves the class icon as the portrait. */}
+        {raceImage ? (
+          <>
+            <img
+              className="forever-portrait-image"
+              src={raceImage}
+              alt={character.race}
+              title={character.race}
+            />
+            <img
+              className="forever-class-badge"
+              src={classIcon}
+              alt={character.characterClass}
+              title={character.characterClass}
+            />
+          </>
         ) : (
           <img
-            className="forever-avatar"
-            src={classIcon}
-            alt={character.characterClass}
-            title={character.characterClass}
-          />
-        )}
-        {showAvatar && (
-          <img
-            className="forever-class-badge"
+            className="forever-portrait-image"
             src={classIcon}
             alt={character.characterClass}
             title={character.characterClass}
