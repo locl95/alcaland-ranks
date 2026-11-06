@@ -253,6 +253,36 @@ test.describe('League of Legends ladder', () => {
     await expect(page.getByText('Caps')).toHaveCount(0);
   });
 
+  test('a player the backend could not sync is listed in an error dialog', async ({ page }) => {
+    await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) =>
+      route.request().method() === 'PUT'
+        ? route.fulfill({ json: { id: 'edit-op' } })
+        : route.fulfill({ json: { owner: 'testuser' } }),
+    );
+    await page.route(`${API}/operations/edit-op`, (route) =>
+      route.fulfill({ json: { id: 'edit-op', status: 'FAILED' } }),
+    );
+    await page.route(`${API}/entities/exists`, (route) =>
+      route.fulfill({
+        json: { exist: [{ name: 'Chovy', tag: 'KR2' }], nonExisting: [], unchecked: [] },
+      }),
+    );
+
+    await page.goto(`/lol/${VALID_VIEW_ID}`);
+    await page.getByRole('button', { name: 'Edit' }).click();
+    const editDialog = page.getByRole('dialog');
+    await editDialog.getByLabel('Riot ID').fill('Chovy#KR2');
+    await editDialog.getByRole('button', { name: 'Add', exact: true }).click();
+    await expect(editDialog.getByTitle('Player found')).toBeVisible();
+    await editDialog.getByRole('button', { name: 'Save' }).click();
+
+    const errorDialog = page.getByRole('dialog', { name: "Some players couldn't be synced" });
+    await expect(errorDialog.getByText('Chovy#KR2')).toBeVisible();
+    await expect(page.getByText('Syncing…')).toHaveCount(0);
+    await errorDialog.getByRole('button', { name: 'Got it' }).click();
+    await expect(errorDialog).toBeHidden();
+  });
+
   test('someone else opening a shared link does not get the Edit button', async ({ page }) => {
     await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) => route.fulfill({ status: 403 }));
 

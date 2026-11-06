@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { League, LolMatch, LolPlayer } from '@/games/lol/api/lol-types.ts';
-import { PendingPlayer } from '@/games/lol/hooks/useSaveLolView.ts';
+import { PendingEntity } from '@/features/views/hooks/useSaveEntities.ts';
+import { RiotId } from '@/games/lol/model/riot-id.ts';
 import { LolLadder } from './lol-ladder.tsx';
 
 vi.mock('@/games/lol/api/data-dragon.ts', () => ({
@@ -63,7 +64,7 @@ const players = [
 const renderLadder = (
   queue: 'solo' | 'flex' = 'solo',
   onQueueChange = vi.fn(),
-  pending: PendingPlayer[] = [],
+  pending: PendingEntity<RiotId>[] = [],
 ) => {
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -166,8 +167,8 @@ describe('LolLadder', () => {
 
   it('lists players being added or removed at the bottom, without stats', () => {
     renderLadder('solo', vi.fn(), [
-      { name: 'Chovy', tag: 'KR2', status: 'syncing' },
-      { name: 'Caps', tag: 'EUW', status: 'deleting' },
+      { entity: { name: 'Chovy', tag: 'KR2' }, status: 'syncing' },
+      { entity: { name: 'Caps', tag: 'EUW' }, status: 'deleting' },
     ]);
 
     const rows = screen.getAllByRole('row').slice(-2);

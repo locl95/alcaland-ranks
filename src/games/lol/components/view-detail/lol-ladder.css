@@ -186,32 +186,8 @@ th[aria-sort] .lol-sort-btn {
   background: var(--panel-3);
 }
 
-.lol-pending {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.375rem;
-  color: var(--ink-3);
-  font-size: 0.8125rem;
-  font-weight: 500;
-}
-
-.lol-pending-spinner {
-  width: 1rem;
-  height: 1rem;
-  animation: lol-spin 0.8s linear infinite;
-}
-
-@keyframes lol-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lol-pending-spinner {
-    animation: none;
-  }
+.lol-cell-pending {
+  text-align: right;
 }
 
 .lol-cell-standing {

@@ -10,7 +10,8 @@ import {
   SortKey,
   sortLadder,
 } from '@/games/lol/model/ladder.ts';
-import { PendingPlayer } from '@/games/lol/hooks/useSaveLolView.ts';
+import { PendingEntity } from '@/features/views/hooks/useSaveEntities.ts';
+import { RiotId } from '@/games/lol/model/riot-id.ts';
 import { LolLadderRow } from './lol-ladder-row.tsx';
 import { LolPendingRow } from './lol-pending-row.tsx';
 import './lol-ladder.css';
@@ -28,7 +29,7 @@ const COLUMNS: { label: string; sortKey?: SortKey; className?: string }[] = [
 interface LolLadderProps {
   players: LolPlayer[];
   cachedPlayers: LolPlayer[];
-  pending: PendingPlayer[];
+  pending: PendingEntity<RiotId>[];
   queue: Queue;
   onQueueChange: (queue: Queue) => void;
 }
@@ -155,8 +156,8 @@ export function LolLadder({
                 dataDragonVersion={dataDragonVersion}
               />
             ))}
-            {pending.map((player) => (
-              <LolPendingRow key={`${player.name}#${player.tag}`} player={player} />
+            {pending.map(({ entity, status }) => (
+              <LolPendingRow key={`${entity.name}#${entity.tag}`} riotId={entity} status={status} />
             ))}
           </tbody>
         </table>
