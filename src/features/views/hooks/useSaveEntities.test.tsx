@@ -131,6 +131,19 @@ describe('useSaveEntities', () => {
     expect(result.current.failed).toEqual([]);
   });
 
+  it('reports an added entity that never synced even when the operation completes', async () => {
+    // The backend completes the operation when a single entity fails; it just never shows up.
+    const finish = holdOperation();
+    mockServiceGet.mockResolvedValue({ viewName: 'Squad', data: [row('Faker')] });
+    const { result } = renderSave();
+
+    await act(() => result.current.save(['Faker', 'Chovy']));
+    await finish('COMPLETED');
+
+    await waitFor(() => expect(result.current.failed).toEqual(['Chovy']));
+    expect(result.current.isSaving).toBe(false);
+  });
+
   it('names the entities in the limit message', async () => {
     mockUserRequest.mockRejectedValue(new ApiError(400, 'too many', 'TOO_MANY_ENTITIES'));
     const { result } = renderSave();

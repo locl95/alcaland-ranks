@@ -143,7 +143,8 @@ test.describe('WoW Forever ladder', () => {
         : route.fulfill({ json: { owner: 'testuser' } }),
     );
     await page.route(`${API}/operations/edit-op`, (route) =>
-      route.fulfill({ json: { id: 'edit-op', status: 'FAILED' } }),
+      // A character that fails to sync does not fail the operation: it is just missing.
+      route.fulfill({ json: { id: 'edit-op', status: 'COMPLETED' } }),
     );
     await page.route(`${API}/entities/exists`, (route) =>
       route.fulfill({

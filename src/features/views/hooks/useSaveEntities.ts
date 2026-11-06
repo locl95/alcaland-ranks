@@ -30,7 +30,8 @@ const SAVE_FAILED = 'Failed to save changes — please try again';
  * Saves a ladder's new entity list and tracks it until the backend has synced it: added
  * entities are pending as "syncing" and removed ones as "deleting" until the operation ends
  * and the refreshed /data has arrived. Entities the operation could not add or remove end
- * up in `failed`.
+ * up in `failed`, whatever the operation's status: the backend completes it even when some
+ * entities fail to sync, and an entity that never synced is simply absent from /data.
  */
 export function useSaveEntities<D, E>(
   viewId: string | undefined,
@@ -72,20 +73,18 @@ export function useSaveEntities<D, E>(
     ]);
 
     pollOperation(operationId)
-      .then(async (operation) => {
+      .then(async () => {
         queryClient.invalidateQueries({ queryKey: viewKeys.ownList() });
         const refetched = await fetchViewData<D>(safeViewId).catch(() => null);
         if (refetched) {
           // Swap in the refreshed ladder before dropping the pending rows, so they never blink out.
           queryClient.setQueryData(viewKeys.data(safeViewId), refetched);
-          if (operation.status === 'FAILED') {
-            const synced = (refetched.data ?? []).map(fromData);
-            const syncedKeys = new Set(synced.map(key));
-            setFailed([
-              ...entities.filter((e) => !syncedKeys.has(key(e))),
-              ...synced.filter((e) => !savedKeys.has(key(e))),
-            ]);
-          }
+          const synced = (refetched.data ?? []).map(fromData);
+          const syncedKeys = new Set(synced.map(key));
+          setFailed([
+            ...entities.filter((e) => !syncedKeys.has(key(e))),
+            ...synced.filter((e) => !savedKeys.has(key(e))),
+          ]);
         } else {
           queryClient.invalidateQueries({ queryKey: viewKeys.data(safeViewId) });
         }
