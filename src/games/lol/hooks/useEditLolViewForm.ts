@@ -1,11 +1,6 @@
 import { FormEvent, useState } from 'react';
-import { formatDuplicateMessage } from '@/features/views/utils.ts';
-import {
-  formatNotFoundMessage,
-  parseRiotId,
-  RiotId,
-  riotIdKey,
-} from '@/games/lol/model/riot-id.ts';
+import { formatDuplicateMessage, formatNotFoundMessage } from '@/features/views/utils.ts';
+import { NOT_FOUND_HINT, parseRiotId, RiotId, riotIdKey } from '@/games/lol/model/riot-id.ts';
 import { useRiotIdRows } from '@/games/lol/hooks/useRiotIdRows.ts';
 
 export function useEditLolViewForm(
@@ -31,7 +26,10 @@ export function useEditLolViewForm(
       (duplicate && duplicate.riotId.trim()) ??
         (alreadyInLadder ? `${alreadyInLadder.name}#${alreadyInLadder.tag}` : null),
     ) ??
-    formatNotFoundMessage(notFoundRows.map((r) => r.riotId.trim())) ??
+    formatNotFoundMessage(
+      notFoundRows.map((r) => r.riotId.trim()),
+      NOT_FOUND_HINT,
+    ) ??
     submitError;
 
   const hasPendingRows = rows.some(

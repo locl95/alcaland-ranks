@@ -3,10 +3,7 @@ import { NA_REALMS } from '@/games/wow/constants/naRealms.ts';
 
 export const normalizeKey = (s: string): string => s.toLowerCase().replace(/\s+/g, '');
 
-export const formatNotFoundMessage = (names: string[]): string | null =>
-  names.length === 0
-    ? null
-    : `${names.join(', ')} ${names.length === 1 ? 'was' : 'were'} not found. Check the name, realm and region.`;
+export const NOT_FOUND_HINT = 'Check the name, realm and region.';
 
 export const toRealmSlug = (realm: string, region: string): string => {
   const realms = region.toLowerCase() === 'us' ? NA_REALMS : EU_REALMS;

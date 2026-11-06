@@ -2,8 +2,8 @@ import { FormEvent, useState } from 'react';
 import { View } from '@/features/views/model/view.ts';
 import { userRequest } from '@/shared/api/httpClient.ts';
 import { ApiError } from '@/shared/api/ApiError.ts';
-import { formatDuplicateMessage } from '@/features/views/utils.ts';
-import { formatNotFoundMessage, parseRiotId } from '@/games/lol/model/riot-id.ts';
+import { formatDuplicateMessage, formatNotFoundMessage } from '@/features/views/utils.ts';
+import { NOT_FOUND_HINT, parseRiotId } from '@/games/lol/model/riot-id.ts';
 import { useRiotIdRows } from '@/games/lol/hooks/useRiotIdRows.ts';
 
 const LIMIT_ERRORS: Record<string, string> = {
@@ -21,7 +21,10 @@ export function useCreateLolViewForm(onClose: () => void, onCreateView: (view: V
 
   const errorMessage =
     formatDuplicateMessage(duplicate && duplicate.riotId.trim()) ??
-    formatNotFoundMessage(notFoundRows.map((r) => r.riotId.trim())) ??
+    formatNotFoundMessage(
+      notFoundRows.map((r) => r.riotId.trim()),
+      NOT_FOUND_HINT,
+    ) ??
     submitError;
 
   const addedPlayers = addedRows.flatMap((r) => parseRiotId(r.riotId) ?? []);

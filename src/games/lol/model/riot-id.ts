@@ -14,7 +14,4 @@ export function parseRiotId(input: string): RiotId | null {
 export const riotIdKey = ({ name, tag }: RiotId): string =>
   `${name.toLowerCase()}#${tag.toLowerCase()}`;
 
-export const formatNotFoundMessage = (riotIds: string[]): string | null =>
-  riotIds.length === 0
-    ? null
-    : `${riotIds.join(', ')} ${riotIds.length === 1 ? 'was' : 'were'} not found. Check the Riot ID.`;
+export const NOT_FOUND_HINT = 'Check the Riot ID.';

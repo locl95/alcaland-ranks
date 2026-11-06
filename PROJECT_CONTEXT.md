@@ -142,10 +142,11 @@ realm field well inside the animation's duration.
 
 ### Dialog behaviour comes from Radix, not from us
 
-All three modals (`create-wow-view`, `edit-view`, `sync-error-dialog`) are
+Every modal (`create-wow-view`, `edit-view`, `sync-error-dialog`, `create-lol-view`,
+`edit-lol-view`, `matchup-dialog`) is
 `Dialog.Root` → `Dialog.Portal` → `Dialog.Overlay` + `Dialog.Content`. Focus trap, focus
 restore, scroll lock (`react-remove-scroll`), `aria-modal`, Escape and outside-click all
-come from Radix. `dialog.css` is **look only** — it exists so the three cannot drift
+come from Radix. `dialog.css` is **look only** — it exists so they cannot drift
 apart again.
 
 Don't hand-roll `body.style.overflow` or a keydown listener in a dialog. That was the

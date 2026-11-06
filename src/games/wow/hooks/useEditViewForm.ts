@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { WowProfile } from '@/games/wow/api/wow-types.ts';
 import { entityKey, verifyEntity } from '@/games/wow/api/wow-entity-api.ts';
 import { CheckStatus } from '@/features/views/components/shared/verification-badge.tsx';
-import { formatDuplicateMessage } from '@/features/views/utils.ts';
-import { formatNotFoundMessage, toRealmSlug } from '@/games/wow/utils.ts';
+import { formatDuplicateMessage, formatNotFoundMessage } from '@/features/views/utils.ts';
+import { NOT_FOUND_HINT, toRealmSlug } from '@/games/wow/utils.ts';
 
 export interface EditableCharacter {
   id: number;
@@ -148,7 +148,7 @@ export function useEditViewForm(
     errorMessage:
       saveError ??
       formatDuplicateMessage(duplicateName) ??
-      formatNotFoundMessage(notFoundName ? [notFoundName] : []),
+      formatNotFoundMessage(notFoundName ? [notFoundName] : [], NOT_FOUND_HINT),
     isChecking,
     canSave,
     addCharacter,

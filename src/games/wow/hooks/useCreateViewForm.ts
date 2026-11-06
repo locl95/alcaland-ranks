@@ -5,8 +5,8 @@ import { ApiError } from '@/shared/api/ApiError.ts';
 import { ViewExtraArguments } from '@/features/views/api/view-types.ts';
 import { entityKey, verifyEntity, verifyGuild } from '@/games/wow/api/wow-entity-api.ts';
 import { useEntityRows } from '@/features/views/hooks/useEntityRows.ts';
-import { formatDuplicateMessage } from '@/features/views/utils.ts';
-import { formatNotFoundMessage } from '@/games/wow/utils.ts';
+import { formatDuplicateMessage, formatNotFoundMessage } from '@/features/views/utils.ts';
+import { NOT_FOUND_HINT } from '@/games/wow/utils.ts';
 
 export type CreateMode = 'characters' | 'guild';
 
@@ -63,7 +63,10 @@ export function useCreateViewForm(onClose: () => void, onCreateView: (view: View
 
   const errorMessage =
     formatDuplicateMessage(duplicate && duplicate.name.trim()) ??
-    formatNotFoundMessage(notFoundRows.map((r) => r.name.trim())) ??
+    formatNotFoundMessage(
+      notFoundRows.map((r) => r.name.trim()),
+      NOT_FOUND_HINT,
+    ) ??
     submitError;
 
   const ladderName = mode === 'guild' ? (addedRows[0]?.name.trim() ?? '') : name;
