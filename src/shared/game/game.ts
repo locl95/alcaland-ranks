@@ -1,11 +1,15 @@
 import { createContext, useContext } from 'react';
 
-export type GameSlug = 'wow' | 'lol';
+export type GameSlug = 'wow' | 'lol' | 'wow-forever';
 
-export const GAMES: { slug: GameSlug; label: string }[] = [
-  { slug: 'wow', label: 'World of Warcraft Retail' },
-  { slug: 'lol', label: 'League of Legends' },
+/** `query` is how the backend names the game in query params (`?game=`). */
+export const GAMES: { slug: GameSlug; label: string; query: string }[] = [
+  { slug: 'wow', label: 'World of Warcraft Retail', query: 'wow' },
+  { slug: 'lol', label: 'League of Legends', query: 'lol' },
+  { slug: 'wow-forever', label: 'World of Warcraft Forever', query: 'wow_forever' },
 ];
+
+export const gameQuery = (slug: GameSlug): string => GAMES.find((g) => g.slug === slug)!.query;
 
 export const GameContext = createContext<GameSlug | null>(null);
 

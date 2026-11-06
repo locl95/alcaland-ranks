@@ -12,7 +12,7 @@ export interface ViewMetadata {
   totalCount?: number | null;
 }
 
-export type Game = 'WOW' | 'LOL';
+export type Game = 'WOW' | 'LOL' | 'WOW_FOREVER';
 
 export type VerifyResult = 'valid' | 'invalid' | 'unverified';
 

@@ -1,0 +1,21 @@
+.forever-character-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.forever-character-row .form-input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Name and surname get a line of their own; region and actions wrap below. */
+@media (max-width: 480px) {
+  .forever-character-row {
+    flex-wrap: wrap;
+  }
+
+  .forever-character-row .form-input {
+    flex: 1 1 calc(50% - 0.25rem);
+  }
+}

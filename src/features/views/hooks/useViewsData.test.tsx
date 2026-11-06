@@ -210,6 +210,18 @@ describe('useViewsData', () => {
     });
   });
 
+  it('asks the backend for the game by its own name, not the URL slug', async () => {
+    const { wrapper } = makeWrapper();
+    renderHook(() => useViewsData(true, 'wow-forever'), { wrapper });
+
+    await waitFor(() =>
+      expect(mockUserRequest).toHaveBeenCalledWith(
+        'GET',
+        '/views?game=wow_forever&page=1&limit=10&include=metadata',
+      ),
+    );
+  });
+
   describe('createView', () => {
     it('adds the pending view to the list immediately', async () => {
       mockPollOperation.mockReturnValue(new Promise(() => {}));

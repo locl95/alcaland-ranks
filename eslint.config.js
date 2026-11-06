@@ -25,7 +25,7 @@ export default tseslint.config(
       }],
     },
   },
-  ...['wow', 'lol'].map((game) => ({
+  ...['wow', 'lol', 'wow-forever'].map((game) => ({
     files: [`src/games/${game}/**`],
     rules: {
       'no-restricted-imports': ['error', {
