@@ -5,7 +5,15 @@ import { useChampion } from '@/games/lol/api/data-dragon.ts';
 import { ChampionIcon } from './champion-icon.tsx';
 import { MatchRow } from './match-row.tsx';
 import { MatchupDialog } from './matchup-dialog.tsx';
-import { formatKda, roleSplit, summarize, topChampions } from '@/games/lol/model/match-stats.ts';
+import {
+  formatKda,
+  kdaTier,
+  roleSplit,
+  summarize,
+  topChampions,
+  winrateTone,
+} from '@/games/lol/model/match-stats.ts';
+import '@/games/lol/components/shared/stat-tones.css';
 import './player-details.css';
 
 interface PlayerDetailsProps {
@@ -36,7 +44,9 @@ export function PlayerDetails({ playerName, matches }: Readonly<PlayerDetailsPro
           {summary.wins}W {summary.losses}L
         </span>
         {summary.winrate !== null && (
-          <span className="lol-details-winrate num">{percent(summary.winrate)}</span>
+          <span className={`lol-details-winrate num lol-tone--${winrateTone(summary.winrate)}`}>
+            {percent(summary.winrate)}
+          </span>
         )}
         {summary.remakes > 0 && (
           <span className="lol-details-remakes">
@@ -59,9 +69,15 @@ export function PlayerDetails({ playerName, matches }: Readonly<PlayerDetailsPro
                 <span className="lol-champion-name">
                   {champion(c.championId)?.name ?? c.championName}
                 </span>
-                <span className="num">{c.games}</span>
-                <span className="num">{percent(c.wins / c.games)}</span>
-                <span className="lol-champion-kda num">{formatKda(c.kda)}</span>
+                <span className="lol-champion-games num">
+                  {c.games} {c.games === 1 ? 'game' : 'games'}
+                </span>
+                <span className={`num lol-tone--${winrateTone(c.wins / c.games)}`}>
+                  {percent(c.wins / c.games)}
+                </span>
+                <span className={`lol-champion-kda num lol-kda--${kdaTier(c.kda)}`}>
+                  {formatKda(c.kda)}
+                </span>
               </li>
             ))}
           </ul>

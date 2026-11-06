@@ -51,8 +51,11 @@
 }
 
 .lol-matchup-ratio {
-  color: var(--ink-3);
   font-size: 0.8125rem;
+}
+
+.lol-matchup-ratio.lol-kda--low {
+  color: var(--ink-3);
 }
 
 .lol-matchup-vs {

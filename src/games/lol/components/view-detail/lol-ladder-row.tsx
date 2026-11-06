@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { ChevronDown, ExternalLink } from 'lucide-react';
-import { formatRank } from '@/games/lol/model/ranked.ts';
+import { formatTier } from '@/games/lol/model/ranked.ts';
+import { winrateTone } from '@/games/lol/model/match-stats.ts';
 import { profileIconUrl } from '@/games/lol/api/data-dragon.ts';
 import { TIER_IMAGES } from '@/games/lol/assets/tier-images.ts';
 import { LadderEntry } from '@/games/lol/model/ladder.ts';
 import { PlayerDetails } from './player-details/player-details.tsx';
+import { RecentForm } from './recent-form.tsx';
+import '@/games/lol/components/shared/stat-tones.css';
 
 interface LolLadderRowProps {
   entry: LadderEntry;
@@ -36,7 +39,10 @@ export function LolLadderRow({ entry, dataDragonVersion }: Readonly<LolLadderRow
 
   return (
     <>
-      <tr className={league ? 'lol-row' : 'lol-row lol-row--unranked'}>
+      <tr
+        className={league ? 'lol-row lol-row--expandable' : 'lol-row lol-row--unranked'}
+        onClick={league ? () => setIsExpanded((prev) => !prev) : undefined}
+      >
         <td className="lol-cell-standing num">{standing ?? '—'}</td>
         <td>
           {league ? (
@@ -44,7 +50,6 @@ export function LolLadderRow({ entry, dataDragonVersion }: Readonly<LolLadderRow
               type="button"
               className="lol-player lol-player-toggle"
               aria-expanded={isExpanded}
-              onClick={() => setIsExpanded((prev) => !prev)}
             >
               {playerLabel}
               <ChevronDown className="lol-player-chevron" aria-hidden={true} />
@@ -63,7 +68,10 @@ export function LolLadderRow({ entry, dataDragonVersion }: Readonly<LolLadderRow
                 alt=""
                 aria-hidden={true}
               />
-              <span>{formatRank(league)}</span>
+              <span className="lol-rank-text">
+                <span>{formatTier(league)}</span>
+                <span className="lol-rank-lp">{league.leaguePoints} LP</span>
+              </span>
             </div>
           ) : (
             <span className="lol-unranked">Unranked</span>
@@ -76,9 +84,14 @@ export function LolLadderRow({ entry, dataDragonVersion }: Readonly<LolLadderRow
             </span>
           )}
         </td>
+        <td className="lol-cell-secondary">{league && <RecentForm matches={league.matches} />}</td>
         <td className="lol-cell-secondary num">{league?.gamesPlayed}</td>
         <td className="lol-cell-secondary num">
-          {league && `${Math.round(league.winrate * 100)}%`}
+          {league && (
+            <span className={`lol-tone--${winrateTone(league.winrate)}`}>
+              {Math.round(league.winrate * 100)}%
+            </span>
+          )}
         </td>
         <td className="lol-cell-link">
           <a
@@ -87,6 +100,7 @@ export function LolLadderRow({ entry, dataDragonVersion }: Readonly<LolLadderRow
             rel="noopener noreferrer"
             aria-label={`${riotId} on op.gg`}
             title="Open on op.gg"
+            onClick={(e) => e.stopPropagation()}
           >
             <ExternalLink className="lol-link-icon" />
           </a>
@@ -94,7 +108,7 @@ export function LolLadderRow({ entry, dataDragonVersion }: Readonly<LolLadderRow
       </tr>
       {isExpanded && league && (
         <tr className="lol-details-row">
-          <td colSpan={8}>
+          <td colSpan={9}>
             <PlayerDetails playerName={player.summonerName} matches={league.matches} />
           </td>
         </tr>

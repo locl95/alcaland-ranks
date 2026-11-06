@@ -1,6 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { LolMatch } from '@/games/lol/api/lol-types.ts';
-import { formatKda, kda, roleSplit, summarize, topChampions } from './match-stats.ts';
+import {
+  formatKda,
+  kda,
+  kdaTier,
+  roleSplit,
+  summarize,
+  topChampions,
+  winrateTone,
+} from './match-stats.ts';
 
 let nextId = 0;
 const match = (overrides: Partial<LolMatch> = {}): LolMatch => ({
@@ -64,15 +72,34 @@ describe('topChampions', () => {
 });
 
 describe('roleSplit', () => {
-  it('lists every role in lane order, including the ones not played', () => {
-    const roles = roleSplit([match({ individualPosition: 'UTILITY' }), match()]);
+  it('lists only the roles played, most played first and ties in lane order', () => {
+    const roles = roleSplit([
+      match({ individualPosition: 'UTILITY' }),
+      match({ individualPosition: 'MIDDLE' }),
+      match({ individualPosition: 'MIDDLE' }),
+      match(),
+    ]);
 
     expect(roles.map((r) => [r.position, r.games])).toEqual([
-      ['TOP', 0],
+      ['MIDDLE', 2],
       ['JUNGLE', 1],
-      ['MIDDLE', 0],
-      ['BOTTOM', 0],
       ['UTILITY', 1],
     ]);
+  });
+});
+
+describe('kdaTier', () => {
+  it('rates 3 and up as good, and 5 and up or deathless as great', () => {
+    expect(kdaTier(2.9)).toBe('low');
+    expect(kdaTier(3)).toBe('good');
+    expect(kdaTier(5)).toBe('great');
+    expect(kdaTier('perfect')).toBe('great');
+  });
+});
+
+describe('winrateTone', () => {
+  it('is up from 50% and down below it', () => {
+    expect(winrateTone(0.5)).toBe('up');
+    expect(winrateTone(0.49)).toBe('down');
   });
 });

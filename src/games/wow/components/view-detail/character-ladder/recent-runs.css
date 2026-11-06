@@ -155,7 +155,7 @@
 
 .recent-run-status.depleted {
   color: var(--down);
-  background: rgba(248, 113, 122, 0.1);
+  background: color-mix(in srgb, var(--down) 10%, transparent);
 }
 
 .recent-run-date {

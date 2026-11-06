@@ -6,10 +6,12 @@ import {
   formatKda,
   formatMinutes,
   kda,
+  kdaTier,
   RESULT_LABEL,
   resultOf,
 } from '@/games/lol/model/match-stats.ts';
 import '@/features/views/components/shared/dialog.css';
+import '@/games/lol/components/shared/stat-tones.css';
 import './matchup-dialog.css';
 
 interface MatchupDialogProps {
@@ -24,6 +26,7 @@ const formatTime = (seconds: number) =>
 export function MatchupDialog({ playerName, match, onClose }: Readonly<MatchupDialogProps>) {
   const result = resultOf(match);
   const { matchUp } = match;
+  const matchRatio = kda(match.kills, match.deaths, match.assists);
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
@@ -51,8 +54,8 @@ export function MatchupDialog({ playerName, match, onClose }: Readonly<MatchupDi
               <span className="num">
                 {match.kills} / {match.deaths} / {match.assists}
               </span>
-              <span className="lol-matchup-ratio num">
-                {formatKda(kda(match.kills, match.deaths, match.assists))}
+              <span className={`lol-matchup-ratio num lol-kda--${kdaTier(matchRatio)}`}>
+                {formatKda(matchRatio)}
               </span>
             </div>
 
@@ -71,7 +74,9 @@ export function MatchupDialog({ playerName, match, onClose }: Readonly<MatchupDi
                 <span className="num">
                   {matchUp.kills} / {matchUp.deaths} / {matchUp.assists}
                 </span>
-                <span className="lol-matchup-ratio num">
+                <span
+                  className={`lol-matchup-ratio num lol-kda--${kdaTier(kda(matchUp.kills, matchUp.deaths, matchUp.assists))}`}
+                >
                   {formatKda(kda(matchUp.kills, matchUp.deaths, matchUp.assists))}
                 </span>
               </div>

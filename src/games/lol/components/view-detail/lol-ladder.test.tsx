@@ -139,6 +139,25 @@ describe('LolLadder', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('expands a player from anywhere on their row, but not from the op.gg link', async () => {
+    renderLadder();
+    const goldie = screen.getByRole('button', { name: /Goldie/ });
+
+    await userEvent.click(screen.getByText('Gold I'));
+    expect(goldie).toHaveAttribute('aria-expanded', 'true');
+
+    await userEvent.click(screen.getByRole('link', { name: 'Goldie#EUW on op.gg' }));
+    expect(goldie).toHaveAttribute('aria-expanded', 'true');
+
+    await userEvent.click(screen.getByText('Gold I'));
+    expect(goldie).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('shows each player’s recent form', () => {
+    renderLadder();
+    expect(screen.getByRole('img', { name: 'Last 1 games: 1 wins, 0 losses' })).toBeInTheDocument();
+  });
+
   it('does not let an unranked player expand', () => {
     renderLadder();
     expect(screen.queryByRole('button', { name: /NoRanked/ })).not.toBeInTheDocument();

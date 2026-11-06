@@ -126,7 +126,8 @@
   white-space: nowrap;
 }
 
-.lol-sort-btn {
+.lol-sort-btn,
+.lol-col-label {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -168,6 +169,10 @@ th[aria-sort] .lol-sort-btn {
   background: var(--panel-2);
 }
 
+.lol-row--expandable {
+  cursor: pointer;
+}
+
 .lol-row--unranked td {
   color: var(--ink-4);
 }
@@ -195,7 +200,7 @@ th[aria-sort] .lol-sort-btn {
 }
 
 .lol-player-tag {
-  color: var(--ink-4);
+  color: var(--ink-3);
 }
 
 .lol-rank {
@@ -209,6 +214,11 @@ th[aria-sort] .lol-sort-btn {
   width: 1.75rem;
   height: 1.75rem;
   object-fit: contain;
+}
+
+.lol-rank-lp::before {
+  content: '·';
+  margin: 0 0.3em;
 }
 
 .lol-unranked {
@@ -230,7 +240,7 @@ th[aria-sort] .lol-sort-btn {
 
 .lol-change--down {
   color: var(--down);
-  background: rgba(248, 113, 122, 0.1);
+  background: color-mix(in srgb, var(--down) 10%, transparent);
 }
 
 .lol-cell-link {
@@ -240,7 +250,7 @@ th[aria-sort] .lol-sort-btn {
 
 .lol-cell-link a {
   display: inline-flex;
-  color: var(--ink-4);
+  color: var(--ink-3);
   transition: color var(--motion-base);
 }
 
@@ -275,8 +285,22 @@ th[aria-sort] .lol-sort-btn {
   }
 
   .lol-rank {
-    white-space: normal;
     font-size: 0.8125rem;
+  }
+
+  .lol-rank-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+
+  .lol-rank-lp {
+    color: var(--ink-3);
+    font-size: 0.75rem;
+  }
+
+  .lol-rank-lp::before {
+    content: none;
   }
 
   .lol-rank-emblem {
@@ -319,7 +343,7 @@ th[aria-sort] .lol-sort-btn {
 .lol-player-chevron {
   width: 0.875rem;
   height: 0.875rem;
-  color: var(--ink-4);
+  color: var(--ink-3);
   transition: transform var(--motion-base);
 }
 
@@ -327,7 +351,7 @@ th[aria-sort] .lol-sort-btn {
   transform: rotate(180deg);
 }
 
-.lol-player-toggle:hover .lol-player-name {
+.lol-row--expandable:hover .lol-player-name {
   text-decoration: underline;
   text-underline-offset: 3px;
 }

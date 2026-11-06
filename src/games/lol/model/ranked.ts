@@ -29,7 +29,7 @@ export function totalLp({ tier, rank, leaguePoints }: League): number {
 export const lpChange = (current: League | null, previous: League | null): number | null =>
   current && previous ? totalLp(current) - totalLp(previous) : null;
 
-export const formatRank = ({ tier, rank, leaguePoints }: League): string => {
+export const formatTier = ({ tier, rank }: League): string => {
   const name = tier.charAt(0) + tier.slice(1).toLowerCase();
-  return `${isApexTier(tier) ? name : `${name} ${rank}`} · ${leaguePoints} LP`;
+  return isApexTier(tier) ? name : `${name} ${rank}`;
 };

@@ -25,6 +25,13 @@ export const kda = (kills: number, deaths: number, assists: number): number | 'p
 export const formatKda = (ratio: number | 'perfect'): string =>
   ratio === 'perfect' ? 'Perfect' : `${ratio.toFixed(1)} KDA`;
 
+export type KdaTier = 'low' | 'good' | 'great';
+
+export const kdaTier = (ratio: number | 'perfect'): KdaTier =>
+  ratio === 'perfect' || ratio >= 5 ? 'great' : ratio >= 3 ? 'good' : 'low';
+
+export const winrateTone = (winrate: number): 'up' | 'down' => (winrate >= 0.5 ? 'up' : 'down');
+
 export interface MatchSummary {
   wins: number;
   losses: number;
@@ -83,5 +90,7 @@ export const roleSplit = (matches: LolMatch[]): RoleShare[] => {
   return POSITIONS.map(({ key }) => {
     const games = counted.filter((m) => m.individualPosition === key);
     return { position: key, games: games.length, wins: games.filter((g) => g.win).length };
-  });
+  })
+    .filter((role) => role.games > 0)
+    .sort((a, b) => b.games - a.games);
 };

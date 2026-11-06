@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatRank, lpChange, totalLp } from './ranked.ts';
+import { formatTier, lpChange, totalLp } from './ranked.ts';
 import { League } from '@/games/lol/api/lol-types.ts';
 
 const league = (tier: string, rank: string, leaguePoints: number): League => ({
@@ -38,9 +38,9 @@ describe('lpChange', () => {
   });
 });
 
-describe('formatRank', () => {
+describe('formatTier', () => {
   it('drops the division for apex tiers', () => {
-    expect(formatRank(league('GOLD', 'I', 1))).toBe('Gold I · 1 LP');
-    expect(formatRank(league('GRANDMASTER', 'I', 512))).toBe('Grandmaster · 512 LP');
+    expect(formatTier(league('GOLD', 'I', 1))).toBe('Gold I');
+    expect(formatTier(league('GRANDMASTER', 'I', 512))).toBe('Grandmaster');
   });
 });

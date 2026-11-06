@@ -148,8 +148,8 @@ test.describe('League of Legends ladder', () => {
     await page.getByText('Flex Squad').click();
 
     await expect(page).toHaveURL(`/lol/${VALID_VIEW_ID}`);
-    await expect(page.getByText('Challenger · 1200 LP')).toBeVisible();
-    await expect(page.getByText('Diamond II · 40 LP')).toBeVisible();
+    await expect(page.getByText('1200 LP', { exact: true })).toBeVisible();
+    await expect(page.getByText('40 LP', { exact: true })).toBeVisible();
   });
 
   test('switching to Flex keeps the queue in the link', async ({ page }) => {
@@ -157,7 +157,7 @@ test.describe('League of Legends ladder', () => {
     await page.getByRole('button', { name: 'Flex' }).click();
 
     await expect(page).toHaveURL(`/lol/${VALID_VIEW_ID}?queue=flex`);
-    await expect(page.getByText('Gold I · 10 LP')).toBeVisible();
+    await expect(page.getByText('10 LP', { exact: true })).toBeVisible();
     await expect(page.getByText('Unranked')).toBeVisible();
   });
 
@@ -168,7 +168,7 @@ test.describe('League of Legends ladder', () => {
       'aria-pressed',
       'true',
     );
-    await expect(page.getByText('Gold I · 10 LP')).toBeVisible();
+    await expect(page.getByText('10 LP', { exact: true })).toBeVisible();
   });
 
   test('expands a player into their recent games and opens a matchup', async ({ page }) => {
@@ -233,7 +233,7 @@ test.describe('League of Legends ladder', () => {
 
     await page.goto(`/lol/${VALID_VIEW_ID}`);
 
-    await expect(page.getByText('Challenger · 1200 LP')).toBeVisible();
+    await expect(page.getByText('1200 LP', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Edit' })).toHaveCount(0);
   });
 });

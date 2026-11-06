@@ -13,13 +13,14 @@ import {
 import { LolLadderRow } from './lol-ladder-row.tsx';
 import './lol-ladder.css';
 
-const COLUMNS: { key: SortKey; label: string; className?: string }[] = [
-  { key: 'name', label: 'Player' },
-  { key: 'level', label: 'Level', className: 'lol-cell-secondary' },
-  { key: 'rank', label: 'Rank' },
-  { key: 'change', label: 'Change' },
-  { key: 'games', label: 'Games', className: 'lol-cell-secondary' },
-  { key: 'winrate', label: 'Winrate', className: 'lol-cell-secondary' },
+const COLUMNS: { label: string; sortKey?: SortKey; className?: string }[] = [
+  { label: 'Player', sortKey: 'name' },
+  { label: 'Level', sortKey: 'level', className: 'lol-cell-secondary' },
+  { label: 'Rank', sortKey: 'rank' },
+  { label: 'LP gain', sortKey: 'change' },
+  { label: 'Form', className: 'lol-cell-secondary' },
+  { label: 'Games', sortKey: 'games', className: 'lol-cell-secondary' },
+  { label: 'Winrate', sortKey: 'winrate', className: 'lol-cell-secondary' },
 ];
 
 interface LolLadderProps {
@@ -109,24 +110,32 @@ export function LolLadder({
               <th className="lol-cell-standing" scope="col">
                 #
               </th>
-              {COLUMNS.map(({ key, label, className }) => (
+              {COLUMNS.map(({ label, sortKey, className }) => (
                 <th
-                  key={key}
+                  key={label}
                   scope="col"
                   className={className}
                   aria-sort={
-                    sort.key === key ? (sort.descending ? 'descending' : 'ascending') : undefined
+                    sortKey && sort.key === sortKey
+                      ? sort.descending
+                        ? 'descending'
+                        : 'ascending'
+                      : undefined
                   }
                 >
-                  <button type="button" className="lol-sort-btn" onClick={() => sortBy(key)}>
-                    {label}
-                    {sort.key === key &&
-                      (sort.descending ? (
-                        <ChevronDown className="lol-sort-icon" aria-hidden={true} />
-                      ) : (
-                        <ChevronUp className="lol-sort-icon" aria-hidden={true} />
-                      ))}
-                  </button>
+                  {sortKey ? (
+                    <button type="button" className="lol-sort-btn" onClick={() => sortBy(sortKey)}>
+                      {label}
+                      {sort.key === sortKey &&
+                        (sort.descending ? (
+                          <ChevronDown className="lol-sort-icon" aria-hidden={true} />
+                        ) : (
+                          <ChevronUp className="lol-sort-icon" aria-hidden={true} />
+                        ))}
+                    </button>
+                  ) : (
+                    <span className="lol-col-label">{label}</span>
+                  )}
                 </th>
               ))}
               <th className="lol-cell-link" scope="col">
