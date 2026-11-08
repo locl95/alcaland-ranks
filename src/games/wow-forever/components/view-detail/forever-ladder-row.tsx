@@ -1,5 +1,4 @@
 import { CSSProperties } from 'react';
-import { Swords } from 'lucide-react';
 import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.ts';
 import { CLASS_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
 import { RACE_IMAGES, getRaceImageKey } from '@/shared/warcraft/race-images.ts';
@@ -65,18 +64,26 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
             </span>
           )}
         </div>
-        <div className="forever-row-meta">
-          <span className="forever-ilvl num" title="Equipped item level">
-            <Swords className="forever-ilvl-icon" aria-hidden={true} />
-            {character.equippedItemLevel}
-          </span>
-          {character.guild && <span className="forever-guild">&lt;{character.guild}&gt;</span>}
+        {/* Always a guild line, so every row has the same height. */}
+        {character.guild ? (
+          <p className="forever-guild">&lt;{character.guild}&gt;</p>
+        ) : (
+          <p className="forever-guild forever-guild--none">No guild</p>
+        )}
+        <div className="forever-row-tags">
           <span className="forever-badge" title="Ruleset">
             {character.ruleset}
           </span>
           <span className="forever-badge">{regionLabel(character.region)}</span>
         </div>
       </div>
+
+      {/* A column of its own, beside the level, so item levels line up and can be
+          compared down the ladder. */}
+      <span className="forever-ilvl num" title="Equipped item level">
+        <span className="sr-only">Item level </span>
+        {character.equippedItemLevel}
+      </span>
 
       <div className="forever-level">
         {levelGain > 0 && (

@@ -116,11 +116,14 @@
   color: var(--up);
 }
 
+/* line-height 1 keeps the label no taller than the icon, so a button with text
+   (Edit, Sync's countdown) matches the icon-only ones beside it. */
 .header-button-text {
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.03em;
+  line-height: 1;
 }
 
 .header-icon {

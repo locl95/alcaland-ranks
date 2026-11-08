@@ -30,7 +30,8 @@ export function ForeverLadder({
     <section className="forever-ladder" aria-label="Ladder">
       <div className="forever-ladder-cols">
         <span className="eyebrow">Character</span>
-        <span className="eyebrow">Level</span>
+        <span className="eyebrow forever-col-ilvl">iLvl</span>
+        <span className="eyebrow forever-col-level">Level</span>
       </div>
       <ol className="forever-ladder-rows">
         {pageItems.map((entry, index) => (

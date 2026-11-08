@@ -75,6 +75,9 @@
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.03em;
+  /* Keeps the label no taller than the icon, so this matches the user menu beside
+     it (and the 35px action buttons on the ladder header). */
+  line-height: 1;
   transition:
     background var(--motion-base),
     border-color var(--motion-base),
@@ -116,9 +119,10 @@
   color: var(--ink);
 }
 
+/* Same size as the create button's icon, so both buttons come out the same height. */
 .user-menu-icon {
-  width: 1rem;
-  height: 1rem;
+  width: 1.0625rem;
+  height: 1.0625rem;
   color: var(--ink-3);
   flex-shrink: 0;
 }

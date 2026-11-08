@@ -47,14 +47,14 @@ describe('ForeverLadder', () => {
     );
 
     const row = within(rowOf('Daxan'));
-    expect(row.getByText('18')).toBeInTheDocument();
+    expect(row.getByText('Item level').parentElement).toHaveTextContent('Item level 18');
     expect(row.getByText('<TSALAB>')).toBeInTheDocument();
     expect(row.getByText('PvE')).toBeInTheDocument();
     expect(row.getByText('NA')).toBeInTheDocument();
-    expect(row.getByText('Level', { exact: false }).parentElement).toHaveTextContent('Level 22');
+    expect(row.getByText('Level').parentElement).toHaveTextContent('Level 22');
   });
 
-  it('leaves out the guild of a character without one', () => {
+  it('says "No guild" for a character without one', () => {
     render(
       <ForeverLadder
         characters={[character('Siempre', 14, { guild: null })]}
@@ -63,7 +63,9 @@ describe('ForeverLadder', () => {
       />,
     );
 
-    expect(within(rowOf('Siempre')).queryByText(/</)).not.toBeInTheDocument();
+    const row = within(rowOf('Siempre'));
+    expect(row.getByText('No guild')).toBeInTheDocument();
+    expect(row.queryByText(/</)).not.toBeInTheDocument();
   });
 
   it('shows the race with the class icon on its corner', () => {
