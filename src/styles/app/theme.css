@@ -8,6 +8,10 @@
 
    Cyan (--beacon) is reserved for interaction only: focus, the primary
    action, the active tab. Nothing else.
+
+   These are the default theme. A game can opt into its own look with a
+   :root[data-game='<slug>'] block that redefines the tokens it wants to change
+   (GameLayout sets data-game); see src/games/wow-forever/forever-theme.css.
    -------------------------------------------------------------------------- */
 
 @font-face {
@@ -75,6 +79,8 @@
   --beacon: #37c9f0;
   --beacon-soft: rgba(55, 201, 240, 0.1);
   --beacon-edge: rgba(55, 201, 240, 0.32);
+  --beacon-hover: rgba(55, 201, 240, 0.18);
+  --beacon-bright: #b8ecfa;
 
   /* Rarity ramp — mirrors WoW item quality, driven by getScoreClass */
   --rarity-common: #9aa8bb;

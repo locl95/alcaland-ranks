@@ -65,6 +65,15 @@ A game's URL slug and the name the backend expects in `?game=` can differ
 - `src/styles/app/theme.css` — the design system: self-hosted fonts, colour tokens,
   motion tokens, the CSS reset, and the shared `.num` / `.eyebrow` / `.score-*` helpers.
   See "Design system" below. Components consume tokens; they don't hardcode values.
+- Per-game themes are opt-in. `GameLayout` sets `<html data-game="<slug>">`, and a game
+  that wants its own look adds `src/games/<slug>/<slug>-theme.css` with a
+  `:root[data-game='<slug>']` block redefining only the tokens it changes, imported in
+  `src/styles/index.css`. Games without one use the default. WoW Forever has one
+  (leather and parchment, gold instead of cyan as `--beacon`, and two type families only:
+  Marcellus as `--font-display` for names and titles, the system sans for the rest,
+  numbers included).
+  It is on `<html>`, not a wrapper div, so the theme reaches Radix dialogs portalled into
+  `<body>`.
 - `src/shared/api/httpClient.ts` — two request tiers:
   - `serviceGet` / `serviceRequest` — service token, public data
   - `userRequest` / `userRequestVoid` — user JWT, with 401 refresh + request queueing

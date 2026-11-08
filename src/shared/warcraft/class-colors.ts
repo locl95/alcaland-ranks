@@ -3,7 +3,7 @@ export const getClassSlug = (className: string): string =>
   className.toLowerCase().replace(/\s+/g, '-');
 
 export const CLASS_COLORS: Record<string, string> = {
-  warrior: '#d97706',
+  warrior: '#9a6534',
   paladin: '#ec4899',
   hunter: '#65a30d',
   rogue: '#facc15',

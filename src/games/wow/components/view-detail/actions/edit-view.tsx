@@ -15,7 +15,7 @@ import { useEditViewForm } from '@/games/wow/hooks/useEditViewForm.ts';
 import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
 import { Pager } from '@/features/views/components/shared/pager.tsx';
 
-const DARK_CLASSES = new Set(['death-knight', 'warlock', 'demon-hunter']);
+const DARK_CLASSES = new Set(['warrior', 'death-knight', 'warlock', 'demon-hunter']);
 
 interface EditViewProps {
   characters: WowProfile[];
