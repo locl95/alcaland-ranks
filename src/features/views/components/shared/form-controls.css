@@ -74,7 +74,7 @@
 }
 
 .btn-icon-primary:hover:not(:disabled) {
-  background: rgba(55, 201, 240, 0.18);
+  background: var(--beacon-hover);
   border-color: var(--beacon);
 }
 
@@ -140,9 +140,9 @@
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: rgba(55, 201, 240, 0.18);
+  background: var(--beacon-hover);
   border-color: var(--beacon);
-  color: #b8ecfa;
+  color: var(--beacon-bright);
 }
 
 .btn-primary:disabled {
