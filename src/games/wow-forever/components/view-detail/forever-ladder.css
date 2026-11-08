@@ -228,6 +228,22 @@
   color: var(--ink);
 }
 
+/* Bottom right, on the line of the tags, in the quietest ink of the row: a
+   detail to look for, not a third number to compare. The full date is on hover. */
+.forever-last-login {
+  position: absolute;
+  right: 1.75rem;
+  bottom: 0.8125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1875rem;
+  font-size: 0.6875rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
 @media (max-width: 640px) {
   .forever-ladder {
     --col-gap: 0.5rem;
@@ -264,6 +280,12 @@
 
   .forever-guild {
     font-size: 0.6875rem;
+  }
+
+  .forever-last-login {
+    right: 0.75rem;
+    bottom: 0.625rem;
+    font-size: 0.625rem;
   }
 
   .forever-row-tags {

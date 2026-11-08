@@ -1,10 +1,12 @@
 import { CSSProperties } from 'react';
+import { Clock } from 'lucide-react';
 import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.ts';
 import { CLASS_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
 import { RACE_IMAGES, getRaceImageKey } from '@/shared/warcraft/race-images.ts';
 import { formatCharacterName } from '@/games/wow-forever/model/character.ts';
 import { LadderEntry } from '@/games/wow-forever/model/ladder.ts';
 import { regionLabel } from '@/games/wow-forever/constants/regions.ts';
+import { compactTimeSince } from '@/games/wow-forever/model/last-login.ts';
 
 interface ForeverLadderRowProps {
   position: number;
@@ -96,6 +98,16 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
           {character.level}
         </span>
       </div>
+
+      <time
+        className="forever-last-login"
+        dateTime={character.lastLogin}
+        title={`Last login ${new Date(character.lastLogin).toLocaleString()}`}
+      >
+        <Clock size={10} strokeWidth={2.25} aria-hidden />
+        <span className="sr-only">Last login </span>
+        {compactTimeSince(new Date(character.lastLogin), new Date())}
+      </time>
     </li>
   );
 }
