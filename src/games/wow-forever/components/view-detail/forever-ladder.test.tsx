@@ -54,6 +54,18 @@ describe('ForeverLadder', () => {
     expect(row.getByText('Level').parentElement).toHaveTextContent('Level 22');
   });
 
+  it('shows how long ago the character last logged in', () => {
+    vi.useFakeTimers({ now: new Date('2026-11-08T20:00:00Z') });
+    render(
+      <ForeverLadder characters={[character('Daxan', 22)]} cachedCharacters={[]} pending={[]} />,
+    );
+    vi.useRealTimers();
+
+    const lastLogin = within(rowOf('Daxan')).getByText('Last login').parentElement;
+    expect(lastLogin).toHaveTextContent('Last login 3d');
+    expect(lastLogin).toHaveAttribute('datetime', '2026-11-05T20:00:00Z');
+  });
+
   it('says "No guild" for a character without one', () => {
     render(
       <ForeverLadder
