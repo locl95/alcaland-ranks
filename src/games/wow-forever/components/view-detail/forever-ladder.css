@@ -4,6 +4,7 @@
 
 .forever-ladder {
   border: 1px solid var(--rule);
+  border-top: 3px solid var(--frame);
   background: var(--panel);
   border-radius: var(--rad-lg);
   overflow: hidden;
