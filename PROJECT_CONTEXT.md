@@ -55,7 +55,8 @@ Each game lives in `src/games/<game>/` (`wow`, `lol`, `wow-forever`) and repeats
 game shares: the ladder list, the detail header, sync, the create-form row logic and
 the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts).
 `src/shared/warcraft/` holds the class icons and colours, and the race art (PNGs dropped
-in `assets/races/`), that every Warcraft game uses.
+in `assets/races/`), that every Warcraft game uses. WoW Forever has its own race icons
+for now (`src/games/wow-forever/assets/races/`), kept out of Retail on purpose.
 A game's URL slug and the name the backend expects in `?game=` can differ
 (`wow-forever` / `wow_forever`): `GAMES` in `shared/game/game.ts` carries both.
 

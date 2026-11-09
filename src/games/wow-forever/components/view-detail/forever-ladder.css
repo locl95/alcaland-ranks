@@ -117,15 +117,17 @@ button.forever-row:hover {
   font-weight: 500;
 }
 
-/* The race is the portrait; the class icon sits on its corner. */
+/* Blizzard's render of the character's face, as tall as the name, guild and
+   tags beside it (their line boxes add up to 4rem). A fixed size rather than a
+   stretch: a stretched box has no width until the remote image has loaded. */
 .forever-portrait {
-  position: relative;
   flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 4rem;
+  height: 4rem;
 }
 
 .forever-portrait-image {
+  display: block;
   width: 100%;
   height: 100%;
   border-radius: var(--rad-sm);
@@ -133,14 +135,17 @@ button.forever-row:hover {
   box-shadow: 0 0 0 1px var(--rule);
 }
 
-.forever-class-badge {
-  position: absolute;
-  right: -0.3125rem;
-  bottom: -0.3125rem;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 3px;
-  box-shadow: 0 0 0 2px var(--panel);
+.forever-identity {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.forever-identity img {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--rad-sm);
+  box-shadow: 0 0 0 1px var(--rule);
 }
 
 .forever-row-info {
@@ -289,14 +294,20 @@ button.forever-row:hover {
     font-size: 0.75rem;
   }
 
+  /* The smaller name, guild and tags of a phone add up to 3.375rem. */
   .forever-portrait {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 3.375rem;
+    height: 3.375rem;
   }
 
-  .forever-class-badge {
-    width: 1rem;
-    height: 1rem;
+  .forever-identity img {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* The race leaves the row on a phone; the class stays, and the spine says it too. */
+  .forever-identity-race {
+    display: none;
   }
 
   .forever-row-name {

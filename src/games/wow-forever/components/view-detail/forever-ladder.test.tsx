@@ -1,11 +1,16 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
-import { ForeverCharacter, WowItem, WowTalentTree } from '@/games/wow-forever/api/forever-types.ts';
+import {
+  ForeverCharacter,
+  WowItem,
+  WowStats,
+  WowTalentTree,
+} from '@/games/wow-forever/api/forever-types.ts';
 import { ForeverLadder } from './forever-ladder.tsx';
 
 // Only the Orc has race art here, as if just that PNG had been added.
-vi.mock('@/shared/warcraft/race-images.ts', () => ({
+vi.mock('@/games/wow-forever/assets/race-images.ts', () => ({
   RACE_IMAGES: { orc: 'orc.png' } as Record<string, string>,
   getRaceImageKey: (race: string) => race.toLowerCase().replace(/\s+/g, ''),
 }));
@@ -74,8 +79,35 @@ const ENHANCEMENT: WowTalentTree = {
   ],
 };
 
+const WARRIOR_STATS: WowStats = {
+  health: 388,
+  resource: { type: 'Rage', value: 100 },
+  strength: 42,
+  agility: 26,
+  intellect: 18,
+  stamina: 45,
+  spirit: 27,
+  attackPower: 103,
+  mainHandStats: { minDamage: 50.75, maxDamage: 63.75, speed: 3.5, dps: 16.357143 },
+  offHandStats: { minDamage: 7.86, maxDamage: 7.86, speed: 2.0, dps: 3.93 },
+  meleeCrit: 4.3342004,
+  rangedCrit: 1.7742002,
+  spellCrit: 0,
+  spellPower: 0,
+  spellPenetration: 0,
+  manaRegen: 0,
+  manaRegenCombat: 0,
+  armor: 465,
+  defense: 63,
+  dodge: 4.2542005,
+  parry: 4.92,
+  block: 4.92,
+  resistances: { fire: 0, shadow: 0, nature: 0, arcane: 0, frost: 0 },
+};
+
 const rowOf = (name: string) => screen.getByText(`${name} Test`).closest('li')!;
 const imagesOf = (name: string) => within(rowOf(name)).getAllByRole('img');
+const portraitOf = (name: string) => rowOf(name).querySelector('.forever-portrait-image');
 
 describe('ForeverLadder', () => {
   it('shows each character with item level, guild, ruleset and region', () => {
@@ -195,6 +227,40 @@ describe('ForeverLadder', () => {
     expect(within(tooltip).getByText(/Increases your attack speed by 30%/)).toBeInTheDocument();
   });
 
+  it("shows the character's stats between the items", async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { items: [RAGE_OF_THE_STORM], stats: WARRIOR_STATS })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+
+    const equipment = screen.getByRole('region', { name: 'Equipment of Daxan Test' });
+    for (const title of ['Core', 'Offensive', 'Defensive', 'Resources', 'Resistances']) {
+      expect(within(equipment).getByRole('heading', { name: title })).toBeVisible();
+    }
+    expect(within(equipment).getByText('Melee Crit').nextSibling).toHaveTextContent('4.33%');
+    expect(within(equipment).getByText('Rage').nextSibling).toHaveTextContent('100');
+  });
+
+  it('says what has not synced yet instead of an empty sheet', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { items: null, talents: undefined })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+
+    expect(screen.getByText("Equipment hasn't synced yet.")).toBeVisible();
+    expect(screen.getByText("Talents haven't synced yet.")).toBeVisible();
+  });
+
   it('says so when no talent points are spent yet', async () => {
     const user = userEvent.setup();
     render(
@@ -219,29 +285,35 @@ describe('ForeverLadder', () => {
     expect(row.queryByText(/</)).not.toBeInTheDocument();
   });
 
-  it('shows the race with the class icon on its corner', () => {
-    render(
-      <ForeverLadder characters={[character('Daxan', 22)]} cachedCharacters={[]} pending={[]} />,
-    );
-
-    const [race, classBadge] = imagesOf('Daxan');
-    expect(race).toHaveAttribute('alt', 'Orc');
-    expect(race).toHaveAttribute('src', 'orc.png');
-    expect(classBadge).toHaveAttribute('alt', 'Warrior');
-  });
-
-  it('shows the class icon alone for a race without art yet', () => {
+  it("shows Blizzard's render as the portrait, and the class and race beside the name", () => {
     render(
       <ForeverLadder
-        characters={[character('Siempre', 14, { race: 'Night Elf' })]}
+        characters={[character('Daxan', 22, { avatar: 'daxan-avatar.jpg' })]}
         cachedCharacters={[]}
         pending={[]}
       />,
     );
 
-    const images = imagesOf('Siempre');
-    expect(images).toHaveLength(1);
-    expect(images[0]).toHaveAttribute('alt', 'Warrior');
+    expect(portraitOf('Daxan')).toHaveAttribute('src', 'daxan-avatar.jpg');
+    const [classIcon, raceIcon] = imagesOf('Daxan');
+    expect(classIcon).toHaveAttribute('alt', 'Warrior');
+    expect(raceIcon).toHaveAttribute('alt', 'Orc');
+    expect(raceIcon).toHaveAttribute('src', 'orc.png');
+  });
+
+  it('falls back to the race for the portrait, then to the class', () => {
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22), character('Siempre', 14, { race: 'Night Elf' })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+
+    expect(portraitOf('Daxan')).toHaveAttribute('src', 'orc.png');
+    expect(portraitOf('Siempre')).toHaveAttribute('src', expect.stringContaining('warrior'));
+    // No race art for the Night Elf: just the class beside the name.
+    expect(imagesOf('Siempre').map((image) => image.getAttribute('alt'))).toEqual(['Warrior']);
   });
 
   it('marks places and levels gained or lost since the last snapshot', () => {

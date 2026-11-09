@@ -58,13 +58,13 @@ test.describe('WoW Forever ladder', () => {
     await expect(rows.nth(1)).not.toContainText('<');
   });
 
-  test('shows the class icon while there is no race art', async ({ page }) => {
+  test('shows the class and race of each character beside the name', async ({ page }) => {
     await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
 
-    // No race PNGs exist yet, so every portrait is the class icon.
     const rows = page.getByRole('listitem');
-    await expect(rows.nth(0).getByRole('img')).toHaveAttribute('alt', 'Mage');
-    await expect(rows.nth(1).getByRole('img')).toHaveAttribute('alt', 'Warrior');
+    await expect(rows.nth(0).getByRole('img', { name: 'Mage' })).toBeVisible();
+    await expect(rows.nth(0).getByRole('img', { name: 'Orc' })).toBeVisible();
+    await expect(rows.nth(1).getByRole('img', { name: 'Warrior' })).toBeVisible();
   });
 
   test("clicking a row shows the character's equipment and talents, with details on hover", async ({

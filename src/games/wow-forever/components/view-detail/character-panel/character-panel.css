@@ -1,6 +1,5 @@
 /* A drawer under the row, sunk one step below it: it belongs to the row above,
-   and the class spine carries on down its side to say so. Talents sit beside
-   the equipment while there is room, and drop below it when there is not. */
+   and the class spine carries on down its side to say so. */
 .character-panel {
   position: relative;
   display: flex;
@@ -30,17 +29,21 @@
   }
 }
 
-.character-panel .talent-trees {
-  flex: 1 1 18rem;
+/* Half each: the sheet and its stats, then the talents. When both halves
+   cannot have 30rem, each takes the full width. */
+.character-panel > * {
+  flex: 1 1 30rem;
   min-width: 0;
+}
+
+/* What the panel says when part of the character has not synced. */
+.character-panel-missing {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
 }
 
 @media (max-width: 640px) {
   .character-panel {
     padding: 1rem 0.75rem 1.25rem 1.25rem;
-  }
-
-  .character-panel .equipment-sheet {
-    flex-basis: 100%;
   }
 }

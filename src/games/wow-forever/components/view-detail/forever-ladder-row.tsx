@@ -2,7 +2,7 @@ import { CSSProperties, useId, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.ts';
 import { CLASS_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
-import { RACE_IMAGES, getRaceImageKey } from '@/shared/warcraft/race-images.ts';
+import { RACE_IMAGES, getRaceImageKey } from '@/games/wow-forever/assets/race-images.ts';
 import { formatCharacterName } from '@/games/wow-forever/model/character.ts';
 import { LadderEntry } from '@/games/wow-forever/model/ladder.ts';
 import { regionLabel } from '@/games/wow-forever/constants/regions.ts';
@@ -18,6 +18,8 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
   const { character, standingChange, levelGain } = entry;
   const classIcon = CLASS_IMAGES[getClassImageKey(character.characterClass)];
   const raceImage = RACE_IMAGES[getRaceImageKey(character.race)];
+  // Blizzard's render of the face; without one, the race, then the class.
+  const portraitFallback = raceImage ?? classIcon;
   const [open, setOpen] = useState(false);
   const panelId = useId();
 
@@ -37,31 +39,12 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
         <span className="forever-row-position num">{position}</span>
 
         <span className="forever-portrait">
-          {/* The race is the portrait, with the class on its corner; a race without art
-            yet leaves the class icon as the portrait. */}
-          {raceImage ? (
-            <>
-              <img
-                className="forever-portrait-image"
-                src={raceImage}
-                alt={character.race}
-                title={character.race}
-              />
-              <img
-                className="forever-class-badge"
-                src={classIcon}
-                alt={character.characterClass}
-                title={character.characterClass}
-              />
-            </>
-          ) : (
-            <img
-              className="forever-portrait-image"
-              src={classIcon}
-              alt={character.characterClass}
-              title={character.characterClass}
-            />
-          )}
+          <img
+            className="forever-portrait-image"
+            src={character.avatar ?? portraitFallback}
+            alt=""
+            onError={(e) => (e.currentTarget.src = portraitFallback)}
+          />
         </span>
 
         <div className="forever-row-info">
@@ -88,6 +71,19 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
             <span className="forever-badge">{regionLabel(character.region)}</span>
           </div>
         </div>
+
+        {/* Class and race side by side, as o7gg shows them; a race without art is left out. */}
+        <span className="forever-identity">
+          <img src={classIcon} alt={character.characterClass} title={character.characterClass} />
+          {raceImage && (
+            <img
+              className="forever-identity-race"
+              src={raceImage}
+              alt={character.race}
+              title={character.race}
+            />
+          )}
+        </span>
 
         {/* A column of its own, beside the level, so item levels line up and can be
           compared down the ladder. */}

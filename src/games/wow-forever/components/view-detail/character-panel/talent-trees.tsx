@@ -7,11 +7,14 @@ import './talent-trees.css';
 
 /** Each specialization with points in it, and the talents trained there. */
 export function TalentTrees({ character }: Readonly<{ character: ForeverCharacter }>) {
-  const trees = spentTrees(character.talents);
+  const trees = character.talents ? spentTrees(character.talents) : [];
 
   return (
     <section className="talent-trees" aria-label={`Talents of ${formatCharacterName(character)}`}>
-      {trees.length === 0 && <p className="talent-trees-empty">No talent points spent yet.</p>}
+      {!character.talents && <p className="character-panel-missing">Talents haven't synced yet.</p>}
+      {character.talents && trees.length === 0 && (
+        <p className="character-panel-missing">No talent points spent yet.</p>
+      )}
       {trees.map((tree) => {
         const specIcon = SPEC_IMAGES[getSpecImageKey(character.characterClass, tree.name)];
         return (
