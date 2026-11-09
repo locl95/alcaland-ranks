@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import type { View } from '@/features/views/model/view.ts';
 import type { SimpleView } from '@/features/views/api/view-types.ts';
 
@@ -65,17 +64,6 @@ export const MockCreateView = ({
     </button>
   </div>
 );
-
-export const MockViewDetail = () => {
-  const navigate = useNavigate();
-  return (
-    <div data-testid="view-detail">
-      <button data-testid="back-btn" onClick={() => navigate('/')}>
-        Back
-      </button>
-    </div>
-  );
-};
 
 export const makeSimpleView = (id: string, name: string): SimpleView => ({
   id,
