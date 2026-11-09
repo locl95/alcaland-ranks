@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { WowProfile, Season } from '@/games/wow/api/wow-types';
+import { WowProfile, Season } from '@/games/wow/retail/api/wow-types';
 import { API } from '../constants';
 
 export const mockCharacter: WowProfile = {

@@ -1,0 +1,130 @@
+import { Swords } from 'lucide-react';
+import './ladder-row.css';
+import { memo, useState } from 'react';
+import { WowProfile, Season } from '@/games/wow/retail/api/wow-types.ts';
+import { EntityStatus } from '@/features/views/hooks/useSaveEntities.ts';
+import { PendingStatus } from '@/features/views/components/shared/pending-status.tsx';
+import { CharacterMenu } from './character-menu.tsx';
+import { LadderRowExpanded } from './ladder-row-expanded.tsx';
+
+import { getScoreClass, getScoreTier } from '@/games/wow/retail/utils.ts';
+import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.ts';
+import { getClassSlug } from '@/shared/warcraft/class-colors.ts';
+import { RACE_IMAGES, getRaceImageKey } from '@/shared/warcraft/race-images.ts';
+
+interface LadderRowProps {
+  index: number;
+  character: WowProfile;
+  pendingStatus?: EntityStatus;
+  cachedCharacters: WowProfile[];
+  season: Season | null;
+}
+
+export const LadderRow = memo(function LadderRow({
+  index,
+  character,
+  pendingStatus,
+  cachedCharacters,
+  season,
+}: Readonly<LadderRowProps>) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isSyncing = character.score === null;
+  const hasHistoricalData = cachedCharacters.length > 0;
+  const cachedIndex = cachedCharacters.findIndex((c) => c.id === character.id);
+  const positionChange = hasHistoricalData && cachedIndex !== -1 ? cachedIndex - index : null;
+
+  const showPositionChange =
+    !isSyncing && hasHistoricalData && positionChange !== null && positionChange !== 0;
+  const raceImage = RACE_IMAGES[getRaceImageKey(character.race)];
+  const cachedCharacter = cachedIndex !== -1 ? cachedCharacters[cachedIndex] : undefined;
+  const scoreGain =
+    !isSyncing && cachedCharacter && cachedCharacter.score !== null
+      ? Math.round(character.score! - cachedCharacter.score)
+      : 0;
+
+  return (
+    <div className="ladder-row" data-tier={isSyncing ? undefined : getScoreTier(character.score!)}>
+      <div className="ladder-row-inner">
+        <button
+          type="button"
+          className="ladder-row-toggle"
+          aria-expanded={isExpanded}
+          onClick={() => setIsExpanded((prev) => !prev)}
+        >
+          <div className="ladder-rank">
+            <span className="rank-number num">{index + 1}</span>
+            {!isSyncing && (
+              <img
+                src={CLASS_IMAGES[getClassImageKey(character.class)]}
+                alt={character.class}
+                title={character.class}
+                className={`class-icon ${getClassSlug(character.class)}`}
+              />
+            )}
+            {!isSyncing && raceImage && (
+              <img
+                src={raceImage}
+                alt={character.race}
+                title={character.race}
+                className="race-icon"
+              />
+            )}
+          </div>
+
+          <div className="ladder-character-info">
+            <div className="ladder-character-name-row">
+              <p className="ladder-character-name">
+                {character.name.charAt(0).toUpperCase() + character.name.slice(1)}
+              </p>
+              {showPositionChange && (
+                <span
+                  className={`ladder-position-change ${positionChange > 0 ? 'improved' : 'declined'}`}
+                >
+                  {positionChange > 0 ? `↑ ${positionChange}` : `↓ ${Math.abs(positionChange)}`}
+                </span>
+              )}
+            </div>
+            {!isSyncing && (
+              <div className="ladder-character-meta">
+                <span className="ladder-character-ilvl num">
+                  <Swords className="ladder-character-ilvl-icon" aria-hidden={true} />
+                  {Math.floor(character.equippedItemLevel)}
+                </span>
+                {character.guild && (
+                  <span className="ladder-character-guild">&lt;{character.guild}&gt;</span>
+                )}
+                <span className="ladder-character-realm">{character.realm}</span>
+                <span className={`ladder-region-badge ${character.region}`}>
+                  {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {isSyncing ? (
+            <div className="ladder-syncing-indicator">
+              <PendingStatus status={pendingStatus ?? 'syncing'} />
+            </div>
+          ) : (
+            <div className="ladder-score">
+              {scoreGain > 0 && <span className="score-improvement num">+{scoreGain}</span>}
+              <p className={`ladder-score-value num ${getScoreClass(character.score!)}`}>
+                {character.score!.toLocaleString()}
+              </p>
+            </div>
+          )}
+        </button>
+
+        {!isSyncing && <CharacterMenu character={character} />}
+      </div>
+
+      {isExpanded && character.mythicPlusRanks && (
+        <LadderRowExpanded
+          character={character}
+          cachedCharacter={cachedCharacter}
+          season={season}
+        />
+      )}
+    </div>
+  );
+});

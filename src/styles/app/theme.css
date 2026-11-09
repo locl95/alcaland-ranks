@@ -11,7 +11,7 @@
 
    These are the default theme. A game can opt into its own look with a
    :root[data-game='<slug>'] block that redefines the tokens it wants to change
-   (GameLayout sets data-game); see src/games/wow-forever/forever-theme.css.
+   (GameLayout sets data-game); see src/games/wow/forever/forever-theme.css.
    -------------------------------------------------------------------------- */
 
 @font-face {

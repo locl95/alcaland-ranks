@@ -1,4 +1,4 @@
 @import '@/styles/app/theme.css';
 
 /* Per-game themes: each only applies under <html data-game="…">. */
-@import '@/games/wow-forever/forever-theme.css';
+@import '@/games/wow/forever/forever-theme.css';
