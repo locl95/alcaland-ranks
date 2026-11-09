@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { seedAuth } from '../mocks/authMocks';
 import { makeSimpleView, mockOwnViews } from '../mocks/viewMocks';
 import { API, VALID_VIEW_ID } from '../constants';
-import { foreverCharacter } from './mocks';
+import { BRAWLERS_HOOD, foreverCharacter } from './mocks';
 
 test.describe('WoW Forever ladder', () => {
   test.beforeEach(async ({ page }) => {
@@ -18,7 +18,11 @@ test.describe('WoW Forever ladder', () => {
           viewName: 'Fresh Start',
           data: [
             foreverCharacter('Siempre', 'Tarde', 14, { guild: null }),
-            foreverCharacter('Daxan', 'Windfury', 22, { characterClass: 'Mage', ruleset: 'PvE' }),
+            foreverCharacter('Daxan', 'Windfury', 22, {
+              characterClass: 'Mage',
+              ruleset: 'PvE',
+              items: [BRAWLERS_HOOD],
+            }),
           ],
         },
       }),
@@ -60,6 +64,25 @@ test.describe('WoW Forever ladder', () => {
     const rows = page.getByRole('listitem');
     await expect(rows.nth(0).getByRole('img')).toHaveAttribute('alt', 'Mage');
     await expect(rows.nth(1).getByRole('img')).toHaveAttribute('alt', 'Warrior');
+  });
+
+  test("clicking a row shows the character's equipment, with details on hover", async ({
+    page,
+  }) => {
+    await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
+
+    await page.getByRole('button', { name: /Daxan Windfury/ }).click();
+    const equipment = page.getByRole('region', { name: 'Equipment of Daxan Windfury' });
+    await expect(equipment.getByRole('img', { name: 'Neck: empty' })).toBeVisible();
+
+    await equipment.getByRole('button', { name: "Brawler's Leather Hood" }).hover();
+    const tooltip = page.getByRole('dialog');
+    await expect(tooltip).toContainText('Item Level 25');
+    await expect(tooltip).toContainText('+8 Agility');
+    await expect(tooltip).toContainText('Requires Level 20');
+
+    await page.mouse.move(0, 0);
+    await expect(tooltip).toBeHidden();
   });
 
   test('the owner removes and adds characters, who sync in place', async ({ page }) => {

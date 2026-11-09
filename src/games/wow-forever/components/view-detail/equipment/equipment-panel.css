@@ -1,0 +1,63 @@
+/* A drawer under the row, sunk one step below it: it belongs to the row above,
+   and the class spine carries on down its side to say so. */
+.equipment-panel {
+  position: relative;
+  display: grid;
+  /* The gap is where the game puts the character model. */
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    'left right'
+    'weapons weapons';
+  justify-content: center;
+  column-gap: 12rem;
+  row-gap: 0.875rem;
+  padding: 1.25rem 1.75rem 1.5rem;
+  background: var(--void-lift);
+  border-top: 1px solid var(--rule-soft);
+  animation: equipment-open var(--motion-base) ease-out;
+}
+
+.equipment-panel::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--class-color);
+}
+
+@keyframes equipment-open {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}
+
+.equipment-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.equipment-column--left {
+  grid-area: left;
+}
+
+.equipment-column--right {
+  grid-area: right;
+}
+
+.equipment-weapons {
+  grid-area: weapons;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .equipment-panel {
+    justify-content: space-between;
+    padding: 1rem 0.75rem 1.25rem 1.25rem;
+  }
+}

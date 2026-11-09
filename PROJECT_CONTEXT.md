@@ -42,7 +42,8 @@ other external service — all data is proxied.
 
 The one exception is images: `Dungeon.icon` from the season payload is rendered
 straight into an `<img src>`, so the browser does load raider.io's CDN directly. This is
-deliberate — see "Dungeon icons" below.
+deliberate — see "Dungeon icons" below. WoW Forever item icons (`WowItem.icon`) work the
+same way against Blizzard's CDN, falling back to the slot's own art when one fails to load.
 
 ## Architecture
 

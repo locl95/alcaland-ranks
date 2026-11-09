@@ -46,19 +46,27 @@
   padding: 0;
 }
 
+/* The class colour is set on the <li>, so the row and its equipment share it. */
+.forever-ladder-rows > li {
+  --class-color: var(--ink-4);
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.forever-ladder-rows > li:last-child {
+  border-bottom: none;
+}
+
 .forever-ladder .pager {
   padding-left: 1.25rem;
   padding-right: 0.75rem;
 }
 
 .forever-row {
-  --class-color: var(--ink-4);
   position: relative;
   display: flex;
   align-items: center;
   gap: var(--col-gap);
   padding: 0.8125rem 1.75rem 0.8125rem 1rem;
-  border-bottom: 1px solid var(--rule-soft);
   background-image: linear-gradient(
     90deg,
     color-mix(in srgb, var(--class-color) 12%, transparent) 0%,
@@ -66,8 +74,25 @@
   );
 }
 
-.forever-row:last-child {
-  border-bottom: none;
+/* A ladder row is a <button> that opens the character's equipment, stripped
+   back to a layout box. The pending row is the same box as a plain <li>. */
+button.forever-row {
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.forever-row:focus-visible {
+  outline-offset: -2px;
+  border-radius: 0;
+}
+
+button.forever-row[aria-expanded='true'] {
+  background-color: var(--panel-2);
 }
 
 .forever-row::before {
@@ -80,7 +105,7 @@
   background: var(--class-color);
 }
 
-.forever-row:hover {
+button.forever-row:hover {
   background-color: var(--panel-2);
 }
 

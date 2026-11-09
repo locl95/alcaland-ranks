@@ -24,6 +24,7 @@ const character = (
   experience,
   ruleset: 'PvP',
   lastLogin: '2026-11-05T20:00:00Z',
+  items: [],
 });
 
 const names = (characters: ForeverCharacter[]) =>

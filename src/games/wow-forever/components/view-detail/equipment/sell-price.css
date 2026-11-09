@@ -1,0 +1,17 @@
+.sell-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.sell-price-coin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.sell-price-coin img {
+  width: 0.8125rem;
+  height: 0.8125rem;
+}

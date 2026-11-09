@@ -20,5 +20,26 @@ export const foreverCharacter = (
   experience: 1000,
   ruleset: 'PvP',
   lastLogin: '2026-11-05T20:00:00Z',
+  items: [],
   ...overrides,
 });
+
+/** An item as /views/{id}/data sends it. No icon, so the tests make no calls to Blizzard. */
+export const BRAWLERS_HOOD = {
+  id: 252504,
+  slot: 'Head',
+  quality: 'Rare',
+  name: "Brawler's Leather Hood",
+  level: 25,
+  binding: 'Binds when picked up',
+  requiredLevel: 20,
+  itemSubclass: 'Leather',
+  armor: '76 Armor',
+  stats: ['+8 Agility', '+10 Stamina'],
+  spells: [],
+  sellPrice: { header: 'Sell Price:', gold: '0', silver: '12', copper: '6' },
+  durability: 'Durability 48 / 50',
+  weaponStats: null,
+  icon: null,
+  enchantments: [],
+};

@@ -1,0 +1,37 @@
+/* Quality is the only colour in the panel, so an epic stands out on sight. */
+.item-slot {
+  --quality-color: var(--rule);
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 2px solid var(--quality-color);
+  border-radius: var(--rad-sm);
+  background: #000;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.item-slot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.item-slot--empty {
+  border-color: var(--rule);
+  opacity: 0.55;
+  cursor: default;
+}
+
+.item-slot-popover {
+  z-index: 50;
+}
+
+@media (max-width: 640px) {
+  .item-slot {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}

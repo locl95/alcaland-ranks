@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
-import { ForeverCharacter } from '@/games/wow-forever/api/forever-types.ts';
+import { ForeverCharacter, WowItem } from '@/games/wow-forever/api/forever-types.ts';
 import { ForeverLadder } from './forever-ladder.tsx';
 
 // Only the Orc has race art here, as if just that PNG had been added.
@@ -30,8 +31,32 @@ const character = (
   experience: 0,
   ruleset: 'PvP',
   lastLogin: '2026-11-05T20:00:00Z',
+  items: [],
   ...overrides,
 });
+
+const RAGE_OF_THE_STORM: WowItem = {
+  id: 280604,
+  slot: 'Main Hand',
+  quality: 'Rare',
+  name: 'Rage of the Storm',
+  level: 40,
+  binding: 'Binds when picked up',
+  requiredLevel: 0,
+  itemSubclass: 'Mace',
+  armor: null,
+  stats: ['+12 Intellect', '+15 Stamina'],
+  spells: ['Equip: Increases the damage dealt by your Stormstrike ability by 10%.'],
+  sellPrice: { header: 'Sell Price:', gold: '1', silver: '62', copper: '35' },
+  durability: 'Durability 98 / 100',
+  weaponStats: {
+    damage: '91 - 137 Damage',
+    dps: '(35.6 damage per second)',
+    attackSpeed: 'Speed 3.20',
+  },
+  icon: 'https://render.worldofwarcraft.com/forever-eu/icons/56/133522.jpg',
+  enchantments: ['Windfury 1'],
+};
 
 const rowOf = (name: string) => screen.getByText(`${name} Test`).closest('li')!;
 const imagesOf = (name: string) => within(rowOf(name)).getAllByRole('img');
@@ -64,6 +89,65 @@ describe('ForeverLadder', () => {
     const lastLogin = within(rowOf('Daxan')).getByText('Last login').parentElement;
     expect(lastLogin).toHaveTextContent('Last login 3d');
     expect(lastLogin).toHaveAttribute('datetime', '2026-11-05T20:00:00Z');
+  });
+
+  it('opens and closes the equipment by clicking the row', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { items: [RAGE_OF_THE_STORM] })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    const toggle = within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(toggle);
+
+    const equipment = screen.getByRole('region', { name: 'Equipment of Daxan Test' });
+    expect(within(equipment).getByRole('button', { name: 'Rage of the Storm' })).toBeVisible();
+    expect(within(equipment).getByRole('img', { name: 'Head: empty' })).toBeVisible();
+
+    await user.click(toggle);
+    expect(screen.queryByRole('region', { name: /Equipment/ })).not.toBeInTheDocument();
+  });
+
+  it("shows an item's details from its icon, as the game's tooltip does", async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { items: [RAGE_OF_THE_STORM] })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+
+    await user.click(screen.getByRole('button', { name: 'Rage of the Storm' }));
+
+    const tooltip = screen.getByRole('dialog');
+    for (const line of [
+      'Item Level 40',
+      'Binds when picked up',
+      'Main Hand',
+      'Mace',
+      '91 - 137 Damage',
+      'Speed 3.20',
+      '(35.6 damage per second)',
+      '+15 Stamina',
+      'Windfury 1',
+      'Durability 98 / 100',
+      'Equip: Increases the damage dealt by your Stormstrike ability by 10%.',
+    ]) {
+      expect(within(tooltip).getByText(line)).toBeInTheDocument();
+    }
+    // No requirement, no line for it.
+    expect(within(tooltip).queryByText(/Requires Level/)).not.toBeInTheDocument();
+    expect(within(tooltip).getByRole('img', { name: 'gold' })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('says "No guild" for a character without one', () => {
