@@ -1,7 +1,7 @@
 import { ForeverCharacter } from '@/games/wow/forever/api/forever-types.ts';
-import { SPEC_IMAGES, getSpecImageKey } from '@/games/wow/forever/assets/spec-images.ts';
+import { SPEC_IMAGES, getSpecImageKey } from '@/games/wow/spec-images.ts';
 import { formatCharacterName } from '@/games/wow/forever/model/character.ts';
-import { spentTrees } from '@/games/wow/forever/model/talents.ts';
+import { specIconName, spentTrees } from '@/games/wow/forever/model/talents.ts';
 import { TalentIcon } from './talent-icon.tsx';
 import './talent-trees.css';
 
@@ -16,7 +16,8 @@ export function TalentTrees({ character }: Readonly<{ character: ForeverCharacte
         <p className="character-panel-missing">No talent points spent yet.</p>
       )}
       {trees.map((tree) => {
-        const specIcon = SPEC_IMAGES[getSpecImageKey(character.characterClass, tree.name)];
+        const specIcon =
+          SPEC_IMAGES[getSpecImageKey(character.characterClass, specIconName(tree.name))];
         return (
           <div key={tree.name} className="talent-tree">
             <div className="talent-tree-head">

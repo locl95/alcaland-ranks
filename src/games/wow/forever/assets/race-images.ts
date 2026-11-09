@@ -1,5 +1,5 @@
 // The game's race icons, from o7gg, named like the key ("nightelf.webp"). Kept to WoW
-// Forever for now: Retail's own race art goes in src/shared/warcraft/assets/races/.
+// Forever for now: race art for every Warcraft game goes in src/games/wow/assets/races/.
 const files = import.meta.glob<string>('/src/games/wow/forever/assets/races/*.webp', {
   eager: true,
   import: 'default',

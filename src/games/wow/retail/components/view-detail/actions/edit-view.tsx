@@ -8,7 +8,7 @@ import './edit-view.css';
 import '@/games/wow/retail/components/view-detail/character-ladder/ladder-row.css';
 import { WowProfile } from '@/games/wow/retail/api/wow-types.ts';
 import { getScoreClass } from '@/games/wow/retail/utils.ts';
-import { CLASS_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
+import { CLASS_COLORS, getClassSlug } from '@/games/wow/class-colors.ts';
 import { RealmSelect } from '@/games/wow/retail/components/landing/realm-select.tsx';
 import { VerificationBadge } from '@/features/views/components/shared/verification-badge.tsx';
 import { useEditViewForm } from '@/games/wow/retail/hooks/useEditViewForm.ts';

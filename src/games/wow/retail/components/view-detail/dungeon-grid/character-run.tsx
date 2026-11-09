@@ -8,8 +8,8 @@ import {
 } from '@/games/wow/retail/api/wow-types.ts';
 import { formatTimeDelta } from '@/games/wow/retail/utils.ts';
 import { KEYSTONE_DISPLAY } from '@/games/wow/retail/constants/keystone.ts';
-import { CLASS_TEXT_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
-import { SPEC_IMAGES, getSpecImageKey } from '@/games/wow/retail/assets/spec-images.ts';
+import { CLASS_TEXT_COLORS, getClassSlug } from '@/games/wow/class-colors.ts';
+import { SPEC_IMAGES, getSpecImageKey } from '@/games/wow/spec-images.ts';
 import { RunDetailsPanel } from './run-details-panel.tsx';
 
 function getScoreImprovement(

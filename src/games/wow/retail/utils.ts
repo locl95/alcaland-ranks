@@ -2,8 +2,6 @@ import { EU_REALMS } from '@/games/wow/retail/constants/euRealms.ts';
 import { NA_REALMS } from '@/games/wow/retail/constants/naRealms.ts';
 import { entityKey } from '@/games/wow/retail/api/wow-entity-api.ts';
 
-export const normalizeKey = (s: string): string => s.toLowerCase().replace(/\s+/g, '');
-
 export const NOT_FOUND_HINT = 'Check the name, realm and region.';
 
 export const toRealmSlug = (realm: string, region: string): string => {

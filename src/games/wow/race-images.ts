@@ -1,6 +1,6 @@
 // Race art is added as PNGs in assets/races/, named like the key ("nightelf.png"); a race
 // without a file is simply missing from the map.
-const files = import.meta.glob<string>('/src/shared/warcraft/assets/races/*.png', {
+const files = import.meta.glob<string>('/src/games/wow/assets/races/*.png', {
   eager: true,
   import: 'default',
 });

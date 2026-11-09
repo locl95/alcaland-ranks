@@ -8,7 +8,7 @@ import {
   formatDate,
 } from '@/games/wow/retail/api/wow-types.ts';
 import { KEYSTONE_DISPLAY } from '@/games/wow/retail/constants/keystone.ts';
-import { CLASS_TEXT_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
+import { CLASS_TEXT_COLORS, getClassSlug } from '@/games/wow/class-colors.ts';
 
 interface RecentRunsProps {
   recentRuns: MythicPlusRecentRun[];

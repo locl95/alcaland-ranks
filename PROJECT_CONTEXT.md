@@ -55,8 +55,9 @@ Each game has its own folder: `src/games/lol/`, and the Warcraft games side by s
 `hooks/` and `model/` (pure domain logic). `src/features/views/` keeps only what every
 game shares: the ladder list, the detail header, sync, the create-form row logic and
 the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts).
-`src/shared/warcraft/` holds the class icons and colours, and the race art (PNGs dropped
-in `assets/races/`), that every Warcraft game uses. WoW Forever has its own race icons
+`src/games/wow/` itself holds what every Warcraft game uses: class and spec icons, class
+colours and the race art (PNGs dropped in `assets/races/`). Spec icons go by Retail's
+spec names; Forever maps the two Classic trees renamed since (Combat, Feral Combat). WoW Forever has its own race icons
 for now (`src/games/wow/forever/assets/races/`), kept out of Retail on purpose.
 A game must not import another game (ESLint enforces it); a Warcraft game may import
 `src/games/wow/`, and that code must not import any one Warcraft game.

@@ -1,4 +1,4 @@
-import { CLASS_IMAGES } from '@/shared/warcraft/class-images.ts';
+import { CLASS_IMAGES } from '@/games/wow/class-images.ts';
 import { ViewsPage } from '@/features/views/components/views-page/views-page.tsx';
 import { CreateForeverView } from './create-forever-view.tsx';
 

@@ -1,7 +1,7 @@
 import { CSSProperties, useId, useState } from 'react';
 import { Clock } from 'lucide-react';
-import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.ts';
-import { CLASS_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
+import { CLASS_IMAGES, getClassImageKey } from '@/games/wow/class-images.ts';
+import { CLASS_COLORS, getClassSlug } from '@/games/wow/class-colors.ts';
 import { RACE_IMAGES, getRaceImageKey } from '@/games/wow/forever/assets/race-images.ts';
 import { formatCharacterName } from '@/games/wow/forever/model/character.ts';
 import { LadderEntry } from '@/games/wow/forever/model/ladder.ts';

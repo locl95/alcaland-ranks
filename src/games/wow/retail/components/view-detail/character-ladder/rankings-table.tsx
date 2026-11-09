@@ -1,5 +1,5 @@
 import { WowProfile } from '@/games/wow/retail/api/wow-types.ts';
-import { CLASS_TEXT_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
+import { CLASS_TEXT_COLORS, getClassSlug } from '@/games/wow/class-colors.ts';
 import { getRankChange, formatRankChange } from '@/games/wow/retail/utils.ts';
 import './rankings-table.css';
 

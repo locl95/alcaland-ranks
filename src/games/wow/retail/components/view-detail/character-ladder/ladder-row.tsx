@@ -8,9 +8,9 @@ import { CharacterMenu } from './character-menu.tsx';
 import { LadderRowExpanded } from './ladder-row-expanded.tsx';
 
 import { getScoreClass, getScoreTier } from '@/games/wow/retail/utils.ts';
-import { CLASS_IMAGES, getClassImageKey } from '@/shared/warcraft/class-images.ts';
-import { getClassSlug } from '@/shared/warcraft/class-colors.ts';
-import { RACE_IMAGES, getRaceImageKey } from '@/shared/warcraft/race-images.ts';
+import { CLASS_IMAGES, getClassImageKey } from '@/games/wow/class-images.ts';
+import { getClassSlug } from '@/games/wow/class-colors.ts';
+import { RACE_IMAGES, getRaceImageKey } from '@/games/wow/race-images.ts';
 
 interface LadderRowProps {
   index: number;

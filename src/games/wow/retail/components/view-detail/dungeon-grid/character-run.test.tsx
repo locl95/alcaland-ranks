@@ -8,7 +8,7 @@ vi.mock('./run-details-panel.tsx', () => ({
   RunDetailsPanel: () => <div data-testid="run-details-panel" />,
 }));
 
-vi.mock('@/games/wow/retail/assets/spec-images.ts', () => ({
+vi.mock('@/games/wow/spec-images.ts', () => ({
   SPEC_IMAGES: {} as Record<string, string>,
   getSpecImageKey: () => 'warrior_arms',
 }));

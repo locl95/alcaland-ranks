@@ -1,9 +1,9 @@
 import './roster-row.css';
 import { Swords } from 'lucide-react';
 import { RunDetailsMember } from '@/games/wow/retail/api/wow-types.ts';
-import { SPEC_IMAGES, getSpecImageKey } from '@/games/wow/retail/assets/spec-images.ts';
+import { SPEC_IMAGES, getSpecImageKey } from '@/games/wow/spec-images.ts';
 import { ROLE_IMAGES } from '@/games/wow/retail/assets/role-images.ts';
-import { CLASS_TEXT_COLORS, getClassSlug } from '@/shared/warcraft/class-colors.ts';
+import { CLASS_TEXT_COLORS, getClassSlug } from '@/games/wow/class-colors.ts';
 import { openExternalProfile, toRealmLabel } from '@/games/wow/retail/utils.ts';
 
 const ROLE_LABEL: Record<string, string> = {
