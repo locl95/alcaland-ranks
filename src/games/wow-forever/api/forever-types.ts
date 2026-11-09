@@ -18,6 +18,8 @@ export interface ForeverCharacter {
   lastLogin: string;
   /** Only what is equipped: an empty slot is simply missing. */
   items: WowItem[];
+  /** One tree per specialization, with the talents trained in it. */
+  talents: WowTalentTree[];
 }
 
 /** An equipped item, as Blizzard displays it: most fields are ready-made English text. */
@@ -54,4 +56,20 @@ export interface WowWeaponStats {
   damage: string;
   dps: string;
   attackSpeed: string;
+}
+
+export interface WowTalentTree {
+  /** The specialization: "Enhancement", "Feral Combat"… */
+  name: string;
+  points: number;
+  talents: WowTalent[];
+}
+
+export interface WowTalent {
+  name: string;
+  spellId: number;
+  /** Points spent in this talent. Its maximum is not sent. */
+  rank: number;
+  description: string;
+  icon: string | null;
 }

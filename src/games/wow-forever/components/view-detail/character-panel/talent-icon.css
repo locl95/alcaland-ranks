@@ -1,0 +1,36 @@
+/* A step smaller than an item, so the equipment still leads the panel. */
+.talent-icon {
+  position: relative;
+  display: block;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--rad-sm);
+  background: #000;
+  cursor: pointer;
+}
+
+.talent-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+}
+
+/* The rank, green and outlined in black as the game draws it over the icon. */
+.talent-icon-rank {
+  position: absolute;
+  right: -0.25rem;
+  bottom: -0.3125rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #1eff00;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}

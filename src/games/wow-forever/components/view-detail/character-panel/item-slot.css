@@ -25,10 +25,6 @@
   cursor: default;
 }
 
-.item-slot-popover {
-  z-index: 50;
-}
-
 @media (max-width: 640px) {
   .item-slot {
     width: 2.5rem;

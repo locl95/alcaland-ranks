@@ -1,11 +1,12 @@
 /* The one piece of the Forever UI that leaves the leather theme on purpose:
    the game's own tooltip, deep blue-black with a grey edge, is what players
-   recognise an item by. Its colours live here rather than in the theme. */
-.item-tooltip {
+   recognise an item or a talent by. Its colours live here, not in the theme. */
+.game-tooltip {
   --tooltip-bg: rgba(8, 12, 28, 0.95);
   --tooltip-edge: #8b8b8b;
   --tooltip-yellow: #ffd100;
   --tooltip-green: #1eff00;
+  z-index: 50;
   /* Narrows rather than run off a phone screen. */
   min-width: min(13rem, var(--radix-popover-content-available-width));
   max-width: min(18rem, var(--radix-popover-content-available-width));
@@ -22,30 +23,9 @@
   color: #fff;
 }
 
-.item-tooltip-name {
+/* The first line of every tooltip: what it is, in the display face. */
+.game-tooltip-title {
   font-family: var(--font-display);
   font-size: 1rem;
   line-height: 1.3;
-  color: var(--quality-color, #fff);
-}
-
-.item-tooltip-level {
-  color: var(--tooltip-yellow);
-}
-
-/* Two facts on one line, as the game pairs them: slot and type, damage and speed. */
-.item-tooltip-pair {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  column-gap: 1.5rem;
-}
-
-/* On a narrow tooltip the pair wraps whole, never mid-fact. */
-.item-tooltip-pair > span {
-  white-space: nowrap;
-}
-
-.item-tooltip-effect {
-  color: var(--tooltip-green);
 }

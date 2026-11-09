@@ -1,0 +1,5 @@
+/* The game sets what a talent does in gold under its name and rank. */
+.talent-tooltip-description {
+  margin-top: 0.125rem;
+  color: var(--tooltip-yellow);
+}

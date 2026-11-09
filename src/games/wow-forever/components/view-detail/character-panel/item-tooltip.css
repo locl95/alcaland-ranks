@@ -1,0 +1,24 @@
+.item-tooltip-name {
+  color: var(--quality-color, #fff);
+}
+
+.item-tooltip-level {
+  color: var(--tooltip-yellow);
+}
+
+/* Two facts on one line, as the game pairs them: slot and type, damage and speed. */
+.item-tooltip-pair {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  column-gap: 1.5rem;
+}
+
+/* On a narrow tooltip the pair wraps whole, never mid-fact. */
+.item-tooltip-pair > span {
+  white-space: nowrap;
+}
+
+.item-tooltip-effect {
+  color: var(--tooltip-green);
+}

@@ -25,6 +25,7 @@ const character = (
   ruleset: 'PvP',
   lastLogin: '2026-11-05T20:00:00Z',
   items: [],
+  talents: [],
 });
 
 const names = (characters: ForeverCharacter[]) =>

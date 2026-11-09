@@ -7,15 +7,10 @@ import {
 import { formatCharacterName } from '@/games/wow-forever/model/character.ts';
 import { itemsBySlot } from '@/games/wow-forever/model/item.ts';
 import { ItemSlot } from './item-slot.tsx';
-import './equipment-panel.css';
-
-interface EquipmentPanelProps {
-  id: string;
-  character: ForeverCharacter;
-}
+import './equipment-sheet.css';
 
 /** The character sheet: armour down both sides, weapons along the bottom. */
-export function EquipmentPanel({ id, character }: Readonly<EquipmentPanelProps>) {
+export function EquipmentSheet({ character }: Readonly<{ character: ForeverCharacter }>) {
   const bySlot = itemsBySlot(character.items);
 
   const slotsOf = (slots: string[]) =>
@@ -23,8 +18,7 @@ export function EquipmentPanel({ id, character }: Readonly<EquipmentPanelProps>)
 
   return (
     <section
-      id={id}
-      className="equipment-panel"
+      className="equipment-sheet"
       aria-label={`Equipment of ${formatCharacterName(character)}`}
     >
       <div className="equipment-column equipment-column--left">{slotsOf(LEFT_SLOTS)}</div>

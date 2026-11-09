@@ -1,0 +1,46 @@
+/* A drawer under the row, sunk one step below it: it belongs to the row above,
+   and the class spine carries on down its side to say so. Talents sit beside
+   the equipment while there is room, and drop below it when there is not. */
+.character-panel {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.5rem 3rem;
+  padding: 1.25rem 1.75rem 1.5rem;
+  background: var(--void-lift);
+  border-top: 1px solid var(--rule-soft);
+  animation: character-panel-open var(--motion-base) ease-out;
+}
+
+.character-panel::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--class-color);
+}
+
+@keyframes character-panel-open {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}
+
+.character-panel .talent-trees {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .character-panel {
+    padding: 1rem 0.75rem 1.25rem 1.25rem;
+  }
+
+  .character-panel .equipment-sheet {
+    flex-basis: 100%;
+  }
+}

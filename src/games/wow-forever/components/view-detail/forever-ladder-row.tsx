@@ -7,7 +7,7 @@ import { formatCharacterName } from '@/games/wow-forever/model/character.ts';
 import { LadderEntry } from '@/games/wow-forever/model/ladder.ts';
 import { regionLabel } from '@/games/wow-forever/constants/regions.ts';
 import { compactTimeSince } from '@/games/wow-forever/model/last-login.ts';
-import { EquipmentPanel } from './equipment/equipment-panel.tsx';
+import { CharacterPanel } from './character-panel/character-panel.tsx';
 
 interface ForeverLadderRowProps {
   position: number;
@@ -119,7 +119,7 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
         </time>
       </button>
 
-      {open && <EquipmentPanel id={panelId} character={character} />}
+      {open && <CharacterPanel id={panelId} character={character} />}
     </li>
   );
 }

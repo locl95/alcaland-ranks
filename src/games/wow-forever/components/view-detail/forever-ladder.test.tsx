@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
-import { ForeverCharacter, WowItem } from '@/games/wow-forever/api/forever-types.ts';
+import { ForeverCharacter, WowItem, WowTalentTree } from '@/games/wow-forever/api/forever-types.ts';
 import { ForeverLadder } from './forever-ladder.tsx';
 
 // Only the Orc has race art here, as if just that PNG had been added.
@@ -32,6 +32,7 @@ const character = (
   ruleset: 'PvP',
   lastLogin: '2026-11-05T20:00:00Z',
   items: [],
+  talents: [],
   ...overrides,
 });
 
@@ -56,6 +57,21 @@ const RAGE_OF_THE_STORM: WowItem = {
   },
   icon: 'https://render.worldofwarcraft.com/forever-eu/icons/56/133522.jpg',
   enchantments: ['Windfury 1'],
+};
+
+const ENHANCEMENT: WowTalentTree = {
+  name: 'Enhancement',
+  points: 25,
+  talents: [
+    {
+      name: 'Flurry',
+      spellId: 16256,
+      rank: 5,
+      description:
+        'Increases your attack speed by 30% for your next 3 swings after dealing a melee critical strike.',
+      icon: 'https://render.worldofwarcraft.com/forever-eu/icons/56/132152.jpg',
+    },
+  ],
 };
 
 const rowOf = (name: string) => screen.getByText(`${name} Test`).closest('li')!;
@@ -148,6 +164,45 @@ describe('ForeverLadder', () => {
 
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('shows the talents trained in each specialization, main one first', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[
+          character('Daxan', 22, {
+            characterClass: 'Shaman',
+            talents: [{ name: 'Elemental', points: 5, talents: [] }, ENHANCEMENT],
+          }),
+        ]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+
+    const talents = screen.getByRole('region', { name: 'Talents of Daxan Test' });
+    const trees = within(talents).getAllByRole('heading');
+    expect(trees.map((tree) => tree.parentElement!.textContent)).toEqual([
+      'Enhancement25 points',
+      'Elemental5 points',
+    ]);
+
+    await user.click(within(talents).getByRole('button', { name: 'Flurry, rank 5' }));
+    const tooltip = screen.getByRole('dialog');
+    expect(within(tooltip).getByText('Rank 5')).toBeInTheDocument();
+    expect(within(tooltip).getByText(/Increases your attack speed by 30%/)).toBeInTheDocument();
+  });
+
+  it('says so when no talent points are spent yet', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder characters={[character('Daxan', 8)]} cachedCharacters={[]} pending={[]} />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+
+    expect(screen.getByText('No talent points spent yet.')).toBeVisible();
   });
 
   it('says "No guild" for a character without one', () => {

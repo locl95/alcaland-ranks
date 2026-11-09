@@ -12,7 +12,7 @@ export function ItemTooltip({ item }: Readonly<{ item: WowItem }>) {
       className="item-tooltip"
       style={{ '--quality-color': ITEM_QUALITY_COLORS[item.quality] } as CSSProperties}
     >
-      <p className="item-tooltip-name">{item.name}</p>
+      <p className="game-tooltip-title item-tooltip-name">{item.name}</p>
       <p className="item-tooltip-level">Item Level {item.level}</p>
       {item.binding && <p>{item.binding}</p>}
       <p className="item-tooltip-pair">

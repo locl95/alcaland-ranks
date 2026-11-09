@@ -1,0 +1,37 @@
+.equipment-sheet {
+  display: grid;
+  /* The gap is where the game puts the character model. */
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    'left right'
+    'weapons weapons';
+  column-gap: 5rem;
+  row-gap: 0.875rem;
+}
+
+.equipment-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.equipment-column--left {
+  grid-area: left;
+}
+
+.equipment-column--right {
+  grid-area: right;
+}
+
+.equipment-weapons {
+  grid-area: weapons;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .equipment-sheet {
+    justify-content: space-between;
+  }
+}

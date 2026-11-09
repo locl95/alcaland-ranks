@@ -21,6 +21,7 @@ export const foreverCharacter = (
   ruleset: 'PvP',
   lastLogin: '2026-11-05T20:00:00Z',
   items: [],
+  talents: [],
   ...overrides,
 });
 
@@ -42,4 +43,19 @@ export const BRAWLERS_HOOD = {
   weaponStats: null,
   icon: null,
   enchantments: [],
+};
+
+export const ENHANCEMENT = {
+  name: 'Enhancement',
+  points: 25,
+  talents: [
+    {
+      name: 'Flurry',
+      spellId: 16256,
+      rank: 5,
+      description:
+        'Increases your attack speed by 30% for your next 3 swings after dealing a melee critical strike.',
+      icon: null,
+    },
+  ],
 };
