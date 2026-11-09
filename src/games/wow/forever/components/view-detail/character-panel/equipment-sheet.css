@@ -1,0 +1,47 @@
+.equipment-sheet {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'left stats right'
+    'weapons weapons weapons';
+  gap: 0.875rem 1.5rem;
+}
+
+.equipment-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.equipment-column--left {
+  grid-area: left;
+}
+
+.equipment-column--right {
+  grid-area: right;
+}
+
+.equipment-sheet .character-stats {
+  grid-area: stats;
+}
+
+.equipment-weapons {
+  grid-area: weapons;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* On a phone the stats would squeeze between the columns: they go below. */
+@media (max-width: 640px) {
+  .equipment-sheet {
+    grid-template-areas:
+      'left . right'
+      'weapons weapons weapons'
+      'stats stats stats';
+  }
+
+  .equipment-sheet .character-stats {
+    margin-top: 0.5rem;
+  }
+}

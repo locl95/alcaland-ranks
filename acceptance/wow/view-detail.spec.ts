@@ -6,7 +6,7 @@ import { mockCharacter, mockEntitiesExist, mockSeason } from './mocks';
 import { API, VALID_VIEW_ID } from '../constants';
 import { wheelBackground } from '../helpers';
 import { expectListAnchoredToInput, pickRealm } from './helpers';
-import { ViewData } from '../../src/games/wow/api/wow-types';
+import { ViewData } from '../../src/games/wow/retail/api/wow-types';
 
 const viewData: ViewData = { data: [mockCharacter], viewName: 'My Ladder' };
 const emptyViewData: ViewData = { data: [], viewName: 'My Ladder' };

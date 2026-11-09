@@ -1,12 +1,12 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Spinner } from '@/shared/components/spinner.tsx';
 import { Footer } from '@/shared/components/footer.tsx';
-import { WowLanding } from '@/games/wow/components/landing/wow-landing.tsx';
+import { WowLanding } from '@/games/wow/retail/components/landing/wow-landing.tsx';
 import { LolLanding } from '@/games/lol/components/landing/lol-landing.tsx';
-import { ForeverLanding } from '@/games/wow-forever/components/landing/forever-landing.tsx';
-import { ForeverViewDetail } from '@/games/wow-forever/components/view-detail/forever-view-detail.tsx';
+import { ForeverLanding } from '@/games/wow/forever/components/landing/forever-landing.tsx';
+import { ForeverViewDetail } from '@/games/wow/forever/components/view-detail/forever-view-detail.tsx';
 import { LolViewDetail } from '@/games/lol/components/view-detail/lol-view-detail.tsx';
-import { WowViewDetail } from '@/games/wow/components/view-detail/wow-view-detail.tsx';
+import { WowViewDetail } from '@/games/wow/retail/components/view-detail/wow-view-detail.tsx';
 import { LoginPage } from '@/features/auth/LoginPage.tsx';
 import { GameLayout } from '@/shared/game/game-layout.tsx';
 import { LegacyViewRedirect } from './legacy-view-redirect.tsx';

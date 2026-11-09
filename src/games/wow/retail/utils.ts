@@ -1,0 +1,88 @@
+import { EU_REALMS } from '@/games/wow/retail/constants/euRealms.ts';
+import { NA_REALMS } from '@/games/wow/retail/constants/naRealms.ts';
+import { entityKey } from '@/games/wow/retail/api/wow-entity-api.ts';
+
+export const NOT_FOUND_HINT = 'Check the name, realm and region.';
+
+export const toRealmSlug = (realm: string, region: string): string => {
+  const realms = region.toLowerCase() === 'us' ? NA_REALMS : EU_REALMS;
+  const match = realms.find((r) => r.slug === realm || r.label === realm);
+  return match?.slug ?? realm.trim().toLowerCase().replace(/\s+/g, '-');
+};
+
+export const toRealmLabel = (slug: string, region: string): string => {
+  const realms = region.toLowerCase() === 'us' ? NA_REALMS : EU_REALMS;
+  return realms.find((r) => r.slug === slug)?.label ?? slug;
+};
+
+/** Identifies a character whether its realm is a display name or a slug. */
+export const characterKey = (c: { name: string; realm: string; region: string }): string =>
+  entityKey({ name: c.name, region: c.region, realm: toRealmSlug(c.realm, c.region) });
+
+type ExternalService = 'raiderio' | 'summoned';
+
+const SERVICE_BASE_URLS: Record<ExternalService, string> = {
+  raiderio: 'https://raider.io/characters',
+  summoned: 'https://summoned.io',
+};
+
+export const openExternalProfile = (
+  character: { name: string; realm: string; region: string },
+  service: ExternalService,
+): void => {
+  const realm = character.realm.replace(/\s+/g, '-');
+  const name = character.name.toLowerCase();
+  const region = character.region.toLowerCase();
+  window.open(
+    `${SERVICE_BASE_URLS[service]}/${region}/${realm}/${name}`,
+    '_blank',
+    'noopener,noreferrer',
+  );
+};
+
+export type ScoreTier = 'grey' | 'green' | 'blue' | 'purple' | 'orange';
+
+export const getScoreTier = (score: number): ScoreTier => {
+  if (score < 1600) return 'grey';
+  if (score < 2800) return 'green';
+  if (score < 3400) return 'blue';
+  if (score < 3999) return 'purple';
+  return 'orange';
+};
+
+export const getScoreClass = (score: number): string => `score-${getScoreTier(score)}`;
+
+export const getRankChange = (current: number, previous?: number): number | null => {
+  if (previous === undefined) return null;
+  return previous - current;
+};
+
+export const formatRankChange = (change: number): string => {
+  const formatted = Math.round(Math.abs(change)).toLocaleString();
+  return change > 0 ? `+${formatted}` : `-${formatted}`;
+};
+
+export function formatClearTime(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+export function formatTimeDelta(clearMs: number, parMs: number): { text: string; timed: boolean } {
+  const diffMs = Math.abs(parMs - clearMs);
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const sign = clearMs <= parMs ? '-' : '+';
+  const text = `${sign}${minutes}:${String(seconds).padStart(2, '0')}`;
+  return { text, timed: clearMs <= parMs };
+}
+
+export function formatDate(date: string | Date): string {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+}

@@ -1,0 +1,66 @@
+/* --------------------------------------------------------------------------
+   WoW Forever theme — leather, parchment and firelight, taken from Blizzard's
+   own WoW Forever page (its --wow-color-* palette). Only redefines tokens from
+   src/styles/app/theme.css; anything not listed here stays on the default.
+
+   Gold takes over from cyan as the interaction colour. Values marked
+   "derived" are not in Blizzard's palette: they fill a step it doesn't have.
+   -------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Marcellus';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../../assets/fonts/marcellus-latin-400.woff2') format('woff2');
+}
+
+:root[data-game='wow-forever'] {
+  /* Surfaces */
+  --void: #180f01; /* brown-700 */
+  --void-lift: #20170e; /* brown-600 */
+  --panel: #2b1d1c; /* leather-300 */
+  --panel-2: #3c2a29; /* leather-500 */
+  --panel-3: #4a3533; /* derived */
+  --rule: #504137; /* beige-600 */
+  --rule-soft: rgba(80, 65, 55, 0.6);
+  /* Parchment band along the top of framed panels */
+  --frame: #c6af8d;
+
+  /* Ink */
+  --ink: #f3eee2; /* beige-200 */
+  --ink-2: #b1997f; /* beige-400 */
+  --ink-3: #82705b; /* beige-500 */
+  --ink-4: #5f4d40; /* derived */
+
+  /* Interaction */
+  --beacon: #ffd254; /* gold-400 */
+  --beacon-soft: rgba(255, 210, 84, 0.1);
+  --beacon-edge: rgba(255, 210, 84, 0.32);
+  --beacon-hover: rgba(255, 210, 84, 0.18);
+  --beacon-bright: #fff7c6; /* gold-200 */
+
+  /* Semantic */
+  --danger: #ff522c; /* red-300 */
+  --danger-soft: rgba(255, 82, 44, 0.09);
+  --danger-edge: rgba(255, 82, 44, 0.3);
+
+  /* Type: two families, one job each. Marcellus — a free stand-in for Friz
+     Quadrata, the WoW UI face Blizzard's BlizQuadrata is cut from — sets
+     everything with a proper name: titles, ladders, characters, buttons. The
+     system sans sets everything else, numbers included (still tabular via
+     .num), so the mono face is not used here. */
+  --font-display: 'Marcellus', Georgia, 'Times New Roman', serif;
+  --font-data: var(--font-ui);
+
+  /* Marcellus has one weight. Components ask for 600/700 on display text;
+     render those at the real weight rather than a smeared fake bold, and let
+     size and colour carry the hierarchy. */
+  font-synthesis: none;
+}
+
+/* Page titles in gold with a soft shadow, as on Blizzard's page. */
+:root[data-game='wow-forever'] h1 {
+  color: var(--gold);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}

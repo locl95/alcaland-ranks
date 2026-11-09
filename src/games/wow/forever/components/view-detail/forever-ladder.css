@@ -1,0 +1,349 @@
+/* Same card as the WoW Retail ladder. The spine on each row takes the
+   character's class colour: with no score tiers, class is what tells a
+   leveling group apart at a glance. */
+
+.forever-ladder {
+  /* Shared by the header and the rows so the number columns line up. */
+  --col-gap: 1rem;
+  --col-ilvl: 3rem;
+  --col-level: 5rem;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--frame);
+  background: var(--panel);
+  border-radius: var(--rad-lg);
+  overflow: hidden;
+}
+
+.forever-ladder-cols {
+  display: flex;
+  gap: var(--col-gap);
+  padding: 0.5rem 1.75rem 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.forever-ladder-cols > :first-child {
+  flex: 1;
+}
+
+.forever-col-ilvl,
+.forever-col-level {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.forever-col-ilvl {
+  width: var(--col-ilvl);
+}
+
+.forever-col-level {
+  width: var(--col-level);
+}
+
+.forever-ladder-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* The class colour is set on the <li>, so the row and its equipment share it. */
+.forever-ladder-rows > li {
+  --class-color: var(--ink-4);
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.forever-ladder-rows > li:last-child {
+  border-bottom: none;
+}
+
+.forever-ladder .pager {
+  padding-left: 1.25rem;
+  padding-right: 0.75rem;
+}
+
+.forever-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--col-gap);
+  padding: 0.8125rem 1.75rem 0.8125rem 1rem;
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--class-color) 12%, transparent) 0%,
+    transparent 9rem
+  );
+}
+
+/* A ladder row is a <button> that opens the character's equipment, stripped
+   back to a layout box. The pending row is the same box as a plain <li>. */
+button.forever-row {
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.forever-row:focus-visible {
+  outline-offset: -2px;
+  border-radius: 0;
+}
+
+button.forever-row[aria-expanded='true'] {
+  background-color: var(--panel-2);
+}
+
+.forever-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--class-color);
+}
+
+button.forever-row:hover {
+  background-color: var(--panel-2);
+}
+
+.forever-row-position {
+  width: 1.75rem;
+  flex-shrink: 0;
+  text-align: right;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+/* Blizzard's render of the character's face, as tall as the name, guild and
+   tags beside it (their line boxes add up to 4rem). A fixed size rather than a
+   stretch: a stretched box has no width until the remote image has loaded. */
+.forever-portrait {
+  flex-shrink: 0;
+  width: 4rem;
+  height: 4rem;
+}
+
+.forever-portrait-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--rad-sm);
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.forever-identity {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.forever-identity img {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--rad-sm);
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.forever-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.forever-row-name-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.forever-row-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3125rem;
+  letter-spacing: 0.015em;
+  /* Tall enough for Marcellus's descenders (g, j, p, y): overflow is hidden for
+     the ellipsis, so anything outside the line box gets cut. */
+  line-height: 1.35;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.forever-standing,
+.forever-level-gain {
+  font-family: var(--font-data);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 0.0625rem 0.3125rem;
+  border-radius: var(--rad-sm);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.forever-standing--up,
+.forever-level-gain {
+  color: var(--up);
+  background: color-mix(in srgb, var(--up) 10%, transparent);
+}
+
+.forever-standing--down {
+  color: var(--down);
+  background: color-mix(in srgb, var(--down) 10%, transparent);
+}
+
+/* Name, then guild, then tags: identity reads top-down, as on a WoW nameplate. */
+.forever-guild {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.forever-guild--none {
+  color: var(--ink-3);
+}
+
+.forever-row-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.3125rem;
+  color: var(--ink-2);
+}
+
+.forever-badge {
+  flex-shrink: 0;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 0.0625rem 0.3125rem;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
+
+/* Same size as the level, quieter colour: comparable at a glance, but the level
+   stays the number that ranks the ladder. */
+.forever-ilvl {
+  width: var(--col-ilvl);
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink-3);
+}
+
+.forever-level {
+  width: var(--col-level);
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.forever-level-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+/* Bottom right, on the line of the tags, in the quietest ink of the row: a
+   detail to look for, not a third number to compare. The full date is on hover. */
+.forever-last-login {
+  position: absolute;
+  right: 1.75rem;
+  bottom: 0.8125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1875rem;
+  font-size: 0.6875rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .forever-ladder {
+    --col-gap: 0.5rem;
+    --col-ilvl: 1.75rem;
+    --col-level: 3.5rem;
+  }
+
+  .forever-ladder-cols {
+    padding: 0.4375rem 0.75rem 0.4375rem 0.875rem;
+  }
+
+  .forever-row {
+    padding: 0.625rem 0.75rem 0.625rem 0.5rem;
+  }
+
+  .forever-row-position {
+    width: 1.125rem;
+    font-size: 0.75rem;
+  }
+
+  /* The smaller name, guild and tags of a phone add up to 3.375rem. */
+  .forever-portrait {
+    width: 3.375rem;
+    height: 3.375rem;
+  }
+
+  .forever-identity img {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* The race leaves the row on a phone; the class stays, and the spine says it too. */
+  .forever-identity-race {
+    display: none;
+  }
+
+  .forever-row-name {
+    font-size: 1rem;
+  }
+
+  .forever-guild {
+    font-size: 0.6875rem;
+  }
+
+  .forever-last-login {
+    right: 0.75rem;
+    bottom: 0.625rem;
+    font-size: 0.625rem;
+  }
+
+  .forever-row-tags {
+    margin-top: 0.25rem;
+  }
+
+  .forever-badge {
+    font-size: 0.5rem;
+  }
+
+  .forever-ilvl,
+  .forever-level-value {
+    font-size: 1.0625rem;
+  }
+}
+
+.forever-portrait--empty {
+  border-radius: var(--rad-sm);
+  background: var(--panel-2);
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.forever-row--pending .forever-row-name {
+  color: var(--ink-3);
+}

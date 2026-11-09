@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import App from './App';
 
-vi.mock('@/games/wow/components/landing/wow-landing.tsx', () => ({
+vi.mock('@/games/wow/retail/components/landing/wow-landing.tsx', () => ({
   WowLanding: () => <div data-testid="wow-landing" />,
 }));
 
@@ -11,11 +11,11 @@ vi.mock('@/games/lol/components/landing/lol-landing.tsx', () => ({
   LolLanding: () => <div data-testid="lol-landing" />,
 }));
 
-vi.mock('@/games/wow-forever/components/landing/forever-landing.tsx', () => ({
+vi.mock('@/games/wow/forever/components/landing/forever-landing.tsx', () => ({
   ForeverLanding: () => <div data-testid="forever-landing" />,
 }));
 
-vi.mock('@/games/wow/components/view-detail/wow-view-detail.tsx', () => ({
+vi.mock('@/games/wow/retail/components/view-detail/wow-view-detail.tsx', () => ({
   WowViewDetail: () => <div data-testid="view-detail">{useLocation().pathname}</div>,
 }));
 

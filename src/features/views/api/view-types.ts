@@ -38,21 +38,6 @@ export interface GetViewsResponse {
   records: SimpleView[];
 }
 
-export interface WowEntityRequest {
-  name: string;
-  region: string;
-  realm: string;
-  type: 'wow';
-}
-
-export interface ViewRequest {
-  name: string;
-  entities: WowEntityRequest[];
-  published: boolean;
-  featured: boolean;
-  game: string;
-}
-
 export type OperationStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 
 export interface OperationResult {

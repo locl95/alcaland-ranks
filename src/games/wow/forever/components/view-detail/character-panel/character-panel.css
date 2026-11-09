@@ -1,0 +1,49 @@
+/* A drawer under the row, sunk one step below it: it belongs to the row above,
+   and the class spine carries on down its side to say so. */
+.character-panel {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.5rem 3rem;
+  padding: 1.25rem 1.75rem 1.5rem;
+  background: var(--void-lift);
+  border-top: 1px solid var(--rule-soft);
+  animation: character-panel-open var(--motion-base) ease-out;
+}
+
+.character-panel::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--class-color);
+}
+
+@keyframes character-panel-open {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}
+
+/* Half each: the sheet and its stats, then the talents. When both halves
+   cannot have 30rem, each takes the full width. */
+.character-panel > * {
+  flex: 1 1 30rem;
+  min-width: 0;
+}
+
+/* What the panel says when part of the character has not synced. */
+.character-panel-missing {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+@media (max-width: 640px) {
+  .character-panel {
+    padding: 1rem 0.75rem 1.25rem 1.25rem;
+  }
+}

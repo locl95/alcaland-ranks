@@ -42,19 +42,25 @@ other external service — all data is proxied.
 
 The one exception is images: `Dungeon.icon` from the season payload is rendered
 straight into an `<img src>`, so the browser does load raider.io's CDN directly. This is
-deliberate — see "Dungeon icons" below.
+deliberate — see "Dungeon icons" below. WoW Forever item icons (`WowItem.icon`) work the
+same way against Blizzard's CDN, falling back to the slot's own art when one fails to load.
 
 ## Architecture
 
 Feature-based folders under `src/features/`, with `src/shared/` for cross-cutting code.
-Each game lives in `src/games/<game>/` (`wow`, `lol`, `wow-forever`) and repeats the same layout:
+Each game has its own folder: `src/games/lol/`, and the Warcraft games side by side in
+`src/games/wow/` (`retail/`, `forever/`), where what they share sits too. Each repeats the same layout:
 `api/` (types and calls), `assets/` (images and the modules that map them),
 `components/` (`landing/`, `view-detail/`), `constants/` (fixed data, no images),
 `hooks/` and `model/` (pure domain logic). `src/features/views/` keeps only what every
 game shares: the ladder list, the detail header, sync, the create-form row logic and
 the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts).
-`src/shared/warcraft/` holds the class icons and colours, and the race art (PNGs dropped
-in `assets/races/`), that every Warcraft game uses.
+`src/games/wow/` itself holds what every Warcraft game uses: class and spec icons, class
+colours and the race art (PNGs dropped in `assets/races/`). Spec icons go by Retail's
+spec names; Forever maps the two Classic trees renamed since (Combat, Feral Combat). WoW Forever has its own race icons
+for now (`src/games/wow/forever/assets/races/`), kept out of Retail on purpose.
+A game must not import another game (ESLint enforces it); a Warcraft game may import
+`src/games/wow/`, and that code must not import any one Warcraft game.
 A game's URL slug and the name the backend expects in `?game=` can differ
 (`wow-forever` / `wow_forever`): `GAMES` in `shared/game/game.ts` carries both.
 
@@ -66,7 +72,7 @@ A game's URL slug and the name the backend expects in `?game=` can differ
   motion tokens, the CSS reset, and the shared `.num` / `.eyebrow` / `.score-*` helpers.
   See "Design system" below. Components consume tokens; they don't hardcode values.
 - Per-game themes are opt-in. `GameLayout` sets `<html data-game="<slug>">`, and a game
-  that wants its own look adds `src/games/<slug>/<slug>-theme.css` with a
+  that wants its own look adds a `<slug>-theme.css` in its folder with a
   `:root[data-game='<slug>']` block redefining only the tokens it changes, imported in
   `src/styles/index.css`. Games without one use the default. WoW Forever has one
   (leather and parchment, gold instead of cyan as `--beacon`, and two type families only:
@@ -77,7 +83,7 @@ A game's URL slug and the name the backend expects in `?game=` can differ
 - `src/shared/api/httpClient.ts` — two request tiers:
   - `serviceGet` / `serviceRequest` — service token, public data
   - `userRequest` / `userRequestVoid` — user JWT, with 401 refresh + request queueing
-- `src/features/views/hooks/` and `src/games/<game>/hooks/` — one hook per **screen
+- `src/features/views/hooks/` and each game's `hooks/` — one hook per **screen
   concern** (`useViewsData`, `useSyncView`; WoW: `useViewDetail`, `useCreateViewForm`,
   `useEditViewForm`, `useStaticData`; LoL: `useCreateLolViewForm`, `useEditLolViewForm`;
   Forever: `useCreateForeverViewForm`, `useEditForeverViewForm`). Shared by every game
@@ -87,7 +93,7 @@ A game's URL slug and the name the backend expects in `?game=` can differ
   (`verification-badge`, `pager`, `dialog.css` / `dialog.ts`, `form-controls.css`,
   `empty-state.css`). Not in `hooks/`, which is reserved for screen concerns.
 - `src/features/views/api/viewQueries.ts` — the shared query keys and fetch functions;
-  game-only ones live in the game's `api/` (e.g. `wowStatic` in `games/wow/api/wow-static.ts`)
+  game-only ones live in the game's `api/` (e.g. `wowStatic` in `games/wow/retail/api/wow-static.ts`)
 
 ### Query keys
 

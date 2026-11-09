@@ -1,0 +1,31 @@
+/* The one piece of the Forever UI that leaves the leather theme on purpose:
+   the game's own tooltip, deep blue-black with a grey edge, is what players
+   recognise an item or a talent by. Its colours live here, not in the theme. */
+.game-tooltip {
+  --tooltip-bg: rgba(8, 12, 28, 0.95);
+  --tooltip-edge: #8b8b8b;
+  --tooltip-yellow: #ffd100;
+  --tooltip-green: #1eff00;
+  z-index: 50;
+  /* Narrows rather than run off a phone screen. */
+  min-width: min(13rem, var(--radix-popover-content-available-width));
+  max-width: min(18rem, var(--radix-popover-content-available-width));
+  padding: 0.5rem 0.625rem 0.5625rem;
+  background: var(--tooltip-bg);
+  border: 1px solid var(--tooltip-edge);
+  border-radius: var(--rad-sm);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.7),
+    var(--lift);
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #fff;
+}
+
+/* The first line of every tooltip: what it is, in the display face. */
+.game-tooltip-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.3;
+}
