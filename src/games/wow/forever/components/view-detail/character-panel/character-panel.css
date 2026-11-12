@@ -2,10 +2,7 @@
    and the class spine carries on down its side to say so. */
 .character-panel {
   position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 1.5rem 3rem;
+  container-type: inline-size;
   padding: 1.25rem 1.75rem 1.5rem;
   background: var(--void-lift);
   border-top: 1px solid var(--rule-soft);
@@ -29,11 +26,30 @@
   }
 }
 
-/* Half each: the sheet and its stats, then the talents. When both halves
-   cannot have 30rem, each takes the full width. */
-.character-panel > * {
-  flex: 1 1 30rem;
-  min-width: 0;
+/* Narrow, one column in reading order: PvP, talents, then the sheet. */
+.character-panel-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 1.5rem 3rem;
+}
+
+/* Once both halves can have 30rem: PvP over the sheet on the left, the talents
+   down the right. The 1fr row takes the talents' extra height, so PvP stays one line. */
+@container (min-width: 63rem) {
+  .character-panel-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto 1fr;
+  }
+
+  .character-panel-layout > .talent-trees {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  .character-panel-layout > :not(.talent-trees) {
+    grid-column: 1;
+  }
 }
 
 /* What the panel says when part of the character has not synced. */
