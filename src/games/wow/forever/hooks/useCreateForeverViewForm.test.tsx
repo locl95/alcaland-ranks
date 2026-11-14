@@ -105,4 +105,73 @@ describe('useCreateForeverViewForm', () => {
     expect(result.current.errorMessage).toBe('This ladder has more characters than allowed.');
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  describe('guild mode', () => {
+    const TSALAB = { type: 'wow_forever', name: 'tsalab', region: 'eu', blizzardId: 104078 };
+
+    const addGuild = async (
+      result: { current: ReturnType<typeof useCreateForeverViewForm> },
+      name = 'TSALAB',
+    ) => {
+      act(() => result.current.selectMode('guild'));
+      await addCharacter(result, { name });
+    };
+
+    beforeEach(() => mockServiceRequest.mockResolvedValue({ guild: TSALAB }));
+
+    it('verifies the guild by name and region alone', async () => {
+      const { result } = renderForm();
+      await addGuild(result, ' TSALAB ');
+
+      expect(mockServiceRequest).toHaveBeenCalledWith('POST', '/entities/exists/guild', {
+        game: 'WOW_FOREVER',
+        name: 'TSALAB',
+        region: 'eu',
+      });
+      expect(result.current.rows).toHaveLength(1);
+      expect(result.current.rows[0].status).toBe('valid');
+    });
+
+    it('blocks submitting a guild Blizzard does not know', async () => {
+      mockServiceRequest.mockResolvedValue({ guild: null });
+      const { result } = renderForm();
+      await addGuild(result, 'Nope');
+
+      expect(result.current.errorMessage).toBe('Nope was not found. Check the name and region.');
+      expect(result.current.canSubmit).toBe(false);
+    });
+
+    it('creates a guild ladder named after the guild, with one entity and no surname', async () => {
+      const { result } = renderForm();
+      await addGuild(result);
+      await submit(result);
+
+      expect(mockUserRequest).toHaveBeenCalledWith('POST', '/views', {
+        name: 'TSALAB',
+        entities: [{ type: 'wow_forever', name: 'TSALAB', region: 'eu' }],
+        published: true,
+        featured: false,
+        game: 'WOW_FOREVER',
+        extraArguments: { type: 'wow', isGuild: true },
+      });
+      expect(onCreateView).toHaveBeenCalledWith(
+        expect.objectContaining({
+          simpleView: expect.objectContaining({
+            name: 'TSALAB',
+            extraArguments: { type: 'wow', isGuild: true },
+          }),
+        }),
+      );
+    });
+
+    it('clears the guild row when switching back to characters', async () => {
+      const { result } = renderForm();
+      await addGuild(result);
+      act(() => result.current.selectMode('characters'));
+
+      expect(result.current.mode).toBe('characters');
+      expect(result.current.rows).toHaveLength(1);
+      expect(result.current.rows[0]).toMatchObject({ name: '', status: 'draft' });
+    });
+  });
 });

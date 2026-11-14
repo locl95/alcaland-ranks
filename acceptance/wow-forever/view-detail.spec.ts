@@ -211,4 +211,17 @@ test.describe('WoW Forever ladder', () => {
     await expect(page.getByText('Daxan Windfury')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Edit' })).toHaveCount(0);
   });
+
+  test('the owner of a guild ladder does not get the Edit button', async ({ page }) => {
+    await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) =>
+      route.fulfill({
+        json: { owner: 'testuser', extraArguments: { type: 'wow', isGuild: true } },
+      }),
+    );
+
+    await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
+
+    await expect(page.getByText('Daxan Windfury')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Edit' })).toHaveCount(0);
+  });
 });

@@ -32,7 +32,9 @@ export function ForeverViewDetail() {
     cachedRows: cachedCharacters,
   } = useLadderData<ForeverCharacter>(viewId);
   const sync = useSyncView(viewId);
-  const { isOwner } = useView(viewId);
+  const { view, isOwner } = useView(viewId);
+  // A guild ladder's members are managed by the backend, following the roster.
+  const canEdit = isOwner && !view?.extraArguments?.isGuild;
   const { isSaving, pending, failed, save, clearFailed } = useSaveEntities(
     viewId,
     viewName,
@@ -63,7 +65,7 @@ export function ForeverViewDetail() {
           sync={sync}
           isSyncBlocked={isSaving || isEditOpen}
           actions={
-            isOwner && (
+            canEdit && (
               <button
                 className="header-edit-button"
                 onClick={() => setIsEditOpen(true)}
@@ -80,7 +82,7 @@ export function ForeverViewDetail() {
         {characters.length === 0 && pending.length === 0 ? (
           <div className="empty-state">
             <h3 className="empty-title">No characters in this ladder</h3>
-            {isOwner && (
+            {canEdit && (
               <button className="empty-add-btn" onClick={() => setIsEditOpen(true)}>
                 + Add
               </button>

@@ -4,13 +4,17 @@ import {
   characterKey,
   isCompleteCharacter,
 } from '@/games/wow/forever/model/character.ts';
-import { verifyCharacter } from '@/games/wow/forever/api/forever-entity-api.ts';
+import { verifyCharacter, verifyGuild } from '@/games/wow/forever/api/forever-entity-api.ts';
 
-export const useCharacterRows = () =>
+/** A guild row is a single one, named by name + region; its surname stays empty. */
+const guildKey = ({ name, region }: CharacterRef): string | null =>
+  name.trim() ? `${name.trim().toLowerCase()}|${region.toLowerCase()}` : null;
+
+export const useCharacterRows = (isGuild = false) =>
   useEntityRows<CharacterRef>({
     emptyFields: () => ({ name: '', surname: '', region: 'eu' }),
-    keyOf: (character) => (isCompleteCharacter(character) ? characterKey(character) : null),
+    keyOf: (row) => (isGuild ? guildKey(row) : isCompleteCharacter(row) ? characterKey(row) : null),
     isBlank: ({ name, surname }) => !name.trim() && !surname.trim(),
-    verify: verifyCharacter,
-    growsOnVerify: true,
+    verify: isGuild ? verifyGuild : verifyCharacter,
+    growsOnVerify: !isGuild,
   });

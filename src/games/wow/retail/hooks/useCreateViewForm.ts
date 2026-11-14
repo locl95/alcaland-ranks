@@ -10,8 +10,7 @@ import {
   formatNotFoundMessage,
 } from '@/features/views/utils.ts';
 import { NOT_FOUND_HINT } from '@/games/wow/retail/utils.ts';
-
-export type CreateMode = 'characters' | 'guild';
+import { CreateMode } from '@/games/wow/components/create-mode-toggle.tsx';
 
 interface CharacterFields {
   name: string;

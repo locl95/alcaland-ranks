@@ -5,10 +5,11 @@ import { CreateForeverView } from './create-forever-view.tsx';
 const FOREVER_COPY = {
   members: 'Characters',
   emptyTitle: 'Start your first ladder',
-  emptyText: 'Add the characters you play with and see who comes out on top.',
+  emptyText:
+    'Add the characters you play with, or pull in a whole guild, and see who comes out on top.',
   signedOutTitle: "Track your group's Forever ladder",
   signedOutText:
-    'Build a ladder from your characters and follow every level and item upgrade they make.',
+    'Build a ladder from your characters or a whole guild and follow every level and item upgrade they make.',
 };
 
 export function ForeverLanding() {
