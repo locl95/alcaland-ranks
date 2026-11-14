@@ -30,7 +30,7 @@ export interface ForeverCharacter {
 
 export interface WowPvp {
   honorableKills: number;
-  /** 0 when the character has none. */
+  /** 0 to 14. It stays 0 until enough honorable kills earn rank 1. */
   rank: number;
 }
 

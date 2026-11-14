@@ -1,14 +1,16 @@
 import { Swords } from 'lucide-react';
-import { ForeverCharacter } from '@/games/wow/forever/api/forever-types.ts';
+import { ForeverCharacter, WowPvp } from '@/games/wow/forever/api/forever-types.ts';
 import { formatCharacterName } from '@/games/wow/forever/model/character.ts';
-import rankBadge from '@/games/wow/assets/pvp/badge_of_justice.webp';
+import rankBadge from '@/games/wow/forever/assets/pvp/badge_of_justice.webp';
 import './pvp-standing.css';
 
-/** The character's rank and honorable kills, once they have any kills to show. */
-export function PvpStanding({ character }: Readonly<{ character: ForeverCharacter }>) {
-  const { pvp } = character;
-  if (!pvp || pvp.honorableKills <= 0) return null;
+interface PvpStandingProps {
+  character: ForeverCharacter;
+  pvp: WowPvp;
+}
 
+/** The character's PvP rank and honorable kills. */
+export function PvpStanding({ character, pvp }: Readonly<PvpStandingProps>) {
   return (
     <section className="pvp-standing" aria-label={`PvP of ${formatCharacterName(character)}`}>
       <span className="pvp-standing-item">
