@@ -22,7 +22,7 @@ export function TalentTrees({ character }: Readonly<{ character: ForeverCharacte
           <div key={tree.name} className="talent-tree">
             <div className="talent-tree-head">
               {specIcon && <img className="talent-tree-icon" src={specIcon} alt="" />}
-              <h3 className="talent-tree-name">{tree.name}</h3>
+              <h4 className="talent-tree-name">{tree.name}</h4>
               <span className="talent-tree-points num">
                 {tree.points}
                 <span className="sr-only"> points</span>

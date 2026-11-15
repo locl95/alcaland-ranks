@@ -17,8 +17,9 @@ const openDaxan = async (page: Page) => {
   };
   return {
     pvp: await part('PvP'),
-    talents: await part('Talents'),
+    professions: await part('Professions'),
     equipment: await part('Equipment'),
+    talents: await part('Talents'),
   };
 };
 
@@ -41,6 +42,14 @@ test.describe("WoW Forever character panel's layout", () => {
                 items: [BRAWLERS_HOOD],
                 talents: [ENHANCEMENT],
                 pvp: { honorableKills: 68, rank: 0 },
+                professions: {
+                  primaries: [
+                    { id: 186, name: 'Mining', skillPoints: 202, maxSkillPoints: 225, icon: null },
+                  ],
+                  secondaries: [
+                    { id: 185, name: 'Cooking', skillPoints: 4, maxSkillPoints: 75, icon: null },
+                  ],
+                },
               }),
             ],
           },
@@ -49,22 +58,26 @@ test.describe("WoW Forever character panel's layout", () => {
     }
   });
 
-  test('on a phone, stacks PvP, then talents, then equipment', async ({ page }) => {
+  test('on a phone, stacks PvP, professions, talents, then equipment', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    const { pvp, talents, equipment } = await openDaxan(page);
+    const { pvp, professions, equipment, talents } = await openDaxan(page);
 
-    expect(pvp.y + pvp.height).toBeLessThanOrEqual(talents.y);
+    expect(pvp.y + pvp.height).toBeLessThanOrEqual(professions.y);
+    expect(professions.y + professions.height).toBeLessThanOrEqual(talents.y);
     expect(talents.y + talents.height).toBeLessThanOrEqual(equipment.y);
   });
 
-  test('on a wide screen, puts PvP over the equipment and the talents beside them', async ({
+  test('on a wide screen, puts PvP beside the professions, over the equipment beside the talents', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    const { pvp, talents, equipment } = await openDaxan(page);
+    const { pvp, professions, equipment, talents } = await openDaxan(page);
 
+    expect(pvp.x + pvp.width).toBeLessThanOrEqual(professions.x);
     expect(pvp.y + pvp.height).toBeLessThanOrEqual(equipment.y);
+    expect(professions.y + professions.height).toBeLessThanOrEqual(talents.y);
     expect(equipment.x + equipment.width).toBeLessThanOrEqual(talents.x);
-    expect(talents.y).toBe(pvp.y);
+    expect(talents.y).toBe(equipment.y);
+    expect(professions.x).toBe(talents.x);
   });
 });
