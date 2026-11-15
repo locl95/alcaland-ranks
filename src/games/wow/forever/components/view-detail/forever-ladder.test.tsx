@@ -287,7 +287,7 @@ describe('ForeverLadder', () => {
     expect(pvp).toHaveTextContent('68 honorable kills');
   });
 
-  it('shows no PvP without kills, or when it has not synced', async () => {
+  it('says why there is no PvP to show: no kills yet, or not synced', async () => {
     const user = userEvent.setup();
     render(
       <ForeverLadder
@@ -302,9 +302,65 @@ describe('ForeverLadder', () => {
     await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
     await user.click(within(rowOf('Bolado')).getByRole('button', { name: /Bolado Test/ }));
 
-    expect(screen.getByRole('region', { name: 'Talents of Daxan Test' })).toBeVisible();
-    expect(screen.getByRole('region', { name: 'Talents of Bolado Test' })).toBeVisible();
+    expect(within(rowOf('Daxan')).getByText('No honorable kills yet.')).toBeVisible();
+    expect(within(rowOf('Bolado')).getByText("PvP hasn't synced yet.")).toBeVisible();
     expect(screen.queryByRole('region', { name: /^PvP of/ })).not.toBeInTheDocument();
+  });
+
+  it('shows the professions with their skill, primary ones first', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[
+          character('Daxan', 43, {
+            professions: {
+              primaries: [
+                { id: 186, name: 'Mining', skillPoints: 202, maxSkillPoints: 225, icon: null },
+              ],
+              secondaries: [
+                { id: 185, name: 'Cooking', skillPoints: 4, maxSkillPoints: 75, icon: null },
+              ],
+            },
+          }),
+        ]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+
+    const professions = screen.getByRole('region', { name: 'Professions of Daxan Test' });
+    expect(
+      within(professions)
+        .getAllByRole('list')
+        .map((group) => [group.getAttribute('aria-label'), group.textContent]),
+    ).toEqual([
+      ['Primary professions', '202'],
+      ['Secondary professions', '4'],
+    ]);
+
+    await user.click(within(professions).getByRole('button', { name: 'Mining, 202 of 225' }));
+    const tooltip = screen.getByRole('dialog');
+    expect(tooltip).toHaveTextContent('MiningSkill (202/225)');
+  });
+
+  it('says why there are no professions to show: none learned, or not synced', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[
+          character('Daxan', 43, { professions: { primaries: [], secondaries: [] } }),
+          character('Bolado', 25),
+        ]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+    await user.click(within(rowOf('Bolado')).getByRole('button', { name: /Bolado Test/ }));
+
+    expect(within(rowOf('Daxan')).getByText('No professions learned yet.')).toBeVisible();
+    expect(within(rowOf('Bolado')).getByText("Professions haven't synced yet.")).toBeVisible();
   });
 
   it('says "No guild" for a character without one', () => {

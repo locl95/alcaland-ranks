@@ -26,6 +26,24 @@ export interface ForeverCharacter {
   avatar?: string | null;
   /** Missing on characters synced before the backend sent it. */
   pvp?: WowPvp | null;
+  /** Missing on characters synced before the backend sent it. */
+  professions?: WowProfessions | null;
+}
+
+export interface WowProfessions {
+  /** Mining, Blacksmithing… */
+  primaries: WowProfession[];
+  /** Cooking, Fishing, First Aid. */
+  secondaries: WowProfession[];
+}
+
+export interface WowProfession {
+  id: number;
+  name: string;
+  skillPoints: number;
+  /** The cap of the rank trained so far, not of the profession. */
+  maxSkillPoints: number;
+  icon: string | null;
 }
 
 export interface WowPvp {

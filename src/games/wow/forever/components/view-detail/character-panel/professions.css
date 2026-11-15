@@ -1,0 +1,17 @@
+.professions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem 0.875rem;
+}
+
+.professions-group {
+  display: flex;
+  gap: 0.625rem;
+  list-style: none;
+}
+
+/* A rule between the primary professions and the secondary ones. */
+.professions-group + .professions-group {
+  padding-left: 0.875rem;
+  border-left: 1px solid var(--rule);
+}

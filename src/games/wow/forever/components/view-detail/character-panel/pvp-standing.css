@@ -1,10 +1,11 @@
-/* Laid out like a talent tree's head, name left and number at the right edge,
-   but quieter, so it reads as a note above the talents and not a tree. */
+/* One quiet line. As tall as the professions' icons beside it, so the two
+   sections sit on the same line. */
 .pvp-standing {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.25rem 1.5rem;
+  min-height: 2.25rem;
   font-size: 0.8125rem;
   color: var(--ink-3);
 }

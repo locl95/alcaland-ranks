@@ -26,7 +26,7 @@
   }
 }
 
-/* Narrow, one column in reading order: PvP, talents, then the sheet. */
+/* Narrow, one column in reading order: PvP, professions, talents, then the sheet. */
 .character-panel-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -34,23 +34,37 @@
   gap: 1.5rem 3rem;
 }
 
-/* Once both halves can have 30rem: PvP over the sheet on the left, the talents
-   down the right. The 1fr row takes the talents' extra height, so PvP stays one line. */
+/* Once both halves can have 30rem: the two short sections side by side on top,
+   the sheet and the talents under them, the sheet on the left. */
 @container (min-width: 63rem) {
   .character-panel-layout {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: auto 1fr;
+  }
+
+  .character-panel-equipment {
+    grid-column: 1;
+    grid-row: 2;
   }
 
   .character-panel-talents {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 2;
   }
+}
 
-  .character-panel-pvp,
-  .character-panel-equipment {
-    grid-column: 1;
-  }
+/* A section's name, and a rule from it to the section's edge. */
+.character-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+.character-panel-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule-soft);
 }
 
 /* What the panel says when part of the character has not synced. */
