@@ -9,6 +9,7 @@ import './create-wow-view.css';
 import { View } from '@/features/views/model/view.ts';
 import { RealmSelect } from '@/games/wow/retail/components/landing/realm-select.tsx';
 import { useCreateViewForm } from '@/games/wow/retail/hooks/useCreateViewForm.ts';
+import { CreateModeToggle } from '@/games/wow/components/create-mode-toggle.tsx';
 
 interface CreateViewDialogProps {
   onClose: () => void;
@@ -54,24 +55,7 @@ export function CreateWowView({ onClose, onCreateView }: Readonly<CreateViewDial
 
           <form className="dialog-form" onSubmit={handleSubmit}>
             <div className="form-content">
-              <div className="create-mode-toggle" role="group" aria-label="Ladder contents">
-                <button
-                  type="button"
-                  className={`create-mode-btn${mode === 'characters' ? ' create-mode-btn--active' : ''}`}
-                  aria-pressed={mode === 'characters'}
-                  onClick={() => selectMode('characters')}
-                >
-                  Characters
-                </button>
-                <button
-                  type="button"
-                  className={`create-mode-btn${mode === 'guild' ? ' create-mode-btn--active' : ''}`}
-                  aria-pressed={mode === 'guild'}
-                  onClick={() => selectMode('guild')}
-                >
-                  Guild
-                </button>
-              </div>
+              <CreateModeToggle mode={mode} onSelect={selectMode} />
 
               {mode === 'characters' && (
                 <div className="form-field">

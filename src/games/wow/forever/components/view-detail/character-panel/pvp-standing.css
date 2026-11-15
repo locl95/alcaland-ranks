@@ -1,0 +1,36 @@
+/* Laid out like a talent tree's head, name left and number at the right edge,
+   but quieter, so it reads as a note above the talents and not a tree. */
+.pvp-standing {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+.pvp-standing-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+}
+
+.pvp-standing-icon {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  flex-shrink: 0;
+}
+
+/* The game's own icon, a step larger than the line icon so its detail survives. */
+.pvp-standing-badge {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.pvp-standing-item .num {
+  font-weight: 600;
+  color: var(--ink-2);
+}

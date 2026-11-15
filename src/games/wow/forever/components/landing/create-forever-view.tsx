@@ -5,11 +5,14 @@ import '@/features/views/components/shared/dialog.css';
 import '@/features/views/components/shared/form-controls.css';
 import { useCreateForeverViewForm } from '@/games/wow/forever/hooks/useCreateForeverViewForm.ts';
 import { CharacterRow } from '@/games/wow/forever/components/shared/character-row.tsx';
+import { CreateModeToggle } from '@/games/wow/components/create-mode-toggle.tsx';
 
 export function CreateForeverView({ onClose, onCreateView }: Readonly<CreateDialogProps>) {
   const {
     name,
     setName,
+    mode,
+    selectMode,
     rows,
     canSubmit,
     errorMessage,
@@ -34,15 +37,19 @@ export function CreateForeverView({ onClose, onCreateView }: Readonly<CreateDial
 
           <form className="dialog-form" onSubmit={handleSubmit}>
             <div className="form-content">
-              <div className="form-field">
-                <label className="form-label">Ladder name</label>
-                <input
-                  className="form-input"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., Fresh start crew"
-                />
-              </div>
+              <CreateModeToggle mode={mode} onSelect={selectMode} />
+
+              {mode === 'characters' && (
+                <div className="form-field">
+                  <label className="form-label">Ladder name</label>
+                  <input
+                    className="form-input"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g., Fresh start crew"
+                  />
+                </div>
+              )}
 
               {rows.map((row, index) => (
                 <CharacterRow
@@ -50,11 +57,16 @@ export function CreateForeverView({ onClose, onCreateView }: Readonly<CreateDial
                   character={row}
                   status={row.status}
                   canRemove={index < rows.length - 1}
+                  isGuild={mode === 'guild'}
                   onChange={(changes) => updateRow(row.id, changes)}
                   onVerify={() => verifyRow(row.id)}
                   onRemove={() => removeRow(row.id)}
                 />
               ))}
+
+              {mode === 'guild' && (
+                <p className="form-hint">The whole roster is pulled in for you.</p>
+              )}
 
               {errorMessage && <p className="form-error">{errorMessage}</p>}
             </div>
@@ -64,7 +76,13 @@ export function CreateForeverView({ onClose, onCreateView }: Readonly<CreateDial
                 type="submit"
                 className="btn btn-primary"
                 disabled={!canSubmit}
-                title={canSubmit ? undefined : 'Name the ladder and add at least one character'}
+                title={
+                  canSubmit
+                    ? undefined
+                    : mode === 'guild'
+                      ? 'Add a guild'
+                      : 'Name the ladder and add at least one character'
+                }
               >
                 {isSubmitting ? 'Creating...' : 'Create'}
               </button>

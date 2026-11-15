@@ -30,3 +30,27 @@ export async function verifyCharacter(character: CharacterRef): Promise<VerifyRe
     return 'unverified';
   }
 }
+
+interface GuildExistsResponse {
+  guild: { type: 'wow_forever'; name: string; region: string; blizzardId: number } | null;
+}
+
+/** A guild is named by name + region alone: no surname, and the backend rejects a realm. */
+export const toGuildRequest = ({ name, region }: Pick<CharacterRef, 'name' | 'region'>) => ({
+  type: 'wow_forever',
+  name: name.trim(),
+  region,
+});
+
+export async function verifyGuild({ name, region }: CharacterRef): Promise<VerifyResult> {
+  try {
+    const { guild } = await serviceRequest<GuildExistsResponse>('POST', '/entities/exists/guild', {
+      game: 'WOW_FOREVER',
+      name: name.trim(),
+      region,
+    });
+    return guild ? 'valid' : 'invalid';
+  } catch {
+    return 'unverified';
+  }
+}

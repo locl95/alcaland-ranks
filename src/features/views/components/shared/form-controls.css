@@ -149,3 +149,8 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.form-hint {
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}

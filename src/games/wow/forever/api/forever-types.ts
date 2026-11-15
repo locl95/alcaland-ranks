@@ -24,6 +24,14 @@ export interface ForeverCharacter {
   stats?: WowStats | null;
   /** Blizzard's render of the character's face. */
   avatar?: string | null;
+  /** Missing on characters synced before the backend sent it. */
+  pvp?: WowPvp | null;
+}
+
+export interface WowPvp {
+  honorableKills: number;
+  /** 0 to 14. It stays 0 until enough honorable kills earn rank 1. */
+  rank: number;
 }
 
 /** An equipped item, as Blizzard displays it: most fields are ready-made English text. */

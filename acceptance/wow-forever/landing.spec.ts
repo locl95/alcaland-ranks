@@ -48,4 +48,43 @@ test.describe('WoW Forever', () => {
       game: 'WOW_FOREVER',
     });
   });
+
+  test('creates a guild ladder from the guild name and region', async ({ page }) => {
+    let guildBody: unknown;
+    let createBody: unknown;
+    await mockOwnViews(page, [], 'wow_forever');
+    await page.route(`${API}/entities/exists/guild`, (route) => {
+      guildBody = route.request().postDataJSON();
+      return route.fulfill({
+        json: { guild: { type: 'wow_forever', name: 'tsalab', region: 'eu', blizzardId: 104078 } },
+      });
+    });
+    await page.route(`${API}/views`, (route) => {
+      createBody = route.request().postDataJSON();
+      return route.fulfill({ json: { id: 'op-guild', resourceId: 'f3' } });
+    });
+    await page.route(`${API}/operations/op-guild`, (route) =>
+      route.fulfill({ json: { id: 'op-guild', status: 'PENDING' } }),
+    );
+
+    await page.goto('/wow-forever');
+    await page.getByRole('button', { name: 'Create your first ladder' }).click();
+    await page.getByRole('button', { name: 'Guild', exact: true }).click();
+    await expect(page.getByLabel('Surname')).toHaveCount(0);
+    await page.getByLabel('Guild name').fill('TSALAB');
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+    await expect(page.getByTitle('Guild found')).toBeVisible();
+    await page.getByRole('button', { name: 'Create', exact: true }).click();
+
+    await expect(page.getByRole('heading', { name: 'TSALAB' })).toBeVisible();
+    expect(guildBody).toEqual({ game: 'WOW_FOREVER', name: 'TSALAB', region: 'eu' });
+    expect(createBody).toEqual({
+      name: 'TSALAB',
+      entities: [{ type: 'wow_forever', name: 'TSALAB', region: 'eu' }],
+      published: true,
+      featured: false,
+      game: 'WOW_FOREVER',
+      extraArguments: { type: 'wow', isGuild: true },
+    });
+  });
 });

@@ -11,6 +11,8 @@ interface CharacterRowProps {
   character: CharacterRef;
   status: 'draft' | CheckStatus;
   canRemove: boolean;
+  /** The row names a guild: no surname. */
+  isGuild?: boolean;
   onChange: (changes: Partial<CharacterRef>) => void;
   onVerify: () => void;
   onRemove: () => void;
@@ -20,6 +22,7 @@ export function CharacterRow({
   character,
   status,
   canRemove,
+  isGuild = false,
   onChange,
   onVerify,
   onRemove,
@@ -28,18 +31,20 @@ export function CharacterRow({
     <div className="forever-character-row">
       <input
         className="form-input"
-        placeholder="Name"
-        aria-label="Name"
+        placeholder={isGuild ? 'Guild name' : 'Name'}
+        aria-label={isGuild ? 'Guild name' : 'Name'}
         value={character.name}
         onChange={(e) => onChange({ name: e.target.value })}
       />
-      <input
-        className="form-input"
-        placeholder="Surname"
-        aria-label="Surname"
-        value={character.surname}
-        onChange={(e) => onChange({ surname: e.target.value })}
-      />
+      {!isGuild && (
+        <input
+          className="form-input"
+          placeholder="Surname"
+          aria-label="Surname"
+          value={character.surname}
+          onChange={(e) => onChange({ surname: e.target.value })}
+        />
+      )}
       <select
         className="form-select form-select-region"
         aria-label="Region"
@@ -58,13 +63,13 @@ export function CharacterRow({
           type="button"
           className="btn-icon btn-icon-primary"
           onClick={onVerify}
-          disabled={!isCompleteCharacter(character)}
+          disabled={isGuild ? !character.name.trim() : !isCompleteCharacter(character)}
           title="Add"
         >
           <Plus size={16} />
         </button>
       ) : (
-        <VerificationBadge status={status} noun="Character" />
+        <VerificationBadge status={status} noun={isGuild ? 'Guild' : 'Character'} />
       )}
 
       {canRemove && (

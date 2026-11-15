@@ -271,6 +271,42 @@ describe('ForeverLadder', () => {
     expect(screen.getByText('No talent points spent yet.')).toBeVisible();
   });
 
+  it('shows the PvP rank and honorable kills once there is a kill, even at rank 0', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 43, { pvp: { honorableKills: 68, rank: 0 } })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+
+    const pvp = screen.getByRole('region', { name: 'PvP of Daxan Test' });
+    expect(within(pvp).getByText('Rank 0')).toBeVisible();
+    expect(pvp).toHaveTextContent('68 honorable kills');
+  });
+
+  it('shows no PvP without kills, or when it has not synced', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[
+          character('Daxan', 43, { pvp: { honorableKills: 0, rank: 0 } }),
+          character('Bolado', 25),
+        ]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+    await user.click(within(rowOf('Bolado')).getByRole('button', { name: /Bolado Test/ }));
+
+    expect(screen.getByRole('region', { name: 'Talents of Daxan Test' })).toBeVisible();
+    expect(screen.getByRole('region', { name: 'Talents of Bolado Test' })).toBeVisible();
+    expect(screen.queryByRole('region', { name: /^PvP of/ })).not.toBeInTheDocument();
+  });
+
   it('says "No guild" for a character without one', () => {
     render(
       <ForeverLadder
