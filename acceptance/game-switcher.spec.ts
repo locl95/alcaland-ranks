@@ -49,7 +49,7 @@ test.describe('Game switcher', () => {
     await page.getByRole('menuitem', { name: 'World of Warcraft Forever' }).click();
 
     await expect(page).toHaveURL('/wow-forever');
-    await expect(page.getByRole('heading', { name: 'Forever ladder' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Forever ladder tracker' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Fresh Start' })).toBeVisible();
     await expect(page.getByText(/WoW Ladder/)).toHaveCount(0);
   });

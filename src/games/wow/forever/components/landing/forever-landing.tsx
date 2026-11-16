@@ -16,7 +16,7 @@ export function ForeverLanding() {
   return (
     <ViewsPage
       mark={logo}
-      title="Forever ladder"
+      title="Forever ladder tracker"
       copy={FOREVER_COPY}
       CreateDialog={CreateForeverView}
     />
