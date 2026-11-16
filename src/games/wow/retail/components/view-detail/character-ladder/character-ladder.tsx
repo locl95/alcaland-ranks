@@ -83,22 +83,21 @@ export const CharacterLadder = memo(function CharacterLadder({
 
   return (
     <div className="ladder-card">
-      <div className="ladder-header" onClick={() => setIsLadderOpen(!isLadderOpen)}>
-        <div className="ladder-title">
-          <img src={keystone} alt="" aria-hidden={true} className="keystone-icon" />
-          Ladder
-        </div>
-        <button className="ladder-toggle-btn">
-          {isLadderOpen ? (
-            <ChevronUp className="chevron-icon" />
-          ) : (
-            <ChevronDown className="chevron-icon" />
-          )}
+      {/* The toggle stretches over the whole header, so a click anywhere on it folds the
+          ladder; the filters and search sit above it and take their own clicks. */}
+      <div className="ladder-header">
+        <button
+          type="button"
+          className="ladder-header-toggle"
+          aria-expanded={isLadderOpen}
+          onClick={() => setIsLadderOpen((wasOpen) => !wasOpen)}
+        >
+          <span className="ladder-title">
+            <img src={keystone} alt="" aria-hidden={true} className="keystone-icon" />
+            Ladder
+          </span>
         </button>
-      </div>
-
-      {isLadderOpen && (
-        <>
+        {isLadderOpen && (
           <LadderToolbar>
             <IconFilter
               label="Class"
@@ -109,6 +108,16 @@ export const CharacterLadder = memo(function CharacterLadder({
             />
             <LadderSearch value={search} onChange={filterBy(setSearch)} />
           </LadderToolbar>
+        )}
+        {isLadderOpen ? (
+          <ChevronUp className="chevron-icon ladder-header-chevron" aria-hidden={true} />
+        ) : (
+          <ChevronDown className="chevron-icon ladder-header-chevron" aria-hidden={true} />
+        )}
+      </div>
+
+      {isLadderOpen && (
+        <>
           <div className="ladder-cols">
             <span className="eyebrow">Character</span>
             <SortHeader

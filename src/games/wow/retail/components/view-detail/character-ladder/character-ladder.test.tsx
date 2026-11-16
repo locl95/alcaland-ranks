@@ -66,6 +66,29 @@ describe('CharacterLadder', () => {
     await userEvent.click(screen.getByText('Ladder'));
     expect(screen.getByTestId('ladder-row-1')).toBeInTheDocument();
   });
+
+  it('folds from a header button that says whether it is open, hiding the controls too', async () => {
+    renderLadder([makeProfile(1, 'Arthas', 3000)]);
+    const toggle = screen.getByRole('button', { name: 'Ladder' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    await userEvent.click(toggle);
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+  });
+
+  it('does not fold when a class filter in the header is picked', async () => {
+    renderLadder([
+      { ...makeProfile(1, 'Arthas', 3000), class: 'Death Knight' },
+      { ...makeProfile(2, 'Uther', 2900), class: 'Paladin' },
+    ]);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Paladin' }));
+
+    expect(screen.getByRole('button', { name: 'Ladder' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('ladder-row-2')).toBeInTheDocument();
+  });
 });
 
 describe('CharacterLadder — paging', () => {
