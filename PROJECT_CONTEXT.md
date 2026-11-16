@@ -54,7 +54,9 @@ Each game has its own folder: `src/games/lol/`, and the Warcraft games side by s
 `components/` (`landing/`, `view-detail/`), `constants/` (fixed data, no images),
 `hooks/` and `model/` (pure domain logic). `src/features/views/` keeps only what every
 game shares: the ladder list, the detail header, sync, the create-form row logic and
-the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts).
+the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts, and the
+game switcher's icons in `game-icons/`: single-colour glyphs it paints as a CSS mask).
+Each game's own logo, shown on its landing, is `assets/logo.webp` in its folder.
 `src/games/wow/` itself holds what every Warcraft game uses: class and spec icons, class
 colours, the race art (PNGs dropped in `assets/races/`), the Characters/Guild toggle of
 the create dialog (`components/create-mode-toggle.tsx`) and the ladder's toolbar: its

@@ -1,4 +1,4 @@
-import keystone from '@/games/wow/retail/assets/keystone.webp';
+import logo from '@/games/wow/retail/assets/logo.webp';
 import { useStaticData } from '@/games/wow/retail/hooks/useStaticData.ts';
 import { ViewsPage } from '@/features/views/components/views-page/views-page.tsx';
 import { CreateWowView } from '@/games/wow/retail/components/landing/create-wow-view.tsx';
@@ -18,7 +18,7 @@ export function WowLanding() {
 
   return (
     <ViewsPage
-      mark={keystone}
+      mark={logo}
       title="Mythic+ ladder tracker"
       subtitle={season?.name ? { label: 'Season', value: season.name } : undefined}
       copy={WOW_COPY}
