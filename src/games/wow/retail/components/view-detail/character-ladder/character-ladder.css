@@ -1,4 +1,8 @@
 .ladder-card {
+  /* Shared by the header and the rows so the number columns line up. */
+  --col-gap: 1rem;
+  --col-ilvl: 3rem;
+  --col-score: 7.5rem;
   border: 1px solid var(--rule);
   background: var(--panel);
   border-radius: var(--rad-lg);
@@ -50,15 +54,29 @@
 .ladder-cols {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem 0.5rem 1.25rem;
+  gap: var(--col-gap);
+  /* The right padding lines the score header up with .ladder-score: its right margin
+     plus the character menu. */
+  padding: 0.5rem 4.125rem 0.5rem 1.25rem;
   border-bottom: 1px solid var(--rule);
   background: rgba(255, 255, 255, 0.015);
 }
 
-/* Lines up with .ladder-score: its right margin plus the character menu. */
-.ladder-cols-score {
-  padding-right: 3.125rem;
+.ladder-cols > :first-child {
+  flex: 1;
+}
+
+.ladder-col-ilvl,
+.ladder-col-score {
+  flex-shrink: 0;
+}
+
+.ladder-col-ilvl {
+  width: var(--col-ilvl);
+}
+
+.ladder-col-score {
+  width: var(--col-score);
 }
 
 .ladder-content {
@@ -91,12 +109,14 @@
     font-size: 1.0625rem;
   }
 
-  .ladder-cols {
-    padding: 0.4375rem 0.5rem 0.4375rem 0.875rem;
+  .ladder-card {
+    --col-gap: 0.5rem;
+    --col-ilvl: 2.25rem;
+    --col-score: 5.75rem;
   }
 
-  .ladder-cols-score {
-    padding-right: 2rem;
+  .ladder-cols {
+    padding: 0.4375rem 2.5rem 0.4375rem 0.875rem;
   }
 
   .ladder-card .pager {

@@ -7,6 +7,7 @@
   --col-gap: 1rem;
   --col-ilvl: 3rem;
   --col-level: 5rem;
+  --col-chevron: 1rem;
   border: 1px solid var(--rule);
   border-top: 3px solid var(--frame);
   background: var(--panel);
@@ -38,6 +39,11 @@
 
 .forever-col-level {
   width: var(--col-level);
+}
+
+.forever-col-chevron {
+  flex-shrink: 0;
+  width: var(--col-chevron);
 }
 
 .forever-ladder-rows {
@@ -262,7 +268,8 @@ button.forever-row:hover {
    detail to look for, not a third number to compare. The full date is on hover. */
 .forever-last-login {
   position: absolute;
-  right: 1.75rem;
+  /* Under the level, past the chevron. */
+  right: calc(1.75rem + var(--col-chevron) + var(--col-gap));
   bottom: 0.8125rem;
   display: inline-flex;
   align-items: center;
@@ -272,6 +279,20 @@ button.forever-row:hover {
   font-variant-numeric: tabular-nums;
   color: var(--ink-3);
   white-space: nowrap;
+}
+
+/* Says the row opens, as the Retail ladder header does. */
+.forever-row-chevron {
+  flex-shrink: 0;
+  width: var(--col-chevron);
+  height: var(--col-chevron);
+  color: var(--ink-4);
+  transition: color var(--motion-base);
+}
+
+button.forever-row:hover .forever-row-chevron,
+button.forever-row[aria-expanded='true'] .forever-row-chevron {
+  color: var(--ink-2);
 }
 
 @media (max-width: 640px) {
@@ -319,7 +340,7 @@ button.forever-row:hover {
   }
 
   .forever-last-login {
-    right: 0.75rem;
+    right: calc(0.75rem + var(--col-chevron) + var(--col-gap));
     bottom: 0.625rem;
     font-size: 0.625rem;
   }

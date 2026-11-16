@@ -56,10 +56,15 @@ Each game has its own folder: `src/games/lol/`, and the Warcraft games side by s
 game shares: the ladder list, the detail header, sync, the create-form row logic and
 the dialog/form styles. `src/assets/` keeps only app-wide files (logo, fonts).
 `src/games/wow/` itself holds what every Warcraft game uses: class and spec icons, class
-colours, the race art (PNGs dropped in `assets/races/`) and the Characters/Guild toggle of
-the create dialog (`components/create-mode-toggle.tsx`). Spec icons go by Retail's
-spec names; Forever maps the two Classic trees renamed since (Combat, Feral Combat). WoW Forever has its own race icons
-for now (`src/games/wow/forever/assets/races/`), kept out of Retail on purpose.
+colours, the race art (PNGs dropped in `assets/races/`), the Characters/Guild toggle of
+the create dialog (`components/create-mode-toggle.tsx`) and the ladder's toolbar: its
+name search (`components/ladder-search.tsx`, matching via `name-search.ts`, case- and
+accent-insensitive), the class filter (`icon-filter.tsx`), `ladder-toolbar.tsx`,
+`ladder-no-results.tsx`, and the sortable column headers (`sort-header.tsx`, with the
+sort state in `column-sort.ts`). Each game sorts its own rows in its `model/ladder.ts`.
+Spec icons go by Retail's spec names; Forever maps the two Classic trees renamed since
+(Combat, Feral Combat). WoW Forever has its own race icons for now (webp, in
+`src/games/wow/forever/assets/races/`), kept out of Retail on purpose.
 A game must not import another game (ESLint enforces it); a Warcraft game may import
 `src/games/wow/`, and that code must not import any one Warcraft game.
 A game's URL slug and the name the backend expects in `?game=` can differ

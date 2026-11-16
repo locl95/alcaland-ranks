@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { ForeverCharacter } from '@/games/wow/forever/api/forever-types.ts';
-import { buildLadder } from './ladder.ts';
+import { buildLadder, sortLadder } from './ladder.ts';
 
 const character = (
   name: string,
@@ -67,5 +67,44 @@ describe('buildLadder', () => {
 
     expect(entry.standingChange).toBeNull();
     expect(entry.levelGain).toBe(0);
+  });
+});
+
+describe('sortLadder', () => {
+  // Ladder order: Top (lvl 30, ilvl 20), Mid (lvl 20, ilvl 50), Low (lvl 10, ilvl 20).
+  const rows = buildLadder(
+    [character('Low', 10, 0, 20), character('Top', 30, 0, 20), character('Mid', 20, 0, 50)],
+    [],
+  ).map((entry, index) => ({ entry, position: index + 1 }));
+  const sorted = (key: 'level' | 'ilvl', direction: 'asc' | 'desc') =>
+    sortLadder(rows, { key, direction }).map(({ entry, position }) => [
+      entry.character.name,
+      position,
+    ]);
+
+  it('keeps the ladder order by level, or reverses it', () => {
+    expect(sorted('level', 'desc')).toEqual([
+      ['Top', 1],
+      ['Mid', 2],
+      ['Low', 3],
+    ]);
+    expect(sorted('level', 'asc')).toEqual([
+      ['Low', 3],
+      ['Mid', 2],
+      ['Top', 1],
+    ]);
+  });
+
+  it('sorts by item level either way, the ladder breaking ties', () => {
+    expect(sorted('ilvl', 'desc')).toEqual([
+      ['Mid', 2],
+      ['Top', 1],
+      ['Low', 3],
+    ]);
+    expect(sorted('ilvl', 'asc')).toEqual([
+      ['Top', 1],
+      ['Low', 3],
+      ['Mid', 2],
+    ]);
   });
 });

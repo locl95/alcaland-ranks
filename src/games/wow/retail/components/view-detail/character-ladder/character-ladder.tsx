@@ -8,6 +8,15 @@ import { EntityStatus } from '@/features/views/hooks/useSaveEntities.ts';
 import { characterKey } from '@/games/wow/retail/utils.ts';
 import { LadderRow } from './ladder-row.tsx';
 import { Pager } from '@/features/views/components/shared/pager.tsx';
+import { matchesName } from '@/games/wow/name-search.ts';
+import { LadderSearch } from '@/games/wow/components/ladder-search.tsx';
+import { LadderToolbar } from '@/games/wow/components/ladder-toolbar.tsx';
+import { LadderNoResults } from '@/games/wow/components/ladder-no-results.tsx';
+import { IconFilter } from '@/games/wow/components/icon-filter.tsx';
+import { SortHeader } from '@/games/wow/components/sort-header.tsx';
+import { CLASS_IMAGES, getClassImageKey } from '@/games/wow/class-images.ts';
+import { nextSort } from '@/games/wow/column-sort.ts';
+import { DEFAULT_SORT, LadderSort, sortLadder } from '@/games/wow/retail/model/ladder.ts';
 
 interface CharacterLadderProps {
   characters: WowProfile[];
@@ -32,7 +41,45 @@ export const CharacterLadder = memo(function CharacterLadder({
     [cachedCharacters],
   );
 
-  const { pageItems, startIndex, pagination } = useEntityPage(sortedCharacters);
+  const [search, setSearch] = useState('');
+  const [pickedClass, setPickedClass] = useState('');
+  const [sort, setSort] = useState<LadderSort>(DEFAULT_SORT);
+  // The options come from the ladder itself; a character still syncing has no class yet.
+  const classes = useMemo(
+    () =>
+      [...new Set(characters.filter((c) => c.score !== null).map((c) => c.class))].sort((a, b) =>
+        a.localeCompare(b),
+      ),
+    [characters],
+  );
+  // A pick the ladder no longer has (its last character was removed) stops filtering.
+  const characterClass = classes.includes(pickedClass) ? pickedClass : '';
+  // Each character keeps its real standing, so a filtered or sorted row still shows its rank and movement.
+  const visibleCharacters = useMemo(
+    () =>
+      sortLadder(
+        sortedCharacters
+          .map((character, index) => ({ character, index }))
+          .filter(
+            ({ character }) =>
+              (!characterClass || character.class === characterClass) &&
+              matchesName(character.name, search),
+          ),
+        sort,
+      ),
+    [sortedCharacters, characterClass, search, sort],
+  );
+
+  const { pageItems, pagination } = useEntityPage(visibleCharacters);
+
+  const filterBy = (set: (value: string) => void) => (value: string) => {
+    set(value);
+    pagination.goFirst();
+  };
+  const sortBy = (key: LadderSort['key']) => {
+    setSort((s) => nextSort(s, key));
+    pagination.goFirst();
+  };
 
   return (
     <div className="ladder-card">
@@ -52,15 +99,38 @@ export const CharacterLadder = memo(function CharacterLadder({
 
       {isLadderOpen && (
         <>
+          <LadderToolbar>
+            <IconFilter
+              label="Class"
+              options={classes}
+              iconOf={(c) => CLASS_IMAGES[getClassImageKey(c)]}
+              value={characterClass}
+              onChange={filterBy(setPickedClass)}
+            />
+            <LadderSearch value={search} onChange={filterBy(setSearch)} />
+          </LadderToolbar>
           <div className="ladder-cols">
             <span className="eyebrow">Character</span>
-            <span className="eyebrow ladder-cols-score">M+ score</span>
+            <SortHeader
+              label="iLvl"
+              sortKey="ilvl"
+              sort={sort}
+              onSort={sortBy}
+              className="ladder-col-ilvl"
+            />
+            <SortHeader
+              label="M+ score"
+              sortKey="score"
+              sort={sort}
+              onSort={sortBy}
+              className="ladder-col-score"
+            />
           </div>
           <div className="ladder-content">
-            {pageItems.map((character, index) => (
+            {pageItems.map(({ character, index }) => (
               <LadderRow
                 key={character.id}
-                index={startIndex + index}
+                index={index}
                 character={character}
                 pendingStatus={pendingStatuses.get(characterKey(character))}
                 cachedCharacters={sortedCachedCharacters}
@@ -68,6 +138,7 @@ export const CharacterLadder = memo(function CharacterLadder({
               />
             ))}
           </div>
+          {visibleCharacters.length === 0 && <LadderNoResults />}
           <Pager label="Ladder pages" pagination={pagination} />
         </>
       )}

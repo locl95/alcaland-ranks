@@ -1,4 +1,3 @@
-import { Swords } from 'lucide-react';
 import './ladder-row.css';
 import { memo, useState } from 'react';
 import { WowProfile, Season } from '@/games/wow/retail/api/wow-types.ts';
@@ -86,10 +85,6 @@ export const LadderRow = memo(function LadderRow({
             </div>
             {!isSyncing && (
               <div className="ladder-character-meta">
-                <span className="ladder-character-ilvl num">
-                  <Swords className="ladder-character-ilvl-icon" aria-hidden={true} />
-                  {Math.floor(character.equippedItemLevel)}
-                </span>
                 {character.guild && (
                   <span className="ladder-character-guild">&lt;{character.guild}&gt;</span>
                 )}
@@ -100,6 +95,16 @@ export const LadderRow = memo(function LadderRow({
               </div>
             )}
           </div>
+
+          {/* A column of its own, so item levels line up and can be compared down the ladder. */}
+          <span className="ladder-ilvl num" title="Equipped item level">
+            {!isSyncing && (
+              <>
+                <span className="sr-only">Item level </span>
+                {Math.floor(character.equippedItemLevel)}
+              </>
+            )}
+          </span>
 
           {isSyncing ? (
             <div className="ladder-syncing-indicator">

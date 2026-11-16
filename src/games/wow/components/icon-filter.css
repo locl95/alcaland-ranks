@@ -1,0 +1,50 @@
+/* Kept in step with the LoL ladder's .lol-position-btn, so every game filters alike. */
+.ladder-icon-filter {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+/* A rule between the class and the race icons, so each reads as its own group. */
+.ladder-icon-filter + .ladder-icon-filter {
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--rule);
+}
+
+.ladder-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--rad-md);
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition:
+    opacity var(--motion-base),
+    background var(--motion-base),
+    border-color var(--motion-base);
+}
+
+.ladder-icon-btn img {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--rad-sm);
+}
+
+.ladder-icon-btn:hover {
+  opacity: 1;
+  background: var(--panel-2);
+}
+
+.ladder-icon-btn[aria-pressed='true'] {
+  opacity: 1;
+  background: var(--beacon-soft);
+  border-color: var(--beacon-edge);
+}

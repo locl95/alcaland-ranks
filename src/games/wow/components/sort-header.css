@@ -1,0 +1,35 @@
+/* Right-aligned like the numbers below it, so the arrow sits before the label. */
+.ladder-sort-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  padding: 0;
+  background: none;
+  border: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--motion-fast);
+}
+
+.ladder-sort-header:hover,
+.ladder-sort-header[data-active='true'] {
+  color: var(--ink);
+}
+
+.ladder-sort-arrow {
+  flex-shrink: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--ink-4);
+  transition: color var(--motion-fast);
+}
+
+.ladder-sort-header:hover .ladder-sort-arrow {
+  color: var(--ink-2);
+}
+
+/* --beacon, the theme's interaction colour: the active sort, like the picked filter. */
+.ladder-sort-header[data-active='true'] .ladder-sort-arrow {
+  color: var(--beacon);
+}

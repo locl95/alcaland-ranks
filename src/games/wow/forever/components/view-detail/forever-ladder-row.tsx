@@ -1,5 +1,5 @@
 import { CSSProperties, useId, useState } from 'react';
-import { Clock } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock } from 'lucide-react';
 import { CLASS_IMAGES, getClassImageKey } from '@/games/wow/class-images.ts';
 import { CLASS_COLORS, getClassSlug } from '@/games/wow/class-colors.ts';
 import { RACE_IMAGES, getRaceImageKey } from '@/games/wow/forever/assets/race-images.ts';
@@ -113,6 +113,12 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
           <span className="sr-only">Last login </span>
           {compactTimeSince(new Date(character.lastLogin), new Date())}
         </time>
+
+        {open ? (
+          <ChevronUp className="forever-row-chevron" aria-hidden={true} />
+        ) : (
+          <ChevronDown className="forever-row-chevron" aria-hidden={true} />
+        )}
       </button>
 
       {open && <CharacterPanel id={panelId} character={character} />}
