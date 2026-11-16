@@ -7,3 +7,11 @@
   padding: 0.625rem 0.75rem;
   border-bottom: 1px solid var(--rule);
 }
+
+/* Narrow, each control gets a line of its own, in order: class filter, race filter, search. */
+@media (max-width: 640px) {
+  .ladder-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

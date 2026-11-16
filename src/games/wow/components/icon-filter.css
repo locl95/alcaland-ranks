@@ -48,3 +48,11 @@
   background: var(--beacon-soft);
   border-color: var(--beacon-edge);
 }
+
+/* Stacked in the narrow toolbar, each filter is already on its own line: no rule between. */
+@media (max-width: 640px) {
+  .ladder-icon-filter + .ladder-icon-filter {
+    padding-left: 0;
+    border-left: none;
+  }
+}

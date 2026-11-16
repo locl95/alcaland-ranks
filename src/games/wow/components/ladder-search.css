@@ -21,8 +21,9 @@
   padding-left: 2rem;
 }
 
+/* On its own line in the stacked toolbar, so it takes the whole width. */
 @media (max-width: 640px) {
   .ladder-search {
-    width: 10rem;
+    width: 100%;
   }
 }
