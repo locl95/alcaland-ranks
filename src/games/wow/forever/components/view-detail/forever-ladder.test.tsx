@@ -394,6 +394,18 @@ describe('ForeverLadder', () => {
     expect(raceIcon).toHaveAttribute('src', 'orc_female.webp');
   });
 
+  it('shows the item levels gained since the last snapshot', () => {
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { equippedItemLevel: 24 })]}
+        cachedCharacters={[character('Daxan', 22, { equippedItemLevel: 18 })]}
+        pending={[]}
+      />,
+    );
+
+    expect(screen.getByTitle('Item levels gained since the last snapshot')).toHaveTextContent('+6');
+  });
+
   it("shows the race art for the character's gender", () => {
     render(
       <ForeverLadder

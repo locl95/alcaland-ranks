@@ -1,7 +1,8 @@
 .ladder-card {
   /* Shared by the header and the rows so the number columns line up. */
   --col-gap: 1rem;
-  --col-ilvl: 3rem;
+  /* Wide enough for a gain beside a three-digit item level. */
+  --col-ilvl: 5.25rem;
   --col-score: 7.5rem;
   border: 1px solid var(--rule);
   background: var(--panel);

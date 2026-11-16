@@ -40,6 +40,15 @@ export const LadderRow = memo(function LadderRow({
     !isSyncing && cachedCharacter && cachedCharacter.score !== null
       ? Math.round(character.score! - cachedCharacter.score)
       : 0;
+  // Compared as shown, whole levels, so 672.4 after 672.0 is no gain. A drop counts as none:
+  // it is a swap, not lost gear.
+  const ilvlGain =
+    !isSyncing && cachedCharacter
+      ? Math.max(
+          0,
+          Math.floor(character.equippedItemLevel) - Math.floor(cachedCharacter.equippedItemLevel),
+        )
+      : 0;
 
   return (
     <div className="ladder-row" data-tier={isSyncing ? undefined : getScoreTier(character.score!)}>
@@ -97,14 +106,22 @@ export const LadderRow = memo(function LadderRow({
           </div>
 
           {/* A column of its own, so item levels line up and can be compared down the ladder. */}
-          <span className="ladder-ilvl num" title="Equipped item level">
+          <div className="ladder-ilvl">
+            {ilvlGain > 0 && (
+              <span
+                className="score-improvement ladder-ilvl-gain num"
+                title="Item levels gained since the last snapshot"
+              >
+                +{ilvlGain}
+              </span>
+            )}
             {!isSyncing && (
-              <>
+              <span className="ladder-ilvl-value num" title="Equipped item level">
                 <span className="sr-only">Item level </span>
                 {Math.floor(character.equippedItemLevel)}
-              </>
+              </span>
             )}
-          </span>
+          </div>
 
           {isSyncing ? (
             <div className="ladder-syncing-indicator">

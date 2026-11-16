@@ -5,7 +5,8 @@
 .forever-ladder {
   /* Shared by the header and the rows so the number columns line up. */
   --col-gap: 1rem;
-  --col-ilvl: 3rem;
+  /* Wide enough for a gain beside a three-digit item level. */
+  --col-ilvl: 5.25rem;
   --col-level: 5rem;
   --col-chevron: 1rem;
   border: 1px solid var(--rule);
@@ -234,12 +235,18 @@ button.forever-row:hover {
   border-radius: 3px;
 }
 
-/* Same size as the level, quieter colour: comparable at a glance, but the level
-   stays the number that ranks the ladder. */
 .forever-ilvl {
   width: var(--col-ilvl);
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 0.375rem;
   flex-shrink: 0;
-  text-align: right;
+}
+
+/* Same size as the level, quieter colour: comparable at a glance, but the level
+   stays the number that ranks the ladder. */
+.forever-ilvl-value {
   font-size: 1.5rem;
   font-weight: 500;
   line-height: 1.1;
@@ -353,9 +360,14 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
     font-size: 0.5rem;
   }
 
-  .forever-ilvl,
+  .forever-ilvl-value,
   .forever-level-value {
     font-size: 1.0625rem;
+  }
+
+  /* No room for a second gain: the level's stays, the item level's goes. */
+  .forever-ilvl-gain {
+    display: none;
   }
 }
 

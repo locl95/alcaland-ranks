@@ -15,7 +15,7 @@ interface ForeverLadderRowProps {
 }
 
 export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowProps>) {
-  const { character, standingChange, levelGain } = entry;
+  const { character, standingChange, levelGain, ilvlGain } = entry;
   const classIcon = CLASS_IMAGES[getClassImageKey(character.characterClass)];
   const raceImage = getRaceImage(character.race, character.gender);
   // Blizzard's render of the face; without one, the race, then the class.
@@ -87,10 +87,20 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
 
         {/* A column of its own, beside the level, so item levels line up and can be
           compared down the ladder. */}
-        <span className="forever-ilvl num" title="Equipped item level">
-          <span className="sr-only">Item level </span>
-          {character.equippedItemLevel}
-        </span>
+        <div className="forever-ilvl">
+          {ilvlGain > 0 && (
+            <span
+              className="forever-level-gain forever-ilvl-gain num"
+              title="Item levels gained since the last snapshot"
+            >
+              +{ilvlGain}
+            </span>
+          )}
+          <span className="forever-ilvl-value num" title="Equipped item level">
+            <span className="sr-only">Item level </span>
+            {character.equippedItemLevel}
+          </span>
+        </div>
 
         <div className="forever-level">
           {levelGain > 0 && (

@@ -67,6 +67,16 @@ describe('buildLadder', () => {
 
     expect(entry.standingChange).toBeNull();
     expect(entry.levelGain).toBe(0);
+    expect(entry.ilvlGain).toBe(0);
+  });
+
+  it('counts item levels gained since the last snapshot, a drop as none', () => {
+    const ladder = buildLadder(
+      [character('Geared', 20, 0, 24), character('Swapped', 18, 0, 15)],
+      [character('Geared', 20, 0, 18), character('Swapped', 18, 0, 19)],
+    );
+
+    expect(ladder.map(({ ilvlGain }) => ilvlGain)).toEqual([6, 0]);
   });
 });
 

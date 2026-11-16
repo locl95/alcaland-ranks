@@ -8,6 +8,11 @@ export interface LadderEntry {
   standingChange: number | null;
   /** Levels gained since the last snapshot. */
   levelGain: number;
+  /**
+   * Equipped item levels gained since the last snapshot. A drop counts as none: it is a swap
+   * (a PvP set, a weapon off to train a skill), not lost gear.
+   */
+  ilvlGain: number;
 }
 
 /** A ladder entry with its real place in the ladder, kept when the rows are filtered or sorted. */
@@ -46,11 +51,12 @@ export function buildLadder(
   return [...characters].sort(byProgress).map((character, index) => {
     const before = cachedIndex.get(characterKey(character));
     return before === undefined
-      ? { character, standingChange: null, levelGain: 0 }
+      ? { character, standingChange: null, levelGain: 0, ilvlGain: 0 }
       : {
           character,
           standingChange: before - index,
           levelGain: character.level - cached[before].level,
+          ilvlGain: Math.max(0, character.equippedItemLevel - cached[before].equippedItemLevel),
         };
   });
 }
