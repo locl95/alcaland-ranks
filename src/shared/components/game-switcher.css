@@ -58,6 +58,12 @@
   outline: none;
 }
 
+.game-switcher-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .game-switcher-item[data-highlighted] {
   background: var(--panel-3);
   color: var(--ink);
