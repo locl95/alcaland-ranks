@@ -184,4 +184,29 @@ describe('LadderRow', () => {
     );
     expect(screen.queryByText(/^\+/)).not.toBeInTheDocument();
   });
+
+  const renderIlvl = (now: number, before: number) =>
+    render(
+      <LadderRow
+        index={0}
+        character={makeProfile({ equippedItemLevel: now })}
+        cachedCharacters={[makeProfile({ equippedItemLevel: before })]}
+        season={null}
+      />,
+    );
+
+  it('shows the item levels gained since the last snapshot', () => {
+    renderIlvl(336.2, 330.9);
+
+    expect(screen.getByTitle('Item levels gained since the last snapshot')).toHaveTextContent('+6');
+  });
+
+  it('counts no gain inside the same item level, nor for a drop', () => {
+    const { unmount } = renderIlvl(330.9, 330.1);
+    expect(screen.queryByTitle('Item levels gained since the last snapshot')).toBeNull();
+    unmount();
+
+    renderIlvl(325, 330);
+    expect(screen.queryByTitle('Item levels gained since the last snapshot')).toBeNull();
+  });
 });

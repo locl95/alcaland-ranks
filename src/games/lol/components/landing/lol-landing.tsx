@@ -1,4 +1,4 @@
-import challenger from '@/games/lol/assets/challenger.webp';
+import logo from '@/games/lol/assets/logo.webp';
 import { ViewsPage } from '@/features/views/components/views-page/views-page.tsx';
 import { CreateLolView } from './create-lol-view.tsx';
 
@@ -13,7 +13,7 @@ const LOL_COPY = {
 export function LolLanding() {
   return (
     <ViewsPage
-      mark={challenger}
+      mark={logo}
       title="Ranked ladder tracker"
       copy={LOL_COPY}
       CreateDialog={CreateLolView}

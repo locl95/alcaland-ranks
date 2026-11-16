@@ -1,8 +1,8 @@
 import { CSSProperties, useId, useState } from 'react';
-import { Clock } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock } from 'lucide-react';
 import { CLASS_IMAGES, getClassImageKey } from '@/games/wow/class-images.ts';
 import { CLASS_COLORS, getClassSlug } from '@/games/wow/class-colors.ts';
-import { RACE_IMAGES, getRaceImageKey } from '@/games/wow/forever/assets/race-images.ts';
+import { getRaceImage } from '@/games/wow/race-images.ts';
 import { formatCharacterName } from '@/games/wow/forever/model/character.ts';
 import { LadderEntry } from '@/games/wow/forever/model/ladder.ts';
 import { regionLabel } from '@/games/wow/forever/constants/regions.ts';
@@ -15,9 +15,9 @@ interface ForeverLadderRowProps {
 }
 
 export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowProps>) {
-  const { character, standingChange, levelGain } = entry;
+  const { character, standingChange, levelGain, ilvlGain } = entry;
   const classIcon = CLASS_IMAGES[getClassImageKey(character.characterClass)];
-  const raceImage = RACE_IMAGES[getRaceImageKey(character.race)];
+  const raceImage = getRaceImage(character.race, character.gender);
   // Blizzard's render of the face; without one, the race, then the class.
   const portraitFallback = raceImage ?? classIcon;
   const [open, setOpen] = useState(false);
@@ -87,10 +87,20 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
 
         {/* A column of its own, beside the level, so item levels line up and can be
           compared down the ladder. */}
-        <span className="forever-ilvl num" title="Equipped item level">
-          <span className="sr-only">Item level </span>
-          {character.equippedItemLevel}
-        </span>
+        <div className="forever-ilvl">
+          {ilvlGain > 0 && (
+            <span
+              className="forever-level-gain forever-ilvl-gain num"
+              title="Item levels gained since the last snapshot"
+            >
+              +{ilvlGain}
+            </span>
+          )}
+          <span className="forever-ilvl-value num" title="Equipped item level">
+            <span className="sr-only">Item level </span>
+            {character.equippedItemLevel}
+          </span>
+        </div>
 
         <div className="forever-level">
           {levelGain > 0 && (
@@ -113,6 +123,12 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
           <span className="sr-only">Last login </span>
           {compactTimeSince(new Date(character.lastLogin), new Date())}
         </time>
+
+        {open ? (
+          <ChevronUp className="forever-row-chevron" aria-hidden={true} />
+        ) : (
+          <ChevronDown className="forever-row-chevron" aria-hidden={true} />
+        )}
       </button>
 
       {open && <CharacterPanel id={panelId} character={character} />}

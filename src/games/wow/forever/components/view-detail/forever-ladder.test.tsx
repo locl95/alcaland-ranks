@@ -9,10 +9,11 @@ import {
 } from '@/games/wow/forever/api/forever-types.ts';
 import { ForeverLadder } from './forever-ladder.tsx';
 
-// Only the Orc has race art here, as if just that PNG had been added.
-vi.mock('@/games/wow/forever/assets/race-images.ts', () => ({
-  RACE_IMAGES: { orc: 'orc.png' } as Record<string, string>,
-  getRaceImageKey: (race: string) => race.toLowerCase().replace(/\s+/g, ''),
+// Only the Orc has race art here, as if just its files had been added.
+vi.mock('@/games/wow/race-images.ts', () => ({
+  getRaceImage: (race: string, gender: string) =>
+    race === 'Orc' ? `orc_${gender.toLowerCase()}.webp` : undefined,
+  getRaceFilterImage: (race: string) => (race === 'Orc' ? 'orc.webp' : undefined),
 }));
 
 const character = (
@@ -390,7 +391,31 @@ describe('ForeverLadder', () => {
     const [classIcon, raceIcon] = imagesOf('Daxan');
     expect(classIcon).toHaveAttribute('alt', 'Warrior');
     expect(raceIcon).toHaveAttribute('alt', 'Orc');
-    expect(raceIcon).toHaveAttribute('src', 'orc.png');
+    expect(raceIcon).toHaveAttribute('src', 'orc_female.webp');
+  });
+
+  it('shows the item levels gained since the last snapshot', () => {
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { equippedItemLevel: 24 })]}
+        cachedCharacters={[character('Daxan', 22, { equippedItemLevel: 18 })]}
+        pending={[]}
+      />,
+    );
+
+    expect(screen.getByTitle('Item levels gained since the last snapshot')).toHaveTextContent('+6');
+  });
+
+  it("shows the race art for the character's gender", () => {
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { gender: 'Male' })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+
+    expect(imagesOf('Daxan')[1]).toHaveAttribute('src', 'orc_male.webp');
   });
 
   it('falls back to the race for the portrait, then to the class', () => {
@@ -402,7 +427,7 @@ describe('ForeverLadder', () => {
       />,
     );
 
-    expect(portraitOf('Daxan')).toHaveAttribute('src', 'orc.png');
+    expect(portraitOf('Daxan')).toHaveAttribute('src', 'orc_female.webp');
     expect(portraitOf('Siempre')).toHaveAttribute('src', expect.stringContaining('warrior'));
     // No race art for the Night Elf: just the class beside the name.
     expect(imagesOf('Siempre').map((image) => image.getAttribute('alt'))).toEqual(['Warrior']);
@@ -443,5 +468,138 @@ describe('ForeverLadder', () => {
     expect(within(rowOf('Brakk')).getByText('Syncing…')).toBeInTheDocument();
     expect(within(rowOf('Siempre')).getByText('Deleting…')).toBeInTheDocument();
     expect(within(rowOf('Brakk')).queryByText(/Level/)).not.toBeInTheDocument();
+  });
+
+  it('filters by character name, keeping each row in its real place', async () => {
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22), character('Lúcía', 20), character('Brakk', 18)]}
+        cachedCharacters={[]}
+        pending={[{ entity: { name: 'Dax', surname: 'Alt', region: 'eu' }, status: 'syncing' }]}
+      />,
+    );
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Search character' }), 'lucia');
+
+    const rows = screen.getAllByRole('listitem');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].querySelector('.forever-row-position')).toHaveTextContent('2');
+    expect(rows[0]).toHaveTextContent('Lúcía Test');
+
+    await userEvent.clear(screen.getByRole('searchbox'));
+    await userEvent.type(screen.getByRole('searchbox'), 'dax');
+    expect(screen.getAllByRole('listitem').map((r) => r.textContent)).toEqual([
+      expect.stringContaining('Daxan Test'),
+      expect.stringContaining('Dax Alt'),
+    ]);
+
+    await userEvent.type(screen.getByRole('searchbox'), 'zzz');
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0);
+    expect(screen.getByText('No characters match.')).toBeInTheDocument();
+  });
+
+  it('filters by class and race, offering only those in the ladder, with their icons', async () => {
+    render(
+      <ForeverLadder
+        characters={[
+          character('Daxan', 22),
+          character('Siempre', 20, { characterClass: 'Druid', race: 'Night Elf' }),
+          character('Brakk', 18, { characterClass: 'Druid', race: 'Orc' }),
+        ]}
+        cachedCharacters={[]}
+        pending={[{ entity: { name: 'Dax', surname: 'Alt', region: 'eu' }, status: 'syncing' }]}
+      />,
+    );
+    const names = () =>
+      screen.getAllByRole('listitem').map((r) => r.querySelector('.forever-row-name')!.textContent);
+    const classes = within(screen.getByRole('group', { name: 'Class' }));
+
+    expect(classes.getAllByRole('button').map((b) => b.getAttribute('aria-label'))).toEqual([
+      'Druid',
+      'Warrior',
+    ]);
+    expect(classes.getByRole('button', { name: 'Druid' }).querySelector('img')).not.toBeNull();
+    await userEvent.click(classes.getByRole('button', { name: 'Druid' }));
+    expect(classes.getByRole('button', { name: 'Druid' })).toHaveAttribute('aria-pressed', 'true');
+    expect(names()).toEqual(['Siempre Test', 'Brakk Test']);
+    expect(rowOf('Brakk').querySelector('.forever-row-position')).toHaveTextContent('3');
+
+    // Class and race combine. Only the Orc has race art in this test: the Night Elf shows letters.
+    // The filter's icon stands for the whole race, whatever each character's gender.
+    const races = within(screen.getByRole('group', { name: 'Race' }));
+    const orc = races.getByRole('button', { name: 'Orc' });
+    expect(orc.querySelector('img')).toHaveAttribute('src', 'orc.webp');
+    expect(races.getByRole('button', { name: 'Night Elf' })).toHaveTextContent('Ni');
+    await userEvent.click(orc);
+    expect(names()).toEqual(['Brakk Test']);
+    expect(orc).toHaveAttribute('aria-pressed', 'true');
+
+    // Clicking a picked icon again clears it.
+    await userEvent.click(classes.getByRole('button', { name: 'Druid' }));
+    await userEvent.click(orc);
+    expect(names()).toEqual(['Daxan Test', 'Siempre Test', 'Brakk Test', 'Dax Alt']);
+  });
+
+  it('shows a chevron that flips when the row opens', async () => {
+    render(
+      <ForeverLadder characters={[character('Daxan', 22)]} cachedCharacters={[]} pending={[]} />,
+    );
+    const row = rowOf('Daxan').querySelector('button')!;
+    expect(row.querySelector('.lucide-chevron-down')).toBeInTheDocument();
+
+    await userEvent.click(row);
+
+    expect(row.querySelector('.lucide-chevron-up')).toBeInTheDocument();
+  });
+
+  it('sorts by item level or level from the column headers, keeping real places', async () => {
+    render(
+      <ForeverLadder
+        characters={[
+          character('Daxan', 22, { equippedItemLevel: 30 }),
+          character('Siempre', 20, { equippedItemLevel: 50 }),
+          character('Brakk', 18, { equippedItemLevel: 40 }),
+        ]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    const rows = () =>
+      screen
+        .getAllByRole('listitem')
+        .map(
+          (r) =>
+            `${r.querySelector('.forever-row-position')!.textContent} ${r.querySelector('.forever-row-name')!.textContent}`,
+        );
+
+    expect(screen.getByRole('button', { name: 'Level, sorted descending' })).toBeInTheDocument();
+    expect(rows()).toEqual(['1 Daxan Test', '2 Siempre Test', '3 Brakk Test']);
+
+    await userEvent.click(screen.getByRole('button', { name: 'iLvl' }));
+    expect(rows()).toEqual(['2 Siempre Test', '3 Brakk Test', '1 Daxan Test']);
+    expect(screen.getByRole('button', { name: 'Level' })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'iLvl, sorted descending' }));
+    expect(rows()).toEqual(['1 Daxan Test', '3 Brakk Test', '2 Siempre Test']);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Level' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Level, sorted descending' }));
+    expect(screen.getByRole('button', { name: 'Level, sorted ascending' })).toBeInTheDocument();
+    expect(rows()).toEqual(['3 Brakk Test', '2 Siempre Test', '1 Daxan Test']);
+  });
+
+  it('stops filtering by a class the ladder no longer has', async () => {
+    const daxan = character('Daxan', 22);
+    const brakk = character('Brakk', 18, { characterClass: 'Druid' });
+    const { rerender } = render(
+      <ForeverLadder characters={[daxan, brakk]} cachedCharacters={[]} pending={[]} />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Druid' }));
+
+    rerender(<ForeverLadder characters={[daxan]} cachedCharacters={[]} pending={[]} />);
+
+    // A single class leaves nothing to filter, so its bar hides too.
+    expect(screen.queryByRole('group', { name: 'Class' })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('listitem')).toHaveLength(1);
   });
 });

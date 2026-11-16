@@ -1,4 +1,3 @@
-import { Swords } from 'lucide-react';
 import './ladder-row.css';
 import { memo, useState } from 'react';
 import { WowProfile, Season } from '@/games/wow/retail/api/wow-types.ts';
@@ -40,6 +39,15 @@ export const LadderRow = memo(function LadderRow({
   const scoreGain =
     !isSyncing && cachedCharacter && cachedCharacter.score !== null
       ? Math.round(character.score! - cachedCharacter.score)
+      : 0;
+  // Compared as shown, whole levels, so 672.4 after 672.0 is no gain. A drop counts as none:
+  // it is a swap, not lost gear.
+  const ilvlGain =
+    !isSyncing && cachedCharacter
+      ? Math.max(
+          0,
+          Math.floor(character.equippedItemLevel) - Math.floor(cachedCharacter.equippedItemLevel),
+        )
       : 0;
 
   return (
@@ -86,10 +94,6 @@ export const LadderRow = memo(function LadderRow({
             </div>
             {!isSyncing && (
               <div className="ladder-character-meta">
-                <span className="ladder-character-ilvl num">
-                  <Swords className="ladder-character-ilvl-icon" aria-hidden={true} />
-                  {Math.floor(character.equippedItemLevel)}
-                </span>
                 {character.guild && (
                   <span className="ladder-character-guild">&lt;{character.guild}&gt;</span>
                 )}
@@ -98,6 +102,24 @@ export const LadderRow = memo(function LadderRow({
                   {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
                 </span>
               </div>
+            )}
+          </div>
+
+          {/* A column of its own, so item levels line up and can be compared down the ladder. */}
+          <div className="ladder-ilvl">
+            {ilvlGain > 0 && (
+              <span
+                className="score-improvement ladder-ilvl-gain num"
+                title="Item levels gained since the last snapshot"
+              >
+                +{ilvlGain}
+              </span>
+            )}
+            {!isSyncing && (
+              <span className="ladder-ilvl-value num" title="Equipped item level">
+                <span className="sr-only">Item level </span>
+                {Math.floor(character.equippedItemLevel)}
+              </span>
             )}
           </div>
 

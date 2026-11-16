@@ -10,12 +10,28 @@
 
 .pager-range {
   color: var(--ink-3);
+  white-space: nowrap;
 }
 
 .pager-controls {
   display: flex;
   align-items: center;
   gap: 0.375rem;
+}
+
+.pager-size {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-right: 0.375rem;
+}
+
+.pager-size-select {
+  flex: none;
+  /* Room on the right for .form-select's arrow. */
+  padding: 0.1875rem 1.625rem 0.1875rem 0.5rem;
+  background-position: right 0.5rem center;
+  font-size: 0.8125rem;
 }
 
 .pager-btn {
@@ -56,5 +72,15 @@
   .pager {
     padding-left: 0.625rem;
     padding-right: 0.625rem;
+  }
+
+  /* No room for the word beside the range and the buttons; the select keeps it as its name. */
+  .pager-size .eyebrow {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }

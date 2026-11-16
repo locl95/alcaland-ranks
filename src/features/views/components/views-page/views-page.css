@@ -18,9 +18,12 @@
   min-width: 0;
 }
 
+/* The game's logo. Logos run from squarish (WoW) to wide (LoL): a fixed height with a
+   cap on the width keeps them at a similar weight. */
 .masthead-mark {
-  width: 2.75rem;
-  height: 2.75rem;
+  height: 5.5rem;
+  width: auto;
+  max-width: 13rem;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -265,8 +268,8 @@
   }
 
   .masthead-mark {
-    width: 2rem;
-    height: 2rem;
+    height: 3.5rem;
+    max-width: 7.5rem;
   }
 
   .masthead-title {

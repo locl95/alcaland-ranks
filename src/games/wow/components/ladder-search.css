@@ -1,0 +1,29 @@
+.ladder-search {
+  position: relative;
+  width: 14rem;
+  max-width: 100%;
+}
+
+.ladder-search-icon {
+  position: absolute;
+  left: 0.625rem;
+  top: 50%;
+  width: 1rem;
+  height: 1rem;
+  transform: translateY(-50%);
+  color: var(--ink-4);
+  pointer-events: none;
+}
+
+.ladder-search .form-input {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  padding-left: 2rem;
+}
+
+/* On its own line in the stacked toolbar, so it takes the whole width. */
+@media (max-width: 640px) {
+  .ladder-search {
+    width: 100%;
+  }
+}

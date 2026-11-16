@@ -29,7 +29,7 @@ test.describe('WoW Forever', () => {
     );
 
     await page.goto('/wow-forever');
-    await expect(page.getByRole('heading', { name: 'Forever ladder' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Forever ladder tracker' })).toBeVisible();
     await page.getByRole('button', { name: 'Create your first ladder' }).click();
     await page.getByPlaceholder('e.g., Fresh start crew').fill('Fresh Start');
     await page.getByLabel('Name', { exact: true }).fill('Daxan');

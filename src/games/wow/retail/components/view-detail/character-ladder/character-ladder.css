@@ -1,4 +1,9 @@
 .ladder-card {
+  /* Shared by the header and the rows so the number columns line up. */
+  --col-gap: 1rem;
+  /* Wide enough for a gain beside a three-digit item level. */
+  --col-ilvl: 5.25rem;
+  --col-score: 7.5rem;
   border: 1px solid var(--rule);
   background: var(--panel);
   border-radius: var(--rad-lg);
@@ -6,18 +11,69 @@
   overflow: hidden;
 }
 
+/* Title, then the toolbar's filters and search, then the chevron. */
 .ladder-header {
+  position: relative;
   padding: 0.875rem 1rem;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.75rem;
   border-bottom: 1px solid var(--rule);
   transition: background var(--motion-base);
 }
 
-.ladder-header:hover {
+/* Only the toggle lights the header: hovering a filter or the search is not a fold. */
+.ladder-header:has(.ladder-header-toggle:hover) {
   background: var(--panel-2);
+}
+
+/* The expander is a <button>, stripped back to a layout box, like .ladder-row-toggle. */
+.ladder-header-toggle {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Stretched over the header, so the chevron and the empty space fold the ladder too. */
+.ladder-header-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.ladder-header-toggle:focus-visible {
+  outline: none;
+}
+
+.ladder-header-toggle:focus-visible::after {
+  outline: 2px solid var(--beacon);
+  outline-offset: -2px;
+}
+
+/* The shared toolbar, without its own bar: the header already is one. Above the
+   toggle's stretched area, so its controls take their own clicks. */
+.ladder-header .ladder-toolbar {
+  position: relative;
+  z-index: 1;
+  padding: 0;
+  border-bottom: none;
+}
+
+.ladder-header-chevron {
+  flex-shrink: 0;
+  margin: 0.25rem;
+  color: var(--ink-4);
+  transition: color var(--motion-base);
+}
+
+.ladder-header:has(.ladder-header-toggle:hover) .ladder-header-chevron {
+  color: var(--ink-2);
 }
 
 .ladder-title {
@@ -32,33 +88,32 @@
   text-transform: uppercase;
 }
 
-.ladder-toggle-btn {
-  background: transparent;
-  border: none;
-  color: var(--ink-4);
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  transition: color var(--motion-base);
-}
-
-.ladder-header:hover .ladder-toggle-btn {
-  color: var(--ink-2);
-}
-
 .ladder-cols {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem 0.5rem 1.25rem;
+  gap: var(--col-gap);
+  /* The right padding lines the score header up with .ladder-score: its right margin
+     plus the character menu. */
+  padding: 0.5rem 4.125rem 0.5rem 1.25rem;
   border-bottom: 1px solid var(--rule);
   background: rgba(255, 255, 255, 0.015);
 }
 
-/* Lines up with .ladder-score: its right margin plus the character menu. */
-.ladder-cols-score {
-  padding-right: 3.125rem;
+.ladder-cols > :first-child {
+  flex: 1;
+}
+
+.ladder-col-ilvl,
+.ladder-col-score {
+  flex-shrink: 0;
+}
+
+.ladder-col-ilvl {
+  width: var(--col-ilvl);
+}
+
+.ladder-col-score {
+  width: var(--col-score);
 }
 
 .ladder-content {
@@ -84,19 +139,28 @@
 
 @media (max-width: 640px) {
   .ladder-header {
+    flex-wrap: wrap;
     padding: 0.75rem;
+  }
+
+  /* No room on one line: the title and chevron stay on top, the controls drop below. */
+  .ladder-header .ladder-toolbar {
+    order: 1;
+    flex-basis: 100%;
   }
 
   .ladder-title {
     font-size: 1.0625rem;
   }
 
-  .ladder-cols {
-    padding: 0.4375rem 0.5rem 0.4375rem 0.875rem;
+  .ladder-card {
+    --col-gap: 0.5rem;
+    --col-ilvl: 2.25rem;
+    --col-score: 5.75rem;
   }
 
-  .ladder-cols-score {
-    padding-right: 2rem;
+  .ladder-cols {
+    padding: 0.4375rem 2.5rem 0.4375rem 0.875rem;
   }
 
   .ladder-card .pager {
