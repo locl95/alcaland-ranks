@@ -101,3 +101,50 @@ describe('Pager', () => {
     expect(pagination.goLast).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('Pager — page size', () => {
+  const pageSize = (overrides = {}) => ({
+    size: 10 as const,
+    options: [10, 25, 'all'] as (10 | 25 | 'all')[],
+    rowsPerPage: 10,
+    pick: vi.fn(),
+    ...overrides,
+  });
+
+  it('lets the viewer pick a size, going back to the first page', async () => {
+    const control = pageSize();
+    const pagination = makePagination();
+    render(<Pager label="Ladder pages" pagination={pagination} pageSize={control} />);
+
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Show' }), 'All');
+
+    expect(control.pick).toHaveBeenCalledWith('all');
+    expect(pagination.goFirst).toHaveBeenCalled();
+  });
+
+  it('stays, without page buttons, when the whole ladder is on one page', () => {
+    render(
+      <Pager
+        label="Ladder pages"
+        pagination={makePagination({ pageCount: 1, count: 15, total: 15 })}
+        pageSize={pageSize({ size: 'all' })}
+      />,
+    );
+
+    expect(screen.getByText('1–15 of 15')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Show' })).toHaveValue('all');
+    expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument();
+  });
+
+  it('offers no picker for a ladder that fits one page', () => {
+    const { container } = render(
+      <Pager
+        label="Ladder pages"
+        pagination={makePagination({ pageCount: 1, total: 8 })}
+        pageSize={pageSize({ options: [] })}
+      />,
+    );
+
+    expect(container).toBeEmptyDOMElement();
+  });
+});

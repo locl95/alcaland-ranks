@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { CharacterLadder } from './character-ladder.tsx';
 import { WowProfile } from '@/games/wow/retail/api/wow-types.ts';
 
@@ -92,6 +92,20 @@ describe('CharacterLadder', () => {
 });
 
 describe('CharacterLadder — paging', () => {
+  afterEach(() => localStorage.clear());
+
+  it('shows the whole ladder when picked, and keeps that for the next ladder', async () => {
+    const { unmount } = renderLadder(makeLadder(20));
+    expect(screen.getAllByTestId(/^ladder-row-/)).toHaveLength(10);
+
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Show' }), 'All');
+    expect(screen.getAllByTestId(/^ladder-row-/)).toHaveLength(20);
+
+    unmount();
+    renderLadder(makeLadder(30));
+    expect(screen.getAllByTestId(/^ladder-row-/)).toHaveLength(30);
+  });
+
   it('shows no pager while everyone fits on one page', () => {
     renderLadder(makeLadder(10));
 

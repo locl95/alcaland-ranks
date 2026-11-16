@@ -4,6 +4,7 @@ import './character-ladder.css';
 import { memo, useMemo, useState } from 'react';
 import { WowProfile, Season } from '@/games/wow/retail/api/wow-types.ts';
 import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
+import { usePageSize } from '@/features/views/hooks/usePageSize.ts';
 import { EntityStatus } from '@/features/views/hooks/useSaveEntities.ts';
 import { characterKey } from '@/games/wow/retail/utils.ts';
 import { LadderRow } from './ladder-row.tsx';
@@ -70,7 +71,9 @@ export const CharacterLadder = memo(function CharacterLadder({
     [sortedCharacters, characterClass, search, sort],
   );
 
-  const { pageItems, pagination } = useEntityPage(visibleCharacters);
+  // Sized by the whole ladder, so the options hold still while the search narrows it.
+  const pageSize = usePageSize(sortedCharacters.length);
+  const { pageItems, pagination } = useEntityPage(visibleCharacters, pageSize.rowsPerPage);
 
   const filterBy = (set: (value: string) => void) => (value: string) => {
     set(value);
@@ -148,7 +151,7 @@ export const CharacterLadder = memo(function CharacterLadder({
             ))}
           </div>
           {visibleCharacters.length === 0 && <LadderNoResults />}
-          <Pager label="Ladder pages" pagination={pagination} />
+          <Pager label="Ladder pages" pagination={pagination} pageSize={pageSize} />
         </>
       )}
     </div>

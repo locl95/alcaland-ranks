@@ -11,6 +11,9 @@ import {
   sortLadder,
 } from '@/games/lol/model/ladder.ts';
 import { PendingEntity } from '@/features/views/hooks/useSaveEntities.ts';
+import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
+import { usePageSize } from '@/features/views/hooks/usePageSize.ts';
+import { Pager } from '@/features/views/components/shared/pager.tsx';
 import { RiotId } from '@/games/lol/model/riot-id.ts';
 import { LolLadderRow } from './lol-ladder-row.tsx';
 import { LolPendingRow } from './lol-pending-row.tsx';
@@ -50,17 +53,26 @@ export function LolLadder({
     () => buildLadder(players, cachedPlayers, queue),
     [players, cachedPlayers, queue],
   );
-  const visibleEntries = sortLadder(
-    ladder.filter((entry) => matchesFilters(entry, position, search)),
-    sort,
+  const visibleEntries = useMemo(
+    () =>
+      sortLadder(
+        ladder.filter((entry) => matchesFilters(entry, position, search)),
+        sort,
+      ),
+    [ladder, position, search, sort],
   );
+  // Sized by the whole ladder, so the options hold still while the filters narrow it.
+  const pageSize = usePageSize(ladder.length);
+  const { pageItems, pagination } = useEntityPage(visibleEntries, pageSize.rowsPerPage);
 
-  const sortBy = (key: SortKey) =>
+  const sortBy = (key: SortKey) => {
     setSort((current) =>
       current.key === key
         ? { key, descending: !current.descending }
         : { key, descending: key !== 'name' },
     );
+    pagination.goFirst();
+  };
 
   return (
     <div className="lol-ladder">
@@ -72,7 +84,10 @@ export function LolLadder({
               type="button"
               className={`lol-segmented-btn${queue === q ? ' lol-segmented-btn--active' : ''}`}
               aria-pressed={queue === q}
-              onClick={() => onQueueChange(q)}
+              onClick={() => {
+                onQueueChange(q);
+                pagination.goFirst();
+              }}
             >
               {q === 'solo' ? 'Solo/Duo' : 'Flex'}
             </button>
@@ -88,7 +103,10 @@ export function LolLadder({
               aria-pressed={position === key}
               aria-label={label}
               title={label}
-              onClick={() => setPosition(position === key ? null : key)}
+              onClick={() => {
+                setPosition(position === key ? null : key);
+                pagination.goFirst();
+              }}
             >
               <img src={icon} alt="" aria-hidden={true} />
             </button>
@@ -103,7 +121,10 @@ export function LolLadder({
             placeholder="Search player or tier"
             aria-label="Search player or tier"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              pagination.goFirst();
+            }}
           />
         </label>
       </div>
@@ -149,7 +170,7 @@ export function LolLadder({
             </tr>
           </thead>
           <tbody>
-            {visibleEntries.map((entry) => (
+            {pageItems.map((entry) => (
               <LolLadderRow
                 key={`${entry.player.summonerName}#${entry.player.summonerTag}`}
                 entry={entry}
@@ -165,6 +186,7 @@ export function LolLadder({
           <p className="lol-no-results">No players match.</p>
         )}
       </div>
+      <Pager label="Ladder pages" pagination={pagination} pageSize={pageSize} />
     </div>
   );
 }

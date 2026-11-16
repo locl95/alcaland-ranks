@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { PendingEntity } from '@/features/views/hooks/useSaveEntities.ts';
 import { useEntityPage } from '@/features/views/hooks/useEntityPage.ts';
+import { usePageSize } from '@/features/views/hooks/usePageSize.ts';
 import { Pager } from '@/features/views/components/shared/pager.tsx';
 import {
   CharacterRef,
@@ -78,7 +79,9 @@ export function ForeverLadder({
     characterClass || race
       ? []
       : pending.filter(({ entity }) => matchesName(formatCharacterName(entity), search));
-  const { pageItems, pagination } = useEntityPage(visibleEntries);
+  // Sized by the whole ladder, so the options hold still while the filters narrow it.
+  const pageSize = usePageSize(entries.length);
+  const { pageItems, pagination } = useEntityPage(visibleEntries, pageSize.rowsPerPage);
 
   const filterBy = (set: (value: string) => void) => (value: string) => {
     set(value);
@@ -135,7 +138,7 @@ export function ForeverLadder({
         ))}
       </ol>
       {visibleEntries.length === 0 && visiblePending.length === 0 && <LadderNoResults />}
-      <Pager label="Ladder pages" pagination={pagination} />
+      <Pager label="Ladder pages" pagination={pagination} pageSize={pageSize} />
     </section>
   );
 }
