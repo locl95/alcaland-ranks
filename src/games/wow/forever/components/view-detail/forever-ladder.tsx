@@ -20,7 +20,7 @@ import { LadderSearch } from '@/games/wow/components/ladder-search.tsx';
 import { LadderToolbar } from '@/games/wow/components/ladder-toolbar.tsx';
 import { LadderNoResults } from '@/games/wow/components/ladder-no-results.tsx';
 import { CLASS_IMAGES, getClassImageKey } from '@/games/wow/class-images.ts';
-import { RACE_IMAGES, getRaceImageKey } from '@/games/wow/forever/assets/race-images.ts';
+import { getRaceFilterImage } from '@/games/wow/race-images.ts';
 import { IconFilter } from '@/games/wow/components/icon-filter.tsx';
 import { SortHeader } from '@/games/wow/components/sort-header.tsx';
 import { nextSort } from '@/games/wow/column-sort.ts';
@@ -105,7 +105,7 @@ export function ForeverLadder({
         <IconFilter
           label="Race"
           options={races}
-          iconOf={(r) => RACE_IMAGES[getRaceImageKey(r)]}
+          iconOf={getRaceFilterImage}
           value={race}
           onChange={filterBy(setPickedRace)}
         />

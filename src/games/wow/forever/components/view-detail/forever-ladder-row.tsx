@@ -2,7 +2,7 @@ import { CSSProperties, useId, useState } from 'react';
 import { ChevronDown, ChevronUp, Clock } from 'lucide-react';
 import { CLASS_IMAGES, getClassImageKey } from '@/games/wow/class-images.ts';
 import { CLASS_COLORS, getClassSlug } from '@/games/wow/class-colors.ts';
-import { RACE_IMAGES, getRaceImageKey } from '@/games/wow/forever/assets/race-images.ts';
+import { getRaceImage } from '@/games/wow/race-images.ts';
 import { formatCharacterName } from '@/games/wow/forever/model/character.ts';
 import { LadderEntry } from '@/games/wow/forever/model/ladder.ts';
 import { regionLabel } from '@/games/wow/forever/constants/regions.ts';
@@ -17,7 +17,7 @@ interface ForeverLadderRowProps {
 export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowProps>) {
   const { character, standingChange, levelGain } = entry;
   const classIcon = CLASS_IMAGES[getClassImageKey(character.characterClass)];
-  const raceImage = RACE_IMAGES[getRaceImageKey(character.race)];
+  const raceImage = getRaceImage(character.race, character.gender);
   // Blizzard's render of the face; without one, the race, then the class.
   const portraitFallback = raceImage ?? classIcon;
   const [open, setOpen] = useState(false);

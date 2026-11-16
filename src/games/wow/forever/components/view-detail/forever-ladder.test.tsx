@@ -9,10 +9,11 @@ import {
 } from '@/games/wow/forever/api/forever-types.ts';
 import { ForeverLadder } from './forever-ladder.tsx';
 
-// Only the Orc has race art here, as if just that PNG had been added.
-vi.mock('@/games/wow/forever/assets/race-images.ts', () => ({
-  RACE_IMAGES: { orc: 'orc.png' } as Record<string, string>,
-  getRaceImageKey: (race: string) => race.toLowerCase().replace(/\s+/g, ''),
+// Only the Orc has race art here, as if just its files had been added.
+vi.mock('@/games/wow/race-images.ts', () => ({
+  getRaceImage: (race: string, gender: string) =>
+    race === 'Orc' ? `orc_${gender.toLowerCase()}.webp` : undefined,
+  getRaceFilterImage: (race: string) => (race === 'Orc' ? 'orc.webp' : undefined),
 }));
 
 const character = (
@@ -390,7 +391,19 @@ describe('ForeverLadder', () => {
     const [classIcon, raceIcon] = imagesOf('Daxan');
     expect(classIcon).toHaveAttribute('alt', 'Warrior');
     expect(raceIcon).toHaveAttribute('alt', 'Orc');
-    expect(raceIcon).toHaveAttribute('src', 'orc.png');
+    expect(raceIcon).toHaveAttribute('src', 'orc_female.webp');
+  });
+
+  it("shows the race art for the character's gender", () => {
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { gender: 'Male' })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+
+    expect(imagesOf('Daxan')[1]).toHaveAttribute('src', 'orc_male.webp');
   });
 
   it('falls back to the race for the portrait, then to the class', () => {
@@ -402,7 +415,7 @@ describe('ForeverLadder', () => {
       />,
     );
 
-    expect(portraitOf('Daxan')).toHaveAttribute('src', 'orc.png');
+    expect(portraitOf('Daxan')).toHaveAttribute('src', 'orc_female.webp');
     expect(portraitOf('Siempre')).toHaveAttribute('src', expect.stringContaining('warrior'));
     // No race art for the Night Elf: just the class beside the name.
     expect(imagesOf('Siempre').map((image) => image.getAttribute('alt'))).toEqual(['Warrior']);
@@ -500,9 +513,10 @@ describe('ForeverLadder', () => {
     expect(rowOf('Brakk').querySelector('.forever-row-position')).toHaveTextContent('3');
 
     // Class and race combine. Only the Orc has race art in this test: the Night Elf shows letters.
+    // The filter's icon stands for the whole race, whatever each character's gender.
     const races = within(screen.getByRole('group', { name: 'Race' }));
     const orc = races.getByRole('button', { name: 'Orc' });
-    expect(orc.querySelector('img')).toHaveAttribute('src', 'orc.png');
+    expect(orc.querySelector('img')).toHaveAttribute('src', 'orc.webp');
     expect(races.getByRole('button', { name: 'Night Elf' })).toHaveTextContent('Ni');
     await userEvent.click(orc);
     expect(names()).toEqual(['Brakk Test']);
