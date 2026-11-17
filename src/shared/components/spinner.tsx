@@ -1,4 +1,5 @@
 import { useIsFetching, useIsMutating } from '@tanstack/react-query';
+import './loading-ring.css';
 import './spinner.css';
 
 export function Spinner() {
@@ -11,7 +12,7 @@ export function Spinner() {
 
   return (
     <div className="spinner-overlay">
-      <div className="spinner" />
+      <div className="loading-ring" />
     </div>
   );
 }

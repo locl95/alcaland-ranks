@@ -45,16 +45,17 @@ export const BRAWLERS_HOOD = {
   enchantments: [],
 };
 
-export const ENHANCEMENT = {
-  name: 'Enhancement',
-  points: 25,
+// A Mage's: a talent of a tree the character's class doesn't have can't go to Wowhead.
+export const ARCANE = {
+  name: 'Arcane',
+  points: 5,
   talents: [
     {
-      name: 'Flurry',
-      spellId: 16256,
+      name: 'Improved Channeling',
+      spellId: 11237,
       rank: 5,
       description:
-        'Increases your attack speed by 30% for your next 3 swings after dealing a melee critical strike.',
+        'Gives your Arcane Missiles spell a 100% chance and your Arcane Blast and Arcane Wrath spells a 70% chance to not lose casting time when you take damage.',
       icon: null,
     },
   ],

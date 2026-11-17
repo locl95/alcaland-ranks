@@ -8,18 +8,3 @@
   background: color-mix(in srgb, var(--void) 80%, transparent);
   backdrop-filter: blur(2px);
 }
-
-.spinner {
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 2px solid var(--rule);
-  border-top-color: var(--beacon);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}

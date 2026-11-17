@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -199,33 +199,73 @@ describe('ForeverLadder', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('shows the talents trained in each specialization, main one first', async () => {
+  it("opens Wowhead's talent calculator on the character's build", async () => {
     const user = userEvent.setup();
     render(
       <ForeverLadder
-        characters={[
-          character('Daxan', 22, {
-            characterClass: 'Shaman',
-            talents: [{ name: 'Elemental', points: 5, talents: [] }, ENHANCEMENT],
-          }),
-        ]}
+        characters={[character('Daxan', 22, { characterClass: 'Shaman', talents: [ENHANCEMENT] })]}
         cachedCharacters={[]}
         pending={[]}
       />,
     );
     await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
 
-    const talents = screen.getByRole('region', { name: 'Talents of Daxan Test' });
-    const trees = within(talents).getAllByRole('heading');
-    expect(trees.map((tree) => tree.parentElement!.textContent)).toEqual([
-      'Enhancement25 points',
-      'Elemental5 points',
-    ]);
+    // Flurry, 5 points, is the 11th talent of Enhancement, the Shaman's second tree.
+    expect(screen.getByTitle('Talents of Daxan Test on Wowhead')).toHaveAttribute(
+      'src',
+      expect.stringMatching(/\/forever\/talent-calc\/embed\/shaman\/[a-z]+-00000000005$/),
+    );
+  });
 
-    await user.click(within(talents).getByRole('button', { name: 'Flurry, rank 5' }));
-    const tooltip = screen.getByRole('dialog');
-    expect(within(tooltip).getByText('Rank 5')).toBeInTheDocument();
-    expect(within(tooltip).getByText(/Increases your attack speed by 30%/)).toBeInTheDocument();
+  it('says the talents are loading until their Wowhead page has', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { characterClass: 'Shaman', talents: [ENHANCEMENT] })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+    expect(screen.getByRole('status')).toHaveTextContent('Loading the talents from Wowhead…');
+
+    fireEvent.load(screen.getByTitle('Talents of Daxan Test on Wowhead'));
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('says the talents are loading again when the character comes back with another build', async () => {
+    const user = userEvent.setup();
+    const ladder = (talents: WowTalentTree[]) => (
+      <ForeverLadder
+        characters={[character('Daxan', 22, { characterClass: 'Shaman', talents })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />
+    );
+    const { rerender } = render(ladder([ENHANCEMENT]));
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+    fireEvent.load(screen.getByTitle('Talents of Daxan Test on Wowhead'));
+
+    // A point less in Flurry.
+    const flurry = { ...ENHANCEMENT.talents[0], rank: 4 };
+    rerender(ladder([{ ...ENHANCEMENT, points: 24, talents: [flurry] }]));
+
+    expect(screen.getByRole('status')).toHaveTextContent('Loading the talents from Wowhead…');
+  });
+
+  it("says so when the talents aren't in Wowhead's trees for the class", async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { characterClass: 'Warrior', talents: [ENHANCEMENT] })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+
+    expect(screen.getByText("These talents can't be shown on Wowhead yet.")).toBeVisible();
   });
 
   it("shows the character's stats between the items", async () => {

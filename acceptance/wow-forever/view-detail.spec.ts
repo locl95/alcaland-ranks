@@ -2,10 +2,12 @@ import { test, expect } from '@playwright/test';
 import { seedAuth } from '../mocks/authMocks';
 import { makeSimpleView, mockOwnViews } from '../mocks/viewMocks';
 import { API, VALID_VIEW_ID } from '../constants';
-import { BRAWLERS_HOOD, ENHANCEMENT, foreverCharacter } from './mocks';
+import { ARCANE, BRAWLERS_HOOD, foreverCharacter } from './mocks';
 
 test.describe('WoW Forever ladder', () => {
   test.beforeEach(async ({ page }) => {
+    // The talents' calculator is Wowhead's own page: what matters is the build it's opened on.
+    await page.route('https://www.wowhead.com/**', (route) => route.abort());
     await seedAuth(page);
     await mockOwnViews(
       page,
@@ -22,7 +24,7 @@ test.describe('WoW Forever ladder', () => {
               characterClass: 'Mage',
               ruleset: 'PvE',
               items: [BRAWLERS_HOOD],
-              talents: [ENHANCEMENT],
+              talents: [ARCANE],
             }),
           ],
         },
@@ -67,7 +69,7 @@ test.describe('WoW Forever ladder', () => {
     await expect(rows.nth(1).getByRole('img', { name: 'Warrior' })).toBeVisible();
   });
 
-  test("clicking a row shows the character's equipment and talents, with details on hover", async ({
+  test("clicking a row shows the character's equipment, with details on hover, and talents", async ({
     page,
   }) => {
     await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
@@ -82,15 +84,15 @@ test.describe('WoW Forever ladder', () => {
     await expect(tooltip).toContainText('+8 Agility');
     await expect(tooltip).toContainText('Requires Level 20');
 
-    // Straight from one icon to the next, as a player scans the sheet.
-    const talents = page.getByRole('region', { name: 'Talents of Daxan Windfury' });
-    await expect(talents.getByRole('heading', { name: 'Enhancement' })).toBeVisible();
-    await talents.getByRole('button', { name: 'Flurry, rank 5' }).hover();
-    await expect(tooltip).toContainText('Rank 5');
-    await expect(tooltip).not.toContainText('Item Level');
-
     await page.mouse.move(0, 0);
     await expect(tooltip).toBeHidden();
+
+    // Improved Channeling, 5 points, is the second talent of Arcane, the Mage's first tree.
+    const talents = page.getByRole('region', { name: 'Talents of Daxan Windfury' });
+    await expect(talents.getByTitle('Talents of Daxan Windfury on Wowhead')).toHaveAttribute(
+      'src',
+      /^https:\/\/www\.wowhead\.com\/forever\/talent-calc\/embed\/mage\/[a-z]+05$/,
+    );
   });
 
   test('the owner removes and adds characters, who sync in place', async ({ page }) => {
