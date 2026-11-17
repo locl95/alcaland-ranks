@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { seedAuth } from '../mocks/authMocks';
 import { makeSimpleView, mockOwnViews } from '../mocks/viewMocks';
 import { API, VALID_VIEW_ID } from '../constants';
-import { BRAWLERS_HOOD, ENHANCEMENT, foreverCharacter } from './mocks';
+import { ARCANE, BRAWLERS_HOOD, foreverCharacter } from './mocks';
 
 const openDaxan = async (page: Page) => {
   // The panel slides open; measured mid-slide, its parts would be a fraction off.
@@ -26,6 +26,7 @@ const openDaxan = async (page: Page) => {
 // Layout only: what each part shows is covered in view-detail.spec.ts.
 test.describe("WoW Forever character panel's layout", () => {
   test.beforeEach(async ({ page }) => {
+    await page.route('https://www.wowhead.com/**', (route) => route.abort());
     await seedAuth(page);
     await mockOwnViews(
       page,
@@ -39,8 +40,9 @@ test.describe("WoW Forever character panel's layout", () => {
             viewName: 'Fresh Start',
             data: [
               foreverCharacter('Daxan', 'Windfury', 43, {
+                characterClass: 'Mage',
                 items: [BRAWLERS_HOOD],
-                talents: [ENHANCEMENT],
+                talents: [ARCANE],
                 pvp: { honorableKills: 68, rank: 0 },
                 professions: {
                   primaries: [

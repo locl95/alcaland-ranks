@@ -1,43 +1,32 @@
 import { ForeverCharacter } from '@/games/wow/forever/api/forever-types.ts';
-import { SPEC_IMAGES, getSpecImageKey } from '@/games/wow/spec-images.ts';
 import { formatCharacterName } from '@/games/wow/forever/model/character.ts';
-import { specIconName, spentTrees } from '@/games/wow/forever/model/talents.ts';
-import { TalentIcon } from './talent-icon.tsx';
+import { wowheadTalentCalc } from '@/games/wow/forever/model/talents.ts';
 import './talent-trees.css';
 
-/** Each specialization with points in it, and the talents trained there. */
+/** The character's talent trees, in Wowhead's calculator. */
 export function TalentTrees({ character }: Readonly<{ character: ForeverCharacter }>) {
-  const trees = character.talents ? spentTrees(character.talents) : [];
+  const name = formatCharacterName(character);
+  const spent = character.talents?.some((tree) => tree.points > 0);
+  const calc = character.talents && wowheadTalentCalc(character.characterClass, character.talents);
 
   return (
-    <section className="talent-trees" aria-label={`Talents of ${formatCharacterName(character)}`}>
+    <section className="talent-trees" aria-label={`Talents of ${name}`}>
       {!character.talents && <p className="character-panel-missing">Talents haven't synced yet.</p>}
-      {character.talents && trees.length === 0 && (
+      {character.talents && !spent && (
         <p className="character-panel-missing">No talent points spent yet.</p>
       )}
-      {trees.map((tree) => {
-        const specIcon =
-          SPEC_IMAGES[getSpecImageKey(character.characterClass, specIconName(tree.name))];
-        return (
-          <div key={tree.name} className="talent-tree">
-            <div className="talent-tree-head">
-              {specIcon && <img className="talent-tree-icon" src={specIcon} alt="" />}
-              <h4 className="talent-tree-name">{tree.name}</h4>
-              <span className="talent-tree-points num">
-                {tree.points}
-                <span className="sr-only"> points</span>
-              </span>
-            </div>
-            <ul className="talent-tree-talents">
-              {tree.talents.map((talent) => (
-                <li key={talent.spellId}>
-                  <TalentIcon talent={talent} fallbackIcon={specIcon} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      })}
+      {spent && !calc && (
+        <p className="character-panel-missing">These talents can't be shown on Wowhead yet.</p>
+      )}
+      {spent && calc && (
+        <div className="talent-trees-window">
+          <iframe
+            className="talent-trees-calc"
+            src={calc}
+            title={`Talents of ${name} on Wowhead`}
+          />
+        </div>
+      )}
     </section>
   );
 }

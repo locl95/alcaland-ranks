@@ -31,14 +31,15 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
-  gap: 1.5rem 3rem;
+  gap: 1.5rem;
 }
 
-/* Once both halves can have 30rem: the two short sections side by side on top,
-   the sheet and the talents under them, the sheet on the left. */
-@container (min-width: 63rem) {
+/* Once the sheet can have 30rem beside the 44rem Wowhead's three talent trees need:
+   the two short sections side by side on top, the sheet and the talents under them,
+   the sheet on the left. */
+@container (min-width: 75.5rem) {
   .character-panel-layout {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr) minmax(44rem, 1fr);
   }
 
   .character-panel-equipment {
