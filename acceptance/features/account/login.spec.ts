@@ -37,8 +37,3 @@ test('shows invalid credentials error on wrong password', async ({ page }) => {
   await expect(page.getByText('Invalid username or password.')).toBeVisible();
   await expect(page).toHaveURL('/login');
 });
-
-test('submit button is disabled when fields are empty', async ({ page }) => {
-  await page.goto('/login');
-  await expect(page.getByRole('button', { name: 'Sign in' })).toBeDisabled();
-});

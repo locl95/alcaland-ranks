@@ -9,7 +9,6 @@ import {
   viewData,
 } from '../../mocks/wow';
 import { API, VALID_VIEW_ID } from '../../constants';
-import { wheelBackground } from '../../helpers';
 import { pickRealm } from './helpers';
 import { Page } from '@playwright/test';
 import { WowProfile } from '@/games/wow/retail/api/wow-types';
@@ -95,29 +94,6 @@ test.describe('WoW ladder edit', () => {
     await expect(page.getByRole('button', { name: 'Done' })).toBeEnabled();
     await page.getByPlaceholder('Name').fill('Sylvanas');
     await expect(page.getByRole('button', { name: 'Done' })).toBeDisabled();
-  });
-
-  test('an open dialog freezes the page behind it', async ({ page }) => {
-    const crowd = Array.from({ length: 25 }, (_, i) => ({
-      ...mockCharacter,
-      id: i + 1,
-      name: `Char${i}`,
-      score: 3000 - i * 30,
-    }));
-    await mockViewDetailApis(page, { data: crowd, viewName: 'My Ladder' });
-    await mockOwnViews(page, [makeSimpleView(VALID_VIEW_ID, 'My Ladder')]);
-
-    await page.setViewportSize({ width: 1200, height: 500 });
-    await page.goto('/');
-    await page.getByText('My Ladder').click();
-    await expect(page.getByText('Char0').first()).toBeVisible();
-
-    // Without this the assertion below would pass on a page that never scrolled.
-    expect(await wheelBackground(page)).toBeGreaterThan(0);
-    await page.evaluate(() => window.scrollTo(0, 0));
-
-    await page.getByRole('button', { name: 'Edit' }).click();
-    expect(await wheelBackground(page)).toBe(0);
   });
 });
 

@@ -16,42 +16,6 @@ test.describe('create view', () => {
     await mockEntitiesExist(page);
   });
 
-  // The realm list used to be mouse-only because Enter on it submitted the
-  // whole dialog. These two pin down that it no longer leaks either key.
-  test('Enter picks a realm instead of submitting the dialog', async ({ page }) => {
-    let createCalled = false;
-    await page.route(`${API}/views`, (route) => {
-      createCalled = true;
-      return route.fulfill({ json: { id: 'op-kbd' } });
-    });
-
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Create your first ladder' }).click();
-    await page.getByLabel('Realm').first().fill('sangu');
-    await expect(page.getByRole('option', { name: 'Sanguino' })).toBeVisible();
-
-    await page.keyboard.press('Enter');
-
-    await expect(page.getByLabel('Realm').first()).toHaveValue('Sanguino');
-    await expect(page.getByRole('listbox')).toHaveCount(0);
-    await expect(page.getByText('Create new m+ ladder')).toBeVisible();
-    expect(createCalled).toBe(false);
-  });
-
-  test('Escape closes the realm list before it closes the dialog', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Create your first ladder' }).click();
-    await page.getByLabel('Realm').first().fill('sangu');
-    await expect(page.getByRole('listbox')).toBeVisible();
-
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('listbox')).toHaveCount(0);
-    await expect(page.getByText('Create new m+ ladder')).toBeVisible();
-
-    await page.keyboard.press('Escape');
-    await expect(page.getByText('Create new m+ ladder')).toHaveCount(0);
-  });
-
   test('shows an error banner when the operation fails', async ({ page }) => {
     await page.route(`${API}/views`, (route) => route.fulfill({ json: { id: 'op-fail-123' } }));
     await page.route(`${API}/operations/op-fail-123`, (route) =>

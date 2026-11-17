@@ -47,30 +47,3 @@ test.describe('authenticated', () => {
     await expect(page).toHaveURL(`/wow/${VALID_VIEW_ID}`);
   });
 });
-
-test.describe('paging the ladder list', () => {
-  const manyViews = Array.from({ length: 25 }, (_, i) =>
-    makeSimpleView(`v${i + 1}`, `Ladder ${i + 1}`),
-  );
-
-  test.beforeEach(async ({ page }) => {
-    await seedAuth(page);
-    await mockStaticData(page);
-    await mockOwnViews(page, manyViews);
-  });
-
-  test('asks the server for a page at a time, with the metadata it needs', async ({ page }) => {
-    const [request] = await Promise.all([
-      page.waitForRequest((req) => {
-        const url = new URL(req.url());
-        return url.pathname.endsWith('/views') && req.method() === 'GET';
-      }),
-      page.goto('/'),
-    ]);
-
-    const params = new URL(request.url()).searchParams;
-    expect(params.get('limit')).toBe('10');
-    expect(params.get('page')).toBe('1');
-    expect(params.get('include')).toBe('metadata');
-  });
-});

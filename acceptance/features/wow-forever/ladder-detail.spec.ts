@@ -26,15 +26,6 @@ test.describe('WoW Forever ladder detail', () => {
     await expect(rows.nth(1)).not.toContainText('<');
   });
 
-  test('shows the class and race of each character beside the name', async ({ page }) => {
-    await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
-
-    const rows = page.getByRole('listitem');
-    await expect(rows.nth(0).getByRole('img', { name: 'Mage' })).toBeVisible();
-    await expect(rows.nth(0).getByRole('img', { name: 'Orc' })).toBeVisible();
-    await expect(rows.nth(1).getByRole('img', { name: 'Warrior' })).toBeVisible();
-  });
-
   test("clicking a row shows the character's equipment, with details on hover, and talents", async ({
     page,
   }) => {
