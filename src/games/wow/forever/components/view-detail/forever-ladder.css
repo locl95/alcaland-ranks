@@ -5,7 +5,12 @@
 .forever-ladder {
   /* Shared by the header and the rows so the number columns line up. */
   --col-gap: 1rem;
-  /* Wide enough for a gain beside a three-digit item level. */
+  /* Each number column ends in a slot for its gain, kept whether a row has a gain
+     or not, so the numbers line up. */
+  /* "+12" is 2rem, and 0.375rem from its number. */
+  --gain-ilvl: 2.375rem;
+  --gain-level: 2.375rem;
+  /* Wide enough for a three-digit item level and its gain. */
   --col-ilvl: 5.25rem;
   --col-level: 5rem;
   --col-chevron: 1rem;
@@ -34,12 +39,15 @@
   text-align: right;
 }
 
+/* Over the number, not its gain. */
 .forever-col-ilvl {
   width: var(--col-ilvl);
+  padding-right: var(--gain-ilvl);
 }
 
 .forever-col-level {
   width: var(--col-level);
+  padding-right: var(--gain-level);
 }
 
 .forever-col-chevron {
@@ -235,13 +243,27 @@ button.forever-row:hover {
   border-radius: 3px;
 }
 
+/* The number, then its gain in a slot of its own: beside the number, the gain
+   reads as its; in a slot, the numbers line up down the ladder. */
 .forever-ilvl {
   width: var(--col-ilvl);
-  display: flex;
-  justify-content: flex-end;
-  align-items: baseline;
-  gap: 0.375rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--gain-ilvl);
+  align-items: center;
   flex-shrink: 0;
+}
+
+.forever-ilvl-value,
+.forever-level-value {
+  grid-column: 1;
+  justify-self: end;
+}
+
+.forever-ilvl .forever-level-gain,
+.forever-level .forever-level-gain {
+  grid-column: 2;
+  justify-self: start;
+  margin-left: 0.375rem;
 }
 
 /* Same size as the level, quieter colour: comparable at a glance, but the level
@@ -256,10 +278,9 @@ button.forever-row:hover {
 
 .forever-level {
   width: var(--col-level);
-  display: flex;
-  justify-content: flex-end;
-  align-items: baseline;
-  gap: 0.375rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--gain-level);
+  align-items: center;
   flex-shrink: 0;
 }
 
@@ -275,8 +296,8 @@ button.forever-row:hover {
    detail to look for, not a third number to compare. The full date is on hover. */
 .forever-last-login {
   position: absolute;
-  /* Under the level, past the chevron. */
-  right: calc(1.75rem + var(--col-chevron) + var(--col-gap));
+  /* Under the level, past its gain and the chevron. */
+  right: calc(1.75rem + var(--col-chevron) + var(--col-gap) + var(--gain-level));
   bottom: 0.8125rem;
   display: inline-flex;
   align-items: center;
@@ -305,7 +326,10 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
 @media (max-width: 640px) {
   .forever-ladder {
     --col-gap: 0.5rem;
-    --col-ilvl: 1.75rem;
+    /* No gains on a phone (below): each column as wide as its header. */
+    --gain-ilvl: 0rem;
+    --gain-level: 0rem;
+    --col-ilvl: 2.625rem;
     --col-level: 3.5rem;
   }
 
@@ -347,7 +371,7 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
   }
 
   .forever-last-login {
-    right: calc(0.75rem + var(--col-chevron) + var(--col-gap));
+    right: calc(0.75rem + var(--col-chevron) + var(--col-gap) + var(--gain-level));
     bottom: 0.625rem;
     font-size: 0.625rem;
   }
@@ -365,8 +389,7 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
     font-size: 1.0625rem;
   }
 
-  /* No room for a second gain: the level's stays, the item level's goes. */
-  .forever-ilvl-gain {
+  .forever-level-gain {
     display: none;
   }
 }

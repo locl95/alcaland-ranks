@@ -1,9 +1,14 @@
 .ladder-card {
   /* Shared by the header and the rows so the number columns line up. */
   --col-gap: 1rem;
-  /* Wide enough for a gain beside a three-digit item level. */
+  /* Each number column ends in a slot for its gain, kept whether a row has a gain
+     or not, so the numbers line up. */
+  --gain-ilvl: 2.25rem;
+  --gain-score: 2.5rem;
+  /* A three-digit item level and its gain; a score with its decimal ("3,456.2" is 6.1rem) and
+     its gain, with room on the left so the item level's gain doesn't read as the score's. */
   --col-ilvl: 5.25rem;
-  --col-score: 7.5rem;
+  --col-score: 9.5rem;
   border: 1px solid var(--rule);
   background: var(--panel);
   border-radius: var(--rad-lg);
@@ -108,12 +113,15 @@
   flex-shrink: 0;
 }
 
+/* Over the number, not its gain. */
 .ladder-col-ilvl {
   width: var(--col-ilvl);
+  padding-right: var(--gain-ilvl);
 }
 
 .ladder-col-score {
   width: var(--col-score);
+  padding-right: var(--gain-score);
 }
 
 .ladder-content {
@@ -155,8 +163,11 @@
 
   .ladder-card {
     --col-gap: 0.5rem;
-    --col-ilvl: 2.25rem;
-    --col-score: 5.75rem;
+    /* No gains on a phone (ladder-row.css): each column as wide as its header. */
+    --gain-ilvl: 0rem;
+    --gain-score: 0rem;
+    --col-ilvl: 2.625rem;
+    --col-score: 5rem;
   }
 
   .ladder-cols {

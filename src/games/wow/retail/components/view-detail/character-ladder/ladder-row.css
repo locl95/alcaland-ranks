@@ -221,13 +221,27 @@
   border-color: rgba(245, 183, 61, 0.3);
 }
 
+/* The number, then its gain in a slot of its own (character-ladder.css): beside the
+   number, the gain reads as its; in a slot, the numbers line up down the ladder. */
 .ladder-ilvl {
   width: var(--col-ilvl);
-  display: flex;
-  justify-content: flex-end;
-  align-items: baseline;
-  gap: 0.375rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--gain-ilvl);
+  align-items: center;
   flex-shrink: 0;
+}
+
+.ladder-ilvl-value,
+.ladder-score-value {
+  grid-column: 1;
+  justify-self: end;
+}
+
+.ladder-ilvl-gain,
+.ladder-score-gain {
+  grid-column: 2;
+  justify-self: start;
+  margin-left: 0.375rem;
 }
 
 .ladder-ilvl-value {
@@ -238,13 +252,11 @@
   color: var(--ink-3);
 }
 
-/* Fixed width, wide enough for a gain and a four-digit score, so the iLvl column lines up. */
 .ladder-score {
   width: var(--col-score);
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 0.375rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--gain-score);
+  align-items: center;
   margin-right: 0.75rem;
   flex-shrink: 0;
 }
@@ -354,8 +366,8 @@
     font-size: 1.0625rem;
   }
 
-  /* No room for a second gain: the score's stays, the item level's goes. */
-  .ladder-ilvl-gain {
+  .ladder-ilvl-gain,
+  .ladder-score-gain {
     display: none;
   }
 }
