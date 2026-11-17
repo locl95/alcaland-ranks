@@ -326,11 +326,17 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
 @media (max-width: 640px) {
   .forever-ladder {
     --col-gap: 0.5rem;
-    /* No gains on a phone (below): each column as wide as its header. */
+    /* No item level gain on a phone (below): the column as wide as its header. The level
+       keeps its gain, its header over both, and the gain takes only the room it needs: no
+       slot kept, the level sits at the edge until a gain pushes it in. */
     --gain-ilvl: 0rem;
-    --gain-level: 0rem;
+    --gain-level: auto;
     --col-ilvl: 2.625rem;
     --col-level: 3.5rem;
+  }
+
+  .forever-col-level {
+    padding-right: 0;
   }
 
   .forever-ladder-cols {
@@ -338,23 +344,39 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
   }
 
   .forever-row {
-    padding: 0.625rem 0.75rem 0.625rem 0.5rem;
+    --row-start: 0.5rem;
+    --position: 1.125rem;
+    --portrait: 2.5rem;
+    --class-badge: 1.25rem;
+    padding: 0.625rem 0.75rem 0.625rem var(--row-start);
   }
 
   .forever-row-position {
-    width: 1.125rem;
+    width: var(--position);
     font-size: 0.75rem;
   }
 
-  /* The smaller name, guild and tags of a phone add up to 3.375rem. */
+  /* Smaller than the name, guild and tags beside it: the room goes to the name. */
   .forever-portrait {
-    width: 3.375rem;
-    height: 3.375rem;
+    width: var(--portrait);
+    height: var(--portrait);
+  }
+
+  /* The class leaves its column for the portrait's corner, a badge on it as on a WoW
+     unit frame, and gives the name the room. The portrait sits in the middle of the row. */
+  .forever-identity {
+    position: absolute;
+    left: calc(
+      var(--row-start) + var(--position) + var(--col-gap) + var(--portrait) - var(--class-badge) +
+        0.25rem
+    );
+    top: calc(50% + var(--portrait) / 2 - var(--class-badge) + 0.25rem);
   }
 
   .forever-identity img {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: var(--class-badge);
+    height: var(--class-badge);
+    box-shadow: 0 0 0 2px var(--panel);
   }
 
   /* The race leaves the row on a phone; the class stays, and the spine says it too. */
@@ -363,7 +385,7 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
   }
 
   .forever-row-name {
-    font-size: 1rem;
+    font-size: 0.9375rem;
   }
 
   .forever-guild {
@@ -371,7 +393,8 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
   }
 
   .forever-last-login {
-    right: calc(0.75rem + var(--col-chevron) + var(--col-gap) + var(--gain-level));
+    /* Under the level and its gain, which share the column on a phone. */
+    right: calc(0.75rem + var(--col-chevron) + var(--col-gap));
     bottom: 0.625rem;
     font-size: 0.625rem;
   }
@@ -389,8 +412,14 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
     font-size: 1.0625rem;
   }
 
-  .forever-level-gain {
+  .forever-ilvl-gain {
     display: none;
+  }
+
+  .forever-level .forever-level-gain {
+    margin-left: 0.25rem;
+    padding: 0 0.25rem;
+    font-size: 0.5625rem;
   }
 }
 
