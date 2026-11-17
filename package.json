@@ -11,6 +11,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:acceptance": "playwright test",
+    "typecheck:acceptance": "tsc -p tsconfig.acceptance.json",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "lint": "eslint src --max-warnings 0"
   },

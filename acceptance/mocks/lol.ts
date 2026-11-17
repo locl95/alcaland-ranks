@@ -1,17 +1,30 @@
 import { Page } from '@playwright/test';
+import { League, LolMatch, LolPlayer } from '@/games/lol/api/lol-types';
 import { makeSimpleView, mockOwnViews } from './views';
 import { API, VALID_VIEW_ID } from '../constants';
 
-export const lolPlayer = (name: string, solo: object | undefined, flex: object | undefined) => ({
+export const lolPlayer = (
+  name: string,
+  solo: League | undefined,
+  flex: League | undefined,
+  tag = 'EUW',
+): LolPlayer => ({
   type: 'lol',
   summonerIcon: 1,
   summonerLevel: 300,
   summonerName: name,
-  summonerTag: 'EUW',
+  summonerTag: tag,
   leagues: { SOLO_Q: solo, FLEX_Q: flex },
 });
 
-export const midMatch = {
+/** A player as the app sends them to create or edit a ladder: their Riot ID. */
+export interface LolEntity {
+  type: 'lol';
+  name: string;
+  tag: string;
+}
+
+export const midMatch: LolMatch = {
   id: 'EUW1_1',
   championId: 7,
   championName: 'Leblanc',
@@ -28,7 +41,7 @@ export const midMatch = {
   matchUp: { championId: 103, championName: 'Ahri', kills: 2, deaths: 7, assists: 3 },
 };
 
-export const rankedLeague = (tier: string, rank: string, leaguePoints: number) => ({
+export const rankedLeague = (tier: string, rank: string, leaguePoints: number): League => ({
   tier,
   rank,
   leaguePoints,
@@ -38,6 +51,17 @@ export const rankedLeague = (tier: string, rank: string, leaguePoints: number) =
   matches: [midMatch],
 });
 
+/** Data Dragon, Riot's static data, answering offline: a version and no champions. */
+export async function mockDataDragon(page: Page) {
+  await page.route('https://ddragon.leagueoflegends.com/**', (route) =>
+    route.request().url().endsWith('versions.json')
+      ? route.fulfill({ json: ['15.1.1'] })
+      : route.request().url().endsWith('champion.json')
+        ? route.fulfill({ json: { data: {} } })
+        : route.abort(),
+  );
+}
+
 /** A two-player ladder, its data and its last snapshot, and Data Dragon answering offline. */
 export async function mockLolLadder(page: Page) {
     await mockOwnViews(
@@ -45,13 +69,7 @@ export async function mockLolLadder(page: Page) {
       [makeSimpleView(VALID_VIEW_ID, 'Flex Squad', 'testuser', 'LOL')],
       'lol',
     );
-    await page.route('https://ddragon.leagueoflegends.com/**', (route) =>
-      route.request().url().endsWith('versions.json')
-        ? route.fulfill({ json: ['15.1.1'] })
-        : route.request().url().endsWith('champion.json')
-          ? route.fulfill({ json: { data: {} } })
-          : route.abort(),
-    );
+    await mockDataDragon(page);
     await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
       route.fulfill({
         json: {

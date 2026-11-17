@@ -1,9 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { seedAuth } from '../../mocks/account';
-import { makeSimpleView, mockOwnViews } from '../../mocks/views';
+import { mockOwnViews } from '../../mocks/views';
 import { mockEntitiesExist, mockStaticData } from '../../mocks/wow';
-import { API, VALID_VIEW_ID } from '../../constants';
+import { API } from '../../constants';
 import { pickRealm } from './helpers';
+import { WowProfile } from '@/games/wow/retail/api/wow-types';
+import { LadderRequest, mockLadderBackend } from '../../mocks/ladders';
+import { WowEntity } from '../../mocks/wow';
 
 test.describe('create view', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,27 +14,6 @@ test.describe('create view', () => {
     await mockStaticData(page);
     await mockOwnViews(page, []);
     await mockEntitiesExist(page);
-  });
-
-  test('submits the form and shows the pending view in the list', async ({ page }) => {
-    await page.route(`${API}/views`, (route) => route.fulfill({ json: { id: 'op-123' } }));
-    // Keep the poll alive so the pending view stays visible during the assertion.
-    await page.route(`${API}/operations/op-123`, (route) =>
-      route.fulfill({ json: { id: 'op-123', status: 'PENDING' } }),
-    );
-
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Create your first ladder' }).click();
-
-    await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
-    await page.getByPlaceholder('Name').fill('Arthas');
-    await pickRealm(page, 'Tarren Mill');
-    await page.getByRole('button', { name: 'Add', exact: true }).click();
-
-    await page.getByRole('button', { name: 'Create', exact: true }).click();
-
-    await expect(page.getByRole('heading', { name: 'My New Ladder' })).toBeVisible();
-    await expect(page.getByText('Synchronizing with server...')).toBeVisible();
   });
 
   // The realm list used to be mouse-only because Enter on it submitted the
@@ -147,37 +129,42 @@ test.describe('create view', () => {
     expect(entities).toHaveLength(1);
     expect(entities[0]).toMatchObject({ name: 'Arthas', realm: 'tarren-mill' });
   });
+});
 
-  test('replaces the pending view with the synced one after backend confirms it', async ({
+test.describe('WoW Retail: creating a ladder', () => {
+  test('the owner creates a ladder from name and realm, and it syncs into their list', async ({
     page,
   }) => {
-    let created = false;
-
-    await page.route(`${API}/views?game=wow&page=*`, (route) =>
-      route.fulfill({
-        json: { records: created ? [makeSimpleView(VALID_VIEW_ID, 'My New Ladder')] : [] },
-      }),
-    );
-    await page.route(`${API}/views`, (route) => {
-      created = true;
-      route.fulfill({ json: { id: 'op-123', resourceId: VALID_VIEW_ID } });
+    await seedAuth(page);
+    await mockStaticData(page);
+    const backend = await mockLadderBackend<WowProfile, WowEntity>(page, {
+      game: 'WOW',
+      ladders: [],
     });
-    await page.route(`${API}/operations/op-123`, (route) =>
-      route.fulfill({ json: { id: 'op-123', status: 'COMPLETED', resourceId: VALID_VIEW_ID } }),
-    );
+    backend.operationStatus = 'PENDING';
 
-    await page.goto('/');
+    await page.goto('/wow');
     await page.getByRole('button', { name: 'Create your first ladder' }).click();
-
-    await page.getByPlaceholder('e.g., Main Push Team').fill('My New Ladder');
-    await page.getByPlaceholder('Name').fill('Arthas');
+    await page.getByPlaceholder('e.g., Main Push Team').fill('Push Crew');
+    await page.getByPlaceholder('Name', { exact: true }).fill('Arthas');
     await pickRealm(page, 'Tarren Mill');
     await page.getByRole('button', { name: 'Add', exact: true }).click();
-
+    await expect(page.getByTitle('Character found')).toBeVisible();
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
-    await expect(page.getByRole('heading', { name: 'My New Ladder' })).toBeVisible();
-    await expect(page.getByText('Synchronizing with server...')).not.toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Push Crew' })).toBeVisible();
+    await expect(page.getByText('Synchronizing with server...')).toBeVisible();
+    expect(backend.created()).toEqual({
+      name: 'Push Crew',
+      entities: [{ type: 'wow', name: 'Arthas', region: 'eu', realm: 'tarren-mill' }],
+      published: true,
+      featured: false,
+      game: 'WOW',
+    } satisfies LadderRequest<WowEntity>);
+
+    backend.operationStatus = 'COMPLETED';
+
+    await expect(page.getByText('Synchronizing with server...')).toBeHidden();
     await expect(page.getByTitle('Delete view')).toBeVisible();
   });
 });

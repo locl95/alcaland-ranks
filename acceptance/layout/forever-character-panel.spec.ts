@@ -12,6 +12,9 @@ const openDaxan = async (page: Page) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
   await page.getByRole('button', { name: /Daxan Windfury/ }).click();
+  // The web fonts set the titles' height: measured before they load, the parts are a few
+  // pixels off.
+  await page.evaluate(() => document.fonts.ready);
 
   const part = async (name: string) => {
     const region = page.getByRole('region', { name: `${name} of Daxan Windfury` });

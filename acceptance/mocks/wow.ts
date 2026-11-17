@@ -23,6 +23,14 @@ export const mockCharacter: WowProfile = {
   },
 };
 
+/** A character, or a guild, as the app sends them to create or edit a ladder. */
+export interface WowEntity {
+  type: 'wow';
+  name: string;
+  region: string;
+  realm: string;
+}
+
 export const mockSeason: Season = {
   isCurrentSeason: true,
   slug: 'midnight-season-1',

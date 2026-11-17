@@ -368,10 +368,22 @@ Two constraints this creates:
 **Where a test goes.** Each level has one job:
 
 - `acceptance/features/` — what a user can do, journey by journey, written as the product
-  would tell it: create a ladder, edit it, sync it, share it, log in and out. One folder per
-  game (`wow/`, `wow-forever/`, `lol/`) and `account/` for what isn't a game's; a file per
-  journey, with the same file names in every game so a missing journey shows. A redesign
-  should only cost these tests their selectors.
+  would tell it: create a ladder, open it, delete it, see its members and a member's
+  details, edit it, sync it, page through it, share it; guild ladders for the WoW games;
+  logging in. One folder per game (`wow/`, `wow-forever/`, `lol/`) and `account/` for what
+  isn't a game's, a file per journey, the same file names in every game. A redesign should
+  only cost these tests their selectors.
+  - Every game proves every ladder journey in its own folder, even though the journeys
+    are the same: the behaviour is shared, but each game wires it on its own, so one game
+    passing says nothing about the others. `features/ladder-journeys.spec.ts` lists the
+    journeys and fails when a game lacks one.
+  - Each journey reads on its own, top to bottom, with the game's real words. Repeat it per
+    game rather than share it: a layer of per-game adapters was tried and dropped, because
+    reading a failure meant reading four files.
+  - `mocks/ladders.ts` is the backend behind them: it keeps state (an operation finishing, a
+    sync bringing new members) and what the app sent. Its answers are typed with the app's
+    own types, and what the app sends with `LadderRequest<E>`, written down there as the
+    contract because the app builds it inline; assert with `satisfies LadderRequest<…>`.
 - `acceptance/layout/` — the few visual rules the app must keep, and only those that broke
   before or would really hurt. Each file opens with the rule it protects and why. Assert
   relations ("doesn't overlap", "fits", "no sideways scroll"), never exact pixels, and no
@@ -399,9 +411,10 @@ labelled `"Open Arthas on another site"`. `getByRole('button', { name: /Arthas/ 
 both — scope to `.ladder-row-toggle`. Testing Library's `getByText` is unambiguous here
 (one `<p class="ladder-character-name">`); Playwright's is not, and needs the same scoping.
 
-**`tsconfig.json` has `"include": ["src"]`** — `acceptance/` is **not type-checked** by
-`tsc -p tsconfig.json`, and Playwright transpiles without checking types. Errors there
-surface only in the editor.
+**`acceptance/` has its own `tsconfig.acceptance.json`**, run by `pnpm typecheck:acceptance`
+and in CI before the acceptance tests: `tsconfig.json` only includes `src`, and Playwright
+transpiles without checking types, so errors there would otherwise surface only in the
+editor.
 
 **Playwright hardcodes port 5173 with `reuseExistingServer` locally.** If a plain
 `pnpm dev` is already running there, the acceptance suite will silently reuse it — and

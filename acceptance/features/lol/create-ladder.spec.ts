@@ -1,28 +1,23 @@
 import { test, expect } from '@playwright/test';
+import { LolPlayer } from '@/games/lol/api/lol-types';
 import { seedAuth } from '../../mocks/account';
-import { mockOwnViews } from '../../mocks/views';
-import { API } from '../../constants';
+import { LadderRequest, mockLadderBackend } from '../../mocks/ladders';
+import { LolEntity, mockDataDragon } from '../../mocks/lol';
 
-test.describe('League of Legends', () => {
+test.describe('League of Legends: creating a ladder', () => {
   test.beforeEach(async ({ page }) => {
     await seedAuth(page);
+    await mockDataDragon(page);
   });
 
-  test('creates a ladder from Riot IDs', async ({ page }) => {
-    let createBody: unknown;
-    await mockOwnViews(page, [], 'lol');
-    await page.route(`${API}/entities/exists`, (route) =>
-      route.fulfill({
-        json: { exist: [{ name: 'Faker', tag: 'KR1' }], nonExisting: [], unchecked: [] },
-      }),
-    );
-    await page.route(`${API}/views`, (route) => {
-      createBody = route.request().postDataJSON();
-      return route.fulfill({ json: { id: 'op-lol', resourceId: 'l2' } });
+  test('the owner creates a ladder from Riot IDs, and it syncs into their list', async ({
+    page,
+  }) => {
+    const backend = await mockLadderBackend<LolPlayer, LolEntity>(page, {
+      game: 'LOL',
+      ladders: [],
     });
-    await page.route(`${API}/operations/op-lol`, (route) =>
-      route.fulfill({ json: { id: 'op-lol', status: 'PENDING' } }),
-    );
+    backend.operationStatus = 'PENDING';
 
     await page.goto('/lol');
     await page.getByRole('button', { name: 'Create your first ladder' }).click();
@@ -33,12 +28,18 @@ test.describe('League of Legends', () => {
     await page.getByRole('button', { name: 'Create', exact: true }).click();
 
     await expect(page.getByRole('heading', { name: 'Solo Grinders' })).toBeVisible();
-    expect(createBody).toEqual({
+    await expect(page.getByText('Synchronizing with server...')).toBeVisible();
+    expect(backend.created()).toEqual({
       name: 'Solo Grinders',
       entities: [{ type: 'lol', name: 'Faker', tag: 'KR1' }],
       published: true,
       featured: false,
       game: 'LOL',
-    });
+    } satisfies LadderRequest<LolEntity>);
+
+    backend.operationStatus = 'COMPLETED';
+
+    await expect(page.getByText('Synchronizing with server...')).toBeHidden();
+    await expect(page.getByTitle('Delete view')).toBeVisible();
   });
 });

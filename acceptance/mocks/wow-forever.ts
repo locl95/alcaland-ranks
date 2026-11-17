@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { ForeverCharacter } from '@/games/wow/forever/api/forever-types';
 import { makeSimpleView, mockOwnViews } from './views';
 import { API, VALID_VIEW_ID } from '../constants';
 
@@ -6,8 +7,8 @@ export const foreverCharacter = (
   name: string,
   surname: string,
   level: number,
-  overrides: object = {},
-) => ({
+  overrides: Partial<ForeverCharacter> = {},
+): ForeverCharacter => ({
   type: 'wow_forever',
   id: level,
   name,
@@ -28,6 +29,26 @@ export const foreverCharacter = (
   talents: [],
   ...overrides,
 });
+
+/** A character as the app sends them to create or edit a ladder. */
+export interface ForeverEntity {
+  type: 'wow_forever';
+  name: string;
+  surname: string;
+  region: string;
+}
+
+/** A guild as the app sends it to create a guild ladder. */
+export interface ForeverGuildEntity {
+  type: 'wow_forever';
+  name: string;
+  region: string;
+}
+
+/** The talents' calculator is Wowhead's own page: kept offline. */
+export async function mockWowhead(page: Page) {
+  await page.route('https://www.wowhead.com/**', (route) => route.abort());
+}
 
 /** An item as /views/{id}/data sends it. No icon, so the tests make no calls to Blizzard. */
 export const BRAWLERS_HOOD = {
