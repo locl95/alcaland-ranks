@@ -81,5 +81,13 @@ test.describe("WoW Forever character panel's layout", () => {
     expect(equipment.x + equipment.width).toBeLessThanOrEqual(talents.x);
     expect(talents.y).toBe(equipment.y);
     expect(professions.x).toBe(talents.x);
+
+    // Wowhead's three trees fit beside the equipment, with no scrolling sideways to reach the last.
+    const calc = page.locator('.talent-trees-window');
+    const { scrollWidth, clientWidth } = await calc.evaluate((window) => ({
+      scrollWidth: window.scrollWidth,
+      clientWidth: window.clientWidth,
+    }));
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
   });
 });

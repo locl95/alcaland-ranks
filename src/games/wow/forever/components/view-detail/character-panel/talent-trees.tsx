@@ -14,7 +14,7 @@ export function TalentTrees({ character }: Readonly<{ character: ForeverCharacte
   const [loadedCalc, setLoadedCalc] = useState<string | null>(null);
 
   return (
-    <section className="talent-trees" aria-label={`Talents of ${name}`}>
+    <section aria-label={`Talents of ${name}`}>
       {!character.talents && <p className="character-panel-missing">Talents haven't synced yet.</p>}
       {character.talents && !spent && (
         <p className="character-panel-missing">No talent points spent yet.</p>

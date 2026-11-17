@@ -234,6 +234,26 @@ describe('ForeverLadder', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
+  it('says the talents are loading again when the character comes back with another build', async () => {
+    const user = userEvent.setup();
+    const ladder = (talents: WowTalentTree[]) => (
+      <ForeverLadder
+        characters={[character('Daxan', 22, { characterClass: 'Shaman', talents })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />
+    );
+    const { rerender } = render(ladder([ENHANCEMENT]));
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+    fireEvent.load(screen.getByTitle('Talents of Daxan Test on Wowhead'));
+
+    // A point less in Flurry.
+    const flurry = { ...ENHANCEMENT.talents[0], rank: 4 };
+    rerender(ladder([{ ...ENHANCEMENT, points: 24, talents: [flurry] }]));
+
+    expect(screen.getByRole('status')).toHaveTextContent('Loading the talents from Wowhead…');
+  });
+
   it("says so when the talents aren't in Wowhead's trees for the class", async () => {
     const user = userEvent.setup();
     render(

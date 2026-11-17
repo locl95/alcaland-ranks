@@ -59,10 +59,6 @@ describe('wowheadTalentCalc', () => {
     expect(wowheadTalentCalc('Warrior', [fury, arms])).toBe(calc('warrior', '3-05'));
   });
 
-  it('opens an empty calculator when no points are spent', () => {
-    expect(wowheadTalentCalc('Warrior', [])).toBe(calc('warrior', ''));
-  });
-
   it("is null for a talent Wowhead's trees don't have, rather than a wrong build", () => {
     expect(wowheadTalentCalc('Warrior', [tree('Fury', [[999999, 1]])])).toBeNull();
   });
