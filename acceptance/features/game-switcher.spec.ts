@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { seedAuth } from './mocks/authMocks';
-import { makeSimpleView, mockOwnViews } from './mocks/viewMocks';
-import { mockStaticData } from './wow/mocks';
+import { seedAuth } from '../mocks/account';
+import { makeSimpleView, mockOwnViews } from '../mocks/views';
+import { mockStaticData } from '../mocks/wow';
 
 const wowLadders = Array.from({ length: 15 }, (_, i) =>
   makeSimpleView(`w${i + 1}`, `WoW Ladder ${i + 1}`),

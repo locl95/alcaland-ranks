@@ -1,80 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { seedAuth } from '../mocks/authMocks';
-import { makeSimpleView, mockOwnViews } from '../mocks/viewMocks';
-import { API, VALID_VIEW_ID } from '../constants';
-import { lolPlayer, rankedLeague } from './mocks';
+import { seedAuth } from '../../mocks/account';
+import { lolPlayer, mockLolLadder, rankedLeague } from '../../mocks/lol';
+import { API, VALID_VIEW_ID } from '../../constants';
 
-test.describe('League of Legends ladder', () => {
+test.describe('League of Legends ladder edit', () => {
   test.beforeEach(async ({ page }) => {
     await seedAuth(page);
-    await mockOwnViews(
-      page,
-      [makeSimpleView(VALID_VIEW_ID, 'Flex Squad', 'testuser', 'LOL')],
-      'lol',
-    );
-    await page.route('https://ddragon.leagueoflegends.com/**', (route) =>
-      route.request().url().endsWith('versions.json')
-        ? route.fulfill({ json: ['15.1.1'] })
-        : route.request().url().endsWith('champion.json')
-          ? route.fulfill({ json: { data: {} } })
-          : route.abort(),
-    );
-    await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
-      route.fulfill({
-        json: {
-          viewName: 'Flex Squad',
-          data: [
-            lolPlayer('Faker', rankedLeague('CHALLENGER', 'I', 1200), undefined),
-            lolPlayer('Caps', rankedLeague('DIAMOND', 'II', 40), rankedLeague('GOLD', 'I', 10)),
-          ],
-        },
-      }),
-    );
-    await page.route(`${API}/views/${VALID_VIEW_ID}/cached-data`, (route) =>
-      route.fulfill({ json: { viewName: 'Flex Squad', data: [] } }),
-    );
-  });
-
-  test('opens a LoL ladder from the landing, ranked by Solo/Duo', async ({ page }) => {
-    await page.goto('/lol');
-    await page.getByText('Flex Squad').click();
-
-    await expect(page).toHaveURL(`/lol/${VALID_VIEW_ID}`);
-    await expect(page.getByText('1200 LP', { exact: true })).toBeVisible();
-    await expect(page.getByText('40 LP', { exact: true })).toBeVisible();
-  });
-
-  test('switching to Flex keeps the queue in the link', async ({ page }) => {
-    await page.goto(`/lol/${VALID_VIEW_ID}`);
-    await page.getByRole('button', { name: 'Flex' }).click();
-
-    await expect(page).toHaveURL(`/lol/${VALID_VIEW_ID}?queue=flex`);
-    await expect(page.getByText('10 LP', { exact: true })).toBeVisible();
-    await expect(page.getByText('Unranked')).toBeVisible();
-  });
-
-  test('a shared Flex link opens on Flex', async ({ page }) => {
-    await page.goto(`/lol/${VALID_VIEW_ID}?queue=flex`);
-
-    await expect(page.getByRole('button', { name: 'Flex' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    await expect(page.getByText('10 LP', { exact: true })).toBeVisible();
-  });
-
-  test('expands a player into their recent games and opens a matchup', async ({ page }) => {
-    await page.goto(`/lol/${VALID_VIEW_ID}`);
-    await page.getByRole('button', { name: /Faker/ }).click();
-
-    await expect(page.getByText('Last 1 games')).toBeVisible();
-    await page.getByRole('button', { name: /9\/1\/6/ }).click();
-
-    const dialog = page.getByRole('dialog');
-    await expect(dialog.getByText('Victory')).toBeVisible();
-    await expect(dialog.getByText('2 / 7 / 3')).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(dialog).toBeHidden();
+    await mockLolLadder(page);
   });
 
   test('the owner removes and adds players, who sync in place', async ({ page }) => {
@@ -173,14 +105,5 @@ test.describe('League of Legends ladder', () => {
     await expect(page.getByText('Syncing…')).toHaveCount(0);
     await errorDialog.getByRole('button', { name: 'Got it' }).click();
     await expect(errorDialog).toBeHidden();
-  });
-
-  test('someone else opening a shared link does not get the Edit button', async ({ page }) => {
-    await page.route(`${API}/views/${VALID_VIEW_ID}`, (route) => route.fulfill({ status: 403 }));
-
-    await page.goto(`/lol/${VALID_VIEW_ID}`);
-
-    await expect(page.getByText('1200 LP', { exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Edit' })).toHaveCount(0);
   });
 });

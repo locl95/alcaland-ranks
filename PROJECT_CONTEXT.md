@@ -365,6 +365,26 @@ Two constraints this creates:
 
 ## Testing notes
 
+**Where a test goes.** Each level has one job:
+
+- `acceptance/features/` — what a user can do, journey by journey, written as the product
+  would tell it: create a ladder, edit it, sync it, share it, log in and out. One folder per
+  game (`wow/`, `wow-forever/`, `lol/`) and `account/` for what isn't a game's; a file per
+  journey, with the same file names in every game so a missing journey shows. A redesign
+  should only cost these tests their selectors.
+- `acceptance/layout/` — the few visual rules the app must keep, and only those that broke
+  before or would really hurt. Each file opens with the rule it protects and why. Assert
+  relations ("doesn't overlap", "fits", "no sideways scroll"), never exact pixels, and no
+  screenshot comparisons: CI renders fonts on Linux, not macOS. A design tweak doesn't earn
+  a layout test.
+- Vitest + Testing Library — how a component behaves: what it shows for given data, keys,
+  focus, a dialog's own rules. Most tests belong here.
+- `acceptance/mocks/` — mocks by the same split: `account.ts`, `views.ts` (every game's
+  ladder list), and one file per game.
+
+Playwright runs the two folders as the `features` and `layout` projects
+(`pnpm test:acceptance --project=layout`); CI runs both.
+
 **jsdom has no layout engine.** Every measurement reads zero: `getBoundingClientRect()`,
 `offsetHeight`, and so on. Anything that depends on real geometry — popup flipping, column
 alignment — can only be verified in a browser, so verify it with Playwright rather than

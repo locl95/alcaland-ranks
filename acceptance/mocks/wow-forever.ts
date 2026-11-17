@@ -1,3 +1,7 @@
+import { Page } from '@playwright/test';
+import { makeSimpleView, mockOwnViews } from './views';
+import { API, VALID_VIEW_ID } from '../constants';
+
 export const foreverCharacter = (
   name: string,
   surname: string,
@@ -60,3 +64,41 @@ export const ARCANE = {
     },
   ],
 };
+
+/** A two-character ladder, its data and its last snapshot, and Wowhead kept offline. */
+export async function mockForeverLadder(page: Page) {
+    // The talents' calculator is Wowhead's own page: what matters is the build it's opened on.
+    await page.route('https://www.wowhead.com/**', (route) => route.abort());
+    await mockOwnViews(
+      page,
+      [makeSimpleView(VALID_VIEW_ID, 'Fresh Start', 'testuser', 'WOW_FOREVER')],
+      'wow_forever',
+    );
+    await page.route(`${API}/views/${VALID_VIEW_ID}/data`, (route) =>
+      route.fulfill({
+        json: {
+          viewName: 'Fresh Start',
+          data: [
+            foreverCharacter('Siempre', 'Tarde', 14, { guild: null }),
+            foreverCharacter('Daxan', 'Windfury', 22, {
+              characterClass: 'Mage',
+              ruleset: 'PvE',
+              items: [BRAWLERS_HOOD],
+              talents: [ARCANE],
+            }),
+          ],
+        },
+      }),
+    );
+    await page.route(`${API}/views/${VALID_VIEW_ID}/cached-data`, (route) =>
+      route.fulfill({
+        json: {
+          viewName: 'Fresh Start',
+          data: [
+            foreverCharacter('Siempre', 'Tarde', 12),
+            foreverCharacter('Daxan', 'Windfury', 10),
+          ],
+        },
+      }),
+    );
+}

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { seedAuth } from '../mocks/authMocks';
-import { mockOwnViews } from '../mocks/viewMocks';
-import { API } from '../constants';
+import { seedAuth } from '../../mocks/account';
+import { mockOwnViews } from '../../mocks/views';
+import { API } from '../../constants';
 
 test.describe('League of Legends', () => {
   test.beforeEach(async ({ page }) => {
