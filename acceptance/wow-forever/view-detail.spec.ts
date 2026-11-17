@@ -69,6 +69,20 @@ test.describe('WoW Forever ladder', () => {
     await expect(rows.nth(1).getByRole('img', { name: 'Warrior' })).toBeVisible();
   });
 
+  test('on a phone, still shows the levels gained, inside the level column', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
+
+    const daxan = page.getByRole('listitem').nth(0);
+    const gain = daxan.getByTitle('Levels gained since the last snapshot');
+    await expect(gain).toHaveText('+12');
+    await expect(gain).toBeVisible();
+
+    const column = (await page.getByRole('button', { name: /^Level/ }).boundingBox())!;
+    const { x, width } = (await gain.boundingBox())!;
+    expect(x + width).toBeLessThanOrEqual(column.x + column.width);
+  });
+
   test("clicking a row shows the character's equipment, with details on hover, and talents", async ({
     page,
   }) => {
