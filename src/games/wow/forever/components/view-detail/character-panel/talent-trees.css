@@ -1,8 +1,17 @@
 /* Wowhead's calculator lays its three trees side by side: narrower than that, it scrolls.
    Below the trees it leaves empty space, which the window cuts off. */
 .talent-trees-window {
+  position: relative;
   height: 420px;
   overflow: auto hidden;
+}
+
+/* Over the calculator while its page loads, which is blank until it has. */
+.talent-trees-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
 }
 
 /* Its full height, or it scrolls inside, and the scrollbar pushes the last tree out. */

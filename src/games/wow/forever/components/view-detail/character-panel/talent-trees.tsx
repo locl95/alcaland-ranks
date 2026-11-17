@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { ForeverCharacter } from '@/games/wow/forever/api/forever-types.ts';
 import { formatCharacterName } from '@/games/wow/forever/model/character.ts';
 import { wowheadTalentCalc } from '@/games/wow/forever/model/talents.ts';
+// The app's loading ring, here over the calculator alone.
+import '@/shared/components/spinner.css';
 import './talent-trees.css';
 
 /** The character's talent trees, in Wowhead's calculator. */
@@ -8,6 +11,8 @@ export function TalentTrees({ character }: Readonly<{ character: ForeverCharacte
   const name = formatCharacterName(character);
   const spent = character.talents?.some((tree) => tree.points > 0);
   const calc = character.talents && wowheadTalentCalc(character.characterClass, character.talents);
+  // The build last loaded: a new one loads its page again.
+  const [loadedCalc, setLoadedCalc] = useState<string | null>(null);
 
   return (
     <section className="talent-trees" aria-label={`Talents of ${name}`}>
@@ -20,10 +25,17 @@ export function TalentTrees({ character }: Readonly<{ character: ForeverCharacte
       )}
       {spent && calc && (
         <div className="talent-trees-window">
+          {loadedCalc !== calc && (
+            <div className="talent-trees-loading" role="status">
+              <div className="spinner" />
+              <span className="sr-only">Loading the talents from Wowhead…</span>
+            </div>
+          )}
           <iframe
             className="talent-trees-calc"
             src={calc}
             title={`Talents of ${name} on Wowhead`}
+            onLoad={() => setLoadedCalc(calc)}
           />
         </div>
       )}

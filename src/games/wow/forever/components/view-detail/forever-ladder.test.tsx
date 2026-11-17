@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -215,6 +215,23 @@ describe('ForeverLadder', () => {
       'src',
       expect.stringMatching(/\/forever\/talent-calc\/embed\/shaman\/[a-z]+-00000000005$/),
     );
+  });
+
+  it('says the talents are loading until their Wowhead page has', async () => {
+    const user = userEvent.setup();
+    render(
+      <ForeverLadder
+        characters={[character('Daxan', 22, { characterClass: 'Shaman', talents: [ENHANCEMENT] })]}
+        cachedCharacters={[]}
+        pending={[]}
+      />,
+    );
+    await user.click(within(rowOf('Daxan')).getByRole('button', { name: /Daxan Test/ }));
+    expect(screen.getByRole('status')).toHaveTextContent('Loading the talents from Wowhead…');
+
+    fireEvent.load(screen.getByTitle('Talents of Daxan Test on Wowhead'));
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it("says so when the talents aren't in Wowhead's trees for the class", async () => {
