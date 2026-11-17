@@ -31,3 +31,8 @@ yarn-error.log*
 .idea
 .idea/
 .claude
+
+# typescript: tsc -b's cache, and what it emits from vite.config.ts
+*.tsbuildinfo
+/vite.config.js
+/vite.config.d.ts
