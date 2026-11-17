@@ -170,7 +170,7 @@ describe('LadderRow', () => {
         season={null}
       />,
     );
-    expect(screen.getByText('+2')).toBeInTheDocument();
+    expect(screen.getByTitle('Score gained since the last snapshot')).toHaveTextContent('+2');
   });
 
   it('shows no score gain when it rounds to zero', () => {

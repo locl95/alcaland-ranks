@@ -88,6 +88,10 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
         {/* A column of its own, beside the level, so item levels line up and can be
           compared down the ladder. */}
         <div className="forever-ilvl">
+          <span className="forever-ilvl-value num" title="Equipped item level">
+            <span className="sr-only">Item level </span>
+            {character.equippedItemLevel}
+          </span>
           {ilvlGain > 0 && (
             <span
               className="forever-level-gain forever-ilvl-gain num"
@@ -96,22 +100,18 @@ export function ForeverLadderRow({ position, entry }: Readonly<ForeverLadderRowP
               +{ilvlGain}
             </span>
           )}
-          <span className="forever-ilvl-value num" title="Equipped item level">
-            <span className="sr-only">Item level </span>
-            {character.equippedItemLevel}
-          </span>
         </div>
 
         <div className="forever-level">
+          <span className="forever-level-value num">
+            <span className="sr-only">Level </span>
+            {character.level}
+          </span>
           {levelGain > 0 && (
             <span className="forever-level-gain num" title="Levels gained since the last snapshot">
               +{levelGain}
             </span>
           )}
-          <span className="forever-level-value num">
-            <span className="sr-only">Level </span>
-            {character.level}
-          </span>
         </div>
 
         <time

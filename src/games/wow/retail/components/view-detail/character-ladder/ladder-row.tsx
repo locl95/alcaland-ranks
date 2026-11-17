@@ -107,18 +107,18 @@ export const LadderRow = memo(function LadderRow({
 
           {/* A column of its own, so item levels line up and can be compared down the ladder. */}
           <div className="ladder-ilvl">
+            {!isSyncing && (
+              <span className="ladder-ilvl-value num" title="Equipped item level">
+                <span className="sr-only">Item level </span>
+                {Math.floor(character.equippedItemLevel)}
+              </span>
+            )}
             {ilvlGain > 0 && (
               <span
                 className="score-improvement ladder-ilvl-gain num"
                 title="Item levels gained since the last snapshot"
               >
                 +{ilvlGain}
-              </span>
-            )}
-            {!isSyncing && (
-              <span className="ladder-ilvl-value num" title="Equipped item level">
-                <span className="sr-only">Item level </span>
-                {Math.floor(character.equippedItemLevel)}
               </span>
             )}
           </div>
@@ -129,10 +129,17 @@ export const LadderRow = memo(function LadderRow({
             </div>
           ) : (
             <div className="ladder-score">
-              {scoreGain > 0 && <span className="score-improvement num">+{scoreGain}</span>}
               <p className={`ladder-score-value num ${getScoreClass(character.score!)}`}>
                 {character.score!.toLocaleString()}
               </p>
+              {scoreGain > 0 && (
+                <span
+                  className="score-improvement ladder-score-gain num"
+                  title="Score gained since the last snapshot"
+                >
+                  +{scoreGain}
+                </span>
+              )}
             </div>
           )}
         </button>
