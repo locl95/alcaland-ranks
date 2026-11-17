@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { ForeverCharacter } from '@/games/wow/forever/api/forever-types.ts';
 import { formatCharacterName } from '@/games/wow/forever/model/character.ts';
 import { wowheadTalentCalc } from '@/games/wow/forever/model/talents.ts';
-// The app's loading ring, here over the calculator alone.
-import '@/shared/components/spinner.css';
+import '@/shared/components/loading-ring.css';
 import './talent-trees.css';
 
 /** The character's talent trees, in Wowhead's calculator. */
@@ -27,7 +26,7 @@ export function TalentTrees({ character }: Readonly<{ character: ForeverCharacte
         <div className="talent-trees-window">
           {loadedCalc !== calc && (
             <div className="talent-trees-loading" role="status">
-              <div className="spinner" />
+              <div className="loading-ring" />
               <span className="sr-only">Loading the talents from Wowhead…</span>
             </div>
           )}

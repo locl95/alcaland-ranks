@@ -238,7 +238,7 @@ describe('ForeverLadder', () => {
     const user = userEvent.setup();
     render(
       <ForeverLadder
-        characters={[character('Daxan', 22, { talents: [ENHANCEMENT] })]}
+        characters={[character('Daxan', 22, { characterClass: 'Warrior', talents: [ENHANCEMENT] })]}
         cachedCharacters={[]}
         pending={[]}
       />,

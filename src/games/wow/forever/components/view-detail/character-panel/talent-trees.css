@@ -14,7 +14,8 @@
   place-items: center;
 }
 
-/* Its full height, or it scrolls inside, and the scrollbar pushes the last tree out. */
+/* Its full height, or it scrolls inside, and the scrollbar pushes the last tree out.
+   44rem fits the three trees; character-panel.css gives the talents column as much. */
 .talent-trees-calc {
   display: block;
   width: 100%;

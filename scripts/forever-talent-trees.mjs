@@ -5,7 +5,8 @@ import { writeFileSync } from 'node:fs';
 const SOURCE = 'https://nether.wowhead.com/forever/data/talents-classic';
 const OUTPUT = new URL('../src/games/wow/forever/model/talent-trees.json', import.meta.url);
 
-// Wowhead's tree ids, in the order its calculator shows each class's trees.
+// Wowhead's tree ids, in the order its calculator shows each class's trees. They're not in the
+// data file: they come from Wowhead's global-core.js (its ID_CLASSIC_<CLASS>_<TREE> constants).
 const CLASS_TREES = {
   Druid: [283, 281, 282],
   Hunter: [361, 363, 362],
@@ -43,11 +44,14 @@ const data = firstObject(await response.text());
 const classes = Object.fromEntries(
   Object.entries(CLASS_TREES).map(([characterClass, treeIds]) => [
     characterClass,
-    treeIds.map((treeId) =>
-      Object.values(data.talents[treeId])
+    treeIds.map((treeId) => {
+      if (!data.talents[treeId]) {
+        throw new Error(`${SOURCE} has no tree ${treeId} for the ${characterClass}`);
+      }
+      return Object.values(data.talents[treeId])
         .sort((a, b) => a.row - b.row || a.col - b.col)
-        .map((talent) => talent.ranks[0]),
-    ),
+        .map((talent) => talent.ranks[0]);
+    }),
   ]),
 );
 

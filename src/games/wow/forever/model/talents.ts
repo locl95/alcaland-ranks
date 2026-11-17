@@ -17,7 +17,9 @@ export const wowheadTalentCalc = (
   const classTrees = CLASSES[characterClass];
   if (!classTrees) return null;
 
-  const ranks = new Map(trees.flatMap((tree) => tree.talents).map((t) => [t.spellId, t.rank]));
+  const ranks = new Map(
+    trees.flatMap((tree) => tree.talents).map((talent) => [talent.spellId, talent.rank]),
+  );
   const known = new Set(classTrees.flat());
   if ([...ranks.keys()].some((spellId) => !known.has(spellId))) return null;
 

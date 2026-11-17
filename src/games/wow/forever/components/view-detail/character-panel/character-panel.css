@@ -34,8 +34,9 @@
   gap: 1.5rem;
 }
 
-/* Once the sheet can have 30rem beside the 44rem Wowhead's three talent trees need:
-   the two short sections side by side on top, the sheet and the talents under them,
+/* Once the sheet can have 30rem beside the 44rem Wowhead's three talent trees need
+   (talent-trees.css), with the 1.5rem gap between: 30 + 1.5 + 44 = 75.5rem. Then the
+   two short sections side by side on top, the sheet and the talents under them,
    the sheet on the left. */
 @container (min-width: 75.5rem) {
   .character-panel-layout {

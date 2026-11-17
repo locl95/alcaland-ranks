@@ -15,8 +15,8 @@ const tree = (name: string, talents: [spellId: number, rank: number][]): WowTale
   })),
 });
 
-const calc = (classAndBuild: string) =>
-  `https://www.wowhead.com/forever/talent-calc/embed/${classAndBuild.replace('/', `/${talentTrees.hashVersion}`)}`;
+const calc = (wowheadClass: string, build: string) =>
+  `https://www.wowhead.com/forever/talent-calc/embed/${wowheadClass}/${talentTrees.hashVersion}${build}`;
 
 // A real character's Fury build, as Blizzard sent it and as Wowhead shows it.
 const FURY = tree('Fury', [
@@ -36,17 +36,31 @@ const FURY = tree('Fury', [
 
 describe('wowheadTalentCalc', () => {
   it('writes each tree in the class order, an empty tree before it as a bare dash', () => {
-    expect(wowheadTalentCalc('Warrior', [FURY])).toBe(calc('warrior/-050530045122100231'));
+    expect(wowheadTalentCalc('Warrior', [FURY])).toBe(calc('warrior', '-050530045122100231'));
   });
 
   it('drops the trees after the last one with points', () => {
     const arms = tree('Arms', [[12282, 3]]); // Improved Heroic Strike, the first talent
 
-    expect(wowheadTalentCalc('Warrior', [arms])).toBe(calc('warrior/3'));
+    expect(wowheadTalentCalc('Warrior', [arms])).toBe(calc('warrior', '3'));
+  });
+
+  it('keeps an empty tree between two with points', () => {
+    const arms = tree('Arms', [[12282, 3]]); // Improved Heroic Strike, Arms' first talent
+    const protection = tree('Protection', [[12298, 2]]); // Shield Specialization, its second
+
+    expect(wowheadTalentCalc('Warrior', [arms, protection])).toBe(calc('warrior', '3--02'));
+  });
+
+  it("writes each tree's talents where they sit, whatever order Blizzard sends the trees in", () => {
+    const fury = tree('Fury', [[12320, 5]]); // Cruelty, Fury's second talent
+    const arms = tree('Arms', [[12282, 3]]);
+
+    expect(wowheadTalentCalc('Warrior', [fury, arms])).toBe(calc('warrior', '3-05'));
   });
 
   it('opens an empty calculator when no points are spent', () => {
-    expect(wowheadTalentCalc('Warrior', [])).toBe(calc('warrior/'));
+    expect(wowheadTalentCalc('Warrior', [])).toBe(calc('warrior', ''));
   });
 
   it("is null for a talent Wowhead's trees don't have, rather than a wrong build", () => {
