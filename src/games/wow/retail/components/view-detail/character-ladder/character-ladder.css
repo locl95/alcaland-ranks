@@ -163,15 +163,25 @@
 
   .ladder-card {
     --col-gap: 0.5rem;
-    /* No gains on a phone (ladder-row.css): each column as wide as its header. */
-    --gain-ilvl: 0rem;
-    --gain-score: 0rem;
-    --col-ilvl: 2.625rem;
-    --col-score: 5rem;
+    /* Smaller numbers and gains than on desktop (ladder-row.css). As on the Forever ladder,
+       the header spans the number and its gain, and the gain takes only the room it needs:
+       no slot kept, the number sits at the edge until a gain pushes it in. Each column as
+       wide as a three-digit item level and "+12", a score like "3,456.2" and "+145". */
+    --gain-ilvl: auto;
+    --gain-score: auto;
+    --col-ilvl: 3.25rem;
+    --col-score: 6.125rem;
   }
 
+  .ladder-col-ilvl,
+  .ladder-col-score {
+    padding-right: 0;
+  }
+
+  /* The right padding lines the columns up with the row's: its padding, the character
+     menu and the gap before it. */
   .ladder-cols {
-    padding: 0.4375rem 2.5rem 0.4375rem 0.875rem;
+    padding: 0.4375rem 2.625rem 0.4375rem 0.875rem;
   }
 
   .ladder-card .pager {

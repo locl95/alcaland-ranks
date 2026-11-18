@@ -132,8 +132,9 @@ describe('LadderRow', () => {
     expect(screen.getByText('<De Tardes>')).toBeInTheDocument();
   });
 
-  it('shows no guild when the character has none', () => {
+  it('says "No guild" when the character has none', () => {
     render(<LadderRow index={0} character={makeProfile()} cachedCharacters={[]} season={null} />);
+    expect(screen.getByText('No guild')).toBeInTheDocument();
     expect(screen.queryByText(/^<.*>$/)).not.toBeInTheDocument();
   });
 

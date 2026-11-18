@@ -92,11 +92,16 @@ export const LadderRow = memo(function LadderRow({
                 </span>
               )}
             </div>
+            {/* Name, then guild, then realm: as the Forever ladder reads. Always a guild
+                line, so every row has the same height. */}
+            {!isSyncing &&
+              (character.guild ? (
+                <p className="ladder-character-guild">&lt;{character.guild}&gt;</p>
+              ) : (
+                <p className="ladder-character-guild ladder-character-guild--none">No guild</p>
+              ))}
             {!isSyncing && (
               <div className="ladder-character-meta">
-                {character.guild && (
-                  <span className="ladder-character-guild">&lt;{character.guild}&gt;</span>
-                )}
                 <span className="ladder-character-realm">{character.realm}</span>
                 <span className={`ladder-region-badge ${character.region}`}>
                   {character.region === 'us' ? 'NA' : character.region.toUpperCase()}
