@@ -1,14 +1,20 @@
+// Layout rule: the character panel reads in order on a phone and uses the width on a wide
+// screen, with Wowhead's three talent trees fitting beside the equipment. Getting the trees
+// to fit without a sideways scroll took several rounds; this keeps it that way.
 import { test, expect, Page } from '@playwright/test';
-import { seedAuth } from '../mocks/authMocks';
-import { makeSimpleView, mockOwnViews } from '../mocks/viewMocks';
+import { seedAuth } from '../mocks/account';
+import { makeSimpleView, mockOwnViews } from '../mocks/views';
 import { API, VALID_VIEW_ID } from '../constants';
-import { ARCANE, BRAWLERS_HOOD, foreverCharacter } from './mocks';
+import { ARCANE, BRAWLERS_HOOD, foreverCharacter } from '../mocks/wow-forever';
 
 const openDaxan = async (page: Page) => {
   // The panel slides open; measured mid-slide, its parts would be a fraction off.
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`/wow-forever/${VALID_VIEW_ID}`);
   await page.getByRole('button', { name: /Daxan Windfury/ }).click();
+  // The web fonts set the titles' height: measured before they load, the parts are a few
+  // pixels off.
+  await page.evaluate(() => document.fonts.ready);
 
   const part = async (name: string) => {
     const region = page.getByRole('region', { name: `${name} of Daxan Windfury` });
@@ -23,7 +29,7 @@ const openDaxan = async (page: Page) => {
   };
 };
 
-// Layout only: what each part shows is covered in view-detail.spec.ts.
+// What each part shows is covered in features/wow-forever/ladder-detail.spec.ts.
 test.describe("WoW Forever character panel's layout", () => {
   test.beforeEach(async ({ page }) => {
     await page.route('https://www.wowhead.com/**', (route) => route.abort());

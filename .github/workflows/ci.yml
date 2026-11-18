@@ -39,6 +39,8 @@ jobs:
 
       - run: pnpm install
 
+      - run: pnpm typecheck:acceptance
+
       - run: pnpm exec playwright install chromium --with-deps
 
       - run: pnpm test:acceptance

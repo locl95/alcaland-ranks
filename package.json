@@ -11,6 +11,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:acceptance": "playwright test",
+    "typecheck:acceptance": "tsc -p tsconfig.acceptance.json",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "lint": "eslint src --max-warnings 0"
   },
@@ -39,6 +40,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "jsdom": "^29.0.1",
     "prettier": "^3.8.3",
+    "typescript": "6.0.3",
     "typescript-eslint": "^8.59.4",
     "vite": "6.3.5",
     "vitest": "^2.1.9"
