@@ -5,10 +5,10 @@ import { ladder, mockLadderBackend } from '../../mocks/ladders';
 import { mockCharacter, mockStaticData, WowEntity } from '../../mocks/wow';
 import { VALID_VIEW_ID } from '../../constants';
 
-// The dungeon grid lists the characters too: their row in the ladder is named after them
-// and their realm.
+// The dungeon grid lists the characters too: their row in the ladder is named after them,
+// their guild (or "No guild") and their realm.
 const ladderRow = (page: Page, name: string) =>
-  page.getByRole('button', { name: new RegExp(` ${name} Tarren Mill`) });
+  page.getByRole('button', { name: new RegExp(` ${name} .*Tarren Mill`) });
 
 test.describe('WoW Retail: paging', () => {
   test.beforeEach(async ({ page }) => {
