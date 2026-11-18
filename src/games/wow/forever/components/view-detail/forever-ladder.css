@@ -326,15 +326,15 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
 @media (max-width: 640px) {
   .forever-ladder {
     --col-gap: 0.5rem;
-    /* No item level gain on a phone (below): the column as wide as its header. The level
-       keeps its gain, its header over both, and the gain takes only the room it needs: no
-       slot kept, the level sits at the edge until a gain pushes it in. */
-    --gain-ilvl: 0rem;
+    /* Each header over its number and gain, and the gain takes only the room it needs:
+       no slot kept, the number sits at the edge until a gain pushes it in. */
+    --gain-ilvl: auto;
     --gain-level: auto;
-    --col-ilvl: 2.625rem;
+    --col-ilvl: 3rem;
     --col-level: 3.5rem;
   }
 
+  .forever-col-ilvl,
   .forever-col-level {
     padding-right: 0;
   }
@@ -412,10 +412,7 @@ button.forever-row[aria-expanded='true'] .forever-row-chevron {
     font-size: 1.0625rem;
   }
 
-  .forever-ilvl-gain {
-    display: none;
-  }
-
+  .forever-ilvl .forever-level-gain,
   .forever-level .forever-level-gain {
     margin-left: 0.25rem;
     padding: 0 0.25rem;
